@@ -16,7 +16,22 @@
 # limitations under the License.
 
 """
-Minimal test suite for log listener functionality - 5 essential tests
+Comprehensive test suite for Gunicorn log listener functionality.
+
+This module contains pytest-based tests for the Gunicorn log listener components,
+including ConfigStreamHandler, LogListenerThread, recovery file operations, and
+signal handler integration.
+
+The tests are organized into classes following pytest best practices:
+- TestConfigStreamHandler: Tests for log record processing
+- TestLogListenerThread: Tests for thread lifecycle and management
+- TestRecoveryFileOperations: Tests for process recovery file handling
+- TestSignalHandlerIntegration: Tests for signal handler functionality
+
+Usage:
+    Run all tests: pytest gunicorn_loglistener_minimal_test.py
+    Run specific class: pytest gunicorn_loglistener_minimal_test.py::TestConfigStreamHandler
+    Run specific test: pytest gunicorn_loglistener_minimal_test.py::TestConfigStreamHandler::test_log_record_handling
 """
 
 import logging
@@ -24,31 +39,124 @@ import os
 import pickle
 import struct
 import tempfile
-import unittest
 from unittest.mock import Mock, patch
+
+import pytest
 
 from desktop.lib.gunicorn_cleanup_utils import cleanup_from_recovery_file, create_signal_handler, write_process_recovery_file
 from desktop.lib.gunicorn_log_utils import ConfigStreamHandler, LogListenerThread, start_log_listener, stop_log_listener
 
 
-class TestMinimalLogListener(unittest.TestCase):
-  """Minimal test suite covering essential loglistener functionality"""
+@pytest.fixture
+def temp_setup():
+  """Fixture to set up temporary directory and socket path for tests"""
+  temp_dir = tempfile.mkdtemp()
+  socket_path = os.path.join(temp_dir, 'test.sock')
 
-  def setUp(self):
-    self.temp_dir = tempfile.mkdtemp()
-    self.socket_path = os.path.join(self.temp_dir, 'test.sock')
+  yield temp_dir, socket_path
 
-  def tearDown(self):
+  # Cleanup
+  try:
+    stop_log_listener()
+  except Exception:
+    pass
+
+  import shutil
+  shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+class GunicornLogListenerTestBase:
+  """Base class for gunicorn log listener tests with common utilities"""
+
+  @classmethod
+  def setup_class(cls):
+    """Setup class-level test resources"""
+    cls.test_data_dir = tempfile.mkdtemp(prefix='gunicorn_test_')
+
+  @classmethod
+  def teardown_class(cls):
+    """Cleanup class-level test resources"""
     try:
       stop_log_listener()
     except Exception:
       pass
 
     import shutil
-    shutil.rmtree(self.temp_dir, ignore_errors=True)
+    if hasattr(cls, 'test_data_dir') and os.path.exists(cls.test_data_dir):
+      shutil.rmtree(cls.test_data_dir, ignore_errors=True)
 
-  def test_1_log_record_handling(self):
-    """Test 1: Core log record processing functionality"""
+  def create_mock_log_record(self, name='test.logger', level=logging.INFO, msg='Test message'):
+    """Create a mock log record for testing"""
+    return logging.LogRecord(
+      name=name,
+      level=level,
+      pathname='/test/path.py',
+      lineno=42,
+      msg=msg,
+      args=(),
+      exc_info=None
+    )
+
+
+class TestConfigStreamHandler(GunicornLogListenerTestBase):
+  """Test cases for ConfigStreamHandler functionality"""
+
+  @pytest.mark.parametrize("log_level,expected_level", [
+    (logging.DEBUG, logging.DEBUG),
+    (logging.INFO, logging.INFO),
+    (logging.WARNING, logging.WARNING),
+    (logging.ERROR, logging.ERROR),
+    (logging.CRITICAL, logging.CRITICAL),
+  ])
+  def test_log_record_handling_different_levels(self, log_level, expected_level):
+    """Test log record processing with different log levels"""
+    mock_connection = Mock()
+    mock_server = Mock()
+    mock_server.ready = True
+    mock_server.logname = None
+
+    handler = ConfigStreamHandler(
+      mock_connection,
+      ('127.0.0.1', 12345),
+      mock_server
+    )
+
+    # Create a test log record with specified level
+    record = self.create_mock_log_record(level=log_level)
+
+    # Serialize the record
+    pickled_record = pickle.dumps(record.__dict__)
+    record_length = struct.pack('>L', len(pickled_record))
+
+    def mock_recv_side_effect(size):
+      if not hasattr(mock_recv_side_effect, 'call_count'):
+        mock_recv_side_effect.call_count = 0
+      mock_recv_side_effect.call_count += 1
+
+      if mock_recv_side_effect.call_count == 1:
+        return record_length
+      elif mock_recv_side_effect.call_count == 2:
+        return pickled_record
+      else:
+        mock_server.ready = False
+        return b''
+
+    mock_connection.recv.side_effect = mock_recv_side_effect
+
+    with patch('logging.getLogger') as mock_get_logger:
+      mock_logger = Mock()
+      mock_get_logger.return_value = mock_logger
+
+      handler.handle()
+
+      mock_get_logger.assert_called_with('test.logger')
+      mock_logger.handle.assert_called_once()
+      # Verify the log record has the expected level
+      call_args = mock_logger.handle.call_args[0][0]
+      assert call_args.levelno == expected_level
+
+  def test_log_record_handling(self):
+    """Test core log record processing functionality"""
     # Test ConfigStreamHandler can process log records
     mock_connection = Mock()
     mock_server = Mock()
@@ -62,15 +170,7 @@ class TestMinimalLogListener(unittest.TestCase):
     )
 
     # Create a test log record
-    record = logging.LogRecord(
-      name='test.logger',
-      level=logging.INFO,
-      pathname='/test/path.py',
-      lineno=42,
-      msg='Test message',
-      args=(),
-      exc_info=None
-    )
+    record = self.create_mock_log_record()
 
     # Serialize the record
     pickled_record = pickle.dumps(record.__dict__)
@@ -105,77 +205,110 @@ class TestMinimalLogListener(unittest.TestCase):
       mock_get_logger.assert_called_with('test.logger')
       mock_logger.handle.assert_called_once()
 
-  def test_2_thread_lifecycle(self):
-    """Test 2: Log listener thread start/stop lifecycle"""
-    thread = LogListenerThread(self.socket_path)
+
+class TestLogListenerThread(GunicornLogListenerTestBase):
+  """Test cases for LogListenerThread functionality"""
+
+  @pytest.mark.parametrize("invalid_socket_path", [
+    "/invalid/path/that/does/not/exist.sock",
+    "",
+    None,
+  ])
+  def test_thread_initialization_with_invalid_paths(self, invalid_socket_path):
+    """Test thread initialization with invalid socket paths"""
+    # All these should work during initialization, but may fail during start
+    thread = LogListenerThread(invalid_socket_path)
+    assert thread.server_address == invalid_socket_path
+    assert thread.daemon
+    assert not thread.ready.is_set()
+    assert thread.stopped()
+
+  def test_thread_lifecycle(self, temp_setup):
+    """Test log listener thread start/stop lifecycle"""
+    temp_dir, socket_path = temp_setup
+    thread = LogListenerThread(socket_path)
 
     # Test initialization
-    self.assertEqual(thread.server_address, self.socket_path)
-    self.assertFalse(thread.ready.is_set())
-    self.assertTrue(thread.daemon)
+    assert thread.server_address == socket_path
+    assert not thread.ready.is_set()
+    assert thread.daemon
 
     # Test stopped status
-    self.assertTrue(thread.stopped())
+    assert thread.stopped()
 
-  @patch('desktop.lib.gunicorn_log_utils.LogListenerThread')
-  @patch('desktop.lib.gunicorn_log_utils.enable_log_listener_logging')
-  def test_3_start_stop_log_listener(self, mock_enable_logging, mock_thread_class):
-    """Test 3: Start and stop log listener functionality"""
-    # Mock the thread
-    mock_thread = Mock()
-    mock_thread.ready.wait.return_value = True
-    mock_thread_class.return_value = mock_thread
+  def test_start_stop_log_listener(self, temp_setup):
+    """Test start and stop log listener functionality"""
+    temp_dir, socket_path = temp_setup
 
-    # Start log listener
-    thread = start_log_listener(self.socket_path)
+    with patch('desktop.lib.gunicorn_log_utils.LogListenerThread') as mock_thread_class:
+      with patch('desktop.lib.gunicorn_log_utils.enable_log_listener_logging') as mock_enable_logging:
+        # Mock the thread
+        mock_thread = Mock()
+        mock_thread.ready.wait.return_value = True
+        mock_thread_class.return_value = mock_thread
 
-    # Verify listener was created and started
-    mock_thread_class.assert_called_once_with(server_address=self.socket_path, verify=None)
-    self.assertEqual(thread, mock_thread)
-    mock_thread.start.assert_called_once()
-    mock_thread.ready.wait.assert_called_once()
-    mock_enable_logging.assert_called_once_with(self.socket_path)
+        # Start log listener
+        thread = start_log_listener(socket_path)
 
-    # Test stop functionality
-    stop_log_listener()  # Should complete without errors
+        # Verify listener was created and started
+        mock_thread_class.assert_called_once_with(server_address=socket_path, verify=None)
+        assert thread == mock_thread
+        mock_thread.start.assert_called_once()
+        mock_thread.ready.wait.assert_called_once()
+        mock_enable_logging.assert_called_once_with(socket_path)
 
-  @patch('psutil.Process')
-  def test_4_recovery_file_operations(self, mock_process_class):
-    """Test 4: Process recovery file creation and cleanup"""
-    # Mock process
-    mock_process = Mock()
-    mock_process.pid = 12345
-    mock_process.create_time.return_value = 1234567890.0
-    mock_process.children.return_value = []
-    mock_process_class.return_value = mock_process
+        # Test stop functionality
+        stop_log_listener()  # Should complete without errors
 
-    recovery_file = os.path.join(self.temp_dir, 'hue_recovery.json')
 
-    # Test writing recovery file
-    with patch.dict(os.environ, {'DESKTOP_LOG_DIR': self.temp_dir}):
-      write_process_recovery_file(
-        socket_path=self.socket_path,
-        pid_file='/tmp/test.pid'
-      )
+class TestRecoveryFileOperations(GunicornLogListenerTestBase):
+  """Test cases for process recovery file operations"""
 
-    # Verify recovery file was created
-    self.assertTrue(os.path.exists(recovery_file))
+  def test_recovery_file_creation_and_cleanup(self, temp_setup):
+    """Test process recovery file creation and cleanup"""
+    temp_dir, socket_path = temp_setup
 
-    # Test cleanup from recovery file when no process is running
-    mock_process.is_running.return_value = False
-    mock_process_class.side_effect = lambda pid: mock_process
+    with patch('psutil.Process') as mock_process_class:
+      # Mock process
+      mock_process = Mock()
+      mock_process.pid = 12345
+      mock_process.create_time.return_value = 1234567890.0
+      mock_process.children.return_value = []
+      mock_process_class.return_value = mock_process
 
-    with patch.dict(os.environ, {'DESKTOP_LOG_DIR': self.temp_dir}):
-      cleanup_from_recovery_file()
+      recovery_file = os.path.join(temp_dir, 'hue_recovery.json')
 
-    # Recovery file should be cleaned up
-    self.assertFalse(os.path.exists(recovery_file))
+      # Test writing recovery file
+      with patch.dict(os.environ, {'DESKTOP_LOG_DIR': temp_dir}):
+        write_process_recovery_file(
+          socket_path=socket_path,
+          pid_file='/tmp/test.pid'
+        )
 
-  def test_5_signal_handler_integration(self):
-    """Test 5: Signal handler creation and integration"""
+      # Verify recovery file was created
+      assert os.path.exists(recovery_file)
+
+      # Test cleanup from recovery file when no process is running
+      mock_process.is_running.return_value = False
+      mock_process_class.side_effect = lambda pid: mock_process
+
+      with patch.dict(os.environ, {'DESKTOP_LOG_DIR': temp_dir}):
+        cleanup_from_recovery_file()
+
+      # Recovery file should be cleaned up
+      assert not os.path.exists(recovery_file)
+
+
+class TestSignalHandlerIntegration(GunicornLogListenerTestBase):
+  """Test cases for signal handler functionality"""
+
+  def test_signal_handler_creation_and_execution(self, temp_setup):
+    """Test signal handler creation and integration"""
+    temp_dir, socket_path = temp_setup
+
     mock_log_listener = Mock()
-    test_socket = os.path.join(self.temp_dir, 'signal_test.sock')
-    test_pid_file = os.path.join(self.temp_dir, 'signal_test.pid')
+    test_socket = os.path.join(temp_dir, 'signal_test.sock')
+    test_pid_file = os.path.join(temp_dir, 'signal_test.pid')
 
     # Create test files
     with open(test_socket, 'w') as f:
@@ -191,7 +324,7 @@ class TestMinimalLogListener(unittest.TestCase):
     )
 
     # Verify handler is callable
-    self.assertTrue(callable(handler))
+    assert callable(handler)
 
     # Test signal handler execution
     with patch('os._exit') as mock_exit:
@@ -204,12 +337,8 @@ class TestMinimalLogListener(unittest.TestCase):
     mock_log_listener.join.assert_called_with(timeout=5)
 
     # Verify files were cleaned up
-    self.assertFalse(os.path.exists(test_socket))
-    self.assertFalse(os.path.exists(test_pid_file))
+    assert not os.path.exists(test_socket)
+    assert not os.path.exists(test_pid_file)
 
     # Verify exit was called
     mock_exit.assert_called_with(0)
-
-
-if __name__ == '__main__':
-  unittest.main()
