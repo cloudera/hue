@@ -44,11 +44,11 @@ const Analytics = (): JSX.Element => {
     save: updateAnalyticsPreference,
     loading: updatingAnalyticsPreference,
     error: updateAnalyticsPreferenceError
-  } = useSaveData<{ collect_usage: boolean }>(USAGE_ANALYTICS_API_URL, {
+  } = useSaveData<UsageAnalyticsResponse>(USAGE_ANALYTICS_API_URL, {
     method: HttpMethod.PUT,
     onSuccess: response => {
       reloadData();
-      const successMessage = response.collect_usage
+      const successMessage = response.collectUsage
         ? t('Analytics have been activated.')
         : t('Analytics have been deactivated.');
       huePubSub.publish<HueAlert>(GLOBAL_INFO_TOPIC, { message: successMessage });

@@ -39,7 +39,7 @@ HUE_JAR_VERSION=$3
 
 PYTHON38_OSES=("centos7" "redhat8" "sles12" "ubuntu20" "ubuntu22")
 PYTHON39_OSES=("redhat8" "redhat8-arm64" "redhat9")
-PYTHON311_OSES=("redhat8" "redhat8-arm64" "redhat9" "sles15" "ubuntu22")
+PYTHON311_OSES=("redhat8" "redhat8-arm64" "redhat9" "sles15" "ubuntu22" "ubuntu24")
 
 LATEST_PYTHON="python3.11"
 PYTHON_VERSIONS=("python3.11" "python3.9" "python3.8")
@@ -106,6 +106,7 @@ install_prerequisite() {
     ubuntu18) ubuntu18_install "$os";;
     ubuntu20) ubuntu20_install "$os";;
     ubuntu22) ubuntu22_install "$os";;
+    ubuntu24) ubuntu24_install "$os";;
     redhat8-arm64) redhat8_arm64_install "$os";;
     *) echo "Unsupported OS: $os"; exit 1 ;;
   esac

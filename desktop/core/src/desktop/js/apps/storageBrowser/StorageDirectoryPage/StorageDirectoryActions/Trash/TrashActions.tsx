@@ -22,7 +22,7 @@ import { i18nReact } from '../../../../../utils/i18nReact';
 import { FileStats, StorageDirectoryTableData } from '../../../types';
 import useSaveData from '../../../../../utils/hooks/useSaveData/useSaveData';
 import { TRASH_PURGE, TRASH_RESTORE_BULK } from '../../../api';
-import { inRestorableTrash } from '../../../../../utils/storageBrowserUtils';
+import { inRestorableTrash } from '../../../utils/utils';
 
 interface TrashActionsProps {
   selectedFiles: StorageDirectoryTableData[];
@@ -49,9 +49,7 @@ const TrashActions = ({
   const [selectedAction, setSelectedAction] = useState<Actions | undefined>();
 
   const { save, loading } = useSaveData(undefined, {
-    onSuccess: () => {
-      setIsModalOpen(false);
-    },
+    onSuccess: () => setIsModalOpen(false),
     onError: onActionError
   });
 

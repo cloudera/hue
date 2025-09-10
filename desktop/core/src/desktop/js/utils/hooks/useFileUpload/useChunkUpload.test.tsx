@@ -305,10 +305,10 @@ describe('useChunkUpload', () => {
 
   it('should handle successful chunk upload and progress', async () => {
     mockSave
-      .mockImplementationOnce((_, { onSuccess, postOptions }) => {
-        if (postOptions?.onUploadProgress) {
-          postOptions.onUploadProgress({ loaded: 50, total: 100 });
-          postOptions.onUploadProgress({ loaded: 100, total: 100 });
+      .mockImplementationOnce((_, { onSuccess, options }) => {
+        if (options?.onUploadProgress) {
+          options.onUploadProgress({ loaded: 50, total: 100 });
+          options.onUploadProgress({ loaded: 100, total: 100 });
         }
         onSuccess();
       })
@@ -558,9 +558,9 @@ describe('useChunkUpload', () => {
   it('should handle progress updates correctly', async () => {
     const mockProgressEvent = { loaded: 75, total: 100 };
 
-    mockSave.mockImplementationOnce((_, { onSuccess, postOptions }) => {
-      if (postOptions?.onUploadProgress) {
-        postOptions.onUploadProgress(mockProgressEvent);
+    mockSave.mockImplementationOnce((_, { onSuccess, options }) => {
+      if (options?.onUploadProgress) {
+        options.onUploadProgress(mockProgressEvent);
       }
       onSuccess();
     });

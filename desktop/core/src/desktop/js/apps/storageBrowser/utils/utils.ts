@@ -83,3 +83,20 @@ export const inTrash = (path: string): boolean => {
 export const inRestorableTrash = (path: string): boolean => {
   return path.match(/^\/user\/.+?\/\.Trash\/.+?/) !== null;
 };
+
+export const isFileSystemNonRoot = (path: string): boolean => {
+  if (isS3(path)) {
+    return !isS3Root(path);
+  }
+  if (isGS(path)) {
+    return !isGSRoot(path);
+  }
+  if (isABFS(path)) {
+    return !isABFSRoot(path);
+  }
+  if (isOFS(path)) {
+    return !isOFSServiceID(path) && !isOFSVol(path);
+  }
+  //in case of HDFS root and non root have same level of access. hence no check
+  return true;
+};

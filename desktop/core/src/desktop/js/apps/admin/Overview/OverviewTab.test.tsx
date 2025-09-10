@@ -125,7 +125,7 @@ describe('OverviewTab', () => {
       silenceErrors: true,
       ignoreSuccessErrors: true
     };
-    const expectedPostOptions = {
+    const expectedOptions = {
       silenceErrors: true,
       ignoreSuccessErrors: true,
       qsEncodeData: false
@@ -213,7 +213,7 @@ describe('OverviewTab', () => {
           'put',
           USAGE_ANALYTICS_API_URL,
           { collect_usage: true },
-          expectedPostOptions
+          expectedOptions
         );
       });
     });
@@ -229,7 +229,7 @@ describe('OverviewTab', () => {
           'put',
           USAGE_ANALYTICS_API_URL,
           { collect_usage: false },
-          expectedPostOptions
+          expectedOptions
         );
       });
     });

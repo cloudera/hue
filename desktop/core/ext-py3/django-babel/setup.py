@@ -24,7 +24,7 @@ setup(
     url='https://github.com/python-babel/django-babel/',
     packages=find_packages(exclude=('tests',)),
     install_requires=[
-        'django>=1.8,<4.2',
+        'django>=1.8,<4.3',
         'babel>=1.3',
     ],
     classifiers=[

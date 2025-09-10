@@ -14,18 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import logging
-import unittest
+from unittest.mock import patch
+
+from django.test import TestCase
 
 from aws import conf
 from aws.client import Client, get_credential_provider
-from django.test import TestCase
-
-from desktop.lib.fsmanager import get_client, clear_cache
+from desktop.conf import RAZ, USE_STORAGE_CONNECTORS
+from desktop.lib.fsmanager import clear_cache, get_client
 from desktop.lib.python_util import current_ms_from_utc
-from desktop.conf import RAZ
-
-from unittest.mock import patch
-
 
 LOG = logging.getLogger()
 
@@ -33,7 +30,10 @@ LOG = logging.getLogger()
 class TestAWS(TestCase):
   def test_with_credentials(self):
     try:
-      finish = conf.AWS_ACCOUNTS.set_for_testing({'default': {'access_key_id': 'access_key_id', 'secret_access_key': 'secret_access_key'}})
+      finish = [
+        USE_STORAGE_CONNECTORS.set_for_testing(False),
+        conf.AWS_ACCOUNTS.set_for_testing({"default": {"access_key_id": "access_key_id", "secret_access_key": "secret_access_key"}}),
+      ]
       with patch('aws.client.conf_idbroker.get_conf') as get_conf:
         with patch('aws.client.Client.get_s3_connection'):
           get_conf.return_value = {}
@@ -42,16 +42,19 @@ class TestAWS(TestCase):
 
           provider = get_credential_provider('default', 'hue')
           assert provider.get_credentials().get('AccessKeyId') == conf.AWS_ACCOUNTS['default'].ACCESS_KEY_ID.get()
-          assert client1 == client2 # Should be the same as no support for user based client with credentials & no Expiration
+          assert client1 == client2  # Should be the same as no support for user based client with credentials & no Expiration
     finally:
-      finish()
+      for f in finish:
+        f()
       clear_cache()
       conf.clear_cache()
 
-
   def test_with_idbroker(self):
     try:
-      finish = conf.AWS_ACCOUNTS.set_for_testing({}) # Set empty to test when no configs are set
+      finish = [
+        USE_STORAGE_CONNECTORS.set_for_testing(False),
+        conf.AWS_ACCOUNTS.set_for_testing({}),
+      ]  # Set empty to test when no configs are set
       with patch('aws.client.conf_idbroker.get_conf') as get_conf:
         with patch('aws.client.conf_idbroker.get_cab_address') as get_cab_address:
           with patch('aws.client.Client.get_s3_connection'):
@@ -72,26 +75,29 @@ class TestAWS(TestCase):
                 client1 = get_client(name='default', fs='s3a', user='hue')
                 client2 = get_client(name='default', fs='s3a', user='hue')
 
-                assert client1 != client2 # Test that with Expiration 0 clients not equal
+                assert client1 != client2  # Test that with Expiration 0 clients not equal
 
                 get_cab.return_value = {
-                  'Credentials': {'AccessKeyId': 'AccessKeyId', 'Expiration': int(current_ms_from_utc()) + 10*1000}
+                  'Credentials': {'AccessKeyId': 'AccessKeyId', 'Expiration': int(current_ms_from_utc()) + 10 * 1000}
                 }
                 client3 = get_client(name='default', fs='s3a', user='hue')
                 client4 = get_client(name='default', fs='s3a', user='hue')
                 client5 = get_client(name='default', fs='s3a', user='test')
 
-                assert client3 == client4 # Test that with 10 sec expiration, clients equal
-                assert client4 != client5 # Test different user have different clients
+                assert client3 == client4  # Test that with 10 sec expiration, clients equal
+                assert client4 != client5  # Test different user have different clients
     finally:
-      finish()
+      for f in finish:
+        f()
       clear_cache()
       conf.clear_cache()
 
-
   def test_with_idbroker_and_config(self):
     try:
-      finish = conf.AWS_ACCOUNTS.set_for_testing({'default': {'region': 'ap-northeast-1'}})
+      finish = [
+        USE_STORAGE_CONNECTORS.set_for_testing(False),
+        conf.AWS_ACCOUNTS.set_for_testing({"default": {"region": "ap-northeast-1"}}),
+      ]
       with patch('aws.client.conf_idbroker.get_conf') as get_conf:
         with patch('aws.client.conf_idbroker.get_cab_address') as get_cab_address:
           with patch('aws.client.Client.get_s3_connection'):
@@ -112,14 +118,17 @@ class TestAWS(TestCase):
                 client = Client.from_config(conf.AWS_ACCOUNTS['default'], get_credential_provider('default', 'hue'))
                 assert client._region == 'ap-northeast-1'
     finally:
-      finish()
+      for f in finish:
+        f()
       clear_cache()
       conf.clear_cache()
 
-
   def test_with_idbroker_on_ec2(self):
     try:
-      finish = conf.AWS_ACCOUNTS.set_for_testing({}) # Set empty to test when no configs are set
+      finish = [
+        USE_STORAGE_CONNECTORS.set_for_testing(False),
+        conf.AWS_ACCOUNTS.set_for_testing({}),
+      ]  # Set empty to test when no configs are set
       with patch('aws.client.aws_conf.get_region') as get_region:
         with patch('aws.client.conf_idbroker.get_conf') as get_conf:
           with patch('aws.client.conf_idbroker.get_cab_address') as get_cab_address:
@@ -137,22 +146,21 @@ class TestAWS(TestCase):
                   has_iam_metadata.return_value = True
                   client = Client.from_config(None, get_credential_provider('default', 'hue'))
 
-                  assert client._region == 'us-west-1' # Test different user have different clients
+                  assert client._region == 'us-west-1'  # Test different user have different clients
     finally:
-      finish()
+      for f in finish:
+        f()
       clear_cache()
       conf.clear_cache()
 
-
   def test_with_raz_enabled(self):
-    with patch('aws.client.RazS3Connection') as raz_s3_connection:
+    with patch('aws.client.RazS3Connection'):
       resets = [
         RAZ.IS_ENABLED.set_for_testing(True),
-        conf.AWS_ACCOUNTS.set_for_testing({'default': {
-          'region': 'us-west-2',
-          'host': 's3-us-west-2.amazonaws.com',
-          'allow_environment_credentials': 'false'
-        }})
+        USE_STORAGE_CONNECTORS.set_for_testing(False),
+        conf.AWS_ACCOUNTS.set_for_testing(
+          {"default": {"region": "us-west-2", "host": "s3-us-west-2.amazonaws.com", "allow_environment_credentials": "false"}}
+        ),
       ]
 
       try:

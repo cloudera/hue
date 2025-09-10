@@ -1,0 +1,11 @@
+---
+description: ESLint/Prettier/Stylelint/TS strictness; attach broadly to source and configs.
+globs: [".eslintrc.*", ".prettierrc*", ".stylelintrc*", "**/*.ts", "**/*.tsx", "**/*.scss"]
+alwaysApply: false
+---
+
+# Code Quality
+- Run `npm run lint`, `style-lint`, `prettier` before committing.
+- Do not disable rules without justification in-code.
+- Prefer `readonly`, narrow `unknown`, avoid `any`.
+- Keep imports ordered; avoid unused exports.

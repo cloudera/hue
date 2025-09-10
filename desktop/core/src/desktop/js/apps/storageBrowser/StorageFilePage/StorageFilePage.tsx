@@ -32,7 +32,7 @@ import {
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import { getLastKnownConfig } from '../../../config/hueConfig';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
-import { inTrash } from '../../../utils/storageBrowserUtils';
+import { inTrash } from '../utils/utils';
 import { getLastDirOrFileNameFromPath } from '../../../reactComponents/PathBrowser/PathBrowser.util';
 
 interface StorageFilePageProps {
@@ -54,7 +54,7 @@ const StorageFilePage = ({ fileStats, onReload }: StorageFilePageProps): JSX.Ele
   const pageOffset = (pageNumber - 1) * pageSize;
 
   const { loading: isSaving, save } = useSaveData(SAVE_FILE_API_URL, {
-    postOptions: { qsEncodeData: true } // TODO: Remove once API supports RAW JSON payload
+    options: { qsEncodeData: true } // TODO: Remove once API supports RAW JSON payload
   });
 
   const { data, loading, error } = useLoadData<FilePreview>(FILE_PREVIEW_API_URL, {

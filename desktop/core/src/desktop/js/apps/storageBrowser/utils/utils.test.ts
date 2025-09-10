@@ -27,8 +27,9 @@ import {
   isOFSServiceID,
   isOFSVol,
   inTrash,
-  inRestorableTrash
-} from './storageBrowserUtils';
+  inRestorableTrash,
+  isFileSystemNonRoot
+} from './utils';
 
 describe('isHDFS function', () => {
   test('returns true for paths starting with "/"', () => {
@@ -221,5 +222,52 @@ describe('inRestorableTrash function', () => {
     expect(inRestorableTrash('/user/path/.Trash/Current')).toBe(true);
     expect(inRestorableTrash('/user/path/.Trash/Current/user')).toBe(true);
     expect(inRestorableTrash('/user/path/.Trash/Current/user/path')).toBe(true);
+  });
+});
+
+describe('isFileSystemNonRoot', () => {
+  beforeEach(() => {
+    jest.resetAllMocks();
+  });
+
+  it('returns true for non-root S3 path', () => {
+    expect(isFileSystemNonRoot('s3a://bucket/folder')).toBe(true);
+  });
+
+  it('returns false for S3 root path', () => {
+    expect(isFileSystemNonRoot('s3a://')).toBe(false);
+  });
+
+  it('returns true for non-root GS path', () => {
+    expect(isFileSystemNonRoot('gs://folder')).toBe(true);
+  });
+
+  it('returns false for GS root path', () => {
+    expect(isFileSystemNonRoot('gs://')).toBe(false);
+  });
+
+  it('returns true for non-root ABFS path', () => {
+    expect(isFileSystemNonRoot('abfs://folder')).toBe(true);
+  });
+
+  it('returns false for ABFS root path', () => {
+    expect(isFileSystemNonRoot('abfs://')).toBe(false);
+  });
+
+  it('returns true for OFS when not serviceID or volume', () => {
+    expect(isFileSystemNonRoot('ofs://service/volume/folder')).toBe(true);
+  });
+
+  it('returns false for OFS serviceID', () => {
+    expect(isFileSystemNonRoot('ofs://service')).toBe(false);
+  });
+
+  it('returns false for OFS volume', () => {
+    expect(isFileSystemNonRoot('ofs://service/vol')).toBe(false);
+  });
+
+  it('returns true for HDFS (default case)', () => {
+    expect(isFileSystemNonRoot('/hdfs')).toBe(true);
+    expect(isFileSystemNonRoot('/')).toBe(true);
   });
 });
