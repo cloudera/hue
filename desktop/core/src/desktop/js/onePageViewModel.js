@@ -170,6 +170,44 @@ class OnePageViewModel {
       });
     });
 
+    huePubSub.subscribe('open.editor.new.prefilled.query', statementOptions => {
+      const dialect = statementOptions['type'] || 'hive';
+      const query = statementOptions['query'] || '';
+
+      // We want the URL to update and match the dialect. This also prevents the editor
+      // from an initial loading using the default dialect which might not be the requested dialect.
+      const params = new URLSearchParams({ type: dialect });
+      page('/editor?' + params.toString());  
+      
+      self.getActiveAppViewModel(viewModel => {
+        // Make sure we create a new notebook with the requested dialect so that we can 
+        // insert the query into a blank notebook.
+        viewModel.newNotebook(dialect, () => {});
+      });
+      
+      const insertQuery = () =>
+        huePubSub.publish('editor.insert.at.cursor', {
+          text: query,
+          cursorEndAdjust: 0
+        });
+
+      // The viewModel.newNotebook call unfortunately causes the KO aceEditor binding to initialize twice. 
+      // This is why we need to check for two editor.ready events before cleanup.
+      let nrOfEditorReadyEvents = 0;
+      const editorReadySubscription = huePubSub.subscribe(
+        'editor.ready', () => {            
+            insertQuery();
+            // The viewModel.newNotebook call unfortunately causes the KO aceEditor binding to initialize twice. 
+            // This is why we need to check for 2 editor.ready events before cleanup.
+            nrOfEditorReadyEvents++;
+            if (nrOfEditorReadyEvents === 2) {              
+              editorReadySubscription.remove();
+            }
+          },
+        ''
+      );
+    });
+
     const loadedJs = [];
     const loadedCss = [];
     const loadedApps = [];
