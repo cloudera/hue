@@ -51,6 +51,7 @@ import {
   FILE_UPLOAD_START_EVENT,
   FILE_UPLOAD_SUCCESS_EVENT
 } from '../../../reactComponents/FileUploadQueue/event';
+import { isFileSystemNonRoot } from '../utils/utils';
 
 import './StorageDirectoryPage.scss';
 
@@ -127,7 +128,16 @@ const StorageDirectoryPage = ({
 
   const onRowClicked = (record: StorageDirectoryTableData) => {
     return {
-      onClick: () => {
+      onClick: (event: React.MouseEvent) => {
+        // Handle CTRL+click to open in new tab
+        if (event.ctrlKey || event.metaKey) {
+          const currentUrl = new URL(window.location.href);
+          currentUrl.searchParams.set('path', record.path);
+          window.open(currentUrl.toString(), '_blank');
+          return;
+        }
+
+        // Normal click behavior
         if (selectedFiles.length === 0) {
           onFilePathChange(record.path);
           if (record.type === 'dir') {
@@ -258,7 +268,7 @@ const StorageDirectoryPage = ({
         </div>
       </div>
 
-      <DragAndDrop onDrop={onFilesDrop}>
+      <DragAndDrop onDrop={onFilesDrop} disabled={!isFileSystemNonRoot(fileStats.path)}>
         <LoadingErrorWrapper errors={errorConfig}>
           <PaginatedTable<StorageDirectoryTableData>
             loading={listDirectoryLoading && !polling}
