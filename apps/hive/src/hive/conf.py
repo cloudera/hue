@@ -15,10 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
 import logging
+import sys
 
-from django.utils.translation import gettext as _, gettext_lazy as _t
+from django.utils.translation import gettext as _
 
 import beeswax.hive_site
 from beeswax.settings import NICE_NAME
@@ -63,15 +63,21 @@ def config_validator(user):
         res.append((NICE_NAME, _(msg)))
       else:
         raise e
-  except Exception as e:
+  except Exception:
     msg = "The application won't work without a running HiveServer2."
     LOG.exception(msg)
     res.append((NICE_NAME, _(msg)))
 
   try:
-    from aws.conf import is_enabled as is_s3_enabled
     from azure.conf import is_abfs_enabled
+    from desktop.conf import USE_STORAGE_CONNECTORS
     from desktop.lib.fsmanager import get_filesystem
+
+    if USE_STORAGE_CONNECTORS.get():
+      from desktop.lib.fs.s3.conf_utils import is_s3_enabled
+    else:
+      from aws.conf import is_s3_enabled
+
     warehouse = beeswax.hive_site.get_metastore_warehouse_dir()
     fs = get_filesystem()
     fs_scheme = fs._get_scheme(warehouse)
