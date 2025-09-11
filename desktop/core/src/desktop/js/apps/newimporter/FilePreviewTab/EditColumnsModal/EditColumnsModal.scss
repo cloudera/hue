@@ -30,4 +30,9 @@
     border-radius: vars.$fluidx-border-radius;
     width: 100px;
   }
+
+  &__no-sample {
+    color: vars.$fluidx-gray-500;
+    font-style: italic;
+  }
 }

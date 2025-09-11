@@ -172,6 +172,7 @@ const FilePreviewTab = ({
         setColumns={setEditableColumns}
         sample={tableData[0]}
         sqlDialect={destinationConfig.connectorId}
+        fileFormat={fileFormat}
       />
     </div>
   );

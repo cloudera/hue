@@ -48,6 +48,11 @@ interface EditColumnsModalProps {
   setColumns: (cols: Column[]) => void;
   sample?: ImporterTableData;
   sqlDialect?: string;
+  fileFormat?: {
+    type?: string;
+    fieldSeparator?: string;
+    hasHeader?: boolean;
+  };
 }
 
 const EditColumnsModal = ({
@@ -56,7 +61,8 @@ const EditColumnsModal = ({
   columns,
   setColumns,
   sample,
-  sqlDialect = 'hive'
+  sqlDialect = 'hive',
+  fileFormat
 }: EditColumnsModalProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const [editableRows, setEditableRows] = useState<EditableRow[]>([]);
@@ -99,6 +105,40 @@ const EditColumnsModal = ({
 
     return { errors, duplicates: titleCounts };
   }, [editableRows]);
+
+  const sampleDataAnalysis = useMemo(() => {
+    const missingSampleCount = editableRows.filter(row => !row.sample.trim()).length;
+
+    if (missingSampleCount === 0) {
+      return { recommendations: [] };
+    }
+
+    const isCompletelyMissing = missingSampleCount === editableRows.length;
+    const fileType = fileFormat?.type;
+
+    const getFileSpecificGuidance = () => {
+      if (fileType === 'csv') {
+        return t('Check CSV settings: field separator, quote character, or "Has Header" option.');
+      }
+      if (fileType === 'excel') {
+        return t('Try different Excel sheet or verify sheet contains data.');
+      }
+      if (fileType === 'json') {
+        return t('Verify JSON structure and data format.');
+      }
+      return t('Check file format settings and data structure.');
+    };
+
+    const message = isCompletelyMissing
+      ? `${t('No sample data detected.')} ${getFileSpecificGuidance()} ${t('Import may fail.')}`
+      : `${t('{{count}} columns missing data.', { count: missingSampleCount })} ${t('Verify column types before importing.')}`;
+
+    return {
+      recommendations: [message],
+      hasNoSampleData: isCompletelyMissing,
+      hasPartialSampleData: !isCompletelyMissing
+    };
+  }, [editableRows, fileFormat, t]);
 
   const hasValidationErrors = validateColumnNames.errors.size > 0;
 
@@ -211,7 +251,20 @@ const EditColumnsModal = ({
     {
       title: t('Sample'),
       dataIndex: 'sample',
-      render: (text: string) => <span>{text}</span>
+      render: (text: string) => {
+        if (text) {
+          return <span>{text}</span>;
+        }
+
+        const allEmpty = editableRows.every(row => !row.sample.trim());
+        const warningText = allEmpty ? t('Check file format') : t('Empty column');
+
+        return (
+          <span className="hue-importer-edit-columns-modal__no-sample" title={warningText}>
+            {t('No data')}
+          </span>
+        );
+      }
     },
     {
       title: t('Comment'),
@@ -247,6 +300,14 @@ const EditColumnsModal = ({
           <Alert
             message={validationErrorMessages.join('. ')}
             type="error"
+            showIcon
+            style={{ marginBottom: 16 }}
+          />
+        )}
+        {sampleDataAnalysis.recommendations.length > 0 && (
+          <Alert
+            message={sampleDataAnalysis.recommendations.join(' ')}
+            type="warning"
             showIcon
             style={{ marginBottom: 16 }}
           />
