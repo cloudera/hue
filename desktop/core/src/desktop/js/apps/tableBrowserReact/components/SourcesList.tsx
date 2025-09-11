@@ -15,6 +15,8 @@ import { LinkButton } from 'cuix/dist/components/Button/';
 import Loading from 'cuix/dist/components/Loading';
 import EmptyState from 'cuix/dist/components/EmptyState';
 import Filter from 'cuix/dist/components/Filter';
+import HomeIcon from '@cloudera/cuix-core/icons/react/HomeIcon';
+import PageHeader from './PageHeader';
 import PaginatedTable, {
   type ColumnProps as PaginatedColumnProps
 } from '../../../reactComponents/PaginatedTable/PaginatedTable';
@@ -25,6 +27,7 @@ export interface SourcesListProps {
   sources: string[];
   loading: boolean;
   isRefreshing: boolean;
+  onRefresh?: () => void;
   sourceFilter: string;
   setSourceFilter: (value: string) => void;
   sourcePageNumber: number;
@@ -32,19 +35,37 @@ export interface SourcesListProps {
   sourcePageSize: number;
   setSourcePageSize: (size: number) => void;
   onOpenSource: (sourceType: string) => void;
+  // Breadcrumbs props
+  sourceType?: string;
+  database?: string;
+  table?: string;
+  sourceOptions?: string[];
+  onSelectSource?: (sourceType: string) => void;
+  onClickDataSources?: () => void;
+  onClickDatabases?: () => void;
+  onClickDatabase?: (database: string) => void;
 }
 
 const SourcesList = ({
   sources,
   loading,
   isRefreshing,
+  onRefresh,
   sourceFilter,
   setSourceFilter,
   sourcePageNumber,
   setSourcePageNumber,
   sourcePageSize,
   setSourcePageSize,
-  onOpenSource
+  onOpenSource,
+  sourceType,
+  database,
+  table,
+  sourceOptions,
+  onSelectSource,
+  onClickDataSources,
+  onClickDatabases,
+  onClickDatabase
 }: SourcesListProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
@@ -59,7 +80,7 @@ const SourcesList = ({
       key: 'name',
       render: (text: string, record: { name: string }) => (
         <LinkButton aria-label={t('Open source')} onClick={() => onOpenSource(record.name)}>
-          {text.toUpperCase()}
+          {text}
         </LinkButton>
       )
     }
@@ -73,12 +94,31 @@ const SourcesList = ({
 
   return (
     <div>
-      <h2 className="hue-table-browser__heading">
-        {t('{{label}} ({{count}})', {
-          label: t('Data sources'),
-          count: totalSize
-        })}
-      </h2>
+      <PageHeader
+        title={t('Home')}
+        icon={<HomeIcon />}
+        onRefresh={onRefresh}
+        loading={loading}
+        isRefreshing={isRefreshing}
+        sourceType={sourceType}
+        database={database}
+        table={table}
+        sourceOptions={sourceOptions}
+        onSelectSource={onSelectSource}
+        onClickDataSources={onClickDataSources}
+        onClickDatabases={onClickDatabases}
+        onClickDatabase={onClickDatabase}
+      />
+
+      <div className="hue-table-browser__header-with-actions">
+        <h3 className="hue-h3">
+          {t('{{label}} ({{count}})', {
+            label: t('Data sources'),
+            count: totalSize
+          })}
+        </h3>
+      </div>
+
       <Loading spinning={!!loading || isRefreshing}>
         <div className="hue-table-browser__filter">
           <Filter

@@ -19,6 +19,10 @@ import Loading from 'cuix/dist/components/Loading';
 import Modal from 'cuix/dist/components/Modal';
 import EmptyState from 'cuix/dist/components/EmptyState';
 import Filter from 'cuix/dist/components/Filter';
+import DatabaseIcon from '@cloudera/cuix-core/icons/react/DatabaseIcon';
+import Toolbar, { type ToolbarAction } from './Toolbar';
+import DatabasePropertiesComponent, { type DatabaseProperties } from './DatabaseProperties';
+import PageHeader from './PageHeader';
 import PaginatedTable, {
   type ColumnProps as PaginatedColumnProps
 } from '../../../reactComponents/PaginatedTable/PaginatedTable';
@@ -51,7 +55,18 @@ export interface TablesListProps {
   onSaveDescription: (name: string, value: string) => void;
   onViewSelection?: (name: string) => void;
   onQuerySelection?: (name: string) => void;
-  onDropSelection?: (names: string[]) => Promise<void> | void;
+  onDropSelection?: (names: string[], skipTrash?: boolean) => Promise<void> | void;
+  databaseName?: string;
+  databaseProperties?: DatabaseProperties;
+  loadingDatabaseProperties?: boolean;
+  // Breadcrumbs props
+  sourceType?: string;
+  table?: string;
+  sourceOptions?: string[];
+  onSelectSource?: (sourceType: string) => void;
+  onClickDataSources?: () => void;
+  onClickDatabases?: () => void;
+  onClickDatabase?: (database: string) => void;
 }
 
 const TablesList = ({
@@ -74,11 +89,22 @@ const TablesList = ({
   onSaveDescription,
   onViewSelection,
   onQuerySelection,
-  onDropSelection
+  onDropSelection,
+  databaseName,
+  databaseProperties,
+  loadingDatabaseProperties,
+  sourceType,
+  table,
+  sourceOptions,
+  onSelectSource,
+  onClickDataSources,
+  onClickDatabases,
+  onClickDatabase
 }: TablesListProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const [selected, setSelected] = useState<string[]>([]);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [skipTrash, setSkipTrash] = useState(false);
 
   const filtered = (tables || []).filter(item =>
     tableFilter ? item.name.toLowerCase().includes(tableFilter.toLowerCase()) : true
@@ -95,6 +121,41 @@ const TablesList = ({
       })),
     [filtered]
   );
+
+  // Prepare toolbar actions (excluding refresh which is now separate)
+  const toolbarActions = useMemo(() => {
+    const actions: ToolbarAction[] = [];
+
+    if (onViewSelection) {
+      actions.push({
+        key: 'view',
+        label: t('View'),
+        onClick: () => selected[0] && onViewSelection?.(selected[0]),
+        disabled: selected.length !== 1
+      });
+    }
+
+    if (onQuerySelection) {
+      actions.push({
+        key: 'query',
+        label: t('Query'),
+        onClick: () => selected[0] && onQuerySelection?.(selected[0]),
+        disabled: selected.length !== 1
+      });
+    }
+
+    if (onDropSelection) {
+      actions.push({
+        key: 'drop',
+        label: t('Drop'),
+        onClick: () => setConfirmOpen(true),
+        disabled: !selected.length,
+        variant: 'danger'
+      });
+    }
+
+    return actions;
+  }, [onViewSelection, onQuerySelection, onDropSelection, selected, t]);
 
   if (!loading && filtered.length === 0) {
     return (
@@ -183,56 +244,71 @@ const TablesList = ({
 
   return (
     <div>
-      <h2 className="hue-table-browser__heading">
-        {t('{{label}} ({{count}})', {
-          label: t('Tables'),
-          count: totalSize
-        })}
-      </h2>
-      <Loading spinning={!!loading || isRefreshing}>
-        {(onViewSelection || onQuerySelection || onDropSelection || onRefresh) && (
-          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginBottom: 8 }}>
-            {onRefresh && (
-              <PrimaryButton onClick={onRefresh} disabled={!!loading || isRefreshing}>
-                {t('Refresh')}
-              </PrimaryButton>
-            )}
-            {onViewSelection && (
-              <Button
-                disabled={selected.length !== 1}
-                onClick={() => selected[0] && onViewSelection?.(selected[0])}
-              >
-                {t('View')}
-              </Button>
-            )}
-            {onQuerySelection && (
-              <Button
-                disabled={selected.length !== 1}
-                onClick={() => selected[0] && onQuerySelection?.(selected[0])}
-              >
-                {t('Query')}
-              </Button>
-            )}
-            {onDropSelection && (
-              <Button disabled={!selected.length} onClick={() => setConfirmOpen(true)}>
-                {t('Drop')}
-              </Button>
-            )}
+      {/* Page Header */}
+      <PageHeader
+        title={databaseName}
+        icon={<DatabaseIcon />}
+        onRefresh={onRefresh}
+        loading={loading}
+        isRefreshing={isRefreshing}
+        sourceType={sourceType}
+        database={databaseName}
+        table={table}
+        sourceOptions={sourceOptions}
+        onSelectSource={onSelectSource}
+        onClickDataSources={onClickDataSources}
+        onClickDatabases={onClickDatabases}
+        onClickDatabase={onClickDatabase}
+      />
+
+      {/* Database Properties Section */}
+      {databaseName && (
+        <DatabasePropertiesComponent
+          properties={databaseProperties}
+          loading={loadingDatabaseProperties}
+        />
+      )}
+
+      {/* Header row with title */}
+      <div className="hue-table-browser__header-with-actions">
+        <h2 className="hue-h3">
+          {t('{{label}} ({{count}})', {
+            label: t('Tables'),
+            count: totalSize
+          })}
+        </h2>
+      </div>
+
+      {/* Filter row with filter and toolbar */}
+      <div
+        className={`hue-table-browser__filter-and-actions ${!!loading || isRefreshing ? 'disabled' : ''}`}
+      >
+        <Filter
+          search={{ placeholder: t('Filter tables') }}
+          onChange={(output: FilterOutput) => {
+            if (!!loading || isRefreshing) {
+              return; // Prevent changes while loading
+            }
+            const searchValue = String(
+              (output as unknown as { search?: unknown[] }).search?.[0] ?? ''
+            );
+            if (searchValue !== tableFilter) {
+              setTableFilter(searchValue);
+            }
+          }}
+        />
+        {toolbarActions.length > 0 && (
+          <div className="hue-table-browser__actions">
+            <Toolbar
+              actions={toolbarActions}
+              selectedItems={selected}
+              loading={loading}
+              isRefreshing={isRefreshing}
+            />
           </div>
         )}
-        <div className="hue-table-browser__filter">
-          <Filter
-            search={{ placeholder: t('Filter tables') }}
-            onChange={(output: FilterOutput) => {
-              const searchValue = String(
-                (output as unknown as { search?: unknown[] }).search?.[0] ?? ''
-              );
-              if (searchValue !== tableFilter) {
-                setTableFilter(searchValue);
-              }
-            }}
-          />
-        </div>
+      </div>
+      <Loading spinning={!!loading || isRefreshing}>
         <PaginatedTable<TableRowItem>
           data={pageData}
           columns={columns}
@@ -240,9 +316,6 @@ const TablesList = ({
           onRowSelect={selectedRows =>
             setSelected((selectedRows as unknown as { name: string }[]).map(r => r.name))
           }
-          onRowClick={record => ({
-            onClick: () => onOpenTable((record as unknown as { name: string }).name)
-          })}
           pagination={{
             pageStats: {
               pageNumber: tablePageNumber,
@@ -262,31 +335,43 @@ const TablesList = ({
         okText={t('Drop')}
         okButtonProps={{ danger: true }}
         cancelText={t('Cancel')}
-        onCancel={() => setConfirmOpen(false)}
+        onCancel={() => {
+          setConfirmOpen(false);
+          setSkipTrash(false);
+        }}
         onOk={async () => {
           try {
             if (onDropSelection) {
-              await onDropSelection(selected);
+              await onDropSelection(selected, skipTrash);
             }
             setSelected([]);
           } finally {
             setConfirmOpen(false);
+            setSkipTrash(false);
           }
         }}
       >
-        <div style={{ marginBottom: 8 }}>
+        <div style={{ marginBottom: 16 }}>
           {t('Do you really want to drop the selected table(s)?')}
         </div>
-        <ul>
+        <ul style={{ marginBottom: 16 }}>
           {selected.slice(0, 10).map(name => (
             <li key={name}>{name}</li>
           ))}
         </ul>
         {selected.length > 10 && (
-          <div>
+          <div style={{ marginBottom: 16 }}>
             {t('and')} {selected.length - 10} {t('others')}.
           </div>
         )}
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <input
+            type="checkbox"
+            checked={skipTrash}
+            onChange={e => setSkipTrash(e.target.checked)}
+          />
+          {t('Skip the trash')}
+        </label>
       </Modal>
     </div>
   );

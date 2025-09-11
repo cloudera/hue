@@ -74,5 +74,3 @@ const SampleGrid = ({ data, loading }: SampleGridProps): JSX.Element => {
 };
 
 export default SampleGrid;
-
-

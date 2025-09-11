@@ -1,3 +1,4 @@
+@use 'classes';
 @use 'variables' as vars;
 @use 'mixins';
 
@@ -5,24 +6,78 @@
   .hue-table-browser {
     @include mixins.fillAbsolute;
     @include mixins.flexRowLayout;
-    
+
     min-width: 300px;
-    
+
     &__container {
       height: 100%;
       background-color: vars.$fluidx-gray-100;
       padding: 16px;
     }
 
-    &__heading {
-      color: #1B2329;
-      font: Roboto;
-      font-size: 24px;
-      font-weight: 300;
+    &__page-header {
+      margin-bottom: 16px;
+
+      &__top-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+      }
+
+      &__icon {
+        font-size: 28px;
+        flex-shrink: 0;
+      }
+
+      &__text {
+        margin-bottom: 0;
+        flex: 1;
+        @include mixins.nowrap-ellipsis;
+      }
+
+      &__breadcrumbs-row {
+        margin-top: 8px;
+      }
     }
 
+    &__header-with-actions-only {
+      text-align: right;
+    }
+
+    // For filter-only components (backwards compatibility)
     &__filter {
       margin-bottom: 16px;
+
+      &.disabled {
+        pointer-events: none;
+        opacity: 0.5;
+      }
+    }
+
+    // For components with both filter and actions
+    &__filter-and-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+
+      &.disabled {
+        pointer-events: none;
+        opacity: 0.5;
+      }
+
+      // Filter component takes available space
+      .cuix-filter {
+        flex: 1;
+        margin-right: 16px;
+      }
+
+      // Actions container aligned to the right
+      .hue-table-browser__actions {
+        flex-shrink: 0;
+        margin-bottom: 0; // Override default margin
+      }
     }
 
     &__empty-state {
@@ -30,26 +85,46 @@
       max-width: 100%;
     }
 
+    // Header with actions layout
+    &__header-with-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    // Action buttons container (for lists without headers)
+    &__actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      margin-bottom: 8px;
+    }
+
+    &__view-sql {
+      background-color: vars.$fluidx-gray-050;
+      padding: 12px;
+      overflow-x: auto;
+    }
+
+    &__details-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 16px;
+    }
+
     // Fixes for For Breadcrumbs
     .ant-typography {
       margin-bottom: 0;
     }
-    .ant-btn>span {
+
+    .ant-btn > span {
       display: inline-flex;
     }
-    
 
     // Fixes for Filter
     .ant-input {
       box-shadow: none;
     }
-  }
-}
-
-.cuix.antd {
-  .hue-table-browser__details-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-    gap: 16px;
   }
 }

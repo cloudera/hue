@@ -2,8 +2,9 @@
 // Apache License 2.0 applies.
 
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { Select, Space, Tag } from 'antd';
+import { Select, Space } from 'antd';
 import Button from 'cuix/dist/components/Button/Button';
+import { BorderlessButton } from 'cuix/dist/components/Button';
 import Tooltip from 'cuix/dist/components/Tooltip';
 import Modal from 'cuix/dist/components/Modal';
 import EmptyState from 'cuix/dist/components/EmptyState';
@@ -176,9 +177,9 @@ const Partitions = ({
       key: 'values',
       sorter: true,
       render: (_: string, record) => (
-        <Button onClick={() => openEditorForPartition(record.spec)}>
+        <BorderlessButton onClick={() => openEditorForPartition(record.spec)}>
           {_[0] === '[' ? _ : `[${_}]`}
-        </Button>
+        </BorderlessButton>
       )
     },
     {
@@ -195,7 +196,9 @@ const Partitions = ({
             key: 'browse',
             render: (url: string) => (
               <Tooltip title={t('Browse partition files')}>
-                <Button onClick={() => browsePartitionFolder(url)}>{t('Files')}</Button>
+                <BorderlessButton onClick={() => browsePartitionFolder(url)}>
+                  {t('Files')}
+                </BorderlessButton>
               </Tooltip>
             )
           }
@@ -287,19 +290,12 @@ const Partitions = ({
 
   return (
     <Loading spinning={loading}>
-      <div style={{ marginBottom: 8 }}>
-        {(partitions?.partition_keys_json || []).map((k, idx) => (
-          <Tag key={idx}>{k}</Tag>
-        ))}
-      </div>
-
       {!!keyDefs.length && (
         <div className="hue-table-browser__partitions-keys" style={{ marginBottom: 8 }}>
           <h4 style={{ margin: '0 0 8px' }}>{t('Columns')}</h4>
           <PaginatedTable<{ key: string; index: number; name: string; type?: string }>
             data={keyDefs.map((k, i) => ({ key: `${i}-${k.name}`, index: i + 1, ...k }))}
             columns={[
-              { title: '#', dataIndex: 'index', key: 'index' },
               { title: t('Name'), dataIndex: 'name', key: 'name' },
               { title: t('Type'), dataIndex: 'type', key: 'type' }
             ]}
@@ -316,7 +312,9 @@ const Partitions = ({
         </div>
       )}
 
-      <h4 style={{ margin: '16px 0 8px' }}>{t('Partitions')}</h4>
+      <h4 className="hue-h4" style={{ margin: '16px 0 8px' }}>
+        {t('Partitions')}
+      </h4>
 
       <div className="hue-table-browser__filter" style={{ marginBottom: 8 }}>
         <Filter
@@ -394,15 +392,6 @@ const Partitions = ({
           ))}
         </div>
       )}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
-        {canWrite !== false && (
-          <Tooltip title={t('Delete the selected partitions')}>
-            <Button disabled={!selectedSpecs.length} onClick={() => setConfirmOpen(true)}>
-              {t('Drop partition(s)')}
-            </Button>
-          </Tooltip>
-        )}
-      </div>
 
       {valuesData.length === 0 ? (
         <EmptyState title={t('No partitions')} />

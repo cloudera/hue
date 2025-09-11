@@ -27,9 +27,13 @@ const DetailsSchema = ({ columns }: DetailsSchemaProps): JSX.Element => {
   const [pageSize, setPageSize] = useState(25);
 
   const filtered = useMemo(() => {
-    if (!filter) return columns;
+    if (!filter) {
+      return columns;
+    }
     const q = filter.toLowerCase();
-    return columns.filter(c => c.name.toLowerCase().includes(q) || (c.comment || '').toLowerCase().includes(q));
+    return columns.filter(
+      c => c.name.toLowerCase().includes(q) || (c.comment || '').toLowerCase().includes(q)
+    );
   }, [columns, filter]);
 
   const data = filtered.map(col => ({ key: col.name, ...col }));
@@ -81,5 +85,3 @@ const DetailsSchema = ({ columns }: DetailsSchemaProps): JSX.Element => {
 };
 
 export default DetailsSchema;
-
-

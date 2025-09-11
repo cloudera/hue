@@ -14,39 +14,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Col, Row } from 'antd';
-import Button from 'cuix/dist/components/Button/Button';
-import Loading from 'cuix/dist/components/Loading';
-//
-//
-
 import DataBrowserIcon from '@cloudera/cuix-core/icons/react/DataBrowserIcon';
 
 import { i18nReact } from '../../utils/i18nReact';
 import CommonHeader from '../../reactComponents/CommonHeader/CommonHeader';
-import changeURL from '../../utils/url/changeURL';
-import { buildTableBrowserPath, parseTableBrowserPath } from './utils/routing';
+import { useTableBrowserController } from './utils/useTableBrowserController';
 import { useDataCatalog } from '../../utils/hooks/useDataCatalog/useDataCatalog';
-import Breadcrumbs from './components/Breadcrumbs';
-import Tabs, { TabKey } from './components/Tabs';
-import Overview from './components/Overview';
-import SampleGrid from './components/SampleGrid';
-// import DetailsSchema from './components/DetailsSchema';
-import DetailsProperties from './components/DetailsProperties';
-import Partitions from './components/Partitions';
+import TableDetails from './components/TableDetails';
 import SourcesList from './components/SourcesList';
 import DatabasesList from './components/DatabasesList';
 import TablesList from './components/TablesList';
 import dataCatalog from '../../catalog/dataCatalog';
-import type { Analysis, SampleMeta } from '../../catalog/DataCatalogEntry';
-import ViewSql from './components/ViewSql';
-import Queries from './components/Queries';
-import Privileges from './components/Privileges';
-import huePubSub from '../../utils/huePubSub';
-import { GLOBAL_ERROR_TOPIC, GLOBAL_INFO_TOPIC } from '../../reactComponents/GlobalAlert/events';
-import formatBytes from '../../utils/formatBytes';
-import { formatTimestamp } from '../../utils/dateTimeUtils';
+import { notifyError, notifyInfo } from './utils/notifier';
+import { useTableDetails } from './utils/useTableDetails';
+import { getConnectorIdOrType } from './utils/connector';
+import { post } from '../../api/utils';
 
 import './TableBrowserPage.scss';
 
@@ -54,14 +38,15 @@ import './TableBrowserPage.scss';
 
 const TableBrowserPage = (): JSX.Element => {
   const { t } = i18nReact.useTranslation();
-  const [locationPath, setLocationPath] = useState<string>(window.location.pathname);
-  const route = useMemo(() => parseTableBrowserPath(locationPath), [locationPath]);
-
-  useEffect(() => {
-    const onPopState = () => setLocationPath(window.location.pathname);
-    window.addEventListener('popstate', onPopState);
-    return () => window.removeEventListener('popstate', onPopState);
-  }, []);
+  const {
+    route,
+    activeTab,
+    onTabChange,
+    navigateToSources,
+    navigateToSource,
+    navigateToDatabase,
+    navigateToTable
+  } = useTableBrowserController();
 
   const {
     loading: loadingStates,
@@ -79,10 +64,10 @@ const TableBrowserPage = (): JSX.Element => {
   } = useDataCatalog({ autoSelectFirstDatabase: false });
 
   const [table, setTable] = useState<string | undefined>(route.table);
-  const [activeTab, setActiveTab] = useState<TabKey>('overview');
+  // activeTab provided by controller
   const [dbFilter, setDbFilter] = useState('');
   const [tableFilter, setTableFilter] = useState('');
-  const [loadingData, setLoadingData] = useState(false);
+  // Details loading state is provided by useTableDetails
   const [dbPageSize, setDbPageSize] = useState(50);
   const [dbPageNumber, setDbPageNumber] = useState(1);
   const [dbDescriptions, setDbDescriptions] = useState<Record<string, string>>({});
@@ -99,21 +84,75 @@ const TableBrowserPage = (): JSX.Element => {
   const [sourcePageNumber, setSourcePageNumber] = useState(1);
   // Removed forceShowSources per follow-up TODO; derive strictly from URL
 
+  // Database properties state
+  interface DatabaseProperties {
+    owner_name?: string;
+    owner_type?: string;
+    location?: string;
+    hdfs_link?: string;
+    parameters?: string;
+  }
+
+  const [databaseProperties, setDatabaseProperties] = useState<DatabaseProperties | undefined>(
+    undefined
+  );
+  const [loadingDatabaseProperties, setLoadingDatabaseProperties] = useState(false);
+
+  // Function to fetch database metadata
+  const fetchDatabaseProperties = useCallback(
+    async (databaseName: string) => {
+      if (!databaseName) {
+        return;
+      }
+
+      try {
+        setLoadingDatabaseProperties(true);
+        const result = await post<{ status: number; data: DatabaseProperties }>(
+          `/metastore/databases/${encodeURIComponent(databaseName)}/metadata`,
+          {
+            source_type: route.sourceType || getConnectorIdOrType(connector) || 'hive'
+          },
+          {
+            silenceErrors: true
+          }
+        );
+
+        if (result?.status === 0 && result.data) {
+          setDatabaseProperties(result.data);
+        } else {
+          setDatabaseProperties(undefined);
+        }
+      } catch (error) {
+        console.warn('Failed to fetch database properties:', error);
+        setDatabaseProperties(undefined);
+      } finally {
+        setLoadingDatabaseProperties(false);
+      }
+    },
+    [route.sourceType, connector]
+  );
+
   const updatePath = useCallback(
     (nextDatabase?: string, nextTable?: string) => {
-      const urlPathname = window.location.pathname;
-      const baseIdx = urlPathname.indexOf('/tablebrowser');
-      const base = baseIdx !== -1 ? urlPathname.substring(0, baseIdx) : '';
-      const sourceType =
-        route.sourceType ||
-        (connector &&
-          ((connector as unknown as { id?: string }).id ||
-            (connector as unknown as { type?: string }).type)) ||
-        '';
-      changeURL(buildTableBrowserPath(base, sourceType, nextDatabase, nextTable));
-      setLocationPath(window.location.pathname);
+      const sourceType = route.sourceType || getConnectorIdOrType(connector) || 'hive';
+      if (nextDatabase && nextTable) {
+        navigateToTable(nextDatabase, nextTable);
+      } else if (nextDatabase) {
+        navigateToDatabase(nextDatabase);
+      } else if (sourceType) {
+        navigateToSource(sourceType);
+      } else {
+        navigateToSources();
+      }
     },
-    [locationPath, route.sourceType, connector]
+    [
+      route.sourceType,
+      connector,
+      navigateToDatabase,
+      navigateToTable,
+      navigateToSource,
+      navigateToSources
+    ]
   );
 
   // Initialize from URL on mount (partial sync)
@@ -124,9 +163,6 @@ const TableBrowserPage = (): JSX.Element => {
     if (route.table) {
       setTable(route.table);
     }
-    const params = new URLSearchParams(window.location.search);
-    const tabParam = (params.get('tab') as TabKey) || 'overview';
-    setActiveTab(tabParam);
   }, []);
 
   // Apply sourceType from URL to connector selection once connectors are loaded
@@ -147,35 +183,19 @@ const TableBrowserPage = (): JSX.Element => {
     if (route.database && databases && databases.length && currentDb !== route.database) {
       selectDb(route.database);
     }
-  }, [databases]);
+  }, [databases, route.database, currentDb, selectDb]);
 
   // If no DB provided in URL, avoid auto-selecting the first DB, and don't force a default source
   useEffect(() => {
     if (!route.database && currentDb) {
       selectDb(undefined);
-      const urlPathname = window.location.pathname;
-      const baseIdx = urlPathname.indexOf('/tablebrowser');
-      const base = baseIdx !== -1 ? urlPathname.substring(0, baseIdx) : '';
       if (route.sourceType) {
-        changeURL([base, '/tablebrowser', `/${encodeURIComponent(route.sourceType)}`].join(''));
+        navigateToSource(route.sourceType);
       } else {
-        changeURL([base, '/tablebrowser'].join(''));
+        navigateToSources();
       }
     }
-  }, [currentDb]);
-
-  // Removed pick default action; DB is not auto-selected.
-
-  // Removed unused onPickMockTable (tables now come from the catalog)
-
-  const onTabChange = (key: TabKey) => {
-    const url = new URL(window.location.href);
-    url.searchParams.set('tab', key);
-    changeURL(url.pathname + url.search);
-    setActiveTab(key);
-  };
-
-  // Spinner lifecycle handled explicitly in onRefresh
+  }, [currentDb, route.database, route.sourceType, navigateToSource, navigateToSources, selectDb]);
 
   // Focus management after crumb navigation
   const panelRef = useRef<HTMLDivElement | null>(null);
@@ -184,6 +204,15 @@ const TableBrowserPage = (): JSX.Element => {
       panelRef.current.focus({ preventScroll: false } as unknown as FocusOptions);
     }
   }, [route.sourceType, currentDb, table]);
+
+  // Fetch database properties when currentDb changes
+  useEffect(() => {
+    if (currentDb && !table) {
+      fetchDatabaseProperties(currentDb);
+    } else {
+      setDatabaseProperties(undefined);
+    }
+  }, [currentDb, table, fetchDatabaseProperties]);
 
   // Prefetch database descriptions (Navigator or source metadata) when listing databases
   useEffect(() => {
@@ -224,11 +253,11 @@ const TableBrowserPage = (): JSX.Element => {
         path: [dbName]
       });
       await entry.setComment(value, { silenceErrors: true });
-      huePubSub.publish(GLOBAL_INFO_TOPIC, { message: t('Description saved') });
+      notifyInfo(t('Description saved'));
     } catch {
       // Revert on error
       setDbDescriptions(prev => ({ ...prev, [dbName]: prev[dbName] }));
-      huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: t('Failed to save description') });
+      notifyError(t('Failed to save description'));
     }
   };
 
@@ -271,10 +300,10 @@ const TableBrowserPage = (): JSX.Element => {
         path: [currentDb as string, tblName]
       });
       await entry.setComment(value, { silenceErrors: true });
-      huePubSub.publish(GLOBAL_INFO_TOPIC, { message: t('Description saved') });
+      notifyInfo(t('Description saved'));
     } catch {
       setTableDescriptions(prev => ({ ...prev, [tblName]: prev[tblName] }));
-      huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: t('Failed to save description') });
+      notifyError(t('Failed to save description'));
     }
   };
 
@@ -371,348 +400,20 @@ const TableBrowserPage = (): JSX.Element => {
     tableDescriptions
   ]);
 
-  // Load table analysis and sample when table is selected
-  const [overviewProps, setOverviewProps] = useState<{
-    properties?: { name: string; value: string }[];
-    stats?: {
-      files?: number | string;
-      rows?: number | string;
-      totalSize?: string;
-      lastUpdated?: string;
-    };
-    hdfsLink?: string;
-  }>();
-  const [sampleData, setSampleData] = useState<{
-    headers: string[];
-    rows: (string | number | null)[][];
-  }>();
-  const [detailsColumns, setDetailsColumns] = useState<
-    {
-      name: string;
-      type: string;
-      comment?: string;
-      sample?: string;
-    }[]
-  >([]);
-  const [detailsProperties, setDetailsProperties] = useState<{ name: string; value: string }[]>([]);
-  const [detailsSections, setDetailsSections] = useState<{
-    baseInfo?: { name: string; value: string }[];
-    tableParameters?: { name: string; value: string }[];
-    storageInfo?: { name: string; value: string }[];
-    storageDescParams?: { name: string; value: string }[];
-  }>({});
-
-  const fetchData = useCallback(async () => {
-    setLoadingData(true);
-    if (!currentDb || !table || !connector || !namespace || !compute) {
-      setOverviewProps(undefined);
-      setSampleData(undefined);
-      setDetailsColumns([]);
-      setLoadingData(false);
-      return;
-    }
-    try {
-      const entry = await dataCatalog.getEntry({
-        connector,
-        namespace,
-        compute,
-        path: [currentDb, table]
-      });
-      const analysis: Analysis = await entry.getAnalysis({ silenceErrors: true });
-      const analysisDetails = (
-        analysis as unknown as {
-          details?: { properties?: Record<string, string>; stats?: Record<string, string> };
-        }
-      ).details;
-      const isPartitioned = analysisDetails?.properties?.partitioned;
-      const tableType = analysisDetails?.properties?.table_type;
-      const createdBy = analysisDetails?.properties?.owner || 'hive';
-      const createdTime = analysisDetails?.stats?.created_time;
-      const createdTimeFormatted = createdTime
-        ? (() => {
-            const numeric = Number(createdTime);
-            if (!isNaN(numeric) && isFinite(numeric)) {
-              const ms = numeric < 1e12 ? numeric * 1000 : numeric;
-              return formatTimestamp(new Date(ms));
-            }
-            const d = new Date(createdTime as unknown as string);
-            return isNaN(d.getTime()) ? String(createdTime) : formatTimestamp(d);
-          })()
-        : undefined;
-      const props = [
-        { name: t('Partitioned Table'), value: isPartitioned ? t('Yes') : t('No') },
-        {
-          name: t('Managed and stored in location'),
-          value:
-            (tableType === 'MANAGED_TABLE' ? t('Managed') + ' · ' : t('External') + ' · ') +
-            ((analysis as unknown as { hdfs_link?: string })?.hdfs_link || '-')
-        },
-        {
-          name: t('Created'),
-          value: createdTimeFormatted
-            ? `${t('by')} ${createdBy} ${t('on')} ${createdTimeFormatted}`
-            : '-'
-        }
-      ];
-      const hdfsLink = (analysis as unknown as { hdfs_link?: string })?.hdfs_link;
-      const detailStats = (analysis as unknown as { details?: { stats?: Record<string, string> } })
-        ?.details?.stats;
-      const stats = detailStats
-        ? (() => {
-            const files =
-              (detailStats as Record<string, string>).num_files ||
-              (detailStats as Record<string, string>).numFiles ||
-              (detailStats as Record<string, string>).files;
-            const rows =
-              (detailStats as Record<string, string>).num_rows ||
-              (detailStats as Record<string, string>).numRows ||
-              (detailStats as Record<string, string>).rows;
-            const rawTotalSize =
-              (detailStats as Record<string, string>).total_size ||
-              (detailStats as Record<string, string>).totalSize ||
-              (detailStats as Record<string, string>).size;
-            const totalSize = (() => {
-              const n = Number(rawTotalSize);
-              return !isNaN(n) && isFinite(n)
-                ? formatBytes(n)
-                : (rawTotalSize as unknown as string);
-            })();
-            const rawLastUpdated =
-              (detailStats as Record<string, string>).last_modified_time ||
-              (detailStats as Record<string, string>).lastModified ||
-              (detailStats as Record<string, string>).lastUpdated;
-            const lastUpdated = (() => {
-              const n = Number(rawLastUpdated);
-              if (!isNaN(n) && isFinite(n)) {
-                const ms = n < 1e12 ? n * 1000 : n;
-                return formatTimestamp(new Date(ms));
-              }
-              const d = new Date(rawLastUpdated as unknown as string);
-              return isNaN(d.getTime())
-                ? (rawLastUpdated as unknown as string)
-                : formatTimestamp(d);
-            })();
-            return { files, rows, totalSize, lastUpdated };
-          })()
-        : undefined;
-      const columnsForOverview = (analysis.cols || []).map(c => ({
-        name: (c as unknown as { name: string }).name,
-        type: (c as unknown as { type: string }).type,
-        comment: (c as unknown as { comment?: string }).comment
-      }));
-      setOverviewProps({ properties: props, hdfsLink, stats });
-      // Build structured Details sections similar to legacy Metastore
-      const rawProps = (analysisDetails?.properties || {}) as Record<string, unknown>;
-      const baseInfo: { name: string; value: string }[] = [];
-      const storageInfo: { name: string; value: string }[] = [];
-      const storageDescParams: { name: string; value: string }[] = [];
-      const tableParameters: { name: string; value: string }[] = [];
-
-      const add = (arr: { name: string; value: string }[], name: string, value?: unknown) => {
-        if (typeof value !== 'undefined' && value !== null && String(value) !== '') {
-          arr.push({ name, value: String(value) });
-        }
-      };
-
-      // Detailed Table Information
-      add(baseInfo, t('Database'), currentDb || '');
-      add(baseInfo, t('OwnerType'), rawProps.owner_type || rawProps.ownertype);
-      add(baseInfo, t('Owner'), rawProps.owner);
-      add(baseInfo, t('CreateTime'), createdTimeFormatted);
-      const lastAccessRaw =
-        (rawProps as Record<string, unknown>).last_access_time ||
-        (rawProps as Record<string, unknown>).lastAccessTime ||
-        'UNKNOWN';
-      const lastAccessFormatted = (() => {
-        if (lastAccessRaw === 'UNKNOWN') {
-          return 'UNKNOWN';
-        }
-        const n = Number(lastAccessRaw as unknown as string);
-        if (!isNaN(n) && isFinite(n)) {
-          const ms = n < 1e12 ? n * 1000 : n;
-          return formatTimestamp(new Date(ms));
-        }
-        const d = new Date(lastAccessRaw as unknown as string);
-        return isNaN(d.getTime()) ? String(lastAccessRaw) : formatTimestamp(d);
-      })();
-      add(baseInfo, t('LastAccessTime'), lastAccessFormatted);
-      add(baseInfo, t('Retention'), rawProps.retention);
-      add(baseInfo, t('Location'), (analysis as unknown as { hdfs_link?: string })?.hdfs_link);
-      add(baseInfo, t('Table Type'), rawProps.table_type || rawProps.tableType);
-
-      // Table Parameters: everything under details.stats and details.properties that looks like parameters
-      Object.keys(analysis.details.stats || {}).forEach(key => {
-        const valueRaw = (analysis.details.stats as Record<string, unknown>)[key];
-        const lower = key.toLowerCase();
-        let value: string | undefined;
-        if (lower.includes('size') || lower.includes('bytes') || lower.endsWith('length')) {
-          const n = Number(valueRaw as unknown as string);
-          if (!isNaN(n) && isFinite(n)) {
-            value = formatBytes(n);
-          }
-        } else if (
-          lower.includes('time') ||
-          lower.includes('timestamp') ||
-          lower.includes('date') ||
-          lower.includes('modified')
-        ) {
-          const n = Number(valueRaw as unknown as string);
-          if (!isNaN(n) && isFinite(n)) {
-            const ms = n < 1e12 ? n * 1000 : n;
-            value = formatTimestamp(new Date(ms));
-          } else if (typeof valueRaw === 'string') {
-            const d = new Date(valueRaw);
-            if (!isNaN(d.getTime())) {
-              value = formatTimestamp(d);
-            }
-          }
-        }
-        tableParameters.push({ name: key, value: String(value ?? valueRaw ?? '') });
-      });
-      // Legacy lists some from properties as well (transactional, etc.)
-      [
-        'transactional',
-        'transactional_properties',
-        'transient_lastDdlTime',
-        'COLUMN_STATS_ACCURATE',
-        'bucketing_version'
-      ].forEach(key => {
-        if (typeof rawProps[key] !== 'undefined') {
-          tableParameters.push({ name: key, value: String(rawProps[key] as unknown as string) });
-        }
-      });
-
-      // Storage Information
-      add(
-        storageInfo,
-        t('SerDe Library'),
-        rawProps['SerDe Library:'] || rawProps.serde_lib || rawProps.serdeLibName
-      );
-      add(
-        storageInfo,
-        t('InputFormat'),
-        rawProps.InputFormat || rawProps.input_format || rawProps.inputFormat
-      );
-      add(
-        storageInfo,
-        t('OutputFormat'),
-        rawProps.OutputFormat || rawProps.output_format || rawProps.outputFormat
-      );
-      add(storageInfo, t('Compressed'), rawProps.compressed ? t('Yes') : t('No'));
-      add(storageInfo, t('Num Buckets'), rawProps.numBuckets || rawProps.num_buckets || -1);
-      add(
-        storageInfo,
-        t('Bucket Columns'),
-        Array.isArray(rawProps.bucketCols)
-          ? JSON.stringify(rawProps.bucketCols)
-          : rawProps.bucketCols || '[]'
-      );
-      add(
-        storageInfo,
-        t('Sort Columns'),
-        Array.isArray(rawProps.sortCols)
-          ? JSON.stringify(rawProps.sortCols)
-          : rawProps.sortCols || '[]'
-      );
-
-      // Storage Desc Params: try to parse properties following legacy conventions
-      if (rawProps['Storage Desc Params:']) {
-        storageDescParams.push({
-          name: t('serialization.format'),
-          value: String(rawProps['Storage Desc Params:'])
-        });
-      }
-
-      // Fallback simple flat list
-      const allProps = Object.keys(rawProps).map(key => ({
-        name: key,
-        value: String(rawProps[key] ?? '')
-      }));
-      setDetailsProperties(allProps);
-      setDetailsSections({ baseInfo, tableParameters, storageInfo, storageDescParams });
-      setDetailsColumns(columnsForOverview);
-      const sample = await entry.getSample({ silenceErrors: true });
-      const headers = Array.isArray(sample.meta)
-        ? (sample.meta as SampleMeta[]).map((m: SampleMeta) => m.name)
-        : [];
-      setSampleData({ headers, rows: sample.data || [] });
-      const cols = (analysis.cols || []).map(c => ({
-        name: (c as unknown as { name: string }).name,
-        type: (c as unknown as { type: string }).type,
-        comment: (c as unknown as { comment?: string }).comment
-      }));
-      setDetailsColumns(cols);
-    } catch (err) {
-      huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: t('Failed to load table data') });
-    } finally {
-      setLoadingData(false);
-    }
-  }, [currentDb, table, connector, namespace, compute]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  const {
+    loading: loadingData,
+    overviewProps,
+    detailsColumns,
+    detailsProperties,
+    detailsSections,
+    sampleData,
+    refresh
+  } = useTableDetails({ connector, namespace, compute, database: currentDb, table });
 
   return (
     <div className="hue-table-browser">
       <CommonHeader title={t('Table Browser')} icon={<DataBrowserIcon />} />
       <div className="hue-table-browser__container">
-        <Breadcrumbs
-          sourceType={route.sourceType}
-          database={currentDb}
-          table={table}
-          sourceOptions={(connectors || []).map(c => c.type)}
-          onClickDataSources={() => {
-            // Navigate to Data sources root and clear selection
-            const urlPathname = window.location.pathname;
-            const baseIdx = urlPathname.indexOf('/tablebrowser');
-            const base = baseIdx !== -1 ? urlPathname.substring(0, baseIdx) : '';
-            selectDb(undefined);
-            setTable(undefined);
-            changeURL(buildTableBrowserPath(base));
-            setLocationPath(window.location.pathname);
-          }}
-          onClickDatabases={() => {
-            // Navigate to source root and clear db/table selection
-            const urlPathname = window.location.pathname;
-            const baseIdx = urlPathname.indexOf('/tablebrowser');
-            const base = baseIdx !== -1 ? urlPathname.substring(0, baseIdx) : '';
-            const sourceType = route.sourceType || 'hive';
-            selectDb(undefined);
-            setTable(undefined);
-            changeURL(buildTableBrowserPath(base, sourceType));
-            setLocationPath(window.location.pathname);
-          }}
-          onClickDatabase={(db: string) => {
-            // Navigate to db and clear table selection
-            const urlPathname = window.location.pathname;
-            const baseIdx = urlPathname.indexOf('/tablebrowser');
-            const base = baseIdx !== -1 ? urlPathname.substring(0, baseIdx) : '';
-            const sourceType = route.sourceType || 'hive';
-            if (db !== currentDb) {
-              selectDb(db);
-            }
-            setTable(undefined);
-            changeURL(buildTableBrowserPath(base, sourceType, db));
-            setLocationPath(window.location.pathname);
-          }}
-          onSelectSource={src => {
-            const wanted = (connectors || []).find(
-              c => c.type === src || (c as unknown as { id?: string }).id === src
-            );
-            if (wanted) {
-              setConnector(wanted as unknown as never);
-            }
-            // Reset DB and Table on source change
-            selectDb(undefined);
-            setTable(undefined);
-            const urlPathname = window.location.pathname;
-            const baseIdx = urlPathname.indexOf('/tablebrowser');
-            const base = baseIdx !== -1 ? urlPathname.substring(0, baseIdx) : '';
-            changeURL(buildTableBrowserPath(base, src));
-            setLocationPath(window.location.pathname);
-          }}
-        />
         <Row gutter={16}>
           <Col span={24}>
             <div
@@ -734,12 +435,57 @@ const TableBrowserPage = (): JSX.Element => {
                   }
                   loading={!!loadingStates.database}
                   isRefreshing={isRefreshing}
+                  onRefresh={async () => {
+                    try {
+                      setIsRefreshing(true);
+                      // Refresh connectors/sources by reloading databases which triggers connector refresh
+                      await reloadDatabases();
+                    } catch {
+                      notifyError(t('Failed to refresh data sources'));
+                    } finally {
+                      setIsRefreshing(false);
+                    }
+                  }}
                   sourceFilter={sourceFilter}
                   setSourceFilter={setSourceFilter}
                   sourcePageNumber={sourcePageNumber}
                   setSourcePageNumber={setSourcePageNumber}
                   sourcePageSize={sourcePageSize}
                   setSourcePageSize={setSourcePageSize}
+                  sourceType={route.sourceType}
+                  database={currentDb}
+                  table={table}
+                  sourceOptions={(connectors || []).map(c => c.type)}
+                  onClickDataSources={() => {
+                    // Already on data sources page, no action needed
+                  }}
+                  onClickDatabases={() => {
+                    // Navigate to source root
+                    const sourceType = route.sourceType || 'hive';
+                    selectDb(undefined);
+                    setTable(undefined);
+                    navigateToSource(sourceType);
+                  }}
+                  onClickDatabase={(db: string) => {
+                    // Navigate to database
+                    if (db !== currentDb) {
+                      selectDb(db);
+                    }
+                    setTable(undefined);
+                    navigateToDatabase(db);
+                  }}
+                  onSelectSource={src => {
+                    const wanted = (connectors || []).find(
+                      c => c.type === src || (c as unknown as { id?: string }).id === src
+                    );
+                    if (wanted) {
+                      setConnector(wanted as unknown as never);
+                    }
+                    // Reset DB and Table on source change
+                    selectDb(undefined);
+                    setTable(undefined);
+                    navigateToSource(src);
+                  }}
                   onOpenSource={src => {
                     const wanted = (connectors || []).find(
                       c => c.type === src || (c as unknown as { id?: string }).id === src
@@ -749,11 +495,7 @@ const TableBrowserPage = (): JSX.Element => {
                     }
                     selectDb(undefined);
                     setTable(undefined);
-                    const urlPathname = window.location.pathname;
-                    const baseIdx = urlPathname.indexOf('/tablebrowser');
-                    const base = baseIdx !== -1 ? urlPathname.substring(0, baseIdx) : '';
-                    changeURL(buildTableBrowserPath(base, src));
-                    setLocationPath(window.location.pathname);
+                    navigateToSource(src);
                   }}
                 />
               )}
@@ -776,9 +518,7 @@ const TableBrowserPage = (): JSX.Element => {
                         await reloadDatabases();
                       }
                     } catch {
-                      huePubSub.publish(GLOBAL_ERROR_TOPIC, {
-                        message: t('Failed to refresh databases')
-                      });
+                      notifyError(t('Failed to refresh databases'));
                     } finally {
                       setIsRefreshing(false);
                     }
@@ -802,23 +542,129 @@ const TableBrowserPage = (): JSX.Element => {
                     updatePath(db, undefined);
                   }}
                   onSaveDescription={saveDbDescription}
+                  sourceType={route.sourceType}
+                  database={currentDb}
+                  table={table}
+                  sourceOptions={(connectors || []).map(c => c.type)}
+                  onClickDataSources={() => {
+                    // Navigate to Data sources root and clear selection
+                    selectDb(undefined);
+                    setTable(undefined);
+                    navigateToSources();
+                  }}
+                  onClickDatabases={() => {
+                    // Navigate to source root and clear db/table selection
+                    const sourceType = route.sourceType || 'hive';
+                    selectDb(undefined);
+                    setTable(undefined);
+                    navigateToSource(sourceType);
+                  }}
+                  onClickDatabase={(db: string) => {
+                    // Navigate to db and clear table selection
+                    if (db !== currentDb) {
+                      selectDb(db);
+                    }
+                    setTable(undefined);
+                    navigateToDatabase(db);
+                  }}
+                  onSelectSource={src => {
+                    const wanted = (connectors || []).find(
+                      c => c.type === src || (c as unknown as { id?: string }).id === src
+                    );
+                    if (wanted) {
+                      setConnector(wanted as unknown as never);
+                    }
+                    // Reset DB and Table on source change
+                    selectDb(undefined);
+                    setTable(undefined);
+                    navigateToSource(src);
+                  }}
                   onDropDatabases={async names => {
                     try {
-                      await fetch(`/metastore/databases/drop`, {
-                        method: 'POST',
-                        headers: {
-                          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-                        },
-                        body: names
-                          .map(n => `database_selection=${encodeURIComponent(n)}`)
-                          .concat(['is_embeddable=true'])
-                          .join('&')
+                      // Create URLSearchParams for proper form encoding without qs array notation
+                      const formData = new URLSearchParams();
+                      // Send database names as individual form fields (metastore expects getlist)
+                      names.forEach(name => {
+                        formData.append('database_selection', name);
                       });
+                      formData.append('is_embeddable', 'true');
+                      formData.append(
+                        'source_type',
+                        route.sourceType || getConnectorIdOrType(connector) || 'hive'
+                      );
+                      formData.append('start_time', Date.now().toString());
+
+                      if (namespace) {
+                        formData.append('namespace', JSON.stringify(namespace));
+                      }
+
+                      if (compute) {
+                        formData.append('cluster', JSON.stringify(compute));
+                      }
+
+                      const result = await post<{ history_uuid?: string; message?: string }>(
+                        '/metastore/databases/drop',
+                        formData,
+                        {
+                          silenceErrors: false,
+                          qsEncodeData: false // Don't use qs.stringify, send URLSearchParams directly
+                        }
+                      );
+
+                      // Handle the task execution response
+                      if (result?.message) {
+                        notifyError(result.message);
+                        // If there's an error message, reload databases to restore state
+                        await reloadDatabases();
+                        return;
+                      }
+
+                      // For successful operations (with or without history_uuid), reload databases
                       await reloadDatabases();
-                    } catch {
-                      huePubSub.publish(GLOBAL_ERROR_TOPIC, {
-                        message: t('Failed to drop databases')
-                      });
+                    } catch (error) {
+                      notifyError(t('Failed to drop databases'));
+                      // On error, reload databases to restore the correct state
+                      await reloadDatabases();
+                    }
+                  }}
+                  onCreateDatabase={async (name, comment, location) => {
+                    try {
+                      // Use the beeswax create database endpoint with proper API utils
+                      const formData: Record<string, string> = {
+                        name: name
+                      };
+
+                      if (comment) {
+                        formData.comment = comment;
+                      }
+
+                      if (location) {
+                        formData.external_location = location;
+                        formData.use_default_location = 'false';
+                      } else {
+                        formData.use_default_location = 'true';
+                      }
+
+                      // Use the post utility which handles CSRF tokens automatically
+                      const result = await post<{ status?: number; message?: string }>(
+                        '/beeswax/create/database',
+                        formData,
+                        {
+                          silenceErrors: false
+                        }
+                      );
+
+                      // Check if there was an error
+                      if (result?.status === -1) {
+                        notifyError(result.message || t('Failed to create database'));
+                        return;
+                      }
+
+                      // Reload databases to show the new one
+                      await reloadDatabases();
+                    } catch (error) {
+                      notifyError(t('Failed to create database'));
+                      console.error('Create database error:', error);
                     }
                   }}
                 />
@@ -847,9 +693,7 @@ const TableBrowserPage = (): JSX.Element => {
                         await reloadTables();
                       }
                     } catch {
-                      huePubSub.publish(GLOBAL_ERROR_TOPIC, {
-                        message: t('Failed to refresh tables')
-                      });
+                      notifyError(t('Failed to refresh tables'));
                     } finally {
                       setIsRefreshing(false);
                     }
@@ -875,158 +719,164 @@ const TableBrowserPage = (): JSX.Element => {
                     updatePath(currentDb, name);
                   }}
                   onQuerySelection={name => {
-                    huePubSub.publish('open.editor.new.query', {
+                    type Publish = (topic: string, payload: unknown) => void;
+                    const w = window as unknown as { huePubSub?: { publish?: Publish } };
+                    w.huePubSub?.publish?.('open.editor.new.query', {
                       type: route.sourceType || 'hive',
                       statementType: 'text',
                       statementPath: currentDb && name ? `${currentDb}.${name}` : undefined
                     });
                   }}
-                  onDropSelection={async names => {
+                  onDropSelection={async (names, skipTrash = false) => {
                     try {
-                      await fetch(
+                      // Create URLSearchParams for proper form encoding without qs array notation
+                      const formData = new URLSearchParams();
+                      // Send table names as individual form fields (metastore expects getlist)
+                      names.forEach(name => {
+                        formData.append('table_selection', name);
+                      });
+                      formData.append('is_embeddable', 'true');
+                      formData.append('skip_trash', skipTrash ? 'on' : 'off');
+                      formData.append(
+                        'source_type',
+                        route.sourceType || getConnectorIdOrType(connector) || 'hive'
+                      );
+                      formData.append('start_time', Date.now().toString());
+
+                      if (namespace) {
+                        formData.append('namespace', JSON.stringify(namespace));
+                      }
+
+                      if (compute) {
+                        formData.append('cluster', JSON.stringify(compute));
+                      }
+
+                      const result = await post<{ history_uuid?: string; message?: string }>(
                         `/metastore/tables/drop/${encodeURIComponent(currentDb as string)}`,
+                        formData,
                         {
-                          method: 'POST',
-                          headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-                          },
-                          body: `table_selection=${encodeURIComponent(
-                            JSON.stringify(names)
-                          )}&skip_trash=off&is_embeddable=true`
+                          silenceErrors: false,
+                          qsEncodeData: false // Don't use qs.stringify, send URLSearchParams directly
                         }
                       );
+
+                      // Handle the task execution response
+                      if (result.message) {
+                        notifyError(result.message);
+                        // If there's an error message, reload tables to restore state
+                        await reloadTables();
+                        return;
+                      }
+
+                      // For successful operations (with or without history_uuid), reload tables
                       await reloadTables();
-                    } catch {
-                      huePubSub.publish(GLOBAL_ERROR_TOPIC, {
-                        message: t('Failed to drop tables')
-                      });
+                    } catch (error) {
+                      notifyError(t('Failed to drop tables'));
+                      // On error, reload tables to restore the correct state
+                      await reloadTables();
                     }
+                  }}
+                  databaseName={currentDb}
+                  databaseProperties={databaseProperties}
+                  loadingDatabaseProperties={loadingDatabaseProperties}
+                  sourceType={route.sourceType}
+                  table={table}
+                  sourceOptions={(connectors || []).map(c => c.type)}
+                  onClickDataSources={() => {
+                    // Navigate to Data sources root and clear selection
+                    selectDb(undefined);
+                    setTable(undefined);
+                    navigateToSources();
+                  }}
+                  onClickDatabases={() => {
+                    // Navigate to source root and clear db/table selection
+                    const sourceType = route.sourceType || 'hive';
+                    selectDb(undefined);
+                    setTable(undefined);
+                    navigateToSource(sourceType);
+                  }}
+                  onClickDatabase={(db: string) => {
+                    // Navigate to db and clear table selection
+                    if (db !== currentDb) {
+                      selectDb(db);
+                    }
+                    setTable(undefined);
+                    navigateToDatabase(db);
+                  }}
+                  onSelectSource={src => {
+                    const wanted = (connectors || []).find(
+                      c => c.type === src || (c as unknown as { id?: string }).id === src
+                    );
+                    if (wanted) {
+                      setConnector(wanted as unknown as never);
+                    }
+                    // Reset DB and Table on source change
+                    selectDb(undefined);
+                    setTable(undefined);
+                    navigateToSource(src);
                   }}
                 />
               )}
 
               {!!currentDb && !!table && (
-                <div>
-                  <Tabs
-                    activeKey={activeTab}
-                    onChange={onTabChange}
-                    sampleCount={sampleData?.rows?.length}
-                    partitionsCount={
-                      overviewProps?.stats ? Number(overviewProps?.stats?.files) : undefined
+                <TableDetails
+                  sourceType={route.sourceType}
+                  database={currentDb}
+                  table={table}
+                  activeTab={activeTab}
+                  onTabChange={onTabChange}
+                  onBackToTables={() => {
+                    setTable(undefined);
+                    navigateToDatabase(currentDb);
+                  }}
+                  connector={connector}
+                  namespace={namespace}
+                  compute={compute}
+                  tableDetails={{
+                    loading: loadingData,
+                    overviewProps,
+                    detailsColumns,
+                    detailsProperties,
+                    detailsSections,
+                    sampleData,
+                    refresh
+                  }}
+                  onReloadTables={reloadTables}
+                  sourceOptions={(connectors || []).map(c => c.type)}
+                  onClickDataSources={() => {
+                    // Navigate to Data sources root and clear selection
+                    selectDb(undefined);
+                    setTable(undefined);
+                    navigateToSources();
+                  }}
+                  onClickDatabases={() => {
+                    // Navigate to source root and clear db/table selection
+                    const sourceType = route.sourceType || 'hive';
+                    selectDb(undefined);
+                    setTable(undefined);
+                    navigateToSource(sourceType);
+                  }}
+                  onClickDatabase={(db: string) => {
+                    // Navigate to db and clear table selection
+                    if (db !== currentDb) {
+                      selectDb(db);
                     }
-                  />
-                  <Loading spinning={false}>
-                    {activeTab === 'overview' && (
-                      <Overview
-                        properties={overviewProps?.properties}
-                        stats={overviewProps?.stats}
-                        hdfsLink={overviewProps?.hdfsLink}
-                        columns={detailsColumns}
-                        loadingProperties={loadingData && !overviewProps?.properties}
-                        loadingStats={loadingData && !overviewProps?.stats}
-                        loadingColumns={loadingData && !detailsColumns.length}
-                        onRefreshStats={async () => {
-                          // Reuse toolbar refresh to invalidate and refetch
-                          try {
-                            if (currentDb && table && connector && namespace && compute) {
-                              const entry = await dataCatalog.getEntry({
-                                connector,
-                                namespace,
-                                compute,
-                                path: [currentDb, table]
-                              });
-                              setLoadingData(true);
-                              await entry.clearCache({ cascade: true, silenceErrors: true });
-                            }
-                          } catch {}
-                          await fetchData();
-                          setLoadingData(false);
-                        }}
-                      />
-                    )}
-                    {activeTab === 'sample' && (
-                      <Loading spinning={loadingData && !sampleData}>
-                        <SampleGrid data={sampleData} />
-                      </Loading>
-                    )}
-                    {activeTab === 'details' && (
-                      <Loading
-                        spinning={
-                          loadingData &&
-                          !(
-                            detailsProperties?.length ||
-                            detailsSections.baseInfo?.length ||
-                            detailsSections.tableParameters?.length ||
-                            detailsSections.storageInfo?.length ||
-                            detailsSections.storageDescParams?.length
-                          )
-                        }
-                      >
-                        <DetailsProperties
-                          properties={detailsProperties}
-                          baseInfo={detailsSections.baseInfo}
-                          tableParameters={detailsSections.tableParameters}
-                          storageInfo={detailsSections.storageInfo}
-                          storageDescParams={detailsSections.storageDescParams}
-                        />
-                      </Loading>
-                    )}
-                    {activeTab === 'partitions' && (
-                      <Loading spinning={loadingData && !overviewProps}>
-                        <Partitions
-                          connector={connector}
-                          namespace={namespace}
-                          compute={compute}
-                          database={currentDb}
-                          table={table}
-                          onCountChange={() => {}}
-                        />
-                      </Loading>
-                    )}
-                    {activeTab === 'queries' && (
-                      <Loading spinning={loadingData && !overviewProps}>
-                        <Queries
-                          connector={connector}
-                          namespace={namespace}
-                          compute={compute}
-                          database={currentDb}
-                          table={table}
-                        />
-                      </Loading>
-                    )}
-                    {activeTab === 'viewSql' && (
-                      <Loading spinning={loadingData && !overviewProps?.properties}>
-                        <ViewSql
-                          sql={
-                            (overviewProps?.properties || []).find(
-                              p =>
-                                p.name.toLowerCase() === 'view original text:' ||
-                                p.name.toLowerCase() === 'original query:'
-                            )?.value
-                          }
-                        />
-                      </Loading>
-                    )}
-                    {activeTab === 'privileges' && (
-                      <Loading spinning={loadingData && !overviewProps}>
-                        <Privileges database={currentDb} table={table} />
-                      </Loading>
-                    )}
-                  </Loading>
-                  {!!table && (
-                    <div style={{ marginTop: 12 }}>
-                      <Button
-                        onClick={() => {
-                          setTable(undefined);
-                          updatePath(currentDb, undefined);
-                        }}
-                        data-testid="tb-back"
-                      >
-                        {t('Back to tables')}
-                      </Button>
-                    </div>
-                  )}
-                </div>
+                    setTable(undefined);
+                    navigateToDatabase(db);
+                  }}
+                  onSelectSource={src => {
+                    const wanted = (connectors || []).find(
+                      c => c.type === src || (c as unknown as { id?: string }).id === src
+                    );
+                    if (wanted) {
+                      setConnector(wanted as unknown as never);
+                    }
+                    // Reset DB and Table on source change
+                    selectDb(undefined);
+                    setTable(undefined);
+                    navigateToSource(src);
+                  }}
+                />
               )}
             </div>
           </Col>

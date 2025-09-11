@@ -16,9 +16,9 @@ const Privileges = ({ database, table }: PrivilegesProps): JSX.Element => {
   if (!database || !table) {
     return <EmptyState title={t('No privileges')} />;
   }
-  return <EmptyState title={t('Privileges for {{dbTable}}', { dbTable: `${database}.${table}` })} />;
+  return (
+    <EmptyState title={t('Privileges for {{dbTable}}', { dbTable: `${database}.${table}` })} />
+  );
 };
 
 export default Privileges;
-
-

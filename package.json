@@ -80,6 +80,7 @@
     "sprintf-js": "1.1.2",
     "sql-formatter": "12.2.1",
     "styled-components": "5.3.10",
+    "uuid": "13.0.0",
     "vue": "3.2.0",
     "vue-custom-element": "3.2.14",
     "vue3-datepicker": "0.2.5"
@@ -107,6 +108,7 @@
     "@types/react": "18.0.20",
     "@types/react-dom": "18.0.6",
     "@types/sanitize-html": "1.27.0",
+    "@types/uuid": "10.0.0",
     "@types/webpack": "5.28.0",
     "@typescript-eslint/eslint-plugin": "7.16.0",
     "@typescript-eslint/parser": "7.16.0",

@@ -43,6 +43,7 @@ const Overview = ({
       <span>{t('Stats')}</span>
       {onRefreshStats && (
         <BorderlessButton
+          aria-label={t('Refresh stats')}
           onClick={onRefreshStats}
           title={t('Refresh stats')}
           icon={<RefreshIcon />}

@@ -47,7 +47,7 @@ const Tabs = ({
     ...(showViewSql ? [{ key: 'viewSql', label: t('View SQL') }] : []),
     { key: 'details', label: t('Details') },
     { key: 'privileges', label: t('Privileges') },
-    ...(showErd ? [{ key: 'erd', label: 'ERD' }] : [])
+    ...(showErd ? [{ key: 'erd', label: t('ERD') }] : [])
   ];
 
   return <AntdTabs activeKey={activeKey} onChange={key => onChange(key as TabKey)} items={items} />;

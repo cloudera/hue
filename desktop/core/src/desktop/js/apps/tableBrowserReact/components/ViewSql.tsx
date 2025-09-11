@@ -15,12 +15,10 @@ const ViewSql = ({ sql }: ViewSqlProps): JSX.Element => {
     return <EmptyState title={t('No view SQL')} />;
   }
   return (
-    <pre style={{ background: '#f6f8fa', padding: 12, overflowX: 'auto' }}>
+    <pre className="hue-table-browser__view-sql" role="region" aria-label={t('View SQL')}>
       {sql}
     </pre>
   );
 };
 
 export default ViewSql;
-
-

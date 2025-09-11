@@ -15,10 +15,14 @@ import { buildTableBrowserPath, parseTableBrowserPath } from './routing';
 describe('routing utils', () => {
   it('builds paths correctly', () => {
     expect(buildTableBrowserPath('', undefined, undefined, undefined)).toBe('/tablebrowser');
-    expect(buildTableBrowserPath('/hue', undefined, undefined, undefined)).toBe('/hue/tablebrowser');
+    expect(buildTableBrowserPath('/hue', undefined, undefined, undefined)).toBe(
+      '/hue/tablebrowser'
+    );
     expect(buildTableBrowserPath('/hue', 'impala')).toBe('/hue/tablebrowser/impala');
     expect(buildTableBrowserPath('/hue', 'hive', 'default')).toBe('/hue/tablebrowser/hive/default');
-    expect(buildTableBrowserPath('/hue', 'impala', 'db', 'tbl')).toBe('/hue/tablebrowser/impala/db/tbl');
+    expect(buildTableBrowserPath('/hue', 'impala', 'db', 'tbl')).toBe(
+      '/hue/tablebrowser/impala/db/tbl'
+    );
   });
 
   it('parses paths correctly', () => {
@@ -37,5 +41,3 @@ describe('routing utils', () => {
     });
   });
 });
-
-

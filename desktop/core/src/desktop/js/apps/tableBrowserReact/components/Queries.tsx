@@ -30,11 +30,18 @@ const Queries = ({ connector, namespace, compute, database, table }: QueriesProp
       }
       setLoading(true);
       try {
-        const entry = await dataCatalog.getEntry({ connector, namespace, compute, path: [database, table] });
+        const entry = await dataCatalog.getEntry({
+          connector,
+          namespace,
+          compute,
+          path: [database, table]
+        });
         // Use SQL Analyzer popularity as a proxy for queries; legacy API requires server route
         const analysis = await entry.getAnalysis({ silenceErrors: true });
         const popular = (analysis as any).top_joins || [];
-        const qs = popular.map((j: any) => `${j.leftTable}.${j.leftColumn} = ${j.rightTable}.${j.rightColumn}`);
+        const qs = popular.map(
+          (j: any) => `${j.leftTable}.${j.leftColumn} = ${j.rightTable}.${j.rightColumn}`
+        );
         setQueries(qs);
       } catch (err) {
         setQueries([]);
@@ -51,11 +58,14 @@ const Queries = ({ connector, namespace, compute, database, table }: QueriesProp
 
   return (
     <Loading spinning={loading}>
-      <List bordered size="small" dataSource={queries} renderItem={q => <List.Item>{q}</List.Item>} />
+      <List
+        bordered
+        size="small"
+        dataSource={queries}
+        renderItem={q => <List.Item>{q}</List.Item>}
+      />
     </Loading>
   );
 };
 
 export default Queries;
-
-

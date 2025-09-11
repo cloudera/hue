@@ -45,4 +45,7 @@ export function buildTableBrowserPath(
   ].join('');
 }
 
-
+export function getTableBrowserBasePath(pathname: string = window.location.pathname): string {
+  const baseIdx = pathname.indexOf('/tablebrowser');
+  return baseIdx !== -1 ? pathname.substring(0, baseIdx) : '';
+}

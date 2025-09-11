@@ -11,7 +11,7 @@
 // the License.
 
 import React, { useMemo, useState } from 'react';
-import { Input, Skeleton } from 'antd';
+import { Input, Skeleton, Checkbox } from 'antd';
 import { LinkButton } from 'cuix/dist/components/Button';
 import PrimaryButton from 'cuix/dist/components/Button/PrimaryButton';
 import Button from 'cuix/dist/components/Button/Button';
@@ -19,6 +19,10 @@ import Loading from 'cuix/dist/components/Loading';
 import Modal from 'cuix/dist/components/Modal';
 import EmptyState from 'cuix/dist/components/EmptyState';
 import Filter from 'cuix/dist/components/Filter';
+import DataLakeIcon from '@cloudera/cuix-core/icons/react/DataLakeIcon';
+
+import Toolbar, { type ToolbarAction } from './Toolbar';
+import PageHeader from './PageHeader';
 import PaginatedTable, {
   type ColumnProps as PaginatedColumnProps
 } from '../../../reactComponents/PaginatedTable/PaginatedTable';
@@ -44,6 +48,16 @@ export interface DatabasesListProps {
   onOpenDatabase: (name: string) => void;
   onSaveDescription: (name: string, value: string) => void;
   onDropDatabases?: (names: string[]) => Promise<void> | void;
+  onCreateDatabase?: (name: string, comment?: string, location?: string) => Promise<void> | void;
+  sourceType?: string;
+  // Breadcrumbs props
+  database?: string;
+  table?: string;
+  sourceOptions?: string[];
+  onSelectSource?: (sourceType: string) => void;
+  onClickDataSources?: () => void;
+  onClickDatabases?: () => void;
+  onClickDatabase?: (database: string) => void;
 }
 
 const DatabasesList = ({
@@ -64,11 +78,27 @@ const DatabasesList = ({
   setEditingValue,
   onOpenDatabase,
   onSaveDescription,
-  onDropDatabases
+  onDropDatabases,
+  onCreateDatabase,
+  sourceType,
+  database,
+  table,
+  sourceOptions,
+  onSelectSource,
+  onClickDataSources,
+  onClickDatabases,
+  onClickDatabase
 }: DatabasesListProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const [selected, setSelected] = useState<string[]>([]);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [createForm, setCreateForm] = useState({
+    name: '',
+    comment: '',
+    location: '',
+    useDefaultLocation: true
+  });
 
   const filtered = (databases || []).filter(db =>
     dbFilter ? db.toLowerCase().includes(dbFilter.toLowerCase()) : true
@@ -76,6 +106,37 @@ const DatabasesList = ({
 
   // Hooks must not be conditionally skipped: compute memoized data before any early return
   const data = useMemo(() => filtered.map(name => ({ key: name, name })), [filtered]);
+
+  // Prepare toolbar actions (excluding refresh which is now separate)
+  const toolbarActions = useMemo(() => {
+    const actions: ToolbarAction[] = [];
+
+    if (onCreateDatabase) {
+      actions.push({
+        key: 'new',
+        label: t('New'),
+        onClick: () => setCreateModalOpen(true),
+        variant: 'primary'
+      });
+    }
+
+    if (onDropDatabases) {
+      actions.push({
+        key: 'drop',
+        label: t('Drop'),
+        onClick: () => {
+          if (!selected.length) {
+            return;
+          }
+          setConfirmOpen(true);
+        },
+        disabled: !selected.length,
+        variant: 'danger'
+      });
+    }
+
+    return actions;
+  }, [onCreateDatabase, onDropDatabases, selected.length, t]);
 
   if (!loading && filtered.length === 0) {
     return (
@@ -159,48 +220,61 @@ const DatabasesList = ({
 
   return (
     <div>
-      <h2 className="hue-table-browser__heading">
-        {t('{{label}} ({{count}})', {
-          label: t('Databases'),
-          count: totalSize
-        })}
-      </h2>
-      <Loading spinning={!!loading || isRefreshing}>
-        {(onDropDatabases || onRefresh) && (
-          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginBottom: 8 }}>
-            {onRefresh && (
-              <Button onClick={onRefresh} disabled={!!loading || isRefreshing}>
-                {t('Refresh')}
-              </Button>
-            )}
-            {onDropDatabases && (
-              <Button
-                onClick={() => {
-                  if (!selected.length) {
-                    return;
-                  }
-                  setConfirmOpen(true);
-                }}
-                disabled={!selected.length}
-              >
-                {t('Drop')}
-              </Button>
-            )}
+      <PageHeader
+        title={sourceType?.toUpperCase()}
+        icon={<DataLakeIcon />}
+        onRefresh={onRefresh}
+        loading={loading}
+        isRefreshing={isRefreshing}
+        sourceType={sourceType}
+        database={database}
+        table={table}
+        sourceOptions={sourceOptions}
+        onSelectSource={onSelectSource}
+        onClickDataSources={onClickDataSources}
+        onClickDatabases={onClickDatabases}
+        onClickDatabase={onClickDatabase}
+      />
+
+      <div className="hue-table-browser__header-with-actions">
+        <h3 className="hue-h3">
+          {t('{{label}} ({{count}})', {
+            label: t('Databases'),
+            count: totalSize
+          })}
+        </h3>
+      </div>
+
+      {/* Filter row with filter and toolbar */}
+      <div
+        className={`hue-table-browser__filter-and-actions ${!!loading || isRefreshing ? 'disabled' : ''}`}
+      >
+        <Filter
+          search={{ placeholder: t('Filter databases') }}
+          onChange={(output: FilterOutput) => {
+            if (!!loading || isRefreshing) {
+              return; // Prevent changes while loading
+            }
+            const searchValue = String(
+              (output as unknown as { search?: unknown[] }).search?.[0] ?? ''
+            );
+            if (searchValue !== dbFilter) {
+              setDbFilter(searchValue);
+            }
+          }}
+        />
+        {toolbarActions.length > 0 && (
+          <div className="hue-table-browser__actions">
+            <Toolbar
+              actions={toolbarActions}
+              selectedItems={selected}
+              loading={loading}
+              isRefreshing={isRefreshing}
+            />
           </div>
         )}
-        <div className="hue-table-browser__filter">
-          <Filter
-            search={{ placeholder: t('Filter databases') }}
-            onChange={(output: FilterOutput) => {
-              const searchValue = String(
-                (output as unknown as { search?: unknown[] }).search?.[0] ?? ''
-              );
-              if (searchValue !== dbFilter) {
-                setDbFilter(searchValue);
-              }
-            }}
-          />
-        </div>
+      </div>
+      <Loading spinning={!!loading || isRefreshing}>
         <PaginatedTable<{ name: string; description?: string }>
           data={pageData}
           columns={columns}
@@ -249,6 +323,96 @@ const DatabasesList = ({
         </ul>
         <div className="label label-important" style={{ display: 'inline-block', marginTop: 5 }}>
           {t('Warning: This will drop all tables and objects within the database.')}
+        </div>
+      </Modal>
+
+      <Modal
+        open={createModalOpen}
+        title={t('Create a new database')}
+        okText={t('Create')}
+        cancelText={t('Cancel')}
+        onCancel={() => {
+          setCreateModalOpen(false);
+          setCreateForm({
+            name: '',
+            comment: '',
+            location: '',
+            useDefaultLocation: true
+          });
+        }}
+        onOk={async () => {
+          if (!createForm.name.trim()) {
+            return;
+          }
+          try {
+            if (onCreateDatabase) {
+              await onCreateDatabase(
+                createForm.name.trim(),
+                createForm.comment.trim() || undefined,
+                createForm.useDefaultLocation ? undefined : createForm.location.trim() || undefined
+              );
+            }
+            setCreateForm({
+              name: '',
+              comment: '',
+              location: '',
+              useDefaultLocation: true
+            });
+          } finally {
+            setCreateModalOpen(false);
+          }
+        }}
+      >
+        <div style={{ marginBottom: 16 }}>
+          <label style={{ display: 'block', marginBottom: 4, fontWeight: 'bold' }}>
+            {t('Database Name')} *
+          </label>
+          <Input
+            placeholder={t('database_name')}
+            value={createForm.name}
+            onChange={e => setCreateForm({ ...createForm, name: e.target.value })}
+          />
+          <div style={{ fontSize: '12px', color: '#666', marginTop: 4 }}>
+            {t('Name of the new database. Database names must be globally unique.')}
+          </div>
+        </div>
+
+        <div style={{ marginBottom: 16 }}>
+          <label style={{ display: 'block', marginBottom: 4, fontWeight: 'bold' }}>
+            {t('Description')}
+          </label>
+          <Input.TextArea
+            placeholder={t('Optional description')}
+            value={createForm.comment}
+            onChange={e => setCreateForm({ ...createForm, comment: e.target.value })}
+            rows={2}
+          />
+        </div>
+
+        <div style={{ marginBottom: 16 }}>
+          <Checkbox
+            checked={createForm.useDefaultLocation}
+            onChange={e => setCreateForm({ ...createForm, useDefaultLocation: e.target.checked })}
+            style={{ marginBottom: 8 }}
+          >
+            {t('Use default location')}
+          </Checkbox>
+
+          {!createForm.useDefaultLocation && (
+            <div>
+              <label style={{ display: 'block', marginBottom: 4, fontWeight: 'bold' }}>
+                {t('Location')}
+              </label>
+              <Input
+                placeholder={t('Path to HDFS directory')}
+                value={createForm.location}
+                onChange={e => setCreateForm({ ...createForm, location: e.target.value })}
+              />
+              <div style={{ fontSize: '12px', color: '#666', marginTop: 4 }}>
+                {t('Path to HDFS directory or file of database data.')}
+              </div>
+            </div>
+          )}
         </div>
       </Modal>
     </div>
