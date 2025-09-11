@@ -18,7 +18,6 @@
 """
 Common library to export either CSV or XLS.
 """
-import gc
 import re
 import logging
 import numbers
@@ -27,7 +26,7 @@ from urllib.parse import quote
 
 import six
 import tablib
-import openpyxl
+import xlsxwriter
 from django.http import HttpResponse, StreamingHttpResponse
 from django.utils.encoding import smart_str
 
@@ -36,42 +35,43 @@ from desktop.lib import i18n
 LOG = logging.getLogger()
 
 DOWNLOAD_CHUNK_SIZE = 1 * 1024 * 1024  # 1MB
-ILLEGAL_CHARS = r'[\000-\010]|[\013-\014]|[\016-\037]'
+
+ILLEGAL_CHARS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
+HYPERLINK_RE = re.compile(r'^(https?://.+)', re.IGNORECASE)
+
 FORMAT_TO_CONTENT_TYPE = {
     'csv': 'application/csv',
     'xls': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     'json': 'application/json'
 }
 
-
 def nullify(cell):
-  return cell if cell is not None else "NULL"
-
+    return cell if cell is not None else "NULL"
 
 def file_reader(fh):
-  """Generator that reads a file, chunk-by-chunk."""
-  while True:
-    chunk = fh.read(DOWNLOAD_CHUNK_SIZE)
-    if not chunk:
-      fh.close()
-      break
-    yield chunk
+    """Generator that reads a file, chunk-by-chunk."""
+    while True:
+        chunk = fh.read(DOWNLOAD_CHUNK_SIZE)
+        if not chunk:
+            fh.close()
+            break
+        yield chunk
 
 
 def encode_row(row, encoding=None, make_excel_links=False):
-  encoded_row = []
-  encoding = encoding or i18n.get_site_encoding()
+    encoded_row = []
+    encoding = encoding or i18n.get_site_encoding()
 
-  for cell in row:
-    if isinstance(cell, six.string_types):
-      cell = re.sub(ILLEGAL_CHARS, '?', cell)
-      if make_excel_links:
-        cell = re.compile('^(https?://.+)', re.IGNORECASE).sub(r'=HYPERLINK("\1")', cell)
-    cell = nullify(cell)
-    if not isinstance(cell, numbers.Number):
-      cell = smart_str(cell, encoding, strings_only=True, errors='replace')
-    encoded_row.append(cell)
-  return encoded_row
+    for cell in row:
+        if isinstance(cell, six.string_types):
+            cell = ILLEGAL_CHARS_RE.sub('?', cell)
+            if make_excel_links:
+                cell = HYPERLINK_RE.sub(r'=HYPERLINK("\1")', cell)
+        cell = nullify(cell)
+        if not isinstance(cell, numbers.Number):
+            cell = smart_str(cell, encoding, strings_only=True, errors='replace')
+        encoded_row.append(cell)
+    return encoded_row
 
 
 def dataset(headers, data, encoding=None):
@@ -90,19 +90,6 @@ def dataset(headers, data, encoding=None):
 
   return dataset
 
-
-class XlsWrapper(object):
-  def __init__(self, xls):
-    self.xls = xls
-
-
-def xls_dataset(workbook):
-  output = string_io()
-  workbook.save(output)
-  output.seek(0)
-  return XlsWrapper(output.read())
-
-
 def create_generator(content_generator, format, encoding=None):
   if format == 'csv':
     show_headers = True
@@ -110,23 +97,25 @@ def create_generator(content_generator, format, encoding=None):
       yield dataset(show_headers and headers or None, data, encoding).csv
       show_headers = False
   elif format == 'xls':
-    workbook = openpyxl.Workbook(write_only=True)
-    worksheet = workbook.create_sheet()
+    output = string_io()
+    workbook = xlsxwriter.Workbook(output)
+    worksheet = workbook.add_worksheet()
     row_ctr = 0
 
     for _headers, _data in content_generator:
       # Write headers to workbook once
       if _headers and row_ctr == 0:
-        worksheet.append(encode_row(_headers, encoding))
+        worksheet.write_row(row_ctr, 0, encode_row(_headers, encoding, make_excel_links=False))
         row_ctr += 1
 
       # Write row data to workbook
       for row in _data:
-        worksheet.append(encode_row(row, encoding, make_excel_links=True))
+        worksheet.write_row(row_ctr, 0, encode_row(row, encoding, make_excel_links=False))
         row_ctr += 1
 
-    yield xls_dataset(workbook).xls
-    gc.collect()
+    workbook.close()
+    output.seek(0)
+    yield output.getvalue()
   else:
     raise Exception("Unknown format: %s" % format)
 
@@ -147,7 +136,7 @@ def make_response(generator, format, name, encoding=None, user_agent=None):  # T
       pass
   elif format == 'xls':
     format = 'xlsx'
-    resp = HttpResponse(next(generator), content_type=content_type)
+    resp = StreamingHttpResponse(generator, content_type=content_type)
   elif format == 'json' or format == 'txt':
     resp = HttpResponse(generator, content_type=content_type)
   else:
