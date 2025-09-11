@@ -712,6 +712,12 @@ VCS = UnspecifiedConfigSection(
   )
 )
 
+JAVA_PATH = Config(
+  key="java_path",
+  help=_("Java binary path to add to PATH environment variable."),
+  default=""
+)
+
 
 def default_secure_cookie():
   """Enable secure cookies if HTTPS is enabled."""
