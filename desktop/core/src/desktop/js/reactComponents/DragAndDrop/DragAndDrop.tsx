@@ -23,14 +23,16 @@ import { i18nReact } from '../../utils/i18nReact';
 interface DragAndDropProps {
   onDrop: (files: File[]) => void;
   children?: JSX.Element;
+  disabled?: boolean;
 }
 
-const DragAndDrop = ({ children, onDrop }: DragAndDropProps): JSX.Element => {
+const DragAndDrop = ({ children, onDrop, disabled = false }: DragAndDropProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    noClick: !!children
+    noClick: !!children,
+    disabled
   });
 
   return (
