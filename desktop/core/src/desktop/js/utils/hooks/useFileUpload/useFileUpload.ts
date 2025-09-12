@@ -27,6 +27,7 @@ interface UseUploadQueueResponse {
   addFiles: (newFiles: RegularFile[]) => void;
   cancelFile: (item: RegularFile) => void;
   isLoading: boolean;
+  removeAllFiles: () => void;
 }
 
 interface UploadQueueOptions {
@@ -99,6 +100,17 @@ const useFileUpload = ({
     }
   };
 
+  const removeAllFiles = () => {
+    uploadQueue.forEach(file => {
+      if (isChunkUpload) {
+        cancelFromChunkUpload(file.uuid);
+      } else {
+        cancelFromRegularUpload(file.uuid);
+      }
+    });
+    setUploadQueue([]);
+  };
+
   const addFiles = (fileItems: RegularFile[]) => {
     if (fileItems.length > 0) {
       setUploadQueue(prev => [...prev, ...fileItems]);
@@ -111,7 +123,13 @@ const useFileUpload = ({
     }
   };
 
-  return { uploadQueue, cancelFile, addFiles, isLoading: isChunkLoading || isRegularLoading };
+  return {
+    uploadQueue,
+    cancelFile,
+    addFiles,
+    removeAllFiles,
+    isLoading: isChunkLoading || isRegularLoading
+  };
 };
 
 export default useFileUpload;
