@@ -31,7 +31,8 @@ import { BorderlessButton } from 'cuix/dist/components/Button';
 import PaginatedTable from '../../../reactComponents/PaginatedTable/PaginatedTable';
 import { FILE_GUESS_METADATA, FILE_GUESS_HEADER, FILE_PREVIEW_URL } from '../api';
 import SourceConfiguration from './SourceConfiguration/SourceConfiguration';
-import EditColumnsModal from './EditColumns/EditColumnsModal';
+import EditColumnsModal from './EditColumnsModal/EditColumnsModal';
+import type { Column } from './EditColumnsModal/EditColumnsModal';
 import DestinationSettings from './DestinationSettings/DestinationSettings';
 
 import './FilePreviewTab.scss';
@@ -51,6 +52,7 @@ const FilePreviewTab = ({
   const [fileFormat, setFileFormat] = useState<CombinedFileFormat | undefined>();
 
   const [isEditColumnsOpen, setIsEditColumnsOpen] = useState(false);
+  const [editableColumns, setEditableColumns] = useState<Column[]>([]);
 
   const { loading: guessingFormat } = useLoadData<FileFormatResponse>(FILE_GUESS_METADATA, {
     params: {
@@ -106,12 +108,34 @@ const FilePreviewTab = ({
       skip:
         !fileFormat?.type ||
         fileFormat?.hasHeader === undefined ||
-        destinationConfig.connectorId === undefined
+        destinationConfig.connectorId === undefined,
+      onSuccess: data => {
+        if (data?.columns && Array.isArray(data.columns)) {
+          setEditableColumns(
+            convertToAntdColumns(data.columns).map(col => ({
+              title: col?.title != null ? String(col.title) : '',
+              dataIndex: String(col.dataIndex || '')
+            }))
+          );
+        } else {
+          setEditableColumns([]);
+        }
+      }
     }
   );
 
-  const columns = convertToAntdColumns(previewData?.columns ?? []);
+  const originalColumns = convertToAntdColumns(previewData?.columns ?? []);
   const tableData = convertToDataSource(previewData?.previewData ?? {});
+
+  const displayColumns =
+    editableColumns.length > 0
+      ? editableColumns.map(col => ({
+          title: col.title,
+          dataIndex: col.dataIndex,
+          key: col.dataIndex,
+          width: '100px'
+        }))
+      : originalColumns;
 
   return (
     <div className="hue-importer-preview-page">
@@ -124,20 +148,32 @@ const FilePreviewTab = ({
       <div className="hue-importer-preview-page__main-section">
         <div className="hue-importer-preview-page__header-section">
           <SourceConfiguration fileFormat={fileFormat} setFileFormat={setFileFormat} />
-          <BorderlessButton onClick={() => setIsEditColumnsOpen(true)}>
+          <BorderlessButton
+            onClick={() => setIsEditColumnsOpen(true)}
+            className="hue-importer-preview-page__edit-columns-button"
+          >
             {t('Edit Columns')}
           </BorderlessButton>
         </div>
         <PaginatedTable<ImporterTableData>
           loading={guessingFormat || loadingPreview || guessingHeader}
           data={tableData}
-          columns={columns}
+          columns={displayColumns}
           rowKey="importerDataKey"
           isDynamicHeight
           locale={{ emptyText: t('No data found in the file!') }}
         />
       </div>
-      <EditColumnsModal isOpen={isEditColumnsOpen} closeModal={() => setIsEditColumnsOpen(false)} />
+
+      <EditColumnsModal
+        isOpen={isEditColumnsOpen}
+        closeModal={() => setIsEditColumnsOpen(false)}
+        columns={editableColumns}
+        setColumns={setEditableColumns}
+        sample={tableData[0]}
+        sqlDialect={destinationConfig.connectorId}
+        fileFormat={fileFormat}
+      />
     </div>
   );
 };
