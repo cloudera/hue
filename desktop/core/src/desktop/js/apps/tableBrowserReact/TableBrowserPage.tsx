@@ -20,19 +20,19 @@ import DataBrowserIcon from '@cloudera/cuix-core/icons/react/DataBrowserIcon';
 
 import { i18nReact } from '../../utils/i18nReact';
 import CommonHeader from '../../reactComponents/CommonHeader/CommonHeader';
-import { useTableBrowserController } from './utils/useTableBrowserController';
+import { useTableBrowserController } from './hooks/useTableBrowserController';
 import { useDataCatalog } from '../../utils/hooks/useDataCatalog/useDataCatalog';
-import TableDetails from './components/TableDetails';
-import SourcesList from './components/SourcesList';
-import DatabasesList from './components/DatabasesList';
-import TablesList from './components/TablesList';
+import TableDetails from './TableDetails/TableDetails';
+import SourcesList from './SourceListing/SourcesList';
+import DatabasesList from './DatabaseListing/DatabasesList';
+import TablesList from './TableListing/TablesList';
 import dataCatalog from '../../catalog/dataCatalog';
 import { notifyError } from './utils/notifier';
-import { useTableDetails } from './utils/useTableDetails';
+import { useTableDetails } from './hooks/useTableDetails';
 import { getConnectorIdOrType } from './utils/connector';
 import { post } from '../../api/utils';
-import { useDescriptionManager } from './utils/useDescriptionManager';
-import { useDatabaseProperties } from './utils/useDatabaseProperties';
+import { useDescriptionManager } from './hooks/useDescriptionManager';
+import { useDatabaseProperties } from './hooks/useDatabaseProperties';
 
 import './TableBrowserPage.scss';
 

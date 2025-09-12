@@ -20,12 +20,12 @@ jest.mock('../../../api/utils', () => ({
 }));
 
 // Mock connector utility
-jest.mock('./connector', () => ({
+jest.mock('../utils/connector', () => ({
   getConnectorIdOrType: jest.fn()
 }));
 
 import { post } from '../../../api/utils';
-import { getConnectorIdOrType } from './connector';
+import { getConnectorIdOrType } from '../utils/connector';
 
 const mockedPost = post as jest.MockedFunction<typeof post>;
 const mockedGetConnectorIdOrType = getConnectorIdOrType as jest.MockedFunction<typeof getConnectorIdOrType>;

@@ -18,11 +18,11 @@ import { GLOBAL_ERROR_TOPIC } from '../../../reactComponents/GlobalAlert/events'
 import formatBytes from '../../../utils/formatBytes';
 import { formatTimestamp } from '../../../utils/dateTimeUtils';
 import { post } from '../../../api/utils';
-import { getConnectorIdOrType } from './connector';
+import { getConnectorIdOrType } from '../utils/connector';
 import { getLastKnownConfig } from '../../../config/hueConfig';
 import type { Analysis, SampleMeta } from '../../../catalog/DataCatalogEntry';
 import type { Connector, Compute, Namespace } from '../../../config/types';
-import type { TableStats } from '../components/Overview';
+import type { TableStats } from '../TableDetails/Overview';
 
 export interface UseTableDetailsArgs {
   connector?: Connector | null;

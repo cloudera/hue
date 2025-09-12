@@ -13,7 +13,7 @@
 import React from 'react';
 import Loading from 'cuix/dist/components/Loading';
 import { i18nReact } from '../../../utils/i18nReact';
-import MetaDataDisplay, { type MetaDataGroup } from './MetaDataDisplay';
+import MetaDataDisplay, { type MetaDataGroup } from '../sharedComponents/MetaDataDisplay';
 import './DatabaseProperties.scss';
 
 export interface DatabaseProperties {

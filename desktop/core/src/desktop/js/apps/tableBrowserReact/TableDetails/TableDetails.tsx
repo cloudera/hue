@@ -16,13 +16,13 @@ import Loading from 'cuix/dist/components/Loading';
 import Modal from 'cuix/dist/components/Modal';
 import DataSetsIcon from '@cloudera/cuix-core/icons/react/DataSetsIcon';
 import ViewIcon from '@cloudera/cuix-core/icons/react/ViewIcon';
-import PageHeader from './PageHeader';
+import PageHeader from '../sharedComponents/PageHeader';
 
 import { i18nReact } from '../../../utils/i18nReact';
 import huePubSub from '../../../utils/huePubSub';
 import type { Connector, Namespace, Compute } from '../../../config/types';
-import Tabs, { type TabKey } from './Tabs';
-import Toolbar, { type ToolbarAction } from './Toolbar';
+import Tabs, { type TabKey } from '../sharedComponents/Tabs';
+import Toolbar, { type ToolbarAction } from '../sharedComponents/Toolbar';
 import Overview from './Overview';
 import SampleGrid from './SampleGrid';
 import DetailsProperties from './DetailsProperties';
@@ -33,7 +33,7 @@ import Privileges from './Privileges';
 import { notifyError } from '../utils/notifier';
 import { getConnectorIdOrType } from '../utils/connector';
 import { post } from '../../../api/utils';
-import type { TableDetailsState } from '../utils/useTableDetails';
+import type { TableDetailsState } from '../hooks/useTableDetails';
 
 export interface TableDetailsProps {
   // Route and navigation

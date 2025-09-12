@@ -12,7 +12,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { post } from '../../../api/utils';
-import { getConnectorIdOrType } from './connector';
+import { getConnectorIdOrType } from '../utils/connector';
 import type { Connector } from '../../../config/types';
 
 export interface DatabaseProperties {

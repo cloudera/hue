@@ -16,7 +16,7 @@ import Loading from 'cuix/dist/components/Loading';
 import EmptyState from 'cuix/dist/components/EmptyState';
 import Filter from 'cuix/dist/components/Filter';
 import HomeIcon from '@cloudera/cuix-core/icons/react/HomeIcon';
-import PageHeader from './PageHeader';
+import PageHeader from '../sharedComponents/PageHeader';
 import PaginatedTable, {
   type ColumnProps as PaginatedColumnProps
 } from '../../../reactComponents/PaginatedTable/PaginatedTable';

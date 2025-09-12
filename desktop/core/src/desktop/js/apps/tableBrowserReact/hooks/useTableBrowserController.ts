@@ -12,9 +12,13 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import changeURL from '../../../utils/url/changeURL';
-import { buildTableBrowserPath, getTableBrowserBasePath, parseTableBrowserPath } from './routing';
-import type { TableBrowserRoute } from './routing';
-import type { TabKey } from '../components/Tabs';
+import {
+  buildTableBrowserPath,
+  getTableBrowserBasePath,
+  parseTableBrowserPath
+} from '../utils/routing';
+import type { TableBrowserRoute } from '../utils/routing';
+import type { TabKey } from '../sharedComponents/Tabs';
 
 export interface TableBrowserController {
   locationPath: string;

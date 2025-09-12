@@ -18,10 +18,10 @@ import Modal from 'cuix/dist/components/Modal';
 import EmptyState from 'cuix/dist/components/EmptyState';
 import Filter from 'cuix/dist/components/Filter';
 import DataLakeIcon from '@cloudera/cuix-core/icons/react/DataLakeIcon';
-import InlineDescriptionEditor from './InlineDescriptionEditor';
+import InlineDescriptionEditor from '../sharedComponents/InlineDescriptionEditor';
 
-import Toolbar, { type ToolbarAction } from './Toolbar';
-import PageHeader from './PageHeader';
+import Toolbar, { type ToolbarAction } from '../sharedComponents/Toolbar';
+import PageHeader from '../sharedComponents/PageHeader';
 import PaginatedTable, {
   type ColumnProps as PaginatedColumnProps
 } from '../../../reactComponents/PaginatedTable/PaginatedTable';

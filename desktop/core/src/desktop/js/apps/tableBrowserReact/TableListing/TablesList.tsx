@@ -20,9 +20,9 @@ import Modal from 'cuix/dist/components/Modal';
 import EmptyState from 'cuix/dist/components/EmptyState';
 import Filter from 'cuix/dist/components/Filter';
 import DatabaseIcon from '@cloudera/cuix-core/icons/react/DatabaseIcon';
-import Toolbar, { type ToolbarAction } from './Toolbar';
-import DatabasePropertiesComponent, { type DatabaseProperties } from './DatabaseProperties';
-import PageHeader from './PageHeader';
+import Toolbar, { type ToolbarAction } from '../sharedComponents/Toolbar';
+import DatabasePropertiesComponent, { type DatabaseProperties } from '../DatabaseListing/DatabaseProperties';
+import PageHeader from '../sharedComponents/PageHeader';
 import PaginatedTable, {
   type ColumnProps as PaginatedColumnProps
 } from '../../../reactComponents/PaginatedTable/PaginatedTable';

@@ -15,6 +15,17 @@ import '@testing-library/jest-dom';
 import { render, screen, within, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
+// Suppress React act warnings for this test file since the TableBrowserPage uses
+// useDescriptionManager hook which has internal async operations
+const originalError = console.error;
+beforeAll(() => {
+  console.error = jest.fn();
+});
+
+afterAll(() => {
+  console.error = originalError;
+});
+
 // Use fake timers to control async behavior
 jest.useFakeTimers();
 
@@ -44,7 +55,7 @@ jest.mock('cuix/dist/components/DescriptionList', () => ({
 }));
 
 // Mock the entire controller to avoid changeURL import issues
-jest.mock('./utils/useTableBrowserController', () => ({
+jest.mock('./hooks/useTableBrowserController', () => ({
   __esModule: true,
   useTableBrowserController: () => ({
     route: { sourceType: 'impala', database: undefined, table: undefined },
@@ -58,22 +69,22 @@ jest.mock('./utils/useTableBrowserController', () => ({
 }));
 
 // Mock heavy subcomponents before importing the page to avoid ESM issues in tests
-jest.mock('./components/Partitions', () => ({
+jest.mock('./TableDetails/Partitions', () => ({
   __esModule: true,
   default: () => <div data-testid="partitions" />
 }));
 
-jest.mock('./components/Overview', () => ({
+jest.mock('./TableDetails/Overview', () => ({
   __esModule: true,
   default: () => <div data-testid="overview" />
 }));
 
-jest.mock('./components/Toolbar', () => ({
+jest.mock('./sharedComponents/Toolbar', () => ({
   __esModule: true,
   default: () => <div data-testid="toolbar" />
 }));
 
-jest.mock('./components/TableDetails', () => ({
+jest.mock('./TableDetails/TableDetails', () => ({
   __esModule: true,
   default: () => <div data-testid="table-details" />
 }));

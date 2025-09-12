@@ -7,14 +7,14 @@ import Table from 'cuix/dist/components/Table';
 import Filter from 'cuix/dist/components/Filter';
 import BorderlessButton from 'cuix/dist/components/Button/BorderlessButton';
 import KeyIcon from '@cloudera/cuix-core/icons/react/KeyIcon';
-import InlineDescriptionEditor from './InlineDescriptionEditor';
+import InlineDescriptionEditor from '../sharedComponents/InlineDescriptionEditor';
 import PaginatedTable, {
   type ColumnProps as PaginatedColumnProps
 } from '../../../reactComponents/PaginatedTable/PaginatedTable';
 import type { FilterOutput } from 'cuix/dist/components/Filter/types';
 import type { SortOrder } from 'antd/lib/table/interface';
 import { i18nReact } from '../../../utils/i18nReact';
-import { useDescriptionManager } from '../utils/useDescriptionManager';
+import { useDescriptionManager } from '../hooks/useDescriptionManager';
 import type { Connector, Compute, Namespace } from '../../../config/types';
 
 import './DetailsSchema.scss';

@@ -13,7 +13,7 @@
 import { useCallback, useEffect, useState, useRef, useMemo } from 'react';
 import { i18nReact } from '../../../utils/i18nReact';
 import dataCatalog from '../../../catalog/dataCatalog';
-import { notifyError, notifyInfo } from './notifier';
+import { notifyError, notifyInfo } from '../utils/notifier';
 import type { Connector, Namespace, Compute } from '../../../config/types';
 
 export interface UseDescriptionManagerArgs {

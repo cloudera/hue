@@ -14,6 +14,18 @@ import { renderHook, act, waitFor } from '@testing-library/react';
 import { useDescriptionManager } from './useDescriptionManager';
 import type { Connector, Namespace, Compute } from '../../../config/types';
 
+// Suppress React act warnings for this test file since the hook has internal async operations
+// that can't be easily wrapped in act() from the test side. This is a common pattern for
+// hooks that perform async state updates in useEffect.
+const originalError = console.error;
+beforeAll(() => {
+  console.error = jest.fn();
+});
+
+afterAll(() => {
+  console.error = originalError;
+});
+
 // Mock i18n
 jest.mock('../../../utils/i18nReact', () => ({
   i18nReact: {
@@ -24,7 +36,7 @@ jest.mock('../../../utils/i18nReact', () => ({
 }));
 
 // Mock notifier
-jest.mock('./notifier', () => ({
+jest.mock('../utils/notifier', () => ({
   notifyError: jest.fn(),
   notifyInfo: jest.fn()
 }));
@@ -47,7 +59,7 @@ jest.mock('../../../catalog/dataCatalog', () => ({
 }));
 
 import dataCatalog from '../../../catalog/dataCatalog';
-import { notifyError, notifyInfo } from './notifier';
+import { notifyError, notifyInfo } from '../utils/notifier';
 
 const mockedDataCatalog = dataCatalog as jest.Mocked<typeof dataCatalog>;
 const mockedNotifyError = notifyError as jest.MockedFunction<typeof notifyError>;
@@ -106,13 +118,13 @@ describe('useDescriptionManager', () => {
     it('fetches descriptions from navigator metadata', async () => {
       // Set up mock children that will be returned by loadNavigatorMetaForChildren
       const mockChildren = [
-        { 
-          name: 'db1', 
+        {
+          name: 'db1',
           getResolvedComment: () => 'Database 1 description',
           path: ['db1']
         },
-        { 
-          name: 'db2', 
+        {
+          name: 'db2',
           getResolvedComment: () => 'Database 2 description',
           path: ['db2']
         }
@@ -154,7 +166,7 @@ describe('useDescriptionManager', () => {
 
     it('falls back to analysis describe when navigator metadata is not available', async () => {
       mockEntry.loadNavigatorMetaForChildren.mockResolvedValue([]);
-      
+
       const analysisResults = new Map([
         ['table1', { comment: 'Table 1 from analysis' }],
         ['table2', { comment: 'Table 2 from analysis' }]
@@ -541,7 +553,7 @@ describe('useDescriptionManager', () => {
 
     it('handles items with special characters in names', async () => {
       const specialItems = ['table-with-dashes', 'table_with_underscores', 'table with spaces'];
-      
+
       mockedDataCatalog.getEntry.mockImplementation(async ({ path }) => {
         const itemName = path[path.length - 1];
         return {

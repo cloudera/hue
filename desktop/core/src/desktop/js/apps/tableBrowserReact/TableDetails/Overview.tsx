@@ -15,7 +15,7 @@ import { Card, Col, Row } from 'antd';
 import Loading from 'cuix/dist/components/Loading';
 import { i18nReact } from '../../../utils/i18nReact';
 import DetailsSchema from './DetailsSchema';
-import MetaDataDisplay, { type MetaDataGroup } from './MetaDataDisplay';
+import MetaDataDisplay, { type MetaDataGroup } from '../sharedComponents/MetaDataDisplay';
 import type { Connector, Compute, Namespace } from '../../../config/types';
 
 import './Overview.scss';
