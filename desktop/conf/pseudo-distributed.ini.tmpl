@@ -83,6 +83,9 @@
   # Workers still alive after the timeout (starting from the receipt of the restart signal) are force killed.
   # gunicorn_worker_graceful_timeout=900
 
+  # Name of the Unix Domain Socket file for log listener communication.
+  ## log_listener_socket_name=hue.uds
+
   # Webserver runs as this user
   ## server_user=hue
   ## server_group=hue
