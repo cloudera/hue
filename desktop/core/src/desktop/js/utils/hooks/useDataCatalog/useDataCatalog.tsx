@@ -123,10 +123,8 @@ export const useDataCatalog = (options?: UseDataCatalogOptions): UseDataCatalog 
     try {
       setLoading(prev => ({ ...prev, table: true }));
       const tableEntries = await fetchSourceMeta(connector, namespace, compute, [database]);
-      const tables = tableEntries?.tables_meta?.filter(
-        table => table.type?.toLowerCase() === 'table'
-      );
-      setTables(tables ?? []);
+      // Include both tables and views (don't filter by type)
+      setTables(tableEntries?.tables_meta ?? []);
     } catch (error) {
       setTables([]);
     } finally {
@@ -157,10 +155,8 @@ export const useDataCatalog = (options?: UseDataCatalogOptions): UseDataCatalog 
     try {
       setLoading(prev => ({ ...prev, table: true }));
       const tableEntries = await fetchSourceMeta(connector, namespace, compute, [database]);
-      const onlyTables = tableEntries?.tables_meta?.filter(
-        table => table.type?.toLowerCase() === 'table'
-      );
-      setTables(onlyTables ?? []);
+      // Include both tables and views (don't filter by type)
+      setTables(tableEntries?.tables_meta ?? []);
     } catch (error) {
       setTables([]);
     } finally {

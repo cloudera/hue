@@ -8,20 +8,73 @@ alwaysApply: false
 - Use **React Testing Library**; prefer `user-event` over `fireEvent`.
 - Test primary flows, edge cases, and a11y roles/labels.
 - Avoid implementation details; assert on behavior and DOM.
-- prefer role/name queries, e.g. getByRole; avoid brittle hardcoded strings if translated.
-- Use the component name in the describe and use "it" over "test" for better readbility. 
+- Prefer role/name queries, e.g. getByRole; avoid brittle hardcoded strings if translated.
+- Use the component name in the describe and use "it" over "test" for better readability.
+- Keep tests focused - 10-15 tests covering core functionality is better than 50+ over-detailed tests
+
+## Mocking Strategy
+- **Check global mocks first** - `i18nReact` is already mocked in `jest.init.js`
+- **Mock only what's necessary** - Internal components, not external UI libraries
+- **Use real cuix components** - Most work fine in tests, no need to mock
+- **Mock internal dependencies** - Components from the same app/feature
+- **Avoid excessive mocking** - Let real components work when possible
+
 
 ## Example
 ```ts
-describe('MyComponent', () => {
-  it('renders calls action when clicked', () => {
+// Mock only internal dependencies, not external UI libraries
+jest.mock('./InternalComponent', () => {
+  return function MockInternalComponent(props: { title?: string }) {
+    return <div data-testid="internal-component">{props.title}</div>;
+  };
+});
+
+describe('PageHeader', () => {
+  const defaultProps = {
+    title: 'Test Title',
+    onRefresh: jest.fn(),
+    loading: false
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('renders with title', () => {
+    render(<PageHeader {...defaultProps} />);
+    
+    expect(screen.getByRole('heading', { level: 3 })).toHaveTextContent('Test Title');
+  });
+
+  it('calls onRefresh when refresh button is clicked', async () => {
     const user = userEvent.setup();
-    render(<Foo title="Hi" />);
-    await user.click(screen.getByRole('button', { name: /click/i }));
-    expect(onAction).toHaveBeenCalled();
-  })
-})
+    const onRefresh = jest.fn();
+
+    render(<PageHeader {...defaultProps} onRefresh={onRefresh} />);
+
+    await user.click(screen.getByRole('button', { name: /refresh/i }));
+    expect(onRefresh).toHaveBeenCalledTimes(1);
+  });
+
+  it('disables refresh button when loading', () => {
+    render(<PageHeader {...defaultProps} loading={true} />);
+    
+    expect(screen.getByRole('button', { name: /refresh/i })).toBeDisabled();
+  });
+
+  it('returns null when no content to render', () => {
+    const { container } = render(<PageHeader title={undefined} />);
+    
+    expect(container.firstChild).toBeNull();
+  });
+});
 ```
+
+## Troubleshooting
+- **ES Module errors**: Check if the component uses cuix/antd - don't mock them
+- **i18n not working**: It's already mocked globally, remove local mocks
+- **Tests timing out**: Make sure to await user interactions
+- **Can't find elements**: Use `screen.debug()` to see the rendered DOM
 
 # Executing tests
 ```shell

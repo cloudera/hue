@@ -18,6 +18,31 @@ import userEvent from '@testing-library/user-event';
 // Use fake timers to control async behavior
 jest.useFakeTimers();
 
+// Mock cuix DescriptionList to avoid ES module import issues
+jest.mock('cuix/dist/components/DescriptionList', () => ({
+  __esModule: true,
+  default: function MockDescriptionList({ items }: { items: Array<{ label: string; value: string }> }) {
+    return (
+      <div data-testid="description-list">
+        {items?.map((item, index) => (
+          <div key={index} data-testid="description-item">
+            <span data-testid="description-label">{item.label}</span>
+            <span data-testid="description-value">{item.value}</span>
+          </div>
+        ))}
+      </div>
+    );
+  },
+  DescriptionListItem: function MockDescriptionListItem({ label, value }: { label: string; value: string }) {
+    return (
+      <div data-testid="description-item">
+        <span data-testid="description-label">{label}</span>
+        <span data-testid="description-value">{value}</span>
+      </div>
+    );
+  }
+}));
+
 // Mock the entire controller to avoid changeURL import issues
 jest.mock('./utils/useTableBrowserController', () => ({
   __esModule: true,
@@ -93,7 +118,9 @@ jest.mock('antd', () => {
     Col: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
     Row: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
     Input: MockInput,
-    Checkbox: ({ children, ...props }: any) => <input type="checkbox" {...props} data-testid="checkbox" />,
+    Checkbox: ({ children, ...props }: any) => (
+      <input type="checkbox" {...props} data-testid="checkbox" />
+    ),
     Tabs: ({
       items,
       onChange
@@ -407,7 +434,7 @@ describe('TableBrowserPage breadcrumb navigation', () => {
 
     // Should show breadcrumbs
     expect(screen.getByText('Data sources')).toBeInTheDocument();
-    expect(screen.getByText('IMPALA')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: 'IMPALA' })).toBeInTheDocument();
 
     // Should show database rows
     const rows = screen.getByTestId('rows');

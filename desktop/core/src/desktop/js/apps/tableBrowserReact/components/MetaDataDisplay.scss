@@ -1,0 +1,41 @@
+// Licensed to Cloudera, Inc. under one or more contributor license agreements.
+// Apache License 2.0 applies.
+
+@use 'variables' as vars;
+
+.antd.cuix {
+  .meta-data {
+    display: flex;
+    gap: vars.$fluidx-spacing-s;
+    padding: vars.$fluidx-spacing-xs;
+    background-color: vars.$fluidx-gray-040;
+    border-radius: vars.$border-radius-base;
+  }
+
+  .meta-data__group {
+    display: flex;
+    gap: vars.$fluidx-spacing-s;
+    border-right: 1px solid vars.$fluidx-gray-300;
+    padding-right: vars.$fluidx-spacing-s;
+
+    &:last-child {
+      border-right: none;
+    }
+  }
+
+  .meta-data__column {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .meta-data__column-label {
+    font-size: vars.$font-size-sm;
+    color: vars.$fluidx-gray-700;
+    text-transform: uppercase;
+  }
+
+  .meta-data__column-value {
+    font-size: vars.$font-size-base;
+    color: vars.$fluidx-gray-900;
+  }
+}

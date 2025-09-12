@@ -12,8 +12,8 @@
 
 import React from 'react';
 import Loading from 'cuix/dist/components/Loading';
-import DescriptionList, { DescriptionListItem } from 'cuix/dist/components/DescriptionList';
 import { i18nReact } from '../../../utils/i18nReact';
+import MetaDataDisplay, { type MetaDataGroup } from './MetaDataDisplay';
 import './DatabaseProperties.scss';
 
 export interface DatabaseProperties {
@@ -35,49 +35,83 @@ const DatabasePropertiesComponent = ({
 }: DatabasePropertiesProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
-  return (
-    <div className="hue-database-properties">
-      <h3 className="hue-database-properties__title">{t('Properties')}</h3>
-      <Loading spinning={!!loading}>
-        <DescriptionList layout="inline" upperCaseLabel>
-          <DescriptionListItem label={t('Owner')}>
-            {properties?.owner_name ? (
-              <>
-                {properties.owner_name}
-                {properties.owner_type && (
-                  <span className="hue-database-properties__property-type">
-                    ({properties.owner_type})
-                  </span>
-                )}
-              </>
-            ) : (
-              <span className="hue-database-properties__property-empty">{t('None')}</span>
-            )}
-          </DescriptionListItem>
-          {properties?.location && (
-            <DescriptionListItem label={t('Location')}>
-              {properties.hdfs_link ? (
-                <a
-                  href={properties.hdfs_link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hue-database-properties__property-link"
-                >
-                  {t('location')}
-                </a>
-              ) : (
-                <span className="hue-database-properties__property-path">
-                  {properties.location}
+  // Helper function to check if a group has meaningful data
+  const hasValidData = (groups: MetaDataGroup[]): boolean => {
+    return groups.some(group =>
+      group.items.some(item => {
+        const value = typeof item.value === 'string' ? item.value : String(item.value);
+        return value && value !== '-' && value !== 'null' && value !== 'undefined';
+      })
+    );
+  };
+
+  // Prepare database properties data for MetaDataDisplay
+  const propertiesGroups: MetaDataGroup[] = [
+    {
+      items: [
+        {
+          key: 'owner',
+          label: t('Owner'),
+          value: properties?.owner_name ? (
+            <>
+              {properties.owner_name}
+              {properties.owner_type && (
+                <span className="hue-database-properties__property-type">
+                  ({properties.owner_type})
                 </span>
               )}
-            </DescriptionListItem>
-          )}
-          {properties?.parameters && (
-            <DescriptionListItem label={t('Parameters')}>
-              <div className="hue-database-properties__parameters">{properties.parameters}</div>
-            </DescriptionListItem>
-          )}
-        </DescriptionList>
+            </>
+          ) : (
+            <span className="hue-database-properties__property-empty">{t('None')}</span>
+          )
+        },
+        ...(properties?.location
+          ? [
+              {
+                key: 'location',
+                label: t('Location'),
+                value: properties.hdfs_link ? (
+                  <a
+                    href={properties.hdfs_link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hue-database-properties__property-link"
+                  >
+                    {t('location')}
+                  </a>
+                ) : (
+                  <span className="hue-database-properties__property-path">
+                    {properties.location}
+                  </span>
+                )
+              }
+            ]
+          : []),
+        ...(properties?.parameters
+          ? [
+              {
+                key: 'parameters',
+                label: t('Parameters'),
+                value: (
+                  <div className="hue-database-properties__parameters">{properties.parameters}</div>
+                )
+              }
+            ]
+          : [])
+      ]
+    }
+  ];
+
+  const showProperties = loading || hasValidData(propertiesGroups);
+
+  if (!showProperties) {
+    return <div className="hue-database-properties" />;
+  }
+
+  return (
+    <div className="hue-database-properties">
+      <Loading spinning={!!loading}>
+        <MetaDataDisplay groups={propertiesGroups} />
       </Loading>
     </div>
   );

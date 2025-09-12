@@ -94,7 +94,31 @@ const DetailsProperties = ({
 
   const columns: PaginatedColumnProps<PropertyRow & { key: string }>[] = [
     { title: t('Property'), dataIndex: 'name', key: 'name' },
-    { title: t('Value'), dataIndex: 'value', key: 'value' }
+    {
+      title: t('Value'),
+      dataIndex: 'value',
+      key: 'value',
+      render: (value: string, record: PropertyRow & { key: string }) => {
+        // Check if this is an HDFS/HTTP URL and the property is Location
+        if (
+          record.name === t('Location') &&
+          value &&
+          (value.startsWith('hdfs://') || value.startsWith('http'))
+        ) {
+          return (
+            <a
+              href={value}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: '#1890ff', textDecoration: 'underline' }}
+            >
+              {value}
+            </a>
+          );
+        }
+        return value;
+      }
+    }
   ];
 
   const hasStructured = !!(baseInfo || tableParameters || storageInfo || storageDescParams);

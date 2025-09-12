@@ -1,19 +1,31 @@
 // Licensed to Cloudera, Inc. under one or more contributor license agreements.
-// Apache License 2.0 applies.
+// See the NOTICE file distributed with this work for additional information
+// regarding copyright ownership. Cloudera, Inc. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may not use this file
+// except in compliance with the License. You may obtain a copy of the License at
+// http://www.apache.org/licenses/LICENSE-2.0
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+// License for the specific language governing permissions and limitations under
+// the License.
 
 import React from 'react';
-import { Card, Col, Descriptions, Row } from 'antd';
+import { Card, Col, Row } from 'antd';
 import Loading from 'cuix/dist/components/Loading';
-import BorderlessButton from 'cuix/dist/components/Button/BorderlessButton';
-import RefreshIcon from '@cloudera/cuix-core/icons/react/RefreshIcon';
 import { i18nReact } from '../../../utils/i18nReact';
 import DetailsSchema from './DetailsSchema';
+import MetaDataDisplay, { type MetaDataGroup } from './MetaDataDisplay';
+import type { Connector, Compute, Namespace } from '../../../config/types';
+
+import './Overview.scss';
 
 export interface TableStats {
   files?: number | string;
   rows?: number | string;
   totalSize?: string;
   lastUpdated?: string;
+  schemaLastModified?: string;
 }
 
 export interface OverviewProps {
@@ -21,83 +33,151 @@ export interface OverviewProps {
   stats?: TableStats;
   hdfsLink?: string;
   onRefreshStats?: () => void;
-  columns?: { name: string; type: string; comment?: string; sample?: string }[];
+  columns?: {
+    name: string;
+    type: string;
+    comment?: string;
+    sample?: string;
+    isPartitionKey?: boolean;
+  }[];
+  sampleData?: { headers: string[]; rows: (string | number | null)[][] };
   loadingProperties?: boolean;
   loadingStats?: boolean;
   loadingColumns?: boolean;
+  connector?: Connector | null;
+  namespace?: Namespace | null;
+  compute?: Compute | null;
+  database?: string;
+  table?: string;
 }
 
 const Overview = ({
   properties,
   stats,
   hdfsLink,
-  onRefreshStats,
   columns,
+  sampleData,
   loadingProperties,
   loadingStats,
-  loadingColumns
+  loadingColumns,
+  connector,
+  namespace,
+  compute,
+  database,
+  table
 }: OverviewProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
-  const statsTitle = (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-      <span>{t('Stats')}</span>
-      {onRefreshStats && (
-        <BorderlessButton
-          aria-label={t('Refresh stats')}
-          onClick={onRefreshStats}
-          title={t('Refresh stats')}
-          icon={<RefreshIcon />}
-        />
-      )}
-    </div>
-  );
+
+  // Helper function to check if a group has meaningful data
+  const hasValidData = (groups: MetaDataGroup[]): boolean => {
+    return groups.some(group =>
+      group.items.some(item => {
+        const value = typeof item.value === 'string' ? item.value : String(item.value);
+        return value && value !== '-' && value !== 'null' && value !== 'undefined';
+      })
+    );
+  };
+
+  // Prepare properties data for MetaDataDisplay
+  const propertiesGroups: MetaDataGroup[] = [
+    {
+      items: [
+        ...(hdfsLink
+          ? [
+              {
+                key: 'location',
+                label: t('Stored in'),
+                value: <a href={hdfsLink}>{t('location')}</a>
+              }
+            ]
+          : []),
+        ...(properties || [])
+          .filter(p => !(hdfsLink && p.name === t('Location'))) // Filter out Location if hdfsLink exists
+          .map(p => ({
+            key: p.name,
+            label: p.name,
+            value: p.value
+          }))
+      ]
+    }
+  ];
+
+  // Prepare stats data for MetaDataDisplay
+  const statsGroups: MetaDataGroup[] = [
+    {
+      items: [
+        {
+          key: 'files',
+          label: t('Files'),
+          value: stats?.files ?? '-'
+        },
+        {
+          key: 'rows',
+          label: t('Rows'),
+          value: stats?.rows ?? '-'
+        },
+        {
+          key: 'totalSize',
+          label: t('Total size'),
+          value: stats?.totalSize ?? '-'
+        },
+        {
+          key: 'lastUpdated',
+          label: t('Data last updated on'),
+          value: stats?.lastUpdated ?? '-'
+        },
+        ...(stats?.schemaLastModified
+          ? [
+              {
+                key: 'schemaLastModified',
+                label: t('Schema last modified on'),
+                value: stats.schemaLastModified
+              }
+            ]
+          : [])
+      ]
+    }
+  ];
+
+  const showProperties = loadingProperties || hasValidData(propertiesGroups);
+  const showStats = loadingStats || hasValidData(statsGroups);
+
   return (
-    <div>
-      <Row gutter={16}>
-        <Col span={12}>
-          <Loading spinning={!!loadingProperties}>
-            <Card title={t('Properties')}>
-              <Descriptions column={1} size="small" bordered>
-                {hdfsLink && (
-                  <Descriptions.Item label={t('Location')}>
-                    <a href={hdfsLink}>{t('location')}</a>
-                  </Descriptions.Item>
-                )}
-                {(properties || []).map(p => (
-                  <Descriptions.Item key={p.name} label={p.name}>
-                    {p.value}
-                  </Descriptions.Item>
-                ))}
-              </Descriptions>
-            </Card>
-          </Loading>
-        </Col>
-        <Col span={12}>
-          <Loading spinning={!!loadingStats}>
-            <Card title={statsTitle}>
-              <Descriptions column={1} size="small" bordered>
-                <Descriptions.Item label={t('Files')}>{stats?.files ?? '-'}</Descriptions.Item>
-                <Descriptions.Item label={t('Rows')}>{stats?.rows ?? '-'}</Descriptions.Item>
-                <Descriptions.Item label={t('Total size')}>
-                  {stats?.totalSize ?? '-'}
-                </Descriptions.Item>
-                <Descriptions.Item label={t('Last updated')}>
-                  {stats?.lastUpdated ?? '-'}
-                </Descriptions.Item>
-              </Descriptions>
-            </Card>
-          </Loading>
-        </Col>
-      </Row>
-      <div style={{ marginTop: 16 }}>
-        <Loading spinning={!!loadingColumns}>
-          {!!columns?.length && (
-            <Card title={t('Schema')}>
-              <DetailsSchema columns={columns} />
-            </Card>
+    <div className="hue-table-details-overview">
+      {(showProperties || showStats) && (
+        <Row gutter={16} style={{ marginBottom: 16 }}>
+          {showProperties && (
+            <Col span={showStats ? 12 : 24}>
+              <Loading spinning={!!loadingProperties}>
+                <MetaDataDisplay groups={propertiesGroups} />
+              </Loading>
+            </Col>
           )}
-        </Loading>
-      </div>
+          {showStats && (
+            <Col span={showProperties ? 12 : 24}>
+              <Loading spinning={!!loadingStats}>
+                <MetaDataDisplay groups={statsGroups} />
+              </Loading>
+            </Col>
+          )}
+        </Row>
+      )}
+
+      <Loading spinning={!!loadingColumns}>
+        {!!columns?.length && (
+          <Card title={`${t('Schema')} (${columns.length} ${t('columns')})`}>
+            <DetailsSchema
+              columns={columns}
+              sampleData={sampleData}
+              connector={connector}
+              namespace={namespace}
+              compute={compute}
+              database={database}
+              table={table}
+            />
+          </Card>
+        )}
+      </Loading>
     </div>
   );
 };

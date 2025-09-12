@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { Col, Row } from 'antd';
 import DataBrowserIcon from '@cloudera/cuix-core/icons/react/DataBrowserIcon';
 
@@ -27,10 +27,12 @@ import SourcesList from './components/SourcesList';
 import DatabasesList from './components/DatabasesList';
 import TablesList from './components/TablesList';
 import dataCatalog from '../../catalog/dataCatalog';
-import { notifyError, notifyInfo } from './utils/notifier';
+import { notifyError } from './utils/notifier';
 import { useTableDetails } from './utils/useTableDetails';
 import { getConnectorIdOrType } from './utils/connector';
 import { post } from '../../api/utils';
+import { useDescriptionManager } from './utils/useDescriptionManager';
+import { useDatabaseProperties } from './utils/useDatabaseProperties';
 
 import './TableBrowserPage.scss';
 
@@ -70,13 +72,44 @@ const TableBrowserPage = (): JSX.Element => {
   // Details loading state is provided by useTableDetails
   const [dbPageSize, setDbPageSize] = useState(50);
   const [dbPageNumber, setDbPageNumber] = useState(1);
-  const [dbDescriptions, setDbDescriptions] = useState<Record<string, string>>({});
-  const [editingDb, setEditingDb] = useState<string | null>(null);
-  const [editingValue, setEditingValue] = useState('');
+  // Memoize arrays to prevent unnecessary re-renders
+  const emptyPath = useMemo(() => [], []);
+  const tablePath = useMemo(() => (currentDb ? [currentDb] : []), [currentDb]);
+  const tableNames = useMemo(() => tables?.map(t => t.name) || [], [tables]);
+
+  // Database description management using custom hook
+  const {
+    descriptions: dbDescriptions,
+    editingItem: editingDb,
+    editingValue,
+    setEditingItem: setEditingDb,
+    setEditingValue,
+    saveDescription: saveDbDescription
+  } = useDescriptionManager({
+    connector,
+    namespace,
+    compute,
+    items: databases,
+    path: emptyPath,
+    currentItem: currentDb
+  });
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [tableDescriptions, setTableDescriptions] = useState<Record<string, string>>({});
-  const [editingTableName, setEditingTableName] = useState<string | null>(null);
-  const [editingTableValue, setEditingTableValue] = useState('');
+  // Table description management using custom hook
+  const {
+    descriptions: tableDescriptions,
+    editingItem: editingTableName,
+    editingValue: editingTableValue,
+    setEditingItem: setEditingTableName,
+    setEditingValue: setEditingTableValue,
+    saveDescription: saveTableDescription
+  } = useDescriptionManager({
+    connector,
+    namespace,
+    compute,
+    items: tableNames,
+    path: tablePath,
+    currentItem: table
+  });
   const [tablePageSize, setTablePageSize] = useState(50);
   const [tablePageNumber, setTablePageNumber] = useState(1);
   const [sourceFilter, setSourceFilter] = useState('');
@@ -84,53 +117,14 @@ const TableBrowserPage = (): JSX.Element => {
   const [sourcePageNumber, setSourcePageNumber] = useState(1);
   // Removed forceShowSources per follow-up TODO; derive strictly from URL
 
-  // Database properties state
-  interface DatabaseProperties {
-    owner_name?: string;
-    owner_type?: string;
-    location?: string;
-    hdfs_link?: string;
-    parameters?: string;
-  }
-
-  const [databaseProperties, setDatabaseProperties] = useState<DatabaseProperties | undefined>(
-    undefined
-  );
-  const [loadingDatabaseProperties, setLoadingDatabaseProperties] = useState(false);
-
-  // Function to fetch database metadata
-  const fetchDatabaseProperties = useCallback(
-    async (databaseName: string) => {
-      if (!databaseName) {
-        return;
-      }
-
-      try {
-        setLoadingDatabaseProperties(true);
-        const result = await post<{ status: number; data: DatabaseProperties }>(
-          `/metastore/databases/${encodeURIComponent(databaseName)}/metadata`,
-          {
-            source_type: route.sourceType || getConnectorIdOrType(connector) || 'hive'
-          },
-          {
-            silenceErrors: true
-          }
-        );
-
-        if (result?.status === 0 && result.data) {
-          setDatabaseProperties(result.data);
-        } else {
-          setDatabaseProperties(undefined);
-        }
-      } catch (error) {
-        console.warn('Failed to fetch database properties:', error);
-        setDatabaseProperties(undefined);
-      } finally {
-        setLoadingDatabaseProperties(false);
-      }
-    },
-    [route.sourceType, connector]
-  );
+  // Database properties management using custom hook
+  const { properties: databaseProperties, loading: loadingDatabaseProperties } =
+    useDatabaseProperties({
+      sourceType: route.sourceType,
+      connector,
+      database: currentDb,
+      table
+    });
 
   const updatePath = useCallback(
     (nextDatabase?: string, nextTable?: string) => {
@@ -204,201 +198,6 @@ const TableBrowserPage = (): JSX.Element => {
       panelRef.current.focus({ preventScroll: false } as unknown as FocusOptions);
     }
   }, [route.sourceType, currentDb, table]);
-
-  // Fetch database properties when currentDb changes
-  useEffect(() => {
-    if (currentDb && !table) {
-      fetchDatabaseProperties(currentDb);
-    } else {
-      setDatabaseProperties(undefined);
-    }
-  }, [currentDb, table, fetchDatabaseProperties]);
-
-  // Prefetch database descriptions (Navigator or source metadata) when listing databases
-  useEffect(() => {
-    const loadDbDescriptions = async () => {
-      if (!connector || !namespace || !compute || !databases || currentDb) {
-        return;
-      }
-      try {
-        const sourceEntry = await dataCatalog.getEntry({
-          connector,
-          namespace,
-          compute,
-          path: []
-        });
-        await sourceEntry.getChildren({ silenceErrors: true });
-        const children = await sourceEntry.loadNavigatorMetaForChildren({ silenceErrors: true });
-        const map: Record<string, string> = {};
-        children.forEach(child => {
-          if ((child as unknown as { path: string[] }).path?.length === 1) {
-            map[child.name] = child.getResolvedComment();
-          }
-        });
-        setDbDescriptions(map);
-      } catch {}
-    };
-    loadDbDescriptions();
-  }, [connector, namespace, compute, databases, currentDb]);
-
-  const saveDbDescription = async (dbName: string, value: string) => {
-    setEditingDb(null);
-    // Optimistic update
-    setDbDescriptions(prev => ({ ...prev, [dbName]: value }));
-    try {
-      const entry = await dataCatalog.getEntry({
-        connector,
-        namespace,
-        compute,
-        path: [dbName]
-      });
-      await entry.setComment(value, { silenceErrors: true });
-      notifyInfo(t('Description saved'));
-    } catch {
-      // Revert on error
-      setDbDescriptions(prev => ({ ...prev, [dbName]: prev[dbName] }));
-      notifyError(t('Failed to save description'));
-    }
-  };
-
-  // Prefetch table descriptions when listing tables for a selected DB
-  useEffect(() => {
-    const loadTableDescriptions = async () => {
-      if (!connector || !namespace || !compute || !currentDb || table) {
-        return;
-      }
-      try {
-        const dbEntry = await dataCatalog.getEntry({
-          connector,
-          namespace,
-          compute,
-          path: [currentDb]
-        });
-        await dbEntry.getChildren({ silenceErrors: true });
-        const children = await dbEntry.loadNavigatorMetaForChildren({ silenceErrors: true });
-        const map: Record<string, string> = {};
-        children.forEach(child => {
-          if ((child as unknown as { path: string[] }).path?.length === 2) {
-            map[child.name] = child.getResolvedComment();
-          }
-        });
-        setTableDescriptions(map);
-      } catch {}
-    };
-    loadTableDescriptions();
-  }, [connector, namespace, compute, currentDb, table, tables]);
-
-  const saveTableDescription = async (tblName: string, value: string) => {
-    setEditingTableName(null);
-    // Optimistic update
-    setTableDescriptions(prev => ({ ...prev, [tblName]: value }));
-    try {
-      const entry = await dataCatalog.getEntry({
-        connector,
-        namespace,
-        compute,
-        path: [currentDb as string, tblName]
-      });
-      await entry.setComment(value, { silenceErrors: true });
-      notifyInfo(t('Description saved'));
-    } catch {
-      setTableDescriptions(prev => ({ ...prev, [tblName]: prev[tblName] }));
-      notifyError(t('Failed to save description'));
-    }
-  };
-
-  // Fallback: ensure DB comments via describe for visible page items
-  useEffect(() => {
-    if (!databases || currentDb) {
-      return;
-    }
-    const filtered = (databases || []).filter(db =>
-      dbFilter ? db.toLowerCase().includes(dbFilter.toLowerCase()) : true
-    );
-    const dbData = filtered.map(name => ({ key: name, name }));
-    const dbTotalSize = dbData.length;
-    const dbTotalPages = Math.max(Math.ceil(dbTotalSize / dbPageSize), 1);
-    const pageNumber = Math.min(dbPageNumber, dbTotalPages);
-    const start = (pageNumber - 1) * dbPageSize;
-    const pageData = dbData.slice(start, start + dbPageSize);
-
-    pageData.forEach(({ name }) => {
-      if (typeof dbDescriptions[name] === 'undefined' && connector && namespace && compute) {
-        (async () => {
-          try {
-            const entry = await dataCatalog.getEntry({
-              connector,
-              namespace,
-              compute,
-              path: [name]
-            });
-            const describe: unknown = await entry.getAnalysis({ silenceErrors: true });
-            const comment = (describe as unknown as { comment?: string }).comment || '';
-            if (typeof comment !== 'undefined') {
-              setDbDescriptions(prev => ({ ...prev, [name]: comment }));
-            }
-          } catch {}
-        })();
-      }
-    });
-  }, [
-    databases,
-    dbFilter,
-    dbPageNumber,
-    dbPageSize,
-    connector,
-    namespace,
-    compute,
-    currentDb,
-    dbDescriptions
-  ]);
-
-  // Fallback: ensure table comments via describe for visible page items
-  useEffect(() => {
-    if (!currentDb || !tables || table) {
-      return;
-    }
-    const filtered = (tables || []).filter(item =>
-      tableFilter ? item.name.toLowerCase().includes(tableFilter.toLowerCase()) : true
-    );
-    const tableData = filtered.map(item => ({ key: item.name, name: item.name }));
-    const totalSize = tableData.length;
-    const totalPages = Math.max(Math.ceil(totalSize / tablePageSize), 1);
-    const pageNumber = Math.min(tablePageNumber, totalPages);
-    const start = (pageNumber - 1) * tablePageSize;
-    const pageData = tableData.slice(start, start + tablePageSize);
-
-    pageData.forEach(({ name }) => {
-      if (typeof tableDescriptions[name] === 'undefined' && connector && namespace && compute) {
-        (async () => {
-          try {
-            const entry = await dataCatalog.getEntry({
-              connector,
-              namespace,
-              compute,
-              path: [currentDb, name]
-            });
-            const describe: unknown = await entry.getAnalysis({ silenceErrors: true });
-            const comment = (describe as unknown as { comment?: string }).comment || '';
-            if (typeof comment !== 'undefined') {
-              setTableDescriptions(prev => ({ ...prev, [name]: comment }));
-            }
-          } catch {}
-        })();
-      }
-    });
-  }, [
-    currentDb,
-    tables,
-    tableFilter,
-    tablePageNumber,
-    tablePageSize,
-    connector,
-    namespace,
-    compute,
-    table,
-    tableDescriptions
-  ]);
 
   const {
     loading: loadingData,

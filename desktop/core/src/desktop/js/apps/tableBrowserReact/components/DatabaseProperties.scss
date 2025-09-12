@@ -4,38 +4,35 @@
   .hue-database-properties {
     margin-bottom: 16px;
 
-    &__title {
-      margin-bottom: 12px;
-    }
 
     // Minimal custom styling only where needed
-    &__property-type {
-      opacity: 0.7;
-      margin-left: 4px;
-      font-size: 0.9em;
-    }
+    // &__property-type {
+    //   opacity: 0.7;
+    //   margin-left: 4px;
+    //   font-size: 0.9em;
+    // }
 
-    &__property-empty {
-      opacity: 0.6;
-      font-style: italic;
-    }
+    // &__property-empty {
+    //   opacity: 0.6;
+    //   font-style: italic;
+    // }
 
-    &__property-path {
-      font-family: monospace;
-      font-size: 0.85em;
-      word-break: break-all;
-    }
+    // &__property-path {
+    //   font-family: monospace;
+    //   font-size: 0.85em;
+    //   word-break: break-all;
+    // }
 
-    &__parameters {
-      background-color: vars.$fluidx-gray-050;
-      border: 1px solid vars.$fluidx-gray-200;
-      padding: 8px;
-      border-radius: 4px;
-      font-family: monospace;
-      font-size: 0.85em;
-      max-height: 120px;
-      overflow: auto;
-      white-space: pre-wrap;
-    }
+    // &__parameters {
+    //   background-color: vars.$fluidx-gray-050;
+    //   border: 1px solid vars.$fluidx-gray-200;
+    //   padding: 8px;
+    //   border-radius: 4px;
+    //   font-family: monospace;
+    //   font-size: 0.85em;
+    //   max-height: 120px;
+    //   overflow: auto;
+    //   white-space: pre-wrap;
+    // }
   }
 }

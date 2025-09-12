@@ -10,16 +10,19 @@
 // License for the specific language governing permissions and limitations under
 // the License.
 
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import Button from 'cuix/dist/components/Button/Button';
 import Loading from 'cuix/dist/components/Loading';
+import Modal from 'cuix/dist/components/Modal';
 import DataSetsIcon from '@cloudera/cuix-core/icons/react/DataSetsIcon';
+import ViewIcon from '@cloudera/cuix-core/icons/react/ViewIcon';
 import PageHeader from './PageHeader';
 
 import { i18nReact } from '../../../utils/i18nReact';
+import huePubSub from '../../../utils/huePubSub';
 import type { Connector, Namespace, Compute } from '../../../config/types';
 import Tabs, { type TabKey } from './Tabs';
-import Toolbar from './Toolbar';
+import Toolbar, { type ToolbarAction } from './Toolbar';
 import Overview from './Overview';
 import SampleGrid from './SampleGrid';
 import DetailsProperties from './DetailsProperties';
@@ -79,8 +82,12 @@ const TableDetails = ({
   onClickDatabase
 }: TableDetailsProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
+  const [isDropping, setIsDropping] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [skipTrash, setSkipTrash] = useState(false);
   const {
     loading: loadingData,
+    isRefreshing,
     overviewProps,
     detailsColumns,
     detailsProperties,
@@ -89,9 +96,20 @@ const TableDetails = ({
     refresh
   } = tableDetails;
 
+  // Only show partitions tab if there are partitions
+  const hasPartitions =
+    overviewProps?.properties?.find(p => p.name === t('Partitioned'))?.value === t('Yes');
+
+  // Determine if this is a view to show appropriate icon
+  const isView = overviewProps?.properties?.find(p => p.name === t('Type'))?.value === t('View');
+
   const handleDropTable = async (skipTrash = false): Promise<void> => {
-    // Optimistic UI update - immediately navigate back
-    onBackToTables();
+    // Prevent multiple simultaneous drop operations
+    if (isDropping) {
+      return;
+    }
+
+    setIsDropping(true);
 
     try {
       // Create URLSearchParams for proper form encoding without qs array notation
@@ -129,22 +147,71 @@ const TableDetails = ({
 
       // For successful operations (with or without history_uuid), reload tables
       await onReloadTables();
+      // Only navigate back after successful completion
+      onBackToTables();
     } catch (error) {
       notifyError(t('Failed to drop table'));
       // On error, reload tables to restore the correct state
       await onReloadTables();
       throw error;
+    } finally {
+      setIsDropping(false);
     }
   };
+
+  const openQuery = (): void => {
+    const type = sourceType || 'hive';
+    const query = database && table ? `SELECT * FROM ${database}.${table} LIMIT 100;` : '';
+    huePubSub.publish('open.editor.new.prefilled.query', {
+      type,
+      query
+    });
+  };
+
+  const toolbarActions = useMemo((): ToolbarAction[] => {
+    const actions: ToolbarAction[] = [];
+
+    // Query action
+    actions.push({
+      key: 'query',
+      label: t('Query'),
+      onClick: openQuery,
+      variant: 'primary',
+      disabled: !database || !table
+    });
+
+    // Load Data action
+    actions.push({
+      key: 'loadData',
+      label: t('Load Data'),
+      onClick: () => {
+        // TODO: Implement load data functionality
+      },
+      disabled: !database || !table,
+      tooltip: t('Load data into table')
+    });
+
+    // Drop action
+    actions.push({
+      key: 'drop',
+      label: t('Drop'),
+      onClick: () => setConfirmOpen(true),
+      variant: 'danger',
+      disabled: !database || !table || isDropping,
+      tooltip: t('Drop table')
+    });
+
+    return actions;
+  }, [t, database, table, isDropping]);
 
   return (
     <div>
       <PageHeader
         title={table}
-        icon={<DataSetsIcon />}
+        icon={isView ? <ViewIcon /> : <DataSetsIcon />}
         onRefresh={refresh}
         loading={loadingData}
-        isRefreshing={false}
+        isRefreshing={isRefreshing}
         sourceType={sourceType}
         database={database}
         table={table}
@@ -156,17 +223,7 @@ const TableDetails = ({
       />
 
       <div className="hue-table-browser__header-with-actions-only">
-        <Toolbar
-          sourceType={sourceType || getConnectorIdOrType(connector) || 'hive'}
-          database={database}
-          table={table}
-          onRefresh={refresh}
-          onDrop={handleDropTable}
-          showQuery={true}
-          showLoadData={true}
-          showDrop={true}
-          showRefresh={false}
-        />
+        <Toolbar actions={toolbarActions} loading={isDropping} />
       </div>
 
       <Tabs
@@ -174,6 +231,7 @@ const TableDetails = ({
         onChange={onTabChange}
         sampleCount={sampleData?.rows?.length}
         partitionsCount={overviewProps?.stats ? Number(overviewProps?.stats?.files) : undefined}
+        showPartitions={!!hasPartitions}
       />
 
       <Loading spinning={false}>
@@ -183,30 +241,37 @@ const TableDetails = ({
             stats={overviewProps?.stats}
             hdfsLink={overviewProps?.hdfsLink}
             columns={detailsColumns}
-            loadingProperties={loadingData && !overviewProps?.properties}
-            loadingStats={loadingData && !overviewProps?.stats}
-            loadingColumns={loadingData && !detailsColumns.length}
+            sampleData={sampleData}
+            loadingProperties={(loadingData && !overviewProps?.properties) || isRefreshing}
+            loadingStats={(loadingData && !overviewProps?.stats) || isRefreshing}
+            loadingColumns={(loadingData && !detailsColumns.length) || isRefreshing}
+            connector={connector}
+            namespace={namespace}
+            compute={compute}
+            database={database}
+            table={table}
             onRefreshStats={async () => {
               await refresh();
             }}
           />
         )}
         {activeTab === 'sample' && (
-          <Loading spinning={loadingData && !sampleData}>
+          <Loading spinning={(loadingData && !sampleData) || isRefreshing}>
             <SampleGrid data={sampleData} />
           </Loading>
         )}
         {activeTab === 'details' && (
           <Loading
             spinning={
-              loadingData &&
-              !(
-                detailsProperties?.length ||
-                detailsSections.baseInfo?.length ||
-                detailsSections.tableParameters?.length ||
-                detailsSections.storageInfo?.length ||
-                detailsSections.storageDescParams?.length
-              )
+              (loadingData &&
+                !(
+                  detailsProperties?.length ||
+                  detailsSections.baseInfo?.length ||
+                  detailsSections.tableParameters?.length ||
+                  detailsSections.storageInfo?.length ||
+                  detailsSections.storageDescParams?.length
+                )) ||
+              isRefreshing
             }
           >
             <DetailsProperties
@@ -218,7 +283,7 @@ const TableDetails = ({
             />
           </Loading>
         )}
-        {activeTab === 'partitions' && (
+        {activeTab === 'partitions' && hasPartitions && (
           <Loading spinning={loadingData && !overviewProps}>
             <Partitions
               connector={connector}
@@ -266,6 +331,38 @@ const TableDetails = ({
           {t('Back to tables')}
         </Button>
       </div>
+
+      <Modal
+        open={confirmOpen}
+        title={t('Drop table')}
+        okText={t('Drop')}
+        okButtonProps={{ danger: true }}
+        cancelText={t('Cancel')}
+        onCancel={() => {
+          setConfirmOpen(false);
+          setSkipTrash(false);
+        }}
+        onOk={async () => {
+          try {
+            await handleDropTable(skipTrash);
+          } finally {
+            setConfirmOpen(false);
+            setSkipTrash(false);
+          }
+        }}
+      >
+        <div style={{ marginBottom: 16 }}>
+          {t('Do you really want to drop table "{{tableName}}"?', { tableName: table })}
+        </div>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <input
+            type="checkbox"
+            checked={skipTrash}
+            onChange={e => setSkipTrash(e.target.checked)}
+          />
+          {t('Skip the trash')}
+        </label>
+      </Modal>
     </div>
   );
 };

@@ -27,6 +27,7 @@ import PaginatedTable, {
   type ColumnProps as PaginatedColumnProps
 } from '../../../reactComponents/PaginatedTable/PaginatedTable';
 import type { FilterOutput } from 'cuix/dist/components/Filter/types';
+import type { SortOrder } from 'antd/lib/table/interface';
 import { i18nReact } from '../../../utils/i18nReact';
 
 export interface TableRowItem {
@@ -105,21 +106,47 @@ const TablesList = ({
   const [selected, setSelected] = useState<string[]>([]);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [skipTrash, setSkipTrash] = useState(false);
+  const [sortByColumn, setSortByColumn] = useState<string | undefined>(undefined);
+  const [sortOrder, setSortOrder] = useState<SortOrder>(null);
 
   const filtered = (tables || []).filter(item =>
     tableFilter ? item.name.toLowerCase().includes(tableFilter.toLowerCase()) : true
   );
 
+  // Apply sorting
+  const sorted = useMemo(() => {
+    if (!sortOrder || !sortByColumn) {
+      return filtered;
+    }
+
+    return [...filtered].sort((a, b) => {
+      let aValue: string, bValue: string;
+
+      if (sortByColumn === 'name') {
+        aValue = a.name.toLowerCase();
+        bValue = b.name.toLowerCase();
+      } else if (sortByColumn === 'type') {
+        aValue = a.type.toLowerCase();
+        bValue = b.type.toLowerCase();
+      } else {
+        return 0;
+      }
+
+      const comparison = aValue.localeCompare(bValue);
+      return sortOrder === 'ascend' ? comparison : -comparison;
+    });
+  }, [filtered, sortOrder, sortByColumn]);
+
   // Compute memoized data BEFORE any early return to keep hook order stable
   const data = useMemo(
     () =>
-      filtered.map(item => ({
+      sorted.map(item => ({
         key: item.name,
         name: item.name,
         type: item.type,
         comment: item.comment
       })),
-    [filtered]
+    [sorted]
   );
 
   // Prepare toolbar actions (excluding refresh which is now separate)
@@ -130,8 +157,13 @@ const TablesList = ({
       actions.push({
         key: 'view',
         label: t('View'),
-        onClick: () => selected[0] && onViewSelection?.(selected[0]),
-        disabled: selected.length !== 1
+        onClick: () => {
+          if (selected.length === 1) {
+            onViewSelection(selected[0]);
+          }
+        },
+        disabled: selected.length !== 1,
+        tooltip: selected.length !== 1 ? t('Select exactly one table to view') : undefined
       });
     }
 
@@ -139,8 +171,13 @@ const TablesList = ({
       actions.push({
         key: 'query',
         label: t('Query'),
-        onClick: () => selected[0] && onQuerySelection?.(selected[0]),
-        disabled: selected.length !== 1
+        onClick: () => {
+          if (selected.length === 1) {
+            onQuerySelection(selected[0]);
+          }
+        },
+        disabled: selected.length !== 1,
+        tooltip: selected.length !== 1 ? t('Select exactly one table to query') : undefined
       });
     }
 
@@ -148,9 +185,16 @@ const TablesList = ({
       actions.push({
         key: 'drop',
         label: t('Drop'),
-        onClick: () => setConfirmOpen(true),
+        onClick: () => {
+          if (selected.length === 0) {
+            // This shouldn't happen due to disabled state, but add safety check
+            return;
+          }
+          setConfirmOpen(true);
+        },
         disabled: !selected.length,
-        variant: 'danger'
+        variant: 'danger',
+        tooltip: !selected.length ? t('Select tables to drop') : undefined
       });
     }
 
@@ -160,8 +204,8 @@ const TablesList = ({
   if (!loading && filtered.length === 0) {
     return (
       <div>
-        <div style={{ marginBottom: 8 }}>{t('Tables')}</div>
-        <EmptyState className="hue-table-browser__empty-state" title={t('No tables')} />
+        <div style={{ marginBottom: 8 }}>{t('Tables & Views')}</div>
+        <EmptyState className="hue-table-browser__empty-state" title={t('No tables or views')} />
       </div>
     );
   }
@@ -171,13 +215,14 @@ const TablesList = ({
       title: t('Table'),
       dataIndex: 'name',
       key: 'name',
+      sorter: true,
       render: (text: string, record: { name: string }) => (
         <LinkButton aria-label={t('Open table')} onClick={() => onOpenTable(record.name)}>
           {text}
         </LinkButton>
       )
     },
-    { title: t('Type'), dataIndex: 'type', key: 'type' },
+    { title: t('Type'), dataIndex: 'type', key: 'type', sorter: true },
     {
       title: t('Description'),
       dataIndex: 'comment',
@@ -271,12 +316,12 @@ const TablesList = ({
 
       {/* Header row with title */}
       <div className="hue-table-browser__header-with-actions">
-        <h2 className="hue-h3">
+        <h3 className="hue-h3">
           {t('{{label}} ({{count}})', {
-            label: t('Tables'),
+            label: t('Tables & Views'),
             count: totalSize
           })}
-        </h2>
+        </h3>
       </div>
 
       {/* Filter row with filter and toolbar */}
@@ -284,7 +329,7 @@ const TablesList = ({
         className={`hue-table-browser__filter-and-actions ${!!loading || isRefreshing ? 'disabled' : ''}`}
       >
         <Filter
-          search={{ placeholder: t('Filter tables') }}
+          search={{ placeholder: t('Filter tables & views') }}
           onChange={(output: FilterOutput) => {
             if (!!loading || isRefreshing) {
               return; // Prevent changes while loading
@@ -313,6 +358,10 @@ const TablesList = ({
           data={pageData}
           columns={columns}
           rowKey="key"
+          sortByColumn={sortByColumn}
+          sortOrder={sortOrder}
+          setSortByColumn={column => setSortByColumn(String(column))}
+          setSortOrder={setSortOrder}
           onRowSelect={selectedRows =>
             setSelected((selectedRows as unknown as { name: string }[]).map(r => r.name))
           }

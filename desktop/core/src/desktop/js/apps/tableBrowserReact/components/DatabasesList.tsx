@@ -11,15 +11,14 @@
 // the License.
 
 import React, { useMemo, useState } from 'react';
-import { Input, Skeleton, Checkbox } from 'antd';
+import { Checkbox, Input } from 'antd';
 import { LinkButton } from 'cuix/dist/components/Button';
-import PrimaryButton from 'cuix/dist/components/Button/PrimaryButton';
-import Button from 'cuix/dist/components/Button/Button';
 import Loading from 'cuix/dist/components/Loading';
 import Modal from 'cuix/dist/components/Modal';
 import EmptyState from 'cuix/dist/components/EmptyState';
 import Filter from 'cuix/dist/components/Filter';
 import DataLakeIcon from '@cloudera/cuix-core/icons/react/DataLakeIcon';
+import InlineDescriptionEditor from './InlineDescriptionEditor';
 
 import Toolbar, { type ToolbarAction } from './Toolbar';
 import PageHeader from './PageHeader';
@@ -27,6 +26,7 @@ import PaginatedTable, {
   type ColumnProps as PaginatedColumnProps
 } from '../../../reactComponents/PaginatedTable/PaginatedTable';
 import type { FilterOutput } from 'cuix/dist/components/Filter/types';
+import type { SortOrder } from 'antd/lib/table/interface';
 import { i18nReact } from '../../../utils/i18nReact';
 
 export interface DatabasesListProps {
@@ -93,6 +93,8 @@ const DatabasesList = ({
   const [selected, setSelected] = useState<string[]>([]);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [sortByColumn, setSortByColumn] = useState<string | undefined>(undefined);
+  const [sortOrder, setSortOrder] = useState<SortOrder>(null);
   const [createForm, setCreateForm] = useState({
     name: '',
     comment: '',
@@ -104,8 +106,20 @@ const DatabasesList = ({
     dbFilter ? db.toLowerCase().includes(dbFilter.toLowerCase()) : true
   );
 
+  // Apply sorting
+  const sorted = useMemo(() => {
+    const sortedData = [...filtered];
+    if (sortOrder && sortByColumn) {
+      sortedData.sort((a, b) => {
+        const comparison = a.toLowerCase().localeCompare(b.toLowerCase());
+        return sortOrder === 'ascend' ? comparison : -comparison;
+      });
+    }
+    return sortedData;
+  }, [filtered, sortOrder, sortByColumn]);
+
   // Hooks must not be conditionally skipped: compute memoized data before any early return
-  const data = useMemo(() => filtered.map(name => ({ key: name, name })), [filtered]);
+  const data = useMemo(() => sorted.map(name => ({ key: name, name })), [sorted]);
 
   // Prepare toolbar actions (excluding refresh which is now separate)
   const toolbarActions = useMemo(() => {
@@ -152,6 +166,7 @@ const DatabasesList = ({
       title: t('Database'),
       dataIndex: 'name',
       key: 'name',
+      sorter: true,
       render: (text: string, record: { name: string }) => (
         <LinkButton aria-label={t('Open database')} onClick={() => onOpenDatabase(record.name)}>
           {text}
@@ -164,50 +179,23 @@ const DatabasesList = ({
       key: 'description',
       render: (_: string | undefined, record: { name: string }) => {
         const hasValue = Object.prototype.hasOwnProperty.call(dbDescriptions, record.name);
-        const current = dbDescriptions[record.name] || '';
-        if (editingDb === record.name) {
-          return (
-            <div>
-              <Input.TextArea
-                autoSize={{ minRows: 1, maxRows: 4 }}
-                value={editingValue}
-                onChange={e => setEditingValue(e.target.value)}
-                onPressEnter={e => {
-                  e.preventDefault();
-                  onSaveDescription(record.name, editingValue);
-                }}
-              />
-              <div style={{ marginTop: 4 }}>
-                <PrimaryButton
-                  size="small"
-                  onClick={() => onSaveDescription(record.name, editingValue)}
-                >
-                  {t('Save')}
-                </PrimaryButton>
-                <Button size="small" onClick={() => setEditingDb(null)} style={{ marginLeft: 8 }}>
-                  {t('Cancel')}
-                </Button>
-              </div>
-            </div>
-          );
-        }
-        if (!hasValue) {
-          return <Skeleton.Input active size="small" style={{ width: '60%' }} />;
-        }
+
         return (
-          <div>
-            <span style={{ whiteSpace: 'pre-wrap' }}>{current || ''}</span>
-            <LinkButton
-              size="small"
-              onClick={() => {
-                setEditingDb(record.name);
-                setEditingValue(current);
-              }}
-              style={{ marginLeft: current ? 8 : 0 }}
-            >
-              {current ? t('Edit') : t('Add')}
-            </LinkButton>
-          </div>
+          <InlineDescriptionEditor
+            itemId={record.name}
+            currentDescription={dbDescriptions[record.name]}
+            originalDescription={undefined}
+            isEditing={editingDb === record.name}
+            editingValue={editingValue}
+            hasLoadedDescription={hasValue}
+            onStartEdit={(itemId, initialValue) => {
+              setEditingDb(itemId);
+              setEditingValue(initialValue);
+            }}
+            onCancelEdit={() => setEditingDb(null)}
+            onSave={onSaveDescription}
+            onEditingValueChange={setEditingValue}
+          />
         );
       }
     }
@@ -279,6 +267,10 @@ const DatabasesList = ({
           data={pageData}
           columns={columns}
           rowKey="key"
+          sortByColumn={sortByColumn}
+          sortOrder={sortOrder}
+          setSortByColumn={column => setSortByColumn(String(column))}
+          setSortOrder={setSortOrder}
           onRowSelect={selectedRows =>
             setSelected((selectedRows as unknown as { name: string }[]).map(r => r.name))
           }
@@ -321,7 +313,11 @@ const DatabasesList = ({
             <li key={name}>{name}</li>
           ))}
         </ul>
-        <div className="label label-important" style={{ display: 'inline-block', marginTop: 5 }}>
+        <div
+          role="alert"
+          className="label label-important"
+          style={{ display: 'inline-block', marginTop: 5 }}
+        >
           {t('Warning: This will drop all tables and objects within the database.')}
         </div>
       </Modal>
@@ -368,7 +364,7 @@ const DatabasesList = ({
             {t('Database Name')} *
           </label>
           <Input
-            placeholder={t('database_name')}
+            placeholder={t('Database name')}
             value={createForm.name}
             onChange={e => setCreateForm({ ...createForm, name: e.target.value })}
           />

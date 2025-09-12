@@ -67,6 +67,7 @@ const PageHeader = ({
             title={t('Refresh')}
             icon={<RefreshIcon />}
             disabled={!!loading || !!isRefreshing}
+            {...(isRefreshing && { loading: true })}
           >
             {t('Refresh')}
           </BorderlessButton>

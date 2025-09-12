@@ -26,7 +26,7 @@
       }
 
       &__icon {
-        font-size: 28px;
+        font-size: vars.$font-size-xl;
         flex-shrink: 0;
       }
 
@@ -36,9 +36,6 @@
         @include mixins.nowrap-ellipsis;
       }
 
-      &__breadcrumbs-row {
-        margin-top: 8px;
-      }
     }
 
     &__header-with-actions-only {

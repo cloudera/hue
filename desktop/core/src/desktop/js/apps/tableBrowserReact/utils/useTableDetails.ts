@@ -17,8 +17,12 @@ import huePubSub from '../../../utils/huePubSub';
 import { GLOBAL_ERROR_TOPIC } from '../../../reactComponents/GlobalAlert/events';
 import formatBytes from '../../../utils/formatBytes';
 import { formatTimestamp } from '../../../utils/dateTimeUtils';
+import { post } from '../../../api/utils';
+import { getConnectorIdOrType } from './connector';
+import { getLastKnownConfig } from '../../../config/hueConfig';
 import type { Analysis, SampleMeta } from '../../../catalog/DataCatalogEntry';
 import type { Connector, Compute, Namespace } from '../../../config/types';
+import type { TableStats } from '../components/Overview';
 
 export interface UseTableDetailsArgs {
   connector?: Connector | null;
@@ -30,6 +34,7 @@ export interface UseTableDetailsArgs {
 
 export interface TableDetailsState {
   loading: boolean;
+  isRefreshing: boolean;
   overviewProps?: {
     properties?: { name: string; value: string }[];
     stats?: {
@@ -37,10 +42,17 @@ export interface TableDetailsState {
       rows?: number | string;
       totalSize?: string;
       lastUpdated?: string;
+      schemaLastModified?: string;
     };
     hdfsLink?: string;
   };
-  detailsColumns: { name: string; type: string; comment?: string; sample?: string }[];
+  detailsColumns: {
+    name: string;
+    type: string;
+    comment?: string;
+    sample?: string;
+    isPartitionKey?: boolean;
+  }[];
   detailsProperties: { name: string; value: string }[];
   detailsSections: {
     baseInfo?: { name: string; value: string }[];
@@ -61,6 +73,7 @@ export function useTableDetails({
 }: UseTableDetailsArgs): TableDetailsState {
   const { t } = i18nReact.useTranslation();
   const [loading, setLoading] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [overviewProps, setOverviewProps] = useState<TableDetailsState['overviewProps']>();
   const [sampleData, setSampleData] = useState<TableDetailsState['sampleData']>();
   const [detailsColumns, setDetailsColumns] = useState<TableDetailsState['detailsColumns']>([]);
@@ -91,10 +104,10 @@ export function useTableDetails({
           details?: { properties?: Record<string, string>; stats?: Record<string, string> };
         }
       ).details;
-      const isPartitioned = analysisDetails?.properties?.partitioned;
+      const isPartitioned = (analysis.partition_keys?.length || 0) > 0;
       const tableType = analysisDetails?.properties?.table_type;
       const createdBy = analysisDetails?.properties?.owner || 'hive';
-      const createdTime = analysisDetails?.stats?.created_time;
+      const createdTime = analysisDetails?.properties?.create_time;
       const createdTimeFormatted = createdTime
         ? (() => {
             const numeric = Number(createdTime);
@@ -106,13 +119,20 @@ export function useTableDetails({
             return isNaN(d.getTime()) ? String(createdTime) : formatTimestamp(d);
           })()
         : undefined;
+      // Determine if it's a view or table
+      const isView = (analysis as unknown as { is_view?: boolean })?.is_view || entry.isView();
+      const typeValue = isView ? t('View') : t('Table');
+
       const props = [
-        { name: t('Partitioned Table'), value: isPartitioned ? t('Yes') : t('No') },
+        { name: t('Type'), value: typeValue },
+        { name: t('Partitioned'), value: isPartitioned ? t('Yes') : t('No') },
+        { name: t('Managed'), value: tableType === 'MANAGED_TABLE' ? t('Yes') : t('No') },
         {
-          name: t('Managed and stored in location'),
-          value:
-            (tableType === 'MANAGED_TABLE' ? t('Managed') + ' · ' : t('External') + ' · ') +
-            ((analysis as unknown as { hdfs_link?: string })?.hdfs_link || '-')
+          name: t('Location'),
+          value: (() => {
+            const hdfsLink = (analysis as unknown as { hdfs_link?: string })?.hdfs_link;
+            return hdfsLink || t('unknown location');
+          })()
         },
         {
           name: t('Created'),
@@ -145,6 +165,7 @@ export function useTableDetails({
                 : (rawTotalSize as unknown as string);
             })();
             const rawLastUpdated =
+              (analysisDetails?.properties as Record<string, unknown>)?.transient_lastDdlTime ||
               (detailStats as Record<string, string>).last_modified_time ||
               (detailStats as Record<string, string>).lastModified ||
               (detailStats as Record<string, string>).lastUpdated;
@@ -159,7 +180,32 @@ export function useTableDetails({
                 ? (rawLastUpdated as unknown as string)
                 : formatTimestamp(d);
             })();
-            return { files, rows, totalSize, lastUpdated };
+            const rawSchemaLastModified =
+              (detailStats as Record<string, string>).last_modified_time ||
+              (detailStats as Record<string, string>).lastModified;
+            const schemaLastModifiedBy =
+              (analysisDetails?.properties as Record<string, unknown>)?.last_modified_by ||
+              (detailStats as Record<string, string>).last_modified_by;
+            const schemaLastModified = rawSchemaLastModified
+              ? (() => {
+                  const n = Number(rawSchemaLastModified);
+                  if (!isNaN(n) && isFinite(n)) {
+                    const ms = n < 1e12 ? n * 1000 : n;
+                    const timestamp = formatTimestamp(new Date(ms));
+                    return schemaLastModifiedBy
+                      ? `${timestamp} ${t('by')} ${schemaLastModifiedBy}`
+                      : timestamp;
+                  }
+                  const d = new Date(rawSchemaLastModified as unknown as string);
+                  const timestamp = isNaN(d.getTime())
+                    ? String(rawSchemaLastModified)
+                    : formatTimestamp(d);
+                  return schemaLastModifiedBy
+                    ? `${timestamp} ${t('by')} ${schemaLastModifiedBy}`
+                    : timestamp;
+                })()
+              : undefined;
+            return { files, rows, totalSize, lastUpdated, schemaLastModified };
           })()
         : undefined;
       const columnsForOverview = (analysis.cols || []).map(c => ({
@@ -203,7 +249,8 @@ export function useTableDetails({
       })();
       add(baseInfo, t('LastAccessTime'), lastAccessFormatted);
       add(baseInfo, t('Retention'), rawProps.retention);
-      add(baseInfo, t('Location'), (analysis as unknown as { hdfs_link?: string })?.hdfs_link);
+      const hdfsLocation = (analysis as unknown as { hdfs_link?: string })?.hdfs_link;
+      add(baseInfo, t('Location'), hdfsLocation);
       add(baseInfo, t('Table Type'), rawProps.table_type || rawProps.tableType);
 
       Object.keys(analysis.details.stats || {}).forEach(key => {
@@ -308,15 +355,29 @@ export function useTableDetails({
       setDetailsProperties(allProps);
       setDetailsSections({ baseInfo, tableParameters, storageInfo, storageDescParams });
       setDetailsColumns(columnsForOverview);
-      const sample = await entry.getSample({ silenceErrors: true });
-      const headers = Array.isArray(sample.meta)
-        ? (sample.meta as SampleMeta[]).map((m: SampleMeta) => m.name)
-        : [];
-      setSampleData({ headers, rows: sample.data || [] });
+
+      // Only load sample data if it's not a view, or if views are allowed by config
+      const config = getLastKnownConfig();
+      const allowSampleDataFromViews = config?.hue_config?.allow_sample_data_from_views ?? false;
+
+      if (!isView || allowSampleDataFromViews) {
+        const sample = await entry.getSample({ silenceErrors: true });
+        const headers = Array.isArray(sample.meta)
+          ? (sample.meta as SampleMeta[]).map((m: SampleMeta) => m.name)
+          : [];
+        setSampleData({ headers, rows: sample.data || [] });
+      } else {
+        // Clear sample data for views when not allowed
+        setSampleData(undefined);
+      }
+      const partitionKeyNames = new Set(
+        (analysis.partition_keys || []).map(pk => pk.name).filter(Boolean)
+      );
       const cols = (analysis.cols || []).map(c => ({
         name: (c as unknown as { name: string }).name,
         type: (c as unknown as { type: string }).type,
-        comment: (c as unknown as { comment?: string }).comment
+        comment: (c as unknown as { comment?: string }).comment,
+        isPartitionKey: partitionKeyNames.has((c as unknown as { name: string }).name)
       }));
       setDetailsColumns(cols);
     } catch (err) {
@@ -334,6 +395,7 @@ export function useTableDetails({
     if (!database || !table || !connector || !namespace || !compute) {
       return;
     }
+    setIsRefreshing(true);
     try {
       const entry = await dataCatalog.getEntry({
         connector,
@@ -341,15 +403,95 @@ export function useTableDetails({
         compute,
         path: [database, table]
       });
-      setLoading(true);
       await entry.clearCache({ cascade: true, silenceErrors: true });
-    } catch {}
-    await fetchData();
-    setLoading(false);
-  }, [connector, namespace, compute, database, table, fetchData]);
+
+      // Refresh data without setting main loading state
+      const analysis: Analysis = await entry.getAnalysis({ silenceErrors: true });
+      const analysisDetails = (
+        analysis as unknown as {
+          details?: {
+            stats?: TableStats;
+            properties?: { name: string; value: string }[];
+            hdfsLink?: string;
+          };
+        }
+      )?.details;
+
+      const children = await entry.getChildren({ silenceErrors: true });
+      const columns = children.filter(child => child.isColumn());
+      const columnDetails = columns.map(col => ({
+        name: col.name || '',
+        type: col.getType() || '',
+        comment: col.comment || '',
+        sample: '',
+        isPartitionKey: col.isPartitionKey() || false
+      }));
+
+      // Update state
+      setOverviewProps({
+        properties: analysisDetails?.properties,
+        stats: analysisDetails?.stats,
+        hdfsLink: analysisDetails?.hdfsLink
+      });
+      setDetailsColumns(columnDetails);
+
+      // Fetch additional details
+      const detailsResponse = await post('/metastore/table/', {
+        source_type: getConnectorIdOrType(connector) || 'hive',
+        database: database,
+        table: table
+      });
+
+      if (detailsResponse && typeof detailsResponse === 'object' && 'details' in detailsResponse) {
+        const details = (detailsResponse as { details?: Record<string, unknown> }).details;
+        if (details) {
+          setDetailsProperties(Array.isArray(details.properties) ? details.properties : []);
+          setDetailsSections({
+            baseInfo: Array.isArray(details.partition_keys) ? details.partition_keys : [],
+            tableParameters: Array.isArray(details.details) ? details.details : [],
+            storageInfo: Array.isArray(details.storage) ? details.storage : [],
+            storageDescParams: []
+          });
+        }
+      }
+
+      // Only fetch sample data if it's not a view, or if views are allowed by config
+      const config = getLastKnownConfig();
+      const allowSampleDataFromViews = config?.hue_config?.allow_sample_data_from_views ?? false;
+
+      // Check if current table is a view by looking at properties
+      const currentIsView =
+        overviewProps?.properties?.find(p => p.name === t('Type'))?.value === t('View');
+
+      if (!currentIsView || allowSampleDataFromViews) {
+        // Fetch sample data
+        const sampleResponse = await post('/metastore/table/', {
+          source_type: getConnectorIdOrType(connector) || 'hive',
+          database: database,
+          table: table,
+          sample: true
+        });
+
+        if (sampleResponse && typeof sampleResponse === 'object' && 'sample' in sampleResponse) {
+          const sample = (sampleResponse as { sample?: Record<string, unknown> }).sample;
+          if (sample && typeof sample === 'object' && 'headers' in sample && 'rows' in sample) {
+            setSampleData(sample as { headers: string[]; rows: (string | number | null)[][] });
+          }
+        }
+      } else {
+        // Clear sample data for views when not allowed
+        setSampleData(undefined);
+      }
+    } catch (error) {
+      console.error('Error during refresh:', error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [connector, namespace, compute, database, table]);
 
   return {
     loading,
+    isRefreshing,
     overviewProps,
     detailsColumns,
     detailsProperties,
