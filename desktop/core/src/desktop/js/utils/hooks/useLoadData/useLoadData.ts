@@ -45,7 +45,6 @@ const useLoadData = <T, U = unknown, E = string>(
   const [error, setError] = useState<E>();
 
   const optionsDefault: ApiFetchOptions<T, E> = {
-    encodeData: true,
     silenceErrors: true,
     ignoreSuccessErrors: true
   };

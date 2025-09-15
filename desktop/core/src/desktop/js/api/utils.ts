@@ -267,12 +267,10 @@ export const get = <T, U = unknown, E = AxiosError<DefaultApiResponse>>(
     const { cancelToken, cancel } = getCancelToken();
     let completed = false;
 
-    const encodeData = options?.encodeData == undefined || options?.encodeData;
-
     axiosInstance
       .get<T & DefaultApiResponse>(url, {
         cancelToken,
-        params: encodeData ? new URLSearchParams(data as Record<string, string>) : data
+        params: data
       })
       .then(response => {
         handleResponse(response, resolve, reject, options);

@@ -34,7 +34,6 @@ const mockOptions = {
 };
 
 const mockRequestOptions = {
-  encodeData: true,
   silenceErrors: true,
   ignoreSuccessErrors: true
 };

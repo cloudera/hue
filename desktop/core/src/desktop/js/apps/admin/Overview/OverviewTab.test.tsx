@@ -123,13 +123,11 @@ describe('OverviewTab', () => {
     const mockAnalyticsDataDisabled = { collectUsage: false };
     const expectedFetchOptions = {
       silenceErrors: true,
-      ignoreSuccessErrors: true,
-      encodeData: true
+      ignoreSuccessErrors: true
     };
     const expectedOptions = {
       silenceErrors: true,
-      ignoreSuccessErrors: true,
-      encodeData: false
+      ignoreSuccessErrors: true
     };
 
     const renderAnalyticsAndWaitForLoad = async () => {
@@ -214,7 +212,7 @@ describe('OverviewTab', () => {
           'put',
           USAGE_ANALYTICS_API_URL,
           { collect_usage: true },
-          expectedOptions
+          { ...expectedOptions, encodeData: false }
         );
       });
     });
@@ -230,7 +228,7 @@ describe('OverviewTab', () => {
           'put',
           USAGE_ANALYTICS_API_URL,
           { collect_usage: false },
-          expectedOptions
+          { ...expectedOptions, encodeData: false }
         );
       });
     });
