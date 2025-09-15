@@ -715,7 +715,8 @@ VCS = UnspecifiedConfigSection(
 JAVA_PATH = Config(
   key="java_path",
   help=_("Java binary path to add to PATH environment variable."),
-  default=""
+  default="",
+  type=str
 )
 
 
