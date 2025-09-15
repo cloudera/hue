@@ -74,7 +74,7 @@ def config_validator(user):
     from desktop.lib.fsmanager import get_filesystem
 
     if USE_STORAGE_CONNECTORS.get():
-      from desktop.lib.fs.s3.conf_utils import is_s3_enabled
+      from desktop.lib.fs.s3.conf_utils import is_enabled as is_s3_enabled
     else:
       from aws.conf import is_s3_enabled
 

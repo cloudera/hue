@@ -83,7 +83,8 @@ def get_audit_logger():
 
   audit_logger = logging.getLogger("audit")
   if not [hclass for hclass in audit_logger.handlers if isinstance(hclass, AuditHandler)]:  # Don't add handler twice
-    size, unit = int(AUDIT_LOG_MAX_FILE_SIZE.get()[:-2]), AUDIT_LOG_MAX_FILE_SIZE.get()[-2:]
+    audit_file_size = AUDIT_LOG_MAX_FILE_SIZE.get()
+    size, unit = int(audit_file_size[:-2]), audit_file_size[-2:]
     maxBytes = size * 1024 ** (1 if unit == "KB" else 2 if unit == "MB" else 3)
 
     audit_handler = AuditHandler(AUDIT_EVENT_LOG_DIR.get(), maxBytes=maxBytes, backupCount=50)
