@@ -201,6 +201,13 @@ GUNICORN_WORKER_GRACEFUL_TIMEOUT = Config(
   type=int,
   default=900)
 
+
+LOG_LISTENER_SOCKET_NAME = Config(
+  key="log_listener_socket_name",
+  help=_("Name of the Unix Domain Socket file for log listener communication."),
+  type=str,
+  default="hue.uds")
+
 HTTP_HOST = Config(
   key="http_host",
   help=_("HTTP host to bind to."),

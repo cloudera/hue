@@ -29,7 +29,6 @@ export HUE_HOME_DIR=$(dirname $(dirname "$SCRIPT_DIR"))
 source $SCRIPT_DIR/python/python_helper.sh
 PYTHON_BIN="${VENV_BIN_PATH}/python"
 HUE="${VENV_BIN_PATH}/hue"
-HUE_LOGLISTENER="${HUE_HOME_DIR}/desktop/core/src/desktop/loglistener.py"
 
 echo "Hue Environment Variables:" 1>&2
 env 1>&2
@@ -148,15 +147,6 @@ add_mysql_to_pythonpath_for_version() {
 add_postgres_to_pythonpath_for_version "$SELECTED_PYTHON_VERSION"
 add_mysql_to_pythonpath_for_version "$SELECTED_PYTHON_VERSION"
 
-function stop_previous_hueprocs() {
-  for p in $(cat /tmp/hue_${HUE_PORT}.pid); do
-    if [[ $p -eq $(ps -p $p -ho pid=) ]]; then
-      kill -9 $p
-    fi
-  done
-  rm -f /tmp/hue_${HUE_PORT}.pid
-}
-
 
 # Executes Django database migrations with retry logic to handle
 # concurrent migration attempts from multiple hosts.
@@ -213,12 +203,6 @@ elif [[ "runcpserver" == "$1" ]]; then
   run_syncdb_and_migrate_subcommands
   exec "$HUE" "runcpserver"
 elif [[ "rungunicornserver" == "$1" ]]; then
-  stop_previous_hueprocs
-  sleep 5 # wait to handle some unknown concurrency issue that can kill loglistener process
-  nohup "$PYTHON_BIN" "$HUE_LOGLISTENER" &
-  echo "Log Listener Status: $?" >&2
-  jobs -l >&2
-  echo $! > /tmp/hue_${HUE_PORT}.pid
   run_syncdb_and_migrate_subcommands
   exec "$HUE" "rungunicornserver"
 else
