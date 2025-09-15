@@ -127,7 +127,8 @@ describe('OverviewTab', () => {
     };
     const expectedOptions = {
       silenceErrors: true,
-      ignoreSuccessErrors: true
+      ignoreSuccessErrors: true,
+      encodeData: false
     };
 
     const renderAnalyticsAndWaitForLoad = async () => {
@@ -212,7 +213,7 @@ describe('OverviewTab', () => {
           'put',
           USAGE_ANALYTICS_API_URL,
           { collect_usage: true },
-          { ...expectedOptions, encodeData: false }
+          expectedOptions
         );
       });
     });
@@ -228,7 +229,7 @@ describe('OverviewTab', () => {
           'put',
           USAGE_ANALYTICS_API_URL,
           { collect_usage: false },
-          { ...expectedOptions, encodeData: false }
+          expectedOptions
         );
       });
     });
