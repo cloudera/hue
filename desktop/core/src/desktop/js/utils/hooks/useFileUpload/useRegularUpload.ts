@@ -53,7 +53,7 @@ const useRegularUpload = ({
       onError: error => {
         updateFileVariables(item.uuid, { status: FileStatus.Failed, error });
       },
-      postOptions: {
+      options: {
         params: {
           destination_path: item.filePath,
           overwrite: item.overwrite ? 'true' : 'false'

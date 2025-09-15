@@ -39,7 +39,7 @@ const ReplicationModal = ({
   const { t } = i18nReact.useTranslation();
 
   const { save, loading, error } = useSaveData(SET_REPLICATION_API_URL, {
-    postOptions: { encodeData: true }, // TODO: Remove once API supports RAW JSON payload
+    options: { encodeData: true }, // TODO: Remove once API supports RAW JSON payload
     skip: !file.path,
     onSuccess,
     onError

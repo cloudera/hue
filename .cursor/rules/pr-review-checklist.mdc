@@ -1,0 +1,41 @@
+---
+description: PR review output policy and checklist;
+alwaysApply: false
+---
+# PR Review 
+
+## Instructions
+— Only Output Issues/Improvements, DO NOT list all that is already good.
+- Be concise. 
+- Provide a general feedback section for issues spanning multiple files, e.g. architectural.
+- Provide a section per file with links to the source files.
+
+## Always check for
+- Architecture: lift/split state; keep components cohesive.
+- Naming clarity: components, functions, variables.
+- Edge cases: loading/empty/error; network failures.
+- Accessibility: roles, labels, focus, contrast. Only comment where needed, 
+- Check for aria- attributes ONLY when needed. e.g. 
+  - DO: comment if an icon inly button is missing aria-label. 
+  - DON'T: comment about missing aria-disabled if a native disabled attribute is used.
+- Copy: concise, consistent; i18n everywhere.
+- All files must start with the Cloudera copyright statement
+
+## Make sure that test files
+- test main flows
+- use userEvent and avoid fireEvent unless realy needed.
+- does not test implementation details; assert on behavior and rendered screens.
+- use role/name queries, e.g. getByRole rather than getByText
+- uses toBeVisible() instead of toBeInTheDocument() where possible
+- use the component name in the describe function
+- use "it" function over "test" for better readbility
+
+
+## Make sure the style files
+- use BEM notation (avoid unnecessary nesting for classes but allow .antd.cuix on the root)
+- never use hardcoded colors; use tokens/variables.
+- avoid hardcoded variables for positioning/spacing if possible
+- do not contain unnused classes
+- use classes over HTML elements whenever possible
+
+ 

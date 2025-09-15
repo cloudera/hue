@@ -107,7 +107,7 @@ describe('ImporterPage', () => {
       const saveCall = mockSave.mock.calls[0];
       if (saveCall && saveCall[1] && saveCall[1].onSuccess) {
         saveCall[1].onSuccess({
-          file_path: '/tmp/test.csv'
+          filePath: '/tmp/test.csv'
         });
       }
     });

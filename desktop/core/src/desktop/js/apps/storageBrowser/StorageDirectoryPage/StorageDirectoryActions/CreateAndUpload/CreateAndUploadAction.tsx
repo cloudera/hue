@@ -14,24 +14,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Dropdown } from 'antd';
-import { MenuItemGroupType } from 'antd/lib/menu/hooks/useItems';
-import Modal from 'cuix/dist/components/Modal';
+import { ItemType, MenuItemGroupType } from 'antd/lib/menu/hooks/useItems';
 import FolderIcon from '@cloudera/cuix-core/icons/react/ProjectIcon';
 import FileIcon from '@cloudera/cuix-core/icons/react/DocumentationIcon';
 import DropDownIcon from '@cloudera/cuix-core/icons/react/DropdownIcon';
 import ImportIcon from '@cloudera/cuix-core/icons/react/ImportIcon';
+import BucketIcon from '@cloudera/cuix-core/icons/react/BucketIcon';
+import DatabaseIcon from '@cloudera/cuix-core/icons/react/DatabaseIcon';
+import DataBrowserIcon from '@cloudera/cuix-core/icons/react/DataBrowserIcon';
 import { PrimaryButton } from 'cuix/dist/components/Button';
 
 import { i18nReact } from '../../../../../utils/i18nReact';
 import { CREATE_DIRECTORY_API_URL, CREATE_FILE_API_URL } from '../../../api';
+import {
+  isABFSRoot,
+  isGSRoot,
+  isOFSServiceID,
+  isOFSVol,
+  isS3Root,
+  isFileSystemNonRoot
+} from '../../../utils/utils';
 import { FileStats } from '../../../types';
 import useSaveData from '../../../../../utils/hooks/useSaveData/useSaveData';
 import InputModal from '../../../../../reactComponents/InputModal/InputModal';
-import DragAndDrop from '../../../../../reactComponents/DragAndDrop/DragAndDrop';
 
 import './CreateAndUploadAction.scss';
+import { TFunction } from 'i18next';
 
 interface CreateAndUploadActionProps {
   currentPath: FileStats['path'];
@@ -43,8 +53,72 @@ interface CreateAndUploadActionProps {
 enum ActionType {
   createFile = 'createFile',
   createFolder = 'createFolder',
-  uploadFile = 'uploadFile'
+  uploadFile = 'uploadFile',
+  createBucket = 'createBucket',
+  createVolume = 'createVolume',
+  createFileSystem = 'createFileSystem'
 }
+
+type ActionItem = {
+  icon: React.ReactElement;
+  label: string;
+  modal?: {
+    title: string;
+    label: string;
+  };
+  api?: string;
+  visible: (path: string) => boolean;
+  group: string;
+};
+
+const getActionConfig = (t: TFunction): Record<ActionType, ActionItem> => ({
+  [ActionType.createFile]: {
+    icon: <FileIcon />,
+    label: t('New File'),
+    modal: { title: t('Create File'), label: t('File name') },
+    api: CREATE_FILE_API_URL,
+    group: 'create',
+    visible: path => isFileSystemNonRoot(path)
+  },
+  [ActionType.createFolder]: {
+    icon: <FolderIcon />,
+    label: t('New Folder'),
+    modal: { title: t('Create Folder'), label: t('Folder name') },
+    api: CREATE_DIRECTORY_API_URL,
+    group: 'create',
+    visible: path => isFileSystemNonRoot(path)
+  },
+  [ActionType.createBucket]: {
+    icon: <BucketIcon />,
+    label: t('New Bucket'),
+    modal: { title: t('Create Bucket'), label: t('Bucket name') },
+    api: CREATE_DIRECTORY_API_URL,
+    group: 'create',
+    visible: path => isS3Root(path) || isGSRoot(path) || isOFSVol(path)
+  },
+  [ActionType.createVolume]: {
+    icon: <DatabaseIcon />,
+    label: t('New Volume'),
+    modal: { title: t('Create Volume'), label: t('Volume name') },
+    api: CREATE_DIRECTORY_API_URL,
+    group: 'create',
+    visible: path => isOFSServiceID(path)
+  },
+  [ActionType.createFileSystem]: {
+    icon: <DataBrowserIcon />,
+    label: t('New File System'),
+    modal: { title: t('Create File System'), label: t(')File system name') },
+    api: CREATE_DIRECTORY_API_URL,
+    group: 'create',
+    visible: path => isABFSRoot(path)
+  },
+  [ActionType.uploadFile]: {
+    icon: <ImportIcon />,
+    label: t('Upload File'),
+    group: 'upload',
+    visible: path => isFileSystemNonRoot(path)
+  }
+});
 
 const CreateAndUploadAction = ({
   currentPath,
@@ -53,16 +127,13 @@ const CreateAndUploadAction = ({
   onActionError
 }: CreateAndUploadActionProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [selectedAction, setSelectedAction] = useState<ActionType>();
+  const actionConfig = getActionConfig(t);
 
   const onModalClose = () => {
     setSelectedAction(undefined);
-  };
-
-  const onUpload = (files: File[]) => {
-    onModalClose();
-    onFilesUpload(files);
   };
 
   const onApiSuccess = () => {
@@ -71,7 +142,7 @@ const CreateAndUploadAction = ({
   };
 
   const { save, loading, error } = useSaveData(undefined, {
-    postOptions: { encodeData: true }, // TODO: Remove once API supports RAW JSON payload
+    options: { encodeData: true }, // TODO: Remove once API supports RAW JSON payload
     onSuccess: onApiSuccess,
     onError: onActionError
   });
@@ -80,50 +151,57 @@ const CreateAndUploadAction = ({
     setSelectedAction(action);
   };
 
+  const onFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const filesArray = Array.from(e.target.files);
+      onFilesUpload(filesArray);
+    }
+    // Reset the input value so the same file can be selected again
+    e.target.value = '';
+  };
+
+  const getCreateActionChildren = (): ItemType[] => {
+    return (Object.entries(actionConfig) as [ActionType, (typeof actionConfig)[ActionType]][])
+      .filter(([, cfg]) => cfg.group !== 'upload' && cfg.visible(currentPath))
+      .map(([action, cfg]) => ({
+        icon: cfg.icon,
+        key: action,
+        label: cfg.label,
+        onClick: onActionClick(action)
+      }));
+  };
+
   const newActionsMenuItems: MenuItemGroupType[] = [
     {
       key: 'create',
-      type: 'group',
+      type: 'group' as const,
       label: t('CREATE'),
-      children: [
-        {
-          icon: <FileIcon />,
-          key: ActionType.createFile,
-          label: t('New File'),
-          onClick: onActionClick(ActionType.createFile)
-        },
-        {
-          icon: <FolderIcon />,
-          key: ActionType.createFolder,
-          label: t('New Folder'),
-          onClick: onActionClick(ActionType.createFolder)
-        }
-      ]
+      children: getCreateActionChildren()
     },
     {
       key: 'upload',
-      type: 'group',
+      type: 'group' as const,
       label: t('UPLOAD'),
-      children: [
-        {
-          icon: <ImportIcon />,
-          key: ActionType.uploadFile,
-          label: t('Upload File'),
-          onClick: onActionClick(ActionType.uploadFile)
-        }
-      ]
+      children: actionConfig[ActionType.uploadFile].visible(currentPath)
+        ? [
+            {
+              icon: actionConfig[ActionType.uploadFile].icon,
+              key: ActionType.uploadFile,
+              label: actionConfig[ActionType.uploadFile].label,
+              onClick: () => fileInputRef.current?.click()
+            }
+          ]
+        : []
     }
-  ];
+  ].filter(group => group.children && group.children.length > 0);
 
   const handleCreate = (name: string | number) => {
-    const url = {
-      [ActionType.createFile]: CREATE_FILE_API_URL,
-      [ActionType.createFolder]: CREATE_DIRECTORY_API_URL
-    }[selectedAction ?? ''];
+    const url = selectedAction ? actionConfig[selectedAction]?.api : undefined;
 
     if (!url) {
       return;
     }
+
     save({ path: currentPath, name }, { url });
   };
 
@@ -142,12 +220,18 @@ const CreateAndUploadAction = ({
           <DropDownIcon />
         </PrimaryButton>
       </Dropdown>
-      {(selectedAction === ActionType.createFolder || selectedAction === ActionType.createFile) && (
+      {selectedAction !== undefined && selectedAction !== ActionType.uploadFile && (
         <InputModal
           showModal={true}
-          title={selectedAction === ActionType.createFolder ? t('Create Folder') : t('Create File')}
+          title={
+            actionConfig[selectedAction].modal
+              ? actionConfig[selectedAction].modal.title
+              : t('Create')
+          }
           inputLabel={
-            selectedAction === ActionType.createFolder ? t('Folder name') : t('File name')
+            actionConfig[selectedAction].modal
+              ? actionConfig[selectedAction].modal.label
+              : t('Name')
           }
           submitText={t('Create')}
           onSubmit={handleCreate}
@@ -156,14 +240,15 @@ const CreateAndUploadAction = ({
           error={error}
         />
       )}
-      <Modal
-        onCancel={onModalClose}
-        className="hue-file-upload-modal cuix antd"
-        open={selectedAction === ActionType.uploadFile}
-        title={t('Upload a File')}
-      >
-        <DragAndDrop onDrop={onUpload} />
-      </Modal>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        id="file-upload-input"
+        hidden
+        multiple
+        onChange={onFileUpload}
+      />
     </>
   );
 };

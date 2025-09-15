@@ -15,11 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
+import logging
 import os
 import re
-import json
 import stat
-import logging
 import tempfile
 import urllib.error
 import urllib.parse
@@ -30,20 +30,18 @@ from unittest.mock import Mock, patch
 from urllib.parse import unquote as urllib_unquote
 
 import pandas as pd
-import pytest
 import pyarrow as pa
 import pyarrow.parquet as pq
+import pytest
 from avro import datafile, io, schema
 from django.http import HttpResponse
 from django.test import TestCase
 from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
 
 from aws.conf import AWS_ACCOUNTS
-from aws.s3.s3fs import S3FileSystemException
 from aws.s3.s3test_utils import get_test_bucket
 from azure.conf import ABFS_CLUSTERS, is_abfs_enabled, is_adls_enabled
-from desktop.conf import OZONE, RAZ, is_ofs_enabled, is_oozie_enabled
+from desktop.conf import is_ofs_enabled, is_oozie_enabled, OZONE, RAZ, USE_STORAGE_CONNECTORS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_permission, add_to_group, grant_access, remove_from_group
 from desktop.lib.view_util import location_to_url
@@ -465,13 +463,13 @@ class TestFileBrowserWithHadoop(object):
     kwargs.update(permissions_dict)
 
     # Set 1777, then check permissions of dirs
-    response = self.c.post("/filebrowser/chmod", kwargs)
+    self.c.post("/filebrowser/chmod", kwargs)
     assert 0o41777 == int(self.cluster.fs.stats(PATH)["mode"])
 
     # Now do the above recursively
     assert 0o41777 != int(self.cluster.fs.stats(SUBPATH)["mode"])
     kwargs['recursive'] = True
-    response = self.c.post("/filebrowser/chmod", kwargs)
+    self.c.post("/filebrowser/chmod", kwargs)
     assert 0o41777 == int(self.cluster.fs.stats(SUBPATH)["mode"])
 
     # Test bulk chmod
@@ -515,13 +513,13 @@ class TestFileBrowserWithHadoop(object):
     kwargs.update(permissions_dict)
 
     # Set sticky bit, then check sticky bit is on in hdfs
-    response = self.c.post("/filebrowser/chmod", kwargs)
+    self.c.post("/filebrowser/chmod", kwargs)
     mode = expand_mode(int(self.cluster.fs.stats(PATH)["mode"]))
     assert True is mode[-1]
 
     # Unset sticky bit, then check sticky bit is off in hdfs
     del kwargs['sticky']
-    response = self.c.post("/filebrowser/chmod", kwargs)
+    self.c.post("/filebrowser/chmod", kwargs)
     mode = expand_mode(int(self.cluster.fs.stats(PATH)["mode"]))
     assert False is mode[-1]
 
@@ -573,7 +571,6 @@ class TestFileBrowserWithHadoop(object):
     NAME = "test-rename-before"
     NEW_NAME = "test-rename-after"
     self.cluster.fs.mkdir(PREFIX + NAME)
-    op = "rename"
     # test for full path rename
     self.c.post("/filebrowser/rename", dict(src_path=PREFIX + NAME, dest_path=PREFIX + NEW_NAME))
     assert self.cluster.fs.exists(PREFIX + NEW_NAME)
@@ -775,7 +772,6 @@ class TestFileBrowserWithHadoop(object):
   def test_view_snappy_compressed_avro(self):
     if not snappy_installed():
       pytest.skip("Skipping Test")
-    import snappy
 
     finish = []
     try:
@@ -1505,7 +1501,8 @@ class TestADLSAccessPermissions(object):
     assert 500 == response.status_code
 
     # 500 for real currently
-    assert_raises(IOError, self.client.get, '/filebrowser/edit=ADL://hue-test-01')
+    with pytest.raises(IOError):
+      self.client.get('/filebrowser/edit=ADL://hue-test-01')
 
     # 500 for real currently
 
@@ -1714,7 +1711,11 @@ class TestFileChooserRedirect(object):
           reset()
 
       # S3A - default_s3_home
-      resets = [REMOTE_STORAGE_HOME.set_for_testing(None), AWS_ACCOUNTS.set_for_testing({'default': {'default_home_path': None}})]
+      resets = [
+        REMOTE_STORAGE_HOME.set_for_testing(None),
+        USE_STORAGE_CONNECTORS.set_for_testing(False),
+        AWS_ACCOUNTS.set_for_testing({"default": {"default_home_path": None}}),
+      ]
       try:
         response = self.client.get('/filebrowser/view=%2F?default_s3_home')
 
@@ -1726,6 +1727,7 @@ class TestFileChooserRedirect(object):
 
       resets = [
         REMOTE_STORAGE_HOME.set_for_testing(None),
+        USE_STORAGE_CONNECTORS.set_for_testing(False),
         AWS_ACCOUNTS.set_for_testing({'default': {'default_home_path': 's3a://my_bucket'}}),
       ]
       try:
@@ -1739,6 +1741,7 @@ class TestFileChooserRedirect(object):
       resets = [
         RAZ.IS_ENABLED.set_for_testing(True),
         REMOTE_STORAGE_HOME.set_for_testing(None),
+        USE_STORAGE_CONNECTORS.set_for_testing(False),
         AWS_ACCOUNTS.set_for_testing({'default': {'default_home_path': 's3a://my_bucket'}}),
       ]
       try:
@@ -1753,6 +1756,7 @@ class TestFileChooserRedirect(object):
       resets = [
         RAZ.IS_ENABLED.set_for_testing(True),
         REMOTE_STORAGE_HOME.set_for_testing(None),
+        USE_STORAGE_CONNECTORS.set_for_testing(False),
         AWS_ACCOUNTS.set_for_testing({'default': {'default_home_path': 's3a://my_bucket/user'}}),
       ]
       try:
@@ -1771,7 +1775,7 @@ class TestFileChooserRedirect(object):
           stats.isDir.return_value = True
           listdir_paged.return_value = HttpResponse()
 
-          response = self.client.get('/filebrowser/view=')
+          self.client.get('/filebrowser/view=')
 
           _normalize_path.assert_called_with('/')
 

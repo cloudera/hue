@@ -16,21 +16,23 @@
 
 import logging
 import posixpath
+import ssl
 import threading
-import urllib.error
-import urllib.request
 from urllib.parse import quote as urllib_quote, urlparse as lib_urlparse
 
 import requests
 from django.utils.encoding import iri_to_uri, smart_str
 from django.utils.http import urlencode
 from requests import exceptions
+from requests.adapters import HTTPAdapter
 from requests.auth import AuthBase, HTTPBasicAuth, HTTPDigestAuth
-from requests_kerberos import DISABLED, OPTIONAL, REQUIRED, HTTPKerberosAuth
+from requests_kerberos import DISABLED, HTTPKerberosAuth, OPTIONAL, REQUIRED
 from urllib3.contrib import pyopenssl
 
 from desktop import conf
+from desktop.lib.tls_utils import create_http_ssl_context
 
+# Configure default cipher list for pyopenssl with enhanced TLS support
 pyopenssl.DEFAULT_SSL_CIPHER_LIST = conf.SSL_CIPHER_LIST.get()
 
 __docformat__ = "epytext"
@@ -41,6 +43,45 @@ CACHE_SESSION = {}
 CACHE_SESSION_LOCK = threading.Lock()
 
 
+class TLS13HTTPAdapter(HTTPAdapter):
+  """
+  HTTP adapter with enhanced TLS 1.3 support for requests library.
+  """
+
+  def init_poolmanager(self, *args, **kwargs):
+    """
+    Initialize the urllib3 pool manager with TLS 1.3 support.
+    """
+    try:
+      # Create SSL context with TLS 1.3 support
+      ssl_context = create_http_ssl_context()
+
+      if ssl_context:
+        # Use our custom SSL context
+        kwargs['ssl_context'] = ssl_context
+        LOG.debug("Using custom TLS SSL context for HTTP adapter")
+      else:
+        # Fallback configuration
+        kwargs['cert_reqs'] = ssl.CERT_REQUIRED if conf.SSL_VALIDATE.get() else ssl.CERT_NONE
+
+        if conf.SSL_CACERTS.get():
+          kwargs['ca_certs'] = conf.SSL_CACERTS.get()
+
+        # Set cipher list for fallback
+        if hasattr(ssl, 'SSLContext'):
+          try:
+            kwargs['ssl_ciphers'] = conf.SSL_CIPHER_LIST.get()
+          except Exception:
+            pass
+
+        LOG.debug("Using fallback SSL configuration for HTTP adapter")
+
+    except Exception as e:
+      LOG.warning(f"Could not configure TLS 1.3 for HTTP adapter: {e}")
+
+    return super().init_poolmanager(*args, **kwargs)
+
+
 def get_request_session(url, logger):
   global CACHE_SESSION, CACHE_SESSION_LOCK
 
@@ -48,14 +89,25 @@ def get_request_session(url, logger):
     with CACHE_SESSION_LOCK:
       CACHE_SESSION[url] = requests.Session()
       logger.debug("Setting request Session")
-      CACHE_SESSION[url].mount(
-        url,
-        requests.adapters.HTTPAdapter(
-          pool_connections=conf.CHERRYPY_SERVER_THREADS.get(),
-          pool_maxsize=conf.CHERRYPY_SERVER_THREADS.get()
-        )
+
+      # Use TLS 1.3 supporting adapter
+      tls13_adapter = TLS13HTTPAdapter(
+        pool_connections=conf.CHERRYPY_SERVER_THREADS.get(),
+        pool_maxsize=conf.CHERRYPY_SERVER_THREADS.get()
       )
-      logger.debug("Setting session adapter for %s" % url)
+
+      # Mount the adapter for both HTTP and HTTPS
+      CACHE_SESSION[url].mount('https://', tls13_adapter)
+      CACHE_SESSION[url].mount('http://', tls13_adapter)
+
+      # Configure SSL verification
+      CACHE_SESSION[url].verify = conf.SSL_VALIDATE.get()
+
+      # Set CA certificates if configured
+      if conf.SSL_CACERTS.get() and conf.SSL_VALIDATE.get():
+        CACHE_SESSION[url].verify = conf.SSL_CACERTS.get()
+
+      logger.debug(f"Configured HTTP session with TLS 1.3 support for {url}")
 
   return CACHE_SESSION
 

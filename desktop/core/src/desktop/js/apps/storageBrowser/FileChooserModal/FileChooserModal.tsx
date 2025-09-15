@@ -201,7 +201,7 @@ const FileChooserModal = ({
     loading: createFolderLoading,
     error: createFolderError
   } = useSaveData(CREATE_DIRECTORY_API_URL, {
-    postOptions: { encodeData: true } // TODO: Remove once API supports RAW JSON payload
+    options: { encodeData: true } // TODO: Remove once API supports RAW JSON payload
   });
 
   const handleCreate = () => {

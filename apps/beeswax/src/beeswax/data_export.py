@@ -16,8 +16,8 @@
 # limitations under the License.
 
 import json
-import math
 import logging
+import math
 
 from django.utils.translation import gettext as _
 
@@ -28,7 +28,7 @@ LOG = logging.getLogger()
 
 
 FETCH_SIZE = 1000
-DOWNLOAD_COOKIE_AGE = 1800  # 30 minutes
+DOWNLOAD_COOKIE_AGE = None  # Session cookie - expires when browser closes
 
 
 def download(handle, format, db, id=None, file_name='query_result', user_agent=None):
@@ -124,7 +124,7 @@ class DataAdapter(object):
         size += len(str(col))
       elif col_type is bool:
         size += 4
-      elif col_type == type(None):
+      elif col_type is type(None):
         size += 4
       else:
         size += len(str(col))

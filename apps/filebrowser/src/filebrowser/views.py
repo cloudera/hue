@@ -46,12 +46,12 @@ from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods
 from django.views.static import was_modified_since
 
-from aws.s3.s3fs import get_s3_home_directory, S3FileSystemException, S3ListAllBucketsException
+from aws.s3.s3fs import S3FileSystemException, S3ListAllBucketsException
 from aws.s3.upload import S3FineUploaderChunkedUpload
 from azure.abfs.upload import ABFSFineUploaderChunkedUpload
 from desktop import appmanager
 from desktop.auth.backend import is_admin
-from desktop.conf import RAZ, TASK_SERVER_V2
+from desktop.conf import RAZ, TASK_SERVER_V2, USE_STORAGE_CONNECTORS
 from desktop.lib import i18n
 from desktop.lib.conf import coerce_bool
 from desktop.lib.django_util import format_preserving_redirect, JsonResponse, render
@@ -268,6 +268,11 @@ def view(request, path):
       )
 
   if 'default_s3_home' in request.GET:
+    if USE_STORAGE_CONNECTORS.get():
+      from desktop.lib.fs.s3.conf_utils import get_s3_home_directory
+    else:
+      from aws.s3.s3fs import get_s3_home_directory
+
     home_dir_path = get_s3_home_directory(request.user)
     if request.fs.isdir(home_dir_path):
       return format_preserving_redirect(
