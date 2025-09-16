@@ -15,27 +15,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
-from builtins import range
-import logging
 import os
 import sys
+import logging
 import threading
+from builtins import object, range
 
 from desktop.conf import JAVA_PATH
 from desktop.lib.i18n import force_unicode, smart_str
 from notebook.conf import DBPROXY_EXTRA_CLASSPATH
 from notebook.connectors.base import AuthenticationRequired
+
 LOG = logging.getLogger()
 
 try:
-  from py4j.java_gateway import (
-    CallbackServerParameters,
-    GatewayParameters,
-    JavaGateway,
-    JavaObject,
-    launch_gateway
-  )
+  from py4j.java_gateway import CallbackServerParameters, GatewayParameters, JavaGateway, JavaObject, launch_gateway
 except Exception:
   LOG.warning('Failed to import py4j')
 
