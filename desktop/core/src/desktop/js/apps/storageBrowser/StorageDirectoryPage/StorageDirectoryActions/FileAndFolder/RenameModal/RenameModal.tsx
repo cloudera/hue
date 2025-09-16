@@ -39,7 +39,7 @@ const RenameModal = ({
   const { t } = i18nReact.useTranslation();
 
   const { save, loading, error } = useSaveData(RENAME_API_URL, {
-    options: { encodeData: true }, // TODO: Remove once API supports RAW JSON payload
+    options: { qsEncodeData: true }, // TODO: Remove once API supports RAW JSON payload
     skip: !file.path,
     onSuccess,
     onError

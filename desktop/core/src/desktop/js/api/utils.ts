@@ -52,7 +52,7 @@ export interface ApiFetchOptions<T, E = AxiosError<DefaultApiResponse>> extends 
   silenceErrors?: boolean;
   ignoreSuccessErrors?: boolean;
   transformResponse?: AxiosResponseTransformer;
-  encodeData?: boolean;
+  qsEncodeData?: boolean;
   isRawError?: boolean;
   handleSuccess?: (
     response: T & DefaultApiResponse,
@@ -210,7 +210,7 @@ export const sendApiRequest = <T, U = unknown, E = AxiosError>(
     const { cancelToken, cancel } = getCancelToken();
     let completed = false;
 
-    const encodeData = options?.encodeData == undefined || options?.encodeData;
+    const encodeData = options?.qsEncodeData == undefined || options?.qsEncodeData;
 
     axiosInstance[method]<T & DefaultApiResponse>(url, encodeData ? qs.stringify(data) : data, {
       cancelToken,

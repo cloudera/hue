@@ -24,7 +24,7 @@ const QUERIES_URL = '/jobbrowser/query-store/api/impala/queries';
 
 export const searchQueries = async <Q>(data: SearchRequest): Promise<SearchResponse<Q>> => {
   const response = await post<SearchResponse<Q>>(QUERIES_URL, data, {
-    encodeData: false
+    qsEncodeData: false
   });
   return response;
 };

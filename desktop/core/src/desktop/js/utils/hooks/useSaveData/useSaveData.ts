@@ -79,7 +79,7 @@ const useSaveData = <T, U = unknown, E = string>(
 
       const requestOptions = {
         ...requestOptionsDefault,
-        encodeData: body instanceof FormData || isJSON(body) ? false : true,
+        qsEncodeData: body instanceof FormData || isJSON(body) ? false : true,
         ...localOptions?.options,
         ...saveOptions?.options
       };
