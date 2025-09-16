@@ -15,11 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
-import logging
 import re
-import threading
+import json
 import time
+import logging
+import threading
 from builtins import object
 
 from django.core.cache import caches
@@ -1047,7 +1047,6 @@ class HiveServer2Dbms(object):
         except Exception as double_trouble:
           LOG.exception('Failed to drop table "%s" as well: %s' % (target_table, double_trouble))
         raise ex
-
 
     return query_history
 
