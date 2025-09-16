@@ -20,7 +20,7 @@ import { convertKeysToCamelCase } from '../../../utils/string/changeCasing';
 
 export interface Options<T, U, E> {
   params?: U;
-  fetchOptions?: ApiFetchOptions<T, E>;
+  options?: ApiFetchOptions<T, E>;
   skip?: boolean;
   onSuccess?: (data: T) => void;
   onError?: (error: E) => void;
@@ -44,7 +44,7 @@ const useLoadData = <T, U = unknown, E = string>(
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<E>();
 
-  const fetchOptionsDefault: ApiFetchOptions<T, E> = {
+  const optionsDefault: ApiFetchOptions<T, E> = {
     silenceErrors: true,
     ignoreSuccessErrors: true
   };
@@ -72,8 +72,8 @@ const useLoadData = <T, U = unknown, E = string>(
       setError(undefined);
 
       const fetchOptions = {
-        ...fetchOptionsDefault,
-        ...localOptions?.fetchOptions
+        ...optionsDefault,
+        ...localOptions?.options
       };
 
       try {
