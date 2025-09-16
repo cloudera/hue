@@ -76,7 +76,7 @@ export default class JobBrowserViewModel {
         !this.isMini() && schedulerInterfaceCondition();
 
       const schedulerBeatInterfaceCondition = () =>
-        this.appConfig()?.scheduler?.interpreter_names.indexOf('celery-beat') !== -1;
+        this.appConfig()?.scheduler?.interpreter_names.includes('celery-beat');
 
       const livyInterfaceCondition = () =>
         !this.isMini() &&
