@@ -15,11 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import re
 import json
-import time
 import logging
+import re
 import threading
+import time
 from builtins import object
 
 from django.core.cache import caches
@@ -66,7 +66,7 @@ from beeswax.hive_site import (
   hiveserver2_use_ssl,
 )
 from beeswax.models import QUERY_TYPES, Compute, QueryHistory
-from desktop.conf import CLUSTER_ID, has_connectors
+from desktop.conf import has_connectors
 from desktop.lib.django_util import format_preserving_redirect
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.parameterization import substitute_variables
@@ -108,7 +108,6 @@ def get_zk_hs2():
     # Filter nodes that match the expected pattern before sorting
     sequence_nodes = [x for x in hiveservers if re.search(r'sequence=\d+', x)]
     LOG.info("Selecting Hive server via the following sequence_nodes {0}".format(sequence_nodes))
-    # ['serverUri=dw-dev18:10000;version=3.1.2;sequence=0000000052', 'serverUri=dw-dev17:10000;version=3.1.2;sequence=0000000051']
 
     if sequence_nodes:
       # Sort the filtered list based on the sequence number
@@ -148,20 +147,20 @@ def get(user, query_server=None, cluster=None):
         from impala.dbms import ImpalaDbms
         from impala.server import ImpalaServerClient
         DBMS_CACHE[user.id][query_server['server_name']] = ImpalaDbms(
-            HiveServerClientCompatible(ImpalaServerClient(query_server, user)),
-            QueryHistory.SERVER_TYPE[1][0]
+          HiveServerClientCompatible(ImpalaServerClient(query_server, user)),
+          QueryHistory.SERVER_TYPE[1][0]
         )
       elif query_server['server_name'] == 'hms':
         from beeswax.server.hive_metastore_server import HiveMetastoreClient
         DBMS_CACHE[user.id][query_server['server_name']] = HiveServer2Dbms(
-            HiveMetastoreClient(query_server, user),
-            QueryHistory.SERVER_TYPE[1][0]
+          HiveMetastoreClient(query_server, user),
+          QueryHistory.SERVER_TYPE[1][0]
         )
       else:
         from beeswax.server.hive_server2_lib import HiveServerClient
         DBMS_CACHE[user.id][query_server['server_name']] = HiveServer2Dbms(
-            HiveServerClientCompatible(HiveServerClient(query_server, user)),
-            QueryHistory.SERVER_TYPE[1][0]
+          HiveServerClientCompatible(HiveServerClient(query_server, user)),
+          QueryHistory.SERVER_TYPE[1][0]
         )
     elif RESET_HS2_QUERY_SERVER:
       from beeswax.server.hive_server2_lib import HiveServerClient, HiveServerClientCompatible
@@ -205,10 +204,10 @@ def get_query_server_config(name='beeswax', connector=None):
                   cache.set(
                     "llap",
                     json.dumps({
-                        "host": llap_servers["addresses"][0]["host"],
-                        "port": llap_servers["addresses"][0]["port"]
-                      }),
-                      CACHE_TIMEOUT.get()
+                      "host": llap_servers["addresses"][0]["host"],
+                      "port": llap_servers["addresses"][0]["port"]
+                    }),
+                    CACHE_TIMEOUT.get()
                   )
             else:
               LOG.error("Hive LLAP endpoint not found, reverting to config values")
@@ -296,45 +295,45 @@ def get_query_server_config(name='beeswax', connector=None):
     elif name == 'hms':
       kerberos_principal = get_hiveserver2_kerberos_principal(HIVE_SERVER_HOST.get())
       query_server = {
-          'server_name': 'hms',
-          'server_host': HIVE_METASTORE_HOST.get() if not cluster_config else cluster_config.get('server_host'),
-          'server_port': HIVE_METASTORE_PORT.get(),
-          'principal': kerberos_principal,
-          'transport_mode': 'http' if hiveserver2_transport_mode() == 'HTTP' else 'socket',
-          'auth_username': AUTH_USERNAME.get(),
-          'auth_password': AUTH_PASSWORD.get(),
-          'use_sasl': HIVE_USE_SASL.get()
+        'server_name': 'hms',
+        'server_host': HIVE_METASTORE_HOST.get(),
+        'server_port': HIVE_METASTORE_PORT.get(),
+        'principal': kerberos_principal,
+        'transport_mode': 'http' if hiveserver2_transport_mode() == 'HTTP' else 'socket',
+        'auth_username': AUTH_USERNAME.get(),
+        'auth_password': AUTH_PASSWORD.get(),
+        'use_sasl': HIVE_USE_SASL.get()
       }
     else:
       kerberos_principal = get_hiveserver2_kerberos_principal(activeEndpoint["host"])
       query_server = {
-          'server_name': 'beeswax' if name != 'hplsql' else 'hplsql',
-          'server_host': activeEndpoint["host"],
-          'server_port': LLAP_SERVER_PORT.get() if name == 'llap' else int(activeEndpoint["port"]),
-          'principal': kerberos_principal,
-          'http_url': '%(protocol)s://%(host)s:%(port)s/%(end_point)s' % {
-              'protocol': 'https' if hiveserver2_use_ssl() else 'http',
-              'host': activeEndpoint["host"],
-              'port': activeEndpoint["port"],
-              'end_point': hiveserver2_thrift_http_path()
-            },
-          'transport_mode': 'http' if hiveserver2_transport_mode() == 'HTTP' else 'socket',
-          'auth_username': AUTH_USERNAME.get(),
-          'auth_password': AUTH_PASSWORD.get(),
-          'use_sasl': HIVE_USE_SASL.get(),
-          'close_sessions': CLOSE_SESSIONS.get(),
-          'has_session_pool': has_session_pool(),
-          'max_number_of_sessions': MAX_NUMBER_OF_SESSIONS.get()
-        }
+        'server_name': 'beeswax' if name != 'hplsql' else 'hplsql',
+        'server_host': activeEndpoint["host"],
+        'server_port': LLAP_SERVER_PORT.get() if name == 'llap' else int(activeEndpoint["port"]),
+        'principal': kerberos_principal,
+        'http_url': '%(protocol)s://%(host)s:%(port)s/%(end_point)s' % {
+          'protocol': 'https' if hiveserver2_use_ssl() else 'http',
+          'host': activeEndpoint["host"],
+          'port': activeEndpoint["port"],
+          'end_point': hiveserver2_thrift_http_path()
+        },
+        'transport_mode': 'http' if hiveserver2_transport_mode() == 'HTTP' else 'socket',
+        'auth_username': AUTH_USERNAME.get(),
+        'auth_password': AUTH_PASSWORD.get(),
+        'use_sasl': HIVE_USE_SASL.get(),
+        'close_sessions': CLOSE_SESSIONS.get(),
+        'has_session_pool': has_session_pool(),
+        'max_number_of_sessions': MAX_NUMBER_OF_SESSIONS.get()
+      }
 
     if name == 'sparksql':  # Extends Hive as very similar
       from spark.conf import SQL_SERVER_HOST as SPARK_SERVER_HOST, SQL_SERVER_PORT as SPARK_SERVER_PORT, USE_SASL as SPARK_USE_SASL
 
       query_server.update({
-          'server_name': 'sparksql',
-          'server_host': SPARK_SERVER_HOST.get(),
-          'server_port': SPARK_SERVER_PORT.get(),
-          'use_sasl': SPARK_USE_SASL.get()
+        'server_name': 'sparksql',
+        'server_host': SPARK_SERVER_HOST.get(),
+        'server_port': SPARK_SERVER_PORT.get(),
+        'use_sasl': SPARK_USE_SASL.get()
       })
 
   if not query_server.get('dialect'):
@@ -375,28 +374,28 @@ def get_query_server_config_via_connector(connector):
   auth_password = dbms_conf.AUTH_PASSWORD.get()
 
   return {
-      'is_compute': True,
-      'dialect': compute['dialect'],
-      'server_name': compute_name,
-      'server_host': server_host,
-      'server_port': server_port,
-      # For connectors/computes, the auth details are not available
-      # from configs and needs patching before submitting requests
-      'principal': 'TODO',
-      'auth_username': compute['options'].get('auth_username', auth_username),
-      'auth_password': compute['options'].get('auth_password', auth_password),
+    'is_compute': True,
+    'dialect': compute['dialect'],
+    'server_name': compute_name,
+    'server_host': server_host,
+    'server_port': server_port,
+    # For connectors/computes, the auth details are not available
+    # from configs and needs patching before submitting requests
+    'principal': 'TODO',
+    'auth_username': compute['options'].get('auth_username', auth_username),
+    'auth_password': compute['options'].get('auth_password', auth_password),
 
-      'impersonation_enabled': impersonation_enabled,
-      'use_sasl': str(compute['options'].get('use_sasl', True)).upper() == 'TRUE',
-      'SESSION_TIMEOUT_S': 15 * 60,
-      'querycache_rows': 1000,
-      'QUERY_TIMEOUT_S': 15 * 60,
-      'transport_mode': compute['options'].get('transport_mode', 'http'),
-      'http_url': compute['options'].get('http_url', 'http://%s:%s/cliservice' % (server_host, server_port)),
+    'impersonation_enabled': impersonation_enabled,
+    'use_sasl': str(compute['options'].get('use_sasl', True)).upper() == 'TRUE',
+    'SESSION_TIMEOUT_S': 15 * 60,
+    'querycache_rows': 1000,
+    'QUERY_TIMEOUT_S': 15 * 60,
+    'transport_mode': compute['options'].get('transport_mode', 'http'),
+    'http_url': compute['options'].get('http_url', 'http://%s:%s/cliservice' % (server_host, server_port)),
 
-      'close_sessions': str(compute['options'].get('close_sessions', True)).upper() == 'TRUE',
-      'has_session_pool': str(compute['options'].get('has_session_pool', False)).upper() == 'TRUE',
-      'max_number_of_sessions': compute['options'].get('has_session_pool', -1)
+    'close_sessions': str(compute['options'].get('close_sessions', True)).upper() == 'TRUE',
+    'has_session_pool': str(compute['options'].get('has_session_pool', False)).upper() == 'TRUE',
+    'max_number_of_sessions': compute['options'].get('has_session_pool', -1)
   }
 
 
@@ -426,7 +425,7 @@ class HiveServer2Dbms(object):
     self.client = client
     self.server_type = server_type
     self.server_name = self.client.query_server.get('dialect') if self.client.query_server['server_name'].isdigit() \
-        else self.client.query_server['server_name']
+      else self.client.query_server['server_name']
 
   @classmethod
   def to_matching_wildcard(cls, identifier=None):
@@ -514,10 +513,10 @@ class HiveServer2Dbms(object):
 
       # We get back: database | tableName | isTemporary
       return [{
-          'name': row[1],
-          'type': 'VIEW' if row[2] else 'TABLE',
-          'comment': ''
-        }
+        'name': row[1],
+        'type': 'VIEW' if row[2] else 'TABLE',
+        'comment': ''
+      }
         for row in result.rows()
       ]
     else:
@@ -529,10 +528,10 @@ class HiveServer2Dbms(object):
     except QueryServerException as e:
       LOG.debug("Seems like %s.%s could be a Kudu table" % (database, table_name))
       if 'java.lang.ClassNotFoundException' in e.message and [
-            prop
-            for prop in self.get_table_properties(database, table_name, property_name='storage_handler').rows()
-            if 'KuduStorageHandler' in prop[0]
-        ]:
+        prop
+        for prop in self.get_table_properties(database, table_name, property_name='storage_handler').rows()
+        if 'KuduStorageHandler' in prop[0]
+      ]:
         query_server = get_query_server_config('impala')
         db = get(self.client.user, query_server)
         table = db.get_table(database, table_name)
@@ -630,9 +629,9 @@ class HiveServer2Dbms(object):
 
   def fetch(self, query_handle, start_over=False, rows=None):
     no_start_over_support = [
-        config_variable
-        for config_variable in self.get_default_configuration(False)
-        if config_variable.key == 'support_start_over' and config_variable.value == 'false'
+      config_variable
+      for config_variable in self.get_default_configuration(False)
+      if config_variable.key == 'support_start_over' and config_variable.value == 'false'
     ]
     if no_start_over_support:
       start_over = False
@@ -830,28 +829,28 @@ class HiveServer2Dbms(object):
           return self._extract_impala_column(data)
       else:
         return [
-            {'col_name': data[2][0]},
-            {'data_type': data[2][1]},
-            {'min': data[2][2]},
-            {'max': data[2][3]},
-            {'num_nulls': data[2][4]},
-            {'distinct_count': data[2][5]},
-            {'avg_col_len': data[2][6]},
-            {'max_col_len': data[2][7]},
-            {'num_trues': data[2][8]},
-            {'num_falses': data[2][9]}
+          {'col_name': data[2][0]},
+          {'data_type': data[2][1]},
+          {'min': data[2][2]},
+          {'max': data[2][3]},
+          {'num_nulls': data[2][4]},
+          {'distinct_count': data[2][5]},
+          {'avg_col_len': data[2][6]},
+          {'max_col_len': data[2][7]},
+          {'num_trues': data[2][8]},
+          {'num_falses': data[2][9]}
         ]
     else:
       return []
 
   def _extract_impala_column(self, col):
     return [
-        {'col_name': col[0]},
-        {'data_type': col[1]},
-        {'distinct_count': col[2]},
-        {'num_nulls': col[3]},
-        {'max_col_len': col[4]},
-        {'avg_col_len': col[5]},
+      {'col_name': col[0]},
+      {'data_type': col[1]},
+      {'distinct_count': col[2]},
+      {'num_nulls': col[3]},
+      {'max_col_len': col[4]},
+      {'avg_col_len': col[5]},
     ]
 
   def get_table_properties(self, database, table, property_name=None):
@@ -890,7 +889,7 @@ class HiveServer2Dbms(object):
       GROUP BY %(column)s
       ORDER BY ct DESC
       LIMIT %(limit)s''' % {
-        'database': database, 'table': table, 'column': column, 'prefix_match': prefix_match, 'limit': limit,
+      'database': database, 'table': table, 'column': column, 'prefix_match': prefix_match, 'limit': limit,
     }
 
     query = hql_query(hql)
@@ -1048,7 +1047,7 @@ class HiveServer2Dbms(object):
         except Exception as double_trouble:
           LOG.exception('Failed to drop table "%s" as well: %s' % (target_table, double_trouble))
         raise ex
-      url = format_preserving_redirect(request, reverse('metastore:index'))
+
 
     return query_history
 
@@ -1121,17 +1120,17 @@ class HiveServer2Dbms(object):
     hql_query = query.hql_query
     if query_history is None:
       query_history = QueryHistory.build(
-          owner=self.client.user,
-          query=hql_query,
-          server_host='%(server_host)s' % self.client.query_server,
-          server_port='%(server_port)d' % self.client.query_server,
-          server_name='%(server_name)s' % self.client.query_server,
-          server_type=self.server_type,
-          last_state=QueryHistory.STATE.submitted.value,
-          design=design,
-          notify=query.query.get('email_notify', False),
-          query_type=query.query['type'],
-          statement_number=0
+        owner=self.client.user,
+        query=hql_query,
+        server_host='%(server_host)s' % self.client.query_server,
+        server_port='%(server_port)d' % self.client.query_server,
+        server_name='%(server_name)s' % self.client.query_server,
+        server_type=self.server_type,
+        last_state=QueryHistory.STATE.submitted.value,
+        design=design,
+        notify=query.query.get('email_notify', False),
+        query_type=query.query['type'],
+        statement_number=0
       )
       query_history.save()
 
@@ -1240,9 +1239,6 @@ class HiveServer2Dbms(object):
     '''
     Not using self.client.get_functions() as pretty limited. More comments there.
     '''
-    result = None
-
-    function_filter = "'%s*'" % prefix if prefix else ''
 
     if self.client.query_server['dialect'] == 'impala':
       if database is None:
@@ -1300,7 +1296,7 @@ class HiveServer2Dbms(object):
     )
 
   def get_foreign_keys(self, parent_catalog_name=None, parent_database_name=None, parent_table_name=None, foreign_catalog_name=None,
-      foreign_database_name=None, foreign_table_name=None):
+                       foreign_database_name=None, foreign_table_name=None):
 
     return self.client.get_foreign_keys(
       parent_catalog_name=parent_catalog_name,
