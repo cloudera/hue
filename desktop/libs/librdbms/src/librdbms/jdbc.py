@@ -15,25 +15,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import range
 from builtins import object
+from builtins import range
 import logging
 import os
 import sys
 import threading
 
+from desktop.conf import JAVA_PATH
 from desktop.lib.i18n import force_unicode, smart_str
 from notebook.conf import DBPROXY_EXTRA_CLASSPATH
 from notebook.connectors.base import AuthenticationRequired
-from desktop.conf import JAVA_PATH
 LOG = logging.getLogger()
 
 try:
   from py4j.java_gateway import (
+    CallbackServerParameters,
+    GatewayParameters,
     JavaGateway,
     JavaObject,
-    GatewayParameters,
-    CallbackServerParameters,
     launch_gateway
   )
 except Exception:
@@ -42,12 +42,14 @@ except Exception:
 _GATEWAY_SINGLETON = None
 _GATEWAY_LOCK = threading.Lock()
 
+
 def _build_classpath():
   classpath = os.environ.get('CLASSPATH', '')
   extra = DBPROXY_EXTRA_CLASSPATH.get()
   if extra:
     classpath = f'{extra}:{classpath}' if classpath else extra
   return classpath
+
 
 def _get_or_create_gateway():
   global _GATEWAY_SINGLETON
@@ -190,7 +192,7 @@ class Cursor(object):
         cell = self.rs.getObject(c + 1)
 
         if isinstance(cell, JavaObject):
-          cell = str(cell) # DATETIME
+          cell = str(cell)  # DATETIME
         row.append(cell)
 
       res.append(row)
