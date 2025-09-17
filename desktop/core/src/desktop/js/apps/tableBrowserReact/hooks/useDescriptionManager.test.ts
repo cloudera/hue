@@ -72,7 +72,7 @@ describe('useDescriptionManager', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockedDataCatalog.getEntry.mockResolvedValue(mockEntry as any);
+    mockedDataCatalog.getEntry.mockResolvedValue(mockEntry as typeof mockEntry);
     mockEntry.getChildren.mockResolvedValue(undefined);
     mockEntry.loadNavigatorMetaForChildren.mockResolvedValue([]);
     mockEntry.getAnalysis.mockResolvedValue({ comment: '' });
@@ -130,7 +130,7 @@ describe('useDescriptionManager', () => {
         }
       ];
 
-      mockEntry.loadNavigatorMetaForChildren.mockResolvedValue(mockChildren as any);
+      mockEntry.loadNavigatorMetaForChildren.mockResolvedValue(mockChildren as typeof mockChildren);
 
       const { result } = renderHook(() =>
         useDescriptionManager({
@@ -177,7 +177,7 @@ describe('useDescriptionManager', () => {
         return {
           ...mockEntry,
           getAnalysis: jest.fn().mockResolvedValue(analysisResults.get(itemName) || { comment: '' })
-        } as any;
+        } as typeof mockEntry;
       });
 
       const { result } = renderHook(() =>
@@ -240,7 +240,7 @@ describe('useDescriptionManager', () => {
     it('does not fetch when required parameters are missing', async () => {
       const { result } = renderHook(() =>
         useDescriptionManager({
-          connector: undefined as any,
+          connector: undefined as unknown as Connector,
           namespace: mockNamespace,
           compute: mockCompute,
           items: ['db1'],
@@ -430,7 +430,7 @@ describe('useDescriptionManager', () => {
     });
 
     it('handles empty path correctly', async () => {
-      const { result } = renderHook(() =>
+      renderHook(() =>
         useDescriptionManager({
           connector: mockConnector,
           namespace: mockNamespace,
@@ -453,7 +453,7 @@ describe('useDescriptionManager', () => {
 
   describe('Performance and deduplication', () => {
     it('does not fetch descriptions for items already fetched', async () => {
-      const { result, rerender } = renderHook(
+      const { rerender } = renderHook(
         ({ items }) =>
           useDescriptionManager({
             connector: mockConnector,
@@ -486,7 +486,7 @@ describe('useDescriptionManager', () => {
         return {
           ...mockEntry,
           getAnalysis: jest.fn().mockResolvedValue({ comment: `Description for ${itemName}` })
-        } as any;
+        } as typeof mockEntry;
       });
 
       const { result, rerender } = renderHook(
@@ -526,7 +526,7 @@ describe('useDescriptionManager', () => {
           connector: mockConnector,
           namespace: mockNamespace,
           compute: mockCompute,
-          items: undefined as any,
+          items: undefined as unknown as string[],
           path: []
         })
       );
@@ -559,7 +559,7 @@ describe('useDescriptionManager', () => {
         return {
           ...mockEntry,
           getAnalysis: jest.fn().mockResolvedValue({ comment: `Description for ${itemName}` })
-        } as any;
+        } as typeof mockEntry;
       });
 
       const { result } = renderHook(() =>

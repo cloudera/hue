@@ -5,9 +5,9 @@ import React, { useEffect, useState } from 'react';
 import { List } from 'antd';
 import EmptyState from 'cuix/dist/components/EmptyState';
 import Loading from 'cuix/dist/components/Loading';
-import { i18nReact } from '../../../utils/i18nReact';
-import dataCatalog from '../../../catalog/dataCatalog';
-import type { Connector, Compute, Namespace } from '../../../config/types';
+import { i18nReact } from '../../../../utils/i18nReact';
+import dataCatalog from '../../../../catalog/dataCatalog';
+import type { Connector, Compute, Namespace } from '../../../../config/types';
 
 export interface QueriesProps {
   connector?: Connector | null;
@@ -53,7 +53,12 @@ const Queries = ({ connector, namespace, compute, database, table }: QueriesProp
   }, [connector, namespace, compute, database, table]);
 
   if (!loading && (!queries || queries.length === 0)) {
-    return <EmptyState title={t('No queries found for the current table.')} />;
+    return (
+      <EmptyState
+        title={t('No related queries yet')}
+        subtitle={t('Run queries on this table to see them here.')}
+      />
+    );
   }
 
   return (

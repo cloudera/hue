@@ -1,0 +1,17 @@
+// Licensed to Cloudera, Inc. under one or more contributor license agreements.
+// Apache License 2.0 applies.
+
+@use 'variables' as vars;
+
+.cuix.antd {
+  // Ensure facet dropdown content has spacing whether Filter is wrapped in
+  // hue-table-browser__filter or hue-table-browser__filter-and-actions
+  .hue-table-browser__filter,
+  .hue-table-browser__filter-and-actions {
+    .ant-dropdown {
+      .ant-checkbox-group {
+        padding: 8px;
+      }
+    }
+  }
+}

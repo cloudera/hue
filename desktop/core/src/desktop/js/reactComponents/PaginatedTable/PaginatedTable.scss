@@ -22,6 +22,9 @@
     display: flex;
     flex-direction: column;
     flex: 1;
+    &.hue-paginated-table-container--hscroll {
+      overflow-x: auto;
+    }
   }
 
   .hue-paginated-table-container__placeholder--hidden {
@@ -33,6 +36,38 @@
   }
 
   .hue-paginated-table {
+    &.hue-paginated-table--nowrap {
+      // Prevent wrapping so wide content expands horizontally
+      .ant-table-thead > tr > th,
+      .ant-table-tbody > tr > td {
+        white-space: nowrap;
+        text-overflow: initial;
+      }
+
+      // Ensure header titles dictate at least the column min width
+      .ant-table-thead > tr > th {
+        min-width: max-content;
+      }
+      .ant-table-thead > tr > th .ant-table-column-title {
+        width: max-content;
+        display: inline-block;
+      }
+    }
+
+    // Ensure sticky header overlays body content when page scrolls
+    .ant-table-header {
+      position: sticky;
+      top: -18px !important;
+      z-index: 2;
+      background: vars.$fluidx-white;
+    }
+
+    .ant-table-body {
+      // Create an overlap guard so body rows do not render above header
+      z-index: 1;
+      background: vars.$fluidx-white;
+    }
+
     .ant-table-selection-column {
       // This prevents the eplipses from being applied to the selection column
       text-overflow: initial;

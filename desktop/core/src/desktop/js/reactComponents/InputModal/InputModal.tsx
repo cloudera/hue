@@ -64,6 +64,8 @@ const InputModal = ({
 
   const errors = [{ enabled: !!error, message: error }];
 
+  const isSubmitDisabled = initialValue === value;
+
   return (
     <Modal
       open={showModal}
@@ -71,7 +73,7 @@ const InputModal = ({
       okText={submitText}
       onOk={handleSubmit}
       okButtonProps={{
-        disabled: initialValue === value,
+        disabled: isSubmitDisabled,
         loading
       }}
       cancelText={cancelText}
@@ -84,7 +86,7 @@ const InputModal = ({
           <Form.Item label={inputLabel}>
             <Input
               data-testid="hue-input-modal__input"
-              defaultValue={value}
+              value={value}
               type={inputType}
               disabled={loading}
               onPressEnter={handleSubmit}

@@ -3,104 +3,24 @@
 
 import React, { useMemo, useState } from 'react';
 import { Popover } from 'antd';
-import Table from 'cuix/dist/components/Table';
 import Filter from 'cuix/dist/components/Filter';
 import BorderlessButton from 'cuix/dist/components/Button/BorderlessButton';
 import KeyIcon from '@cloudera/cuix-core/icons/react/KeyIcon';
-import InlineDescriptionEditor from '../sharedComponents/InlineDescriptionEditor';
+import InlineDescriptionEditor from '../../sharedComponents/InlineDescriptionEditor';
 import PaginatedTable, {
   type ColumnProps as PaginatedColumnProps
-} from '../../../reactComponents/PaginatedTable/PaginatedTable';
+} from '../../../../reactComponents/PaginatedTable/PaginatedTable';
 import type { FilterOutput } from 'cuix/dist/components/Filter/types';
 import type { SortOrder } from 'antd/lib/table/interface';
-import { i18nReact } from '../../../utils/i18nReact';
-import { useDescriptionManager } from '../hooks/useDescriptionManager';
-import type { Connector, Compute, Namespace } from '../../../config/types';
+import { i18nReact } from '../../../../utils/i18nReact';
+import { useDescriptionManager } from '../../hooks/useDescriptionManager';
+import type { Connector, Compute, Namespace } from '../../../../config/types';
+import decodeHtmlEntities from '../../../../utils/strings/decodeHtmlEntities';
+import PrettyStructDisplay from '../../sharedComponents/PrettyStructDisplay';
 
-import './DetailsSchema.scss';
+import './Schema.scss';
 
-interface SamplePopoverProps {
-  sampleData: { key: number; value: string | number | null }[];
-}
-
-const SamplePopover = ({ sampleData }: SamplePopoverProps): JSX.Element => {
-  const { t } = i18nReact.useTranslation();
-  const [sampleFilter, setSampleFilter] = useState('');
-
-  const filteredSampleData = sampleData.filter(
-    item =>
-      sampleFilter === '' ||
-      String(item.value || '')
-        .toLowerCase()
-        .includes(sampleFilter.toLowerCase())
-  );
-
-  // Limit display to first 250 items for performance with large datasets
-  const MAX_DISPLAY_ITEMS = 250;
-  const displayData = filteredSampleData.slice(0, MAX_DISPLAY_ITEMS);
-  const hasMore = filteredSampleData.length > MAX_DISPLAY_ITEMS;
-
-  const sampleColumns = [
-    {
-      title: t('Sample Values'),
-      dataIndex: 'value',
-      key: 'value',
-      render: (value: string | number | null) => String(value || '')
-    }
-  ];
-
-  return (
-    <div className="sample-popover__container">
-      <div className="sample-popover__search">
-        <Filter
-          search={{ placeholder: t('Filter sample values') }}
-          onChange={(output: FilterOutput) => {
-            const searchValue = String(
-              (output as unknown as { search?: unknown[] }).search?.[0] ?? ''
-            );
-            setSampleFilter(searchValue);
-          }}
-        />
-      </div>
-      <Table
-        columns={sampleColumns}
-        dataSource={displayData}
-        size="small"
-        pagination={false}
-        showHeader={false}
-        className="sample-popover__table"
-        scroll={{ y: 250 }}
-      />
-      <div className="sample-popover__footer">
-        {hasMore ? (
-          <>
-            {t('Showing first {{count}} of {{total}} values', {
-              count: MAX_DISPLAY_ITEMS,
-              total: filteredSampleData.length
-            })}
-            {sampleFilter && (
-              <div style={{ fontSize: '11px', color: '#999', marginTop: '4px' }}>
-                {t('Use the filter above to narrow down results')}
-              </div>
-            )}
-          </>
-        ) : (
-          filteredSampleData.length > 0 && (
-            <>
-              {t('Showing {{count}} values', { count: filteredSampleData.length })}
-              {sampleData.length !== filteredSampleData.length && (
-                <span style={{ fontSize: '11px', color: '#999' }}>
-                  {' '}
-                  ({t('filtered from {{total}}', { total: sampleData.length })})
-                </span>
-              )}
-            </>
-          )
-        )}
-      </div>
-    </div>
-  );
-};
+// Removed in favor of navigating to Column Details page
 
 export interface ColumnDef {
   name: string;
@@ -118,6 +38,8 @@ export interface DetailsSchemaProps {
   compute?: Compute | null;
   database?: string;
   table?: string;
+  loadingSamples?: boolean;
+  onOpenColumn?: (column: string) => void;
 }
 
 const DetailsSchema = ({
@@ -127,14 +49,83 @@ const DetailsSchema = ({
   namespace,
   compute,
   database,
-  table
+  table,
+  loadingSamples,
+  onOpenColumn
 }: DetailsSchemaProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const [filter, setFilter] = useState('');
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize, setPageSize] = useState(25);
-  const [sortByColumn, setSortByColumn] = useState<string | undefined>(undefined);
-  const [sortOrder, setSortOrder] = useState<SortOrder>(null);
+  const [sortByColumn, setSortByColumn] = useState<string | undefined>('name');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('ascend');
+
+  const isStructType = (type: string): boolean => {
+    const lower = (type || '').toLowerCase();
+    return lower.includes('struct<');
+  };
+
+  const getBaseType = (type: string): string => {
+    const lower = (type || '').trim().toLowerCase();
+    if (!lower) {
+      return '';
+    }
+    if (lower.startsWith('struct<')) {
+      return 'struct';
+    }
+    if (lower.startsWith('array<')) {
+      return 'array';
+    }
+    if (lower.startsWith('map<')) {
+      return 'map';
+    }
+    // primitives possibly with params, e.g., decimal(10,2), varchar(50)
+    const match = lower.match(/^([a-z_]+)/);
+    return match ? match[1] : lower;
+  };
+
+  type TypeCategory = 'number' | 'text' | 'boolean' | 'time' | 'json' | 'complex' | 'other';
+
+  const categorizeType = (type: string): TypeCategory => {
+    const base = getBaseType(type);
+    if (!base) {
+      return 'other';
+    }
+    if (
+      [
+        'int',
+        'integer',
+        'bigint',
+        'smallint',
+        'tinyint',
+        'float',
+        'double',
+        'real',
+        'decimal',
+        'numeric'
+      ].includes(base)
+    ) {
+      return 'number';
+    }
+    if (['string', 'varchar', 'char', 'binary', 'varbinary'].includes(base)) {
+      return 'text';
+    }
+    if (base === 'boolean') {
+      return 'boolean';
+    }
+    if (['date', 'timestamp', 'timestamptz', 'interval'].includes(base)) {
+      return 'time';
+    }
+    if (base === 'json') {
+      return 'json';
+    }
+    if (['struct', 'array', 'map'].includes(base)) {
+      return 'complex';
+    }
+    return 'other';
+  };
+
+  // Colors are applied via SCSS classes using cuix variables.
 
   // Description management
   const {
@@ -148,7 +139,9 @@ const DetailsSchema = ({
     connector,
     namespace,
     compute,
-    items: columns.map(col => col.name),
+    // Avoid prefetching per-column descriptions to prevent N describe/stats calls
+    // We rely on provided column comments and lazy load on explicit actions
+    items: undefined,
     path: database && table ? [database, table] : [],
     currentItem: undefined // We're editing columns, not navigating to them
   });
@@ -222,7 +215,8 @@ const DetailsSchema = ({
     return sampleData.rows
       .map((row, index) => ({
         key: index,
-        value: row[columnIndex]
+        // Backend is encoding HTML entities in the sample data, so we need to decode them
+        value: decodeHtmlEntities(row[columnIndex]) as string | number | null
       }))
       .filter(item => item.value !== null && item.value !== undefined);
   };
@@ -233,7 +227,7 @@ const DetailsSchema = ({
     if (!columnSampleData || columnSampleData.length === 0) {
       return '';
     }
-    return String(columnSampleData[0]?.value || '');
+    return String(columnSampleData[0]?.value ?? '');
   };
 
   // Get second sample value for a column
@@ -242,7 +236,7 @@ const DetailsSchema = ({
     if (!columnSampleData || columnSampleData.length < 2) {
       return '';
     }
-    return String(columnSampleData[1]?.value || '');
+    return String(columnSampleData[1]?.value ?? '');
   };
 
   const columnsDef: PaginatedColumnProps<ColumnDef & { key: string }>[] = [
@@ -260,7 +254,6 @@ const DetailsSchema = ({
             {name}
           </span>
         );
-
         if (!columnSampleData || columnSampleData.length === 0) {
           return (
             <Popover
@@ -299,34 +292,71 @@ const DetailsSchema = ({
               overlayClassName="sample-data-popover"
               getPopupContainer={triggerNode => triggerNode.parentElement || document.body}
             >
-              <BorderlessButton className="clickable-column-name">
+              <BorderlessButton
+                className="clickable-column-name"
+                onClick={() => onOpenColumn && onOpenColumn(name)}
+              >
                 {columnNameWithIcon}
               </BorderlessButton>
             </Popover>
           );
         }
         return (
-          <Popover
-            content={<SamplePopover sampleData={columnSampleData} />}
-            title={
-              <div className="sample-popover-title">
-                {t('Sample data for')}{' '}
-                <span className="sample-popover-title__column-name">{name}</span>
-              </div>
-            }
-            trigger="click"
-            placement="right"
-            overlayClassName="sample-data-popover"
-            getPopupContainer={triggerNode => triggerNode.parentElement || document.body}
+          <BorderlessButton
+            className="clickable-column-name"
+            onClick={() => onOpenColumn && onOpenColumn(name)}
           >
-            <BorderlessButton className="clickable-column-name">
-              {columnNameWithIcon}
-            </BorderlessButton>
-          </Popover>
+            {columnNameWithIcon}
+          </BorderlessButton>
         );
       }
     },
-    { title: t('Type'), dataIndex: 'type', key: 'type', sorter: true },
+    {
+      title: t('Type'),
+      dataIndex: 'type',
+      key: 'type',
+      sorter: true,
+      render: (type: string) => {
+        const category = categorizeType(type);
+        const base = getBaseType(type);
+
+        if (isStructType(type)) {
+          return (
+            <span className="schema-type-cell">
+              <span
+                className={`schema-type-label schema-type--${category}`}
+                title={type}
+                aria-label={`${t('Type')}: ${base}`}
+              >
+                {base}
+              </span>
+              <Popover
+                title={t('Column type')}
+                content={<PrettyStructDisplay structType={type} compact={true} />}
+                trigger="click"
+                placement="right"
+                overlayClassName="schema-type-popover"
+                getPopupContainer={triggerNode => triggerNode.parentElement || document.body}
+              >
+                <BorderlessButton className="schema-popover-trigger">
+                  {t('View struct')}
+                </BorderlessButton>
+              </Popover>
+            </span>
+          );
+        }
+
+        return (
+          <span
+            className={`schema-type-label schema-type--${category}`}
+            title={type}
+            aria-label={`${t('Type')}: ${type}`}
+          >
+            {getBaseType(type)}
+          </span>
+        );
+      }
+    },
     {
       title: t('Description'),
       dataIndex: 'comment',
@@ -359,6 +389,40 @@ const DetailsSchema = ({
       dataIndex: 'sample1',
       key: 'sample1',
       render: (_: string | undefined, record: ColumnDef & { key: string }) => {
+        if (loadingSamples) {
+          return (
+            <span className="schema-sample--loading" title={t('Loading sample values...')}>
+              {t('Loading...')}
+            </span>
+          );
+        }
+        if (isStructType(record.type)) {
+          const columnSampleData = getColumnSampleData(record.name) || [];
+          return (
+            <Popover
+              content={
+                <div className="schema-sample-popover__content">
+                  {columnSampleData.length ? (
+                    columnSampleData.slice(0, 100).map(item => (
+                      <pre key={item.key} className="schema-sample-popover__pre">
+                        {String(item.value ?? '')}
+                      </pre>
+                    ))
+                  ) : (
+                    <div>{t('No sample values available for this column')}</div>
+                  )}
+                </div>
+              }
+              title={`${t('Sample data for')} ${record.name}`}
+              trigger="click"
+              placement="right"
+              overlayClassName="sample-data-popover"
+              getPopupContainer={triggerNode => triggerNode.parentElement || document.body}
+            >
+              <BorderlessButton className="schema-popover-trigger">{t('View')}</BorderlessButton>
+            </Popover>
+          );
+        }
         const sample = getFirstSample(record.name);
         return sample ? <span title={sample}>{sample}</span> : '';
       }
@@ -368,6 +432,16 @@ const DetailsSchema = ({
       dataIndex: 'sample2',
       key: 'sample2',
       render: (_: string | undefined, record: ColumnDef & { key: string }) => {
+        if (loadingSamples) {
+          return (
+            <span className="schema-sample--loading" title={t('Loading sample values...')}>
+              {t('Loading...')}
+            </span>
+          );
+        }
+        if (isStructType(record.type)) {
+          return '';
+        }
         const sample = getSecondSample(record.name);
         return sample ? <span title={sample}>{sample}</span> : '';
       }

@@ -32,7 +32,7 @@ describe('Tabs', () => {
 
     const tabList = screen.getByRole('tablist');
     expect(tabList).toBeInTheDocument();
-    
+
     expect(screen.getByRole('tab', { name: /overview/i })).toHaveAttribute('aria-selected', 'true');
   });
 
@@ -109,6 +109,9 @@ describe('Tabs', () => {
     render(<Tabs {...defaultProps} activeKey="sample" />);
 
     expect(screen.getByRole('tab', { name: /sample/i })).toHaveAttribute('aria-selected', 'true');
-    expect(screen.getByRole('tab', { name: /overview/i })).toHaveAttribute('aria-selected', 'false');
+    expect(screen.getByRole('tab', { name: /overview/i })).toHaveAttribute(
+      'aria-selected',
+      'false'
+    );
   });
 });

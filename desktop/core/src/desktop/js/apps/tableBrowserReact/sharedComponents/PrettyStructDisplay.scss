@@ -1,0 +1,56 @@
+// Licensed to Cloudera, Inc. under one or more contributor license agreements.
+// See the NOTICE file distributed with this work for additional information
+// regarding copyright ownership. Cloudera, Inc. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may not use this file
+// except in compliance with the License. You may obtain a copy of the License at
+// http://www.apache.org/licenses/LICENSE-2.0
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+// License for the specific language governing permissions and limitations under
+// the License.
+
+.hue-pretty-struct-display {
+  background: transparent !important;
+  
+  pre {
+    margin: 0;
+    padding: 0;
+    background: transparent !important;
+    border: none;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    color: inherit;
+  }
+
+  code {
+    background: transparent !important;
+    padding: 0;
+    border: none;
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+  }
+
+  // Compact version for table cells
+  &.hue-pretty-struct-display--compact {
+    pre {
+      font-size: 11px;
+      line-height: 1.4;
+    }
+  }
+}
+
+// Shared type colors for tokens (reusable with markup if needed)
+@import '../../../components/styles/typeColors';
+
+// Optional helpers to colorize simple inline tokens that we may emit
+.hue-pretty-type-label { @extend .hue-type-label; }
+.hue-pretty-type--number { @extend .hue-type--number; }
+.hue-pretty-type--text { @extend .hue-type--text; }
+.hue-pretty-type--boolean { @extend .hue-type--boolean; }
+.hue-pretty-type--time { @extend .hue-type--time; }
+.hue-pretty-type--json { @extend .hue-type--json; }
+.hue-pretty-type--complex { @extend .hue-type--complex; }
+.hue-pretty-type--other { @extend .hue-type--other; }

@@ -2,26 +2,28 @@
 // Apache License 2.0 applies.
 
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { Select, Space } from 'antd';
+import { ConfigProvider } from 'antd';
+import i18n from 'cuix/dist/utils/i18n';
 import Button from 'cuix/dist/components/Button/Button';
 import { BorderlessButton } from 'cuix/dist/components/Button';
 import Tooltip from 'cuix/dist/components/Tooltip';
 import Modal from 'cuix/dist/components/Modal';
 import EmptyState from 'cuix/dist/components/EmptyState';
-import { i18nReact } from '../../../utils/i18nReact';
+import { i18nReact } from '../../../../utils/i18nReact';
 import Loading from 'cuix/dist/components/Loading';
-import dataCatalog from '../../../catalog/dataCatalog';
-import type { Connector, Compute, Namespace } from '../../../config/types';
-import type { Analysis, Partitions as PartitionsType } from '../../../catalog/DataCatalogEntry';
-import huePubSub from '../../../utils/huePubSub';
-import { post } from '../../../api/utils';
+import dataCatalog from '../../../../catalog/dataCatalog';
+import type { Connector, Compute, Namespace } from '../../../../config/types';
+import type { Analysis, Partitions as PartitionsType } from '../../../../catalog/DataCatalogEntry';
+import huePubSub from '../../../../utils/huePubSub';
+import { post } from '../../../../api/utils';
 // import { PrimaryButton } from 'cuix/dist/components/Button';
 import PaginatedTable, {
   type ColumnProps as PaginatedColumnProps,
   SortOrder
-} from '../../../reactComponents/PaginatedTable/PaginatedTable';
+} from '../../../../reactComponents/PaginatedTable/PaginatedTable';
 import Filter from 'cuix/dist/components/Filter';
-import type { FilterOutput } from 'cuix/dist/components/Filter/types';
+import type { FilterOutput, BasicFacet } from 'cuix/dist/components/Filter/types';
+import './Partitions.scss';
 
 export interface PartitionsProps {
   connector?: Connector | null;
@@ -32,6 +34,8 @@ export interface PartitionsProps {
   // Optional write access gate; if undefined, actions are shown and server enforces
   canWrite?: boolean;
   onCountChange?: (count: number) => void;
+  // Triggers refetch after table details refresh completes
+  isRefreshing?: boolean;
 }
 
 const Partitions = ({
@@ -41,20 +45,22 @@ const Partitions = ({
   database,
   table,
   canWrite,
-  onCountChange
+  onCountChange,
+  isRefreshing
 }: PartitionsProps): JSX.Element => {
   const [loading, setLoading] = useState(false);
   const [partitions, setPartitions] = useState<PartitionsType | null>(null);
   const [selectedSpecs, setSelectedSpecs] = useState<string[]>([]);
-  const [filters, setFilters] = useState<{ column?: string; value?: string }[]>([]);
-  const [searchText, setSearchText] = useState('');
+  const [filterOutput, setFilterOutput] = useState<FilterOutput>({});
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [addFacetColumn, setAddFacetColumn] = useState<string | undefined>(undefined);
 
   const [keyDefs, setKeyDefs] = useState<{ name: string; type?: string }[]>([]);
 
   useEffect(() => {
     const fetch = async () => {
+      if (isRefreshing) {
+        return; // Wait until parent refresh has completed to avoid stale cache reads
+      }
       if (!connector || !namespace || !compute || !database || !table) {
         setPartitions(null);
         return;
@@ -91,9 +97,26 @@ const Partitions = ({
       }
     };
     fetch();
-  }, [connector, namespace, compute, database, table]);
+  }, [connector, namespace, compute, database, table, isRefreshing]);
 
   const { t } = i18nReact.useTranslation();
+
+  // Initialize cuix i18n system
+  useEffect(() => {
+    try {
+      if (i18n && typeof i18n.extend === 'function') {
+        i18n.extend({
+          'label.more': 'More',
+          'label.filterBy': 'Filter by',
+          'label.clear': 'Clear',
+          'label.search': 'Search',
+          'label.selected': 'Selected'
+        });
+      }
+    } catch (error) {
+      console.warn('Failed to initialize cuix i18n:', error);
+    }
+  }, []);
 
   const isImpala = useMemo(() => {
     const id = (connector as unknown as { id?: string })?.id;
@@ -130,27 +153,62 @@ const Partitions = ({
     [allRows, keyToIndex]
   );
 
+  // Create facets for all partition columns
+  const facets = useMemo((): BasicFacet[] => {
+    return keyDefs.map(keyDef => ({
+      label: keyDef.name,
+      items: availableFilterValues(keyDef.name),
+      multiple: true,
+      search: true
+    }));
+  }, [keyDefs, availableFilterValues]);
+
+  const handleFilterChange = useCallback((output: FilterOutput) => {
+    // Safely handle the filter output to prevent undefined property errors
+    if (output && typeof output === 'object') {
+      setFilterOutput(output);
+    } else {
+      setFilterOutput({});
+    }
+  }, []);
+
   const filteredRows = useMemo(() => {
     let rows = allRows;
-    // Apply facet filters (AND)
-    filters.forEach(f => {
-      if (!f.column || typeof keyToIndex[f.column] !== 'number' || !f.value) {
+
+    // Apply facet filters from FilterOutput
+    Object.entries(filterOutput).forEach(([facetLabel, facetValues]) => {
+      if (!facetValues || !Array.isArray(facetValues) || facetValues.length === 0) {
         return;
       }
-      const idx = keyToIndex[f.column];
-      rows = rows.filter(r => String(r.columns[idx]) === String(f.value));
-    });
-    if (searchText) {
-      const q = searchText.toLowerCase();
+
+      const columnIndex = keyToIndex[facetLabel];
+      if (typeof columnIndex !== 'number') {
+        return;
+      }
+
+      // Filter rows that match any of the selected values for this facet (OR within facet)
       rows = rows.filter(r => {
-        if (r.partitionSpec.toLowerCase().includes(q)) {
-          return true;
-        }
-        return r.columns.some(c => String(c).toLowerCase().includes(q));
+        const cellValue = String(r.columns[columnIndex]);
+        return facetValues.some(filterValue => cellValue === String(filterValue));
       });
+    });
+
+    // Apply search text filter (from the search facet if present)
+    const searchValues = filterOutput?.search;
+    if (searchValues && Array.isArray(searchValues) && searchValues.length > 0) {
+      const searchText = String(searchValues[0]).toLowerCase();
+      if (searchText) {
+        rows = rows.filter(r => {
+          if (r.partitionSpec.toLowerCase().includes(searchText)) {
+            return true;
+          }
+          return r.columns.some(c => String(c).toLowerCase().includes(searchText));
+        });
+      }
     }
+
     return rows;
-  }, [allRows, filters, keyToIndex, searchText]);
+  }, [allRows, filterOutput, keyToIndex]);
 
   // Note: equality helpers removed; not used in current implementation
 
@@ -291,8 +349,8 @@ const Partitions = ({
   return (
     <Loading spinning={loading}>
       {!!keyDefs.length && (
-        <div className="hue-table-browser__partitions-keys" style={{ marginBottom: 8 }}>
-          <h4 style={{ margin: '0 0 8px' }}>{t('Columns')}</h4>
+        <div className="hue-table-browser__partitions-keys" style={{ marginBottom: 24 }}>
+          <h3 className="hue-h3">{t('Columns')}</h3>
           <PaginatedTable<{ key: string; index: number; name: string; type?: string }>
             data={keyDefs.map((k, i) => ({ key: `${i}-${k.name}`, index: i + 1, ...k }))}
             columns={[
@@ -312,89 +370,40 @@ const Partitions = ({
         </div>
       )}
 
-      <h4 className="hue-h4" style={{ margin: '16px 0 8px' }}>
+      <h3 className="hue-h3" style={{ marginBottom: 16 }}>
         {t('Partitions')}
-      </h4>
+      </h3>
 
-      <div className="hue-table-browser__filter" style={{ marginBottom: 8 }}>
-        <Filter
-          search={{ placeholder: t('Filter partitions') }}
-          onChange={(output: FilterOutput) => {
-            const searchValue = String(
-              (output as unknown as { search?: unknown[] }).search?.[0] ?? ''
-            );
-            if (searchValue !== searchText) {
-              setSearchText(searchValue);
-            }
-          }}
-        />
-      </div>
-      <div style={{ marginBottom: 8, display: 'flex', justifyContent: 'space-between' }}>
-        <Space>
-          <Select
-            style={{ minWidth: 200 }}
-            placeholder={t('Add filter')}
-            value={addFacetColumn}
-            onChange={val => setAddFacetColumn(val)}
-            options={(partitions?.partition_keys_json || [])
-              .filter(k => !filters.some(f => f.column === k))
-              .map(k => ({ label: k, value: k }))}
-          />
-          <Button
-            disabled={!addFacetColumn}
-            onClick={() => {
-              if (!addFacetColumn) {
-                return;
-              }
-              const next = [...filters, { column: addFacetColumn, value: undefined }];
-              setFilters(next);
-              setAddFacetColumn(undefined);
-            }}
+      <div className={`hue-table-browser__filter-and-actions${loading ? ' disabled' : ''}`}>
+        <div className="cuix-filter">
+          <ConfigProvider
+            getPopupContainer={triggerNode => triggerNode?.parentElement || document.body}
           >
-            {t('Add Filter')}
-          </Button>
-        </Space>
+            <Filter
+              key={`filter-${facets.length}`}
+              search={{ placeholder: t('Filter partitions') }}
+              facets={facets}
+              onChange={handleFilterChange}
+            />
+          </ConfigProvider>
+        </div>
+
         {canWrite !== false && (
-          <Tooltip title={t('Delete the selected partitions')}>
-            <Button disabled={!selectedSpecs.length} onClick={() => setConfirmOpen(true)}>
-              {t('Drop partition(s)')}
-            </Button>
-          </Tooltip>
+          <div className="hue-table-browser__actions">
+            <Tooltip title={t('Delete the selected partitions')}>
+              <Button disabled={!selectedSpecs.length} onClick={() => setConfirmOpen(true)}>
+                {t('Drop partition(s)')}
+              </Button>
+            </Tooltip>
+          </div>
         )}
       </div>
-      {!!filters.length && (
-        <div style={{ marginBottom: 8 }}>
-          {filters.map((f, idx) => (
-            <div
-              key={`facet-${f.column}-${idx}`}
-              style={{ display: 'flex', gap: 8, marginBottom: 8 }}
-            >
-              <div style={{ minWidth: 140, alignSelf: 'center' }}>{f.column}</div>
-              <Select
-                showSearch
-                style={{ minWidth: 240 }}
-                placeholder={t('Select value')}
-                value={f.value}
-                onChange={val => {
-                  const next = filters.slice();
-                  next[idx] = { ...next[idx], value: val };
-                  setFilters(next);
-                }}
-                options={availableFilterValues(f.column).map(v => ({ label: v, value: v }))}
-                filterOption={(input, option) =>
-                  (option?.label as string).toLowerCase().includes(input.toLowerCase())
-                }
-              />
-              <Button onClick={() => setFilters(filters.filter((_, i) => i !== idx))}>
-                {t('Remove')}
-              </Button>
-            </div>
-          ))}
-        </div>
-      )}
 
       {valuesData.length === 0 ? (
-        <EmptyState title={t('No partitions')} />
+        <EmptyState
+          title={t('No partitions')}
+          subtitle={t('This table isn’t partitioned or no partitions are available.')}
+        />
       ) : (
         <PaginatedTable<PartitionRow>
           data={pageData}

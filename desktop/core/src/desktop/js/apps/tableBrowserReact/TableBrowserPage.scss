@@ -13,6 +13,7 @@
       height: 100%;
       background-color: vars.$fluidx-gray-100;
       padding: 16px;
+      overflow: auto; // Allow page-level scroll so inner tables can expand
     }
 
     &__page-header {
@@ -35,7 +36,6 @@
         flex: 1;
         @include mixins.nowrap-ellipsis;
       }
-
     }
 
     &__header-with-actions-only {
@@ -98,11 +98,7 @@
       margin-bottom: 8px;
     }
 
-    &__view-sql {
-      background-color: vars.$fluidx-gray-050;
-      padding: 12px;
-      overflow-x: auto;
-    }
+    // View SQL styles moved to TableDetails/ViewSqlTab/ViewSql.scss
 
     &__details-grid {
       display: grid;
@@ -122,6 +118,17 @@
     // Fixes for Filter
     .ant-input {
       box-shadow: none;
+    }
+
+    .cuix-empty-state {
+      max-width: 100%;
+      margin-top: 32px;
+      div {
+        margin-bottom: 24px;
+      }
+      p {
+        margin-bottom: 1em;
+      }
     }
   }
 }

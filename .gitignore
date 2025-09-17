@@ -145,5 +145,8 @@ docs/docs-site/public/
 # VSCode settings
 .vscode
 
+# Cursor screenshots
+.cursor/screenshots
+
 # Test data
 desktop/core/src/desktop/test_data/*

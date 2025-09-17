@@ -1,0 +1,51 @@
+// Licensed to Cloudera, Inc. under one or more contributor license agreements.
+// Apache License 2.0 applies.
+
+@import 'variables';
+
+// Generic label style for rendering data type tokens
+.hue-type-label {
+  letter-spacing: 0.2px;
+  font-family: var(
+    --hue-font-monospace,
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    'Liberation Mono',
+    'Courier New',
+    monospace
+  );
+}
+
+// Canonical color mapping used across the app
+.hue-type--number {
+  color: #f5871f; // Align with Hue editor numeric (teal/orange family)
+}
+
+.hue-type--text {
+  color: #718c00; // Align with Hue editor string (green family)
+}
+
+.hue-type--boolean {
+  color: $cdl-pear-600; // Distinct from numeric
+}
+
+.hue-type--time {
+  color: $cdl-purple-600;
+}
+
+.hue-type--json {
+  color: $cdl-blue-600; // Distinct from numeric teal
+}
+
+.hue-type--complex {
+  color: $cdl-pink-600; // struct/array/map
+}
+
+.hue-type--other {
+  color: var(--hue-text-secondary, rgba(0, 0, 0, 0.65));
+}
+
+

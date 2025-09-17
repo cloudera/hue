@@ -11,7 +11,6 @@
 // the License.
 
 import React, { useState, useMemo } from 'react';
-import Button from 'cuix/dist/components/Button/Button';
 import Loading from 'cuix/dist/components/Loading';
 import Modal from 'cuix/dist/components/Modal';
 import DataSetsIcon from '@cloudera/cuix-core/icons/react/DataSetsIcon';
@@ -23,13 +22,14 @@ import huePubSub from '../../../utils/huePubSub';
 import type { Connector, Namespace, Compute } from '../../../config/types';
 import Tabs, { type TabKey } from '../sharedComponents/Tabs';
 import Toolbar, { type ToolbarAction } from '../sharedComponents/Toolbar';
-import Overview from './Overview';
-import SampleGrid from './SampleGrid';
-import DetailsProperties from './DetailsProperties';
-import Partitions from './Partitions';
-import ViewSql from './ViewSql';
-import Queries from './Queries';
-import Privileges from './Privileges';
+import Overview from './OverviewTab/Overview';
+import SampleGrid from './SampleTab/SampleGrid';
+import DetailsProperties from './DetailsTab/DetailsProperties';
+import Partitions from './PartitionsTab/Partitions';
+import ViewSql from './ViewSqlTab/ViewSql';
+import Queries from './QueriesTab/Queries';
+import Privileges from './PrivilegesTab/Privileges';
+import ImportDataModal from './ImportDataModal/ImportDataModal';
 import { notifyError } from '../utils/notifier';
 import { getConnectorIdOrType } from '../utils/connector';
 import { post } from '../../../api/utils';
@@ -61,6 +61,7 @@ export interface TableDetailsProps {
   onClickDataSources?: () => void;
   onClickDatabases?: () => void;
   onClickDatabase?: (database: string) => void;
+  onOpenColumn?: (column: string) => void;
 }
 
 const TableDetails = ({
@@ -79,12 +80,14 @@ const TableDetails = ({
   onSelectSource,
   onClickDataSources,
   onClickDatabases,
-  onClickDatabase
+  onClickDatabase,
+  onOpenColumn
 }: TableDetailsProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const [isDropping, setIsDropping] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [skipTrash, setSkipTrash] = useState(false);
+  const [importModalOpen, setImportModalOpen] = useState(false);
   const {
     loading: loadingData,
     isRefreshing,
@@ -93,15 +96,18 @@ const TableDetails = ({
     detailsProperties,
     detailsSections,
     sampleData,
+    partitionCount,
     refresh
   } = tableDetails;
 
   // Only show partitions tab if there are partitions
+  const properties = Array.isArray(overviewProps?.properties) ? overviewProps.properties : [];
   const hasPartitions =
-    overviewProps?.properties?.find(p => p.name === t('Partitioned'))?.value === t('Yes');
+    properties.find(p => p.name === t('Partitioned'))?.value === t('Yes') ||
+    (partitionCount !== undefined && partitionCount > 0);
 
-  // Determine if this is a view to show appropriate icon
-  const isView = overviewProps?.properties?.find(p => p.name === t('Type'))?.value === t('View');
+  // Determine if this is a view to show appropriate icon and View SQL tab
+  const isView = properties.find(p => p.name === t('Type'))?.value === t('View');
 
   const handleDropTable = async (skipTrash = false): Promise<void> => {
     // Prevent multiple simultaneous drop operations
@@ -168,6 +174,51 @@ const TableDetails = ({
     });
   };
 
+  const enableImport = useMemo((): boolean => {
+    if (!overviewProps?.properties || !connector) {
+      return false;
+    }
+
+    // Check if table details are loaded (equivalent to detailsLoaded in legacy)
+    const detailsLoaded = !!overviewProps.properties.length;
+    if (!detailsLoaded) {
+      return false;
+    }
+
+    // Get connector dialect
+    const dialect = connector.dialect || connector.id;
+
+    // Check if it's a view
+    const typeProperty = overviewProps.properties.find(p => p.name === t('Type'));
+    const isView = typeProperty?.value === t('View');
+
+    // Check if it's Spark SQL
+    const isSpark = dialect === 'sparksql';
+
+    // Check if it's transactional Hive table
+    const isTransactionalHive =
+      dialect === 'hive' &&
+      overviewProps.properties.some(
+        p => p.name.toLowerCase().includes('transactional') && p.value?.toLowerCase() === 'true'
+      );
+
+    return !(isSpark || isView || isTransactionalHive);
+  }, [overviewProps?.properties, connector, t]);
+
+  const showImportData = (): void => {
+    setImportModalOpen(true);
+  };
+
+  // Extract partition columns for import modal
+  const partitionColumns = useMemo(() => {
+    return detailsColumns
+      .filter(col => col.isPartitionKey)
+      .map(col => ({
+        name: col.name,
+        value: '' // Default empty value
+      }));
+  }, [detailsColumns]);
+
   const toolbarActions = useMemo((): ToolbarAction[] => {
     const actions: ToolbarAction[] = [];
 
@@ -180,16 +231,16 @@ const TableDetails = ({
       disabled: !database || !table
     });
 
-    // Load Data action
-    actions.push({
-      key: 'loadData',
-      label: t('Load Data'),
-      onClick: () => {
-        // TODO: Implement load data functionality
-      },
-      disabled: !database || !table,
-      tooltip: t('Load data into table')
-    });
+    // Import action
+    if (enableImport) {
+      actions.push({
+        key: 'import',
+        label: t('Import'),
+        onClick: showImportData,
+        disabled: !database || !table,
+        tooltip: t('Import data into table')
+      });
+    }
 
     // Drop action
     actions.push({
@@ -202,7 +253,7 @@ const TableDetails = ({
     });
 
     return actions;
-  }, [t, database, table, isDropping]);
+  }, [t, database, table, isDropping, enableImport]);
 
   return (
     <div>
@@ -230,8 +281,9 @@ const TableDetails = ({
         activeKey={activeTab}
         onChange={onTabChange}
         sampleCount={sampleData?.rows?.length}
-        partitionsCount={overviewProps?.stats ? Number(overviewProps?.stats?.files) : undefined}
+        partitionsCount={partitionCount}
         showPartitions={!!hasPartitions}
+        showViewSql={!!isView}
       />
 
       <Loading spinning={false}>
@@ -245,19 +297,28 @@ const TableDetails = ({
             loadingProperties={(loadingData && !overviewProps?.properties) || isRefreshing}
             loadingStats={(loadingData && !overviewProps?.stats) || isRefreshing}
             loadingColumns={(loadingData && !detailsColumns.length) || isRefreshing}
+            loadingSamples={(loadingData && !sampleData) || isRefreshing}
             connector={connector}
             namespace={namespace}
             compute={compute}
             database={database}
             table={table}
+            onOpenColumn={onOpenColumn}
             onRefreshStats={async () => {
               await refresh();
             }}
           />
         )}
         {activeTab === 'sample' && (
-          <Loading spinning={(loadingData && !sampleData) || isRefreshing}>
-            <SampleGrid data={sampleData} />
+          <Loading spinning={!!loadingData && !sampleData}>
+            {loadingData && !sampleData ? null : (
+              <SampleGrid
+                data={sampleData}
+                isRefreshing={isRefreshing}
+                database={database}
+                table={table}
+              />
+            )}
           </Loading>
         )}
         {activeTab === 'details' && (
@@ -291,7 +352,7 @@ const TableDetails = ({
               compute={compute}
               database={database}
               table={table}
-              onCountChange={() => {}}
+              isRefreshing={isRefreshing}
             />
           </Loading>
         )}
@@ -306,17 +367,9 @@ const TableDetails = ({
             />
           </Loading>
         )}
-        {activeTab === 'viewSql' && (
+        {activeTab === 'viewSql' && isView && (
           <Loading spinning={loadingData && !overviewProps?.properties}>
-            <ViewSql
-              sql={
-                (overviewProps?.properties || []).find(
-                  p =>
-                    p.name.toLowerCase() === 'view original text:' ||
-                    p.name.toLowerCase() === 'original query:'
-                )?.value
-              }
-            />
+            <ViewSql rawAnalysis={tableDetails.rawAnalysis} sourceType={sourceType} />
           </Loading>
         )}
         {activeTab === 'privileges' && (
@@ -325,13 +378,6 @@ const TableDetails = ({
           </Loading>
         )}
       </Loading>
-
-      <div style={{ marginTop: 12 }}>
-        <Button onClick={onBackToTables} data-testid="tb-back">
-          {t('Back to tables')}
-        </Button>
-      </div>
-
       <Modal
         open={confirmOpen}
         title={t('Drop table')}
@@ -363,6 +409,18 @@ const TableDetails = ({
           {t('Skip the trash')}
         </label>
       </Modal>
+
+      <ImportDataModal
+        open={importModalOpen}
+        onCancel={() => setImportModalOpen(false)}
+        database={database}
+        table={table}
+        connector={connector}
+        namespace={namespace}
+        compute={compute}
+        sourceType={sourceType}
+        partitionColumns={partitionColumns}
+      />
     </div>
   );
 };

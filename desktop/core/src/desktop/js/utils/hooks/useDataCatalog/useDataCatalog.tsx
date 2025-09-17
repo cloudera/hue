@@ -70,10 +70,11 @@ interface UseDataCatalog {
 
 interface UseDataCatalogOptions {
   autoSelectFirstDatabase?: boolean;
+  autoSelectFirstConnector?: boolean;
 }
 
 export const useDataCatalog = (options?: UseDataCatalogOptions): UseDataCatalog => {
-  const { autoSelectFirstDatabase = true } = options || {};
+  const { autoSelectFirstDatabase = true, autoSelectFirstConnector = true } = options || {};
   const [connectors, setConnectors] = useState<EditorInterpreter[]>([]);
   const [computes, setComputes] = useState<Compute[]>([]);
   const [connector, setConnector] = useState<Connector | null>(null);
@@ -207,7 +208,9 @@ export const useDataCatalog = (options?: UseDataCatalogOptions): UseDataCatalog 
 
     if (availableConnectors.length > 0) {
       setConnectors(availableConnectors);
-      setConnector(availableConnectors[0]);
+      if (autoSelectFirstConnector) {
+        setConnector(availableConnectors[0]);
+      }
     }
     setLoading(prev => ({ ...prev, connector: false }));
   }, []);

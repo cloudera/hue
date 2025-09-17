@@ -17,11 +17,13 @@ import PrimaryButton from 'cuix/dist/components/Button/PrimaryButton';
 import Button from 'cuix/dist/components/Button/Button';
 import Loading from 'cuix/dist/components/Loading';
 import Modal from 'cuix/dist/components/Modal';
-import EmptyState from 'cuix/dist/components/EmptyState';
+// import EmptyState from 'cuix/dist/components/EmptyState';
 import Filter from 'cuix/dist/components/Filter';
 import DatabaseIcon from '@cloudera/cuix-core/icons/react/DatabaseIcon';
 import Toolbar, { type ToolbarAction } from '../sharedComponents/Toolbar';
-import DatabasePropertiesComponent, { type DatabaseProperties } from '../DatabaseListing/DatabaseProperties';
+import DatabasePropertiesComponent, {
+  type DatabaseProperties
+} from '../DatabaseListing/DatabaseProperties';
 import PageHeader from '../sharedComponents/PageHeader';
 import PaginatedTable, {
   type ColumnProps as PaginatedColumnProps
@@ -38,7 +40,7 @@ export interface TableRowItem {
 
 export interface TablesListProps {
   tables: TableRowItem[];
-  loading: boolean;
+  isInitializing: boolean;
   isRefreshing: boolean;
   onRefresh?: () => void;
   tableFilter: string;
@@ -57,6 +59,7 @@ export interface TablesListProps {
   onViewSelection?: (name: string) => void;
   onQuerySelection?: (name: string) => void;
   onDropSelection?: (names: string[], skipTrash?: boolean) => Promise<void> | void;
+  onCreateTable?: () => void;
   databaseName?: string;
   databaseProperties?: DatabaseProperties;
   loadingDatabaseProperties?: boolean;
@@ -72,7 +75,7 @@ export interface TablesListProps {
 
 const TablesList = ({
   tables,
-  loading,
+  isInitializing,
   isRefreshing,
   onRefresh,
   tableFilter,
@@ -91,6 +94,7 @@ const TablesList = ({
   onViewSelection,
   onQuerySelection,
   onDropSelection,
+  onCreateTable,
   databaseName,
   databaseProperties,
   loadingDatabaseProperties,
@@ -153,6 +157,15 @@ const TablesList = ({
   const toolbarActions = useMemo(() => {
     const actions: ToolbarAction[] = [];
 
+    if (onCreateTable) {
+      actions.push({
+        key: 'new',
+        label: t('New'),
+        onClick: onCreateTable,
+        variant: 'primary'
+      });
+    }
+
     if (onViewSelection) {
       actions.push({
         key: 'view',
@@ -199,16 +212,9 @@ const TablesList = ({
     }
 
     return actions;
-  }, [onViewSelection, onQuerySelection, onDropSelection, selected, t]);
+  }, [onCreateTable, onViewSelection, onQuerySelection, onDropSelection, selected, t]);
 
-  if (!loading && filtered.length === 0) {
-    return (
-      <div>
-        <div style={{ marginBottom: 8 }}>{t('Tables & Views')}</div>
-        <EmptyState className="hue-table-browser__empty-state" title={t('No tables or views')} />
-      </div>
-    );
-  }
+  // Keep the filter visible when filtered results are empty; use table built-in empty message.
 
   const columns: PaginatedColumnProps<TableRowItem>[] = [
     {
@@ -294,7 +300,7 @@ const TablesList = ({
         title={databaseName}
         icon={<DatabaseIcon />}
         onRefresh={onRefresh}
-        loading={loading}
+        loading={isInitializing || isRefreshing}
         isRefreshing={isRefreshing}
         sourceType={sourceType}
         database={databaseName}
@@ -326,12 +332,12 @@ const TablesList = ({
 
       {/* Filter row with filter and toolbar */}
       <div
-        className={`hue-table-browser__filter-and-actions ${!!loading || isRefreshing ? 'disabled' : ''}`}
+        className={`hue-table-browser__filter-and-actions ${!!isInitializing || isRefreshing ? 'disabled' : ''}`}
       >
         <Filter
           search={{ placeholder: t('Filter tables & views') }}
           onChange={(output: FilterOutput) => {
-            if (!!loading || isRefreshing) {
+            if (!!isInitializing || isRefreshing) {
               return; // Prevent changes while loading
             }
             const searchValue = String(
@@ -347,35 +353,38 @@ const TablesList = ({
             <Toolbar
               actions={toolbarActions}
               selectedItems={selected}
-              loading={loading}
+              loading={isInitializing}
               isRefreshing={isRefreshing}
             />
           </div>
         )}
       </div>
-      <Loading spinning={!!loading || isRefreshing}>
-        <PaginatedTable<TableRowItem>
-          data={pageData}
-          columns={columns}
-          rowKey="key"
-          sortByColumn={sortByColumn}
-          sortOrder={sortOrder}
-          setSortByColumn={column => setSortByColumn(String(column))}
-          setSortOrder={setSortOrder}
-          onRowSelect={selectedRows =>
-            setSelected((selectedRows as unknown as { name: string }[]).map(r => r.name))
-          }
-          pagination={{
-            pageStats: {
-              pageNumber: tablePageNumber,
-              totalPages,
-              pageSize: tablePageSize,
-              totalSize
-            },
-            setPageNumber: setTablePageNumber,
-            setPageSize: setTablePageSize
-          }}
-        />
+      <Loading spinning={!!isInitializing}>
+        {isInitializing ? null : (
+          <PaginatedTable<TableRowItem>
+            data={pageData}
+            columns={columns}
+            rowKey="key"
+            loading={isRefreshing}
+            sortByColumn={sortByColumn}
+            sortOrder={sortOrder}
+            setSortByColumn={column => setSortByColumn(String(column))}
+            setSortOrder={setSortOrder}
+            onRowSelect={selectedRows =>
+              setSelected((selectedRows as unknown as { name: string }[]).map(r => r.name))
+            }
+            pagination={{
+              pageStats: {
+                pageNumber: tablePageNumber,
+                totalPages,
+                pageSize: tablePageSize,
+                totalSize
+              },
+              setPageNumber: setTablePageNumber,
+              setPageSize: setTablePageSize
+            }}
+          />
+        )}
       </Loading>
 
       <Modal

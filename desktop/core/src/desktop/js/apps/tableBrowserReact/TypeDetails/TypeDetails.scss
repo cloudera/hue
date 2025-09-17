@@ -1,0 +1,17 @@
+// Licensed to Cloudera, Inc. under one or more contributor license agreements.
+// Apache License 2.0 applies.
+
+@import '../../../components/styles/variables';
+@import '../../../components/styles/typeColors';
+
+.cuix.antd {
+  .hue-type-details {
+    .schema-type-cell {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+  }
+}
+
+

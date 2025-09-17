@@ -91,7 +91,7 @@ describe('TableBrowserErrorBoundary', () => {
 
     const TestComponent = () => {
       const [shouldThrow, setShouldThrow] = React.useState(true);
-      
+
       return (
         <TableBrowserErrorBoundary onRetry={() => setShouldThrow(false)}>
           <ThrowError shouldThrow={shouldThrow} />
@@ -141,7 +141,7 @@ describe('TableBrowserErrorBoundary', () => {
 
   it('handles refresh page button click', async () => {
     const user = userEvent.setup();
-    
+
     // Mock window.location.reload
     const mockReload = jest.fn();
     Object.defineProperty(window, 'location', {

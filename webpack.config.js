@@ -15,7 +15,7 @@
 // limitations under the License.
 
 const fs = require('fs');
-const webpack = require('webpack');
+// const webpack = require('webpack');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const {
   BUNDLES,

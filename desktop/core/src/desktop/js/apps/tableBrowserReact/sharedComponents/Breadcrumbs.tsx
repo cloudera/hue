@@ -14,26 +14,38 @@ import React, { useMemo } from 'react';
 import { i18nReact } from '../../../utils/i18nReact';
 // import changeURL from '../../../utils/url/changeURL';
 
+import './Breadcrumbs.scss';
+
 export interface BreadcrumbsProps {
   sourceType?: string;
   database?: string;
   table?: string;
+  column?: string;
+  fields?: string[];
   sourceOptions?: string[];
   onSelectSource?: (sourceType: string) => void;
   onClickDataSources?: () => void;
   onClickDatabases?: () => void;
   onClickDatabase?: (database: string) => void;
+  onClickTable?: (table: string) => void;
+  onClickColumn?: () => void;
+  onClickField?: (path: string[]) => void;
 }
 
 const Breadcrumbs = ({
   sourceType,
   database,
   table,
+  column,
+  fields = [],
   // sourceOptions,
   // onSelectSource,
   onClickDataSources,
   onClickDatabases,
-  onClickDatabase
+  onClickDatabase,
+  onClickTable,
+  onClickColumn,
+  onClickField
 }: BreadcrumbsProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
@@ -43,15 +55,19 @@ const Breadcrumbs = ({
 
   // no-op retained for compatibility
 
-  const { sourcesHref, databasesHref, databaseHref } = useMemo(() => {
+  const { sourcesHref, databasesHref, databaseHref, tableHref } = useMemo(() => {
     const dh = `${base}/tablebrowser/${encodeURIComponent(sourceType || 'hive')}`;
     const dbh = `${dh}${database ? `/${encodeURIComponent(database)}` : ''}`;
-    const sh = `${base}/tablebrowser/`;
-    return { sourcesHref: sh, databasesHref: dh, databaseHref: dbh };
+    const th = `${dbh}${table ? `/${encodeURIComponent(table)}` : ''}`;
+    const sh = `${base}/tablebrowser`;
+    return { sourcesHref: sh, databasesHref: dh, databaseHref: dbh, tableHref: th };
   }, [base, sourceType, database, table, t]);
 
   return (
-    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+    <div
+      className="hue-table-browser-breadcrumbs"
+      style={{ display: 'flex', gap: 8, alignItems: 'center' }}
+    >
       <nav aria-label={t('Breadcrumbs')} style={{ flex: 1, minWidth: 0 }}>
         <ol
           style={{
@@ -140,11 +156,85 @@ const Breadcrumbs = ({
               <li aria-hidden="true" role="presentation">
                 /
               </li>
+              {column ? (
+                <li>
+                  <a
+                    href={tableHref}
+                    aria-label={table}
+                    style={{ textDecoration: 'none' }}
+                    onClick={e => {
+                      if (onClickTable) {
+                        e.preventDefault();
+                        onClickTable(table);
+                      }
+                    }}
+                  >
+                    {table}
+                  </a>
+                </li>
+              ) : (
+                <li>
+                  <span aria-current="page">{table}</span>
+                </li>
+              )}
+            </>
+          )}
+          {database && table && column && (
+            <>
+              <li aria-hidden="true" role="presentation">
+                /
+              </li>
               <li>
-                <span aria-current="page">{table}</span>
+                {fields && fields.length && onClickColumn ? (
+                  <a
+                    href={`${tableHref}/${encodeURIComponent(column)}`}
+                    aria-label={column}
+                    style={{ textDecoration: 'none' }}
+                    onClick={e => {
+                      e.preventDefault();
+                      onClickColumn();
+                    }}
+                  >
+                    {column}
+                  </a>
+                ) : (
+                  <span aria-current="page">{column}</span>
+                )}
               </li>
             </>
           )}
+          {database &&
+            table &&
+            column &&
+            fields &&
+            fields.length > 0 &&
+            fields.map((f, idx) => (
+              <React.Fragment key={`${f}-${idx}`}>
+                <li aria-hidden="true" role="presentation">
+                  /
+                </li>
+                <li>
+                  {idx < fields.length - 1 && onClickField ? (
+                    <a
+                      href={`${tableHref}/${encodeURIComponent(column!)}/${fields
+                        .slice(0, idx + 1)
+                        .map(encodeURIComponent)
+                        .join('/')}`}
+                      aria-label={f}
+                      style={{ textDecoration: 'none' }}
+                      onClick={e => {
+                        e.preventDefault();
+                        onClickField(fields.slice(0, idx + 1));
+                      }}
+                    >
+                      {f}
+                    </a>
+                  ) : (
+                    <span aria-current="page">{f}</span>
+                  )}
+                </li>
+              </React.Fragment>
+            ))}
         </ol>
       </nav>
     </div>

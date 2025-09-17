@@ -11,12 +11,12 @@
 // the License.
 
 import React from 'react';
-import { Card, Col, Row } from 'antd';
+import { Col, Row } from 'antd';
 import Loading from 'cuix/dist/components/Loading';
-import { i18nReact } from '../../../utils/i18nReact';
-import DetailsSchema from './DetailsSchema';
-import MetaDataDisplay, { type MetaDataGroup } from '../sharedComponents/MetaDataDisplay';
-import type { Connector, Compute, Namespace } from '../../../config/types';
+import { i18nReact } from '../../../../utils/i18nReact';
+import Schema from './Schema';
+import MetaDataDisplay, { type MetaDataGroup } from '../../sharedComponents/MetaDataDisplay';
+import type { Connector, Compute, Namespace } from '../../../../config/types';
 
 import './Overview.scss';
 
@@ -44,6 +44,8 @@ export interface OverviewProps {
   loadingProperties?: boolean;
   loadingStats?: boolean;
   loadingColumns?: boolean;
+  loadingSamples?: boolean;
+  onOpenColumn?: (column: string) => void;
   connector?: Connector | null;
   namespace?: Namespace | null;
   compute?: Compute | null;
@@ -52,7 +54,7 @@ export interface OverviewProps {
 }
 
 const Overview = ({
-  properties,
+  properties: rawProperties,
   stats,
   hdfsLink,
   columns,
@@ -60,6 +62,8 @@ const Overview = ({
   loadingProperties,
   loadingStats,
   loadingColumns,
+  loadingSamples,
+  onOpenColumn,
   connector,
   namespace,
   compute,
@@ -67,6 +71,9 @@ const Overview = ({
   table
 }: OverviewProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
+
+  // Ensure properties is always an array
+  const properties = Array.isArray(rawProperties) ? rawProperties : [];
 
   // Helper function to check if a group has meaningful data
   const hasValidData = (groups: MetaDataGroup[]): boolean => {
@@ -91,7 +98,7 @@ const Overview = ({
               }
             ]
           : []),
-        ...(properties || [])
+        ...properties
           .filter(p => !(hdfsLink && p.name === t('Location'))) // Filter out Location if hdfsLink exists
           .map(p => ({
             key: p.name,
@@ -165,17 +172,27 @@ const Overview = ({
 
       <Loading spinning={!!loadingColumns}>
         {!!columns?.length && (
-          <Card title={`${t('Schema')} (${columns.length} ${t('columns')})`}>
-            <DetailsSchema
+          <>
+            <div className="hue-table-browser__header-with-actions">
+              <h3 className="hue-h3">
+                {t('{{label}} ({{count}})', {
+                  label: t('Schema'),
+                  count: columns.length
+                })}
+              </h3>
+            </div>
+            <Schema
               columns={columns}
               sampleData={sampleData}
+              loadingSamples={loadingSamples}
+              onOpenColumn={onOpenColumn}
               connector={connector}
               namespace={namespace}
               compute={compute}
               database={database}
               table={table}
             />
-          </Card>
+          </>
         )}
       </Loading>
     </div>

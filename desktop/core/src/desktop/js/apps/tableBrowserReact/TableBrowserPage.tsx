@@ -15,6 +15,7 @@
 // limitations under the License.
 
 import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react';
+import i18nCuix from 'cuix/dist/utils/i18n';
 import { Col, Row } from 'antd';
 import DataBrowserIcon from '@cloudera/cuix-core/icons/react/DataBrowserIcon';
 
@@ -23,6 +24,8 @@ import CommonHeader from '../../reactComponents/CommonHeader/CommonHeader';
 import { useTableBrowserController } from './hooks/useTableBrowserController';
 import { useDataCatalog } from '../../utils/hooks/useDataCatalog/useDataCatalog';
 import TableDetails from './TableDetails/TableDetails';
+import ColumnDetails from './ColumnDetails/ColumnDetails';
+import TypeDetails from './TypeDetails/TypeDetails';
 import SourcesList from './SourceListing/SourcesList';
 import DatabasesList from './DatabaseListing/DatabasesList';
 import TablesList from './TableListing/TablesList';
@@ -47,7 +50,9 @@ const TableBrowserPage = (): JSX.Element => {
     navigateToSources,
     navigateToSource,
     navigateToDatabase,
-    navigateToTable
+    navigateToTable,
+    navigateToColumn,
+    navigateToField
   } = useTableBrowserController();
 
   const {
@@ -63,7 +68,10 @@ const TableBrowserPage = (): JSX.Element => {
     setConnector,
     reloadDatabases,
     reloadTables
-  } = useDataCatalog({ autoSelectFirstDatabase: false });
+  } = useDataCatalog({
+    autoSelectFirstDatabase: false,
+    autoSelectFirstConnector: !!route.sourceType // don't auto-select on sources page
+  });
 
   const [table, setTable] = useState<string | undefined>(route.table);
   // activeTab provided by controller
@@ -151,6 +159,17 @@ const TableBrowserPage = (): JSX.Element => {
 
   // Initialize from URL on mount (partial sync)
   useEffect(() => {
+    // Initialize default CUIX i18n messages used by components (e.g., Filter empty states)
+    try {
+      if (i18nCuix && typeof i18nCuix.extend === 'function') {
+        i18nCuix.extend({
+          'message.noResultsFound': 'No results found'
+        });
+      }
+    } catch {
+      // noop
+    }
+
     if (route.database) {
       selectDb(route.database);
     }
@@ -199,15 +218,21 @@ const TableBrowserPage = (): JSX.Element => {
     }
   }, [route.sourceType, currentDb, table]);
 
-  const {
-    loading: loadingData,
-    overviewProps,
-    detailsColumns,
-    detailsProperties,
-    detailsSections,
-    sampleData,
-    refresh
-  } = useTableDetails({ connector, namespace, compute, database: currentDb, table });
+  const tableDetails = useTableDetails({
+    connector,
+    namespace,
+    compute,
+    database: currentDb,
+    table
+  });
+
+  const sources = useMemo(
+    () =>
+      Array.from(
+        new Set((connectors || []).map(c => c.type || (c as unknown as { id?: string }).id || ''))
+      ).filter(Boolean) as string[],
+    [connectors]
+  );
 
   return (
     <div className="hue-table-browser">
@@ -223,16 +248,11 @@ const TableBrowserPage = (): JSX.Element => {
             >
               {!route.sourceType && (
                 <SourcesList
-                  sources={
-                    Array.from(
-                      new Set(
-                        (connectors || []).map(
-                          c => c.type || (c as unknown as { id?: string }).id || ''
-                        )
-                      )
-                    ).filter(Boolean) as string[]
+                  sources={sources}
+                  isInitializing={
+                    !isRefreshing &&
+                    (!!loadingStates.connector || !(connectors && connectors.length))
                   }
-                  loading={!!loadingStates.database}
                   isRefreshing={isRefreshing}
                   onRefresh={async () => {
                     try {
@@ -301,7 +321,15 @@ const TableBrowserPage = (): JSX.Element => {
               {route.sourceType && !currentDb && (
                 <DatabasesList
                   databases={databases || []}
-                  loading={!!loadingStates.database}
+                  isInitializing={
+                    !!loadingStates.connector ||
+                    !!loadingStates.namespace ||
+                    !!loadingStates.compute ||
+                    !!loadingStates.database ||
+                    // initial render case while DBs are not fetched yet
+                    !databases ||
+                    databases.length === 0
+                  }
                   isRefreshing={isRefreshing}
                   onRefresh={async () => {
                     try {
@@ -476,7 +504,14 @@ const TableBrowserPage = (): JSX.Element => {
                     type: item.type,
                     comment: item.comment
                   }))}
-                  loading={!!loadingStates.table}
+                  isInitializing={
+                    !!loadingStates.connector ||
+                    !!loadingStates.namespace ||
+                    !!loadingStates.compute ||
+                    !!loadingStates.database ||
+                    // ensure initial render after selecting DB shows loading until first fetch completes
+                    (!!currentDb && (!tables || tables.length === 0))
+                  }
                   isRefreshing={isRefreshing}
                   onRefresh={async () => {
                     try {
@@ -575,6 +610,32 @@ const TableBrowserPage = (): JSX.Element => {
                       await reloadTables();
                     }
                   }}
+                  onCreateTable={() => {
+                    // Navigate to the importer for table creation
+                    const hueUrls = (
+                      window as unknown as { HUE_URLS?: { IMPORTER_CREATE_TABLE?: string } }
+                    ).HUE_URLS;
+                    const baseUrl = hueUrls?.IMPORTER_CREATE_TABLE;
+
+                    if (baseUrl && currentDb) {
+                      // Get the base path (e.g., "/hue")
+                      const basePath = window.location.pathname.split('/tablebrowser')[0] || '';
+
+                      // Construct URL with base path, database name and query parameters
+                      const sourceType =
+                        route.sourceType || getConnectorIdOrType(connector) || 'hive';
+                      const params = new URLSearchParams({
+                        sourceType,
+                        ...(namespace && { namespace: JSON.stringify(namespace) }),
+                        ...(compute && { compute: JSON.stringify(compute) })
+                      });
+
+                      const url = `${basePath}${baseUrl}${currentDb}/?${params.toString()}`;
+                      window.open(url, '_blank');
+                    } else {
+                      console.warn('Importer URL not available or database not selected');
+                    }
+                  }}
                   databaseName={currentDb}
                   databaseProperties={databaseProperties}
                   loadingDatabaseProperties={loadingDatabaseProperties}
@@ -617,7 +678,7 @@ const TableBrowserPage = (): JSX.Element => {
                 />
               )}
 
-              {!!currentDb && !!table && (
+              {!!currentDb && !!table && !route.column && (
                 <TableDetails
                   sourceType={route.sourceType}
                   database={currentDb}
@@ -631,15 +692,7 @@ const TableBrowserPage = (): JSX.Element => {
                   connector={connector}
                   namespace={namespace}
                   compute={compute}
-                  tableDetails={{
-                    loading: loadingData,
-                    overviewProps,
-                    detailsColumns,
-                    detailsProperties,
-                    detailsSections,
-                    sampleData,
-                    refresh
-                  }}
+                  tableDetails={tableDetails}
                   onReloadTables={reloadTables}
                   sourceOptions={(connectors || []).map(c => c.type)}
                   onClickDataSources={() => {
@@ -675,8 +728,69 @@ const TableBrowserPage = (): JSX.Element => {
                     setTable(undefined);
                     navigateToSource(src);
                   }}
+                  onOpenColumn={col => {
+                    navigateToColumn(currentDb, table, col);
+                  }}
                 />
               )}
+
+              {!!currentDb &&
+                !!table &&
+                !!route.column &&
+                (route.fields && route.fields.length ? (
+                  <TypeDetails
+                    key={`typedetails-${route.column}-${route.fields.join('.')}`}
+                    sourceType={route.sourceType}
+                    database={currentDb}
+                    table={table}
+                    column={route.column}
+                    fields={route.fields}
+                    tableDetails={tableDetails}
+                    onOpenField={next =>
+                      navigateToField(currentDb, table, route.column as string, next)
+                    }
+                    onClickDataSources={() => {
+                      selectDb(undefined);
+                      setTable(undefined);
+                      navigateToSources();
+                    }}
+                    onClickDatabases={() => {
+                      selectDb(undefined);
+                      setTable(undefined);
+                      navigateToSource(route.sourceType || 'hive');
+                    }}
+                    onClickDatabase={db => {
+                      if (db !== currentDb) {
+                        selectDb(db);
+                      }
+                      setTable(undefined);
+                      navigateToDatabase(db);
+                    }}
+                    onClickTable={tbl => {
+                      if (currentDb) {
+                        setTable(tbl);
+                        navigateToTable(currentDb, tbl);
+                      }
+                    }}
+                  />
+                ) : (
+                  <ColumnDetails
+                    key={`${route.column}-root`}
+                    sourceType={route.sourceType}
+                    database={currentDb}
+                    table={table}
+                    column={route.column}
+                    fields={route.fields}
+                    connector={connector}
+                    namespace={namespace}
+                    compute={compute}
+                    tableDetails={tableDetails}
+                    onBackToTable={() => navigateToTable(currentDb, table)}
+                    onOpenField={next =>
+                      navigateToField(currentDb, table, route.column as string, next)
+                    }
+                  />
+                ))}
             </div>
           </Col>
         </Row>

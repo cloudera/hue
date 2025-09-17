@@ -71,15 +71,14 @@ describe('InputModal', () => {
         inputType="text"
       />
     );
-    const submitButton = screen.getByRole('button', { name: 'Create' });
-
     expect(mockOnSubmit).not.toHaveBeenCalled();
 
     const inputField = screen.getByRole('textbox');
     await user.type(inputField, 'test-file.txt');
 
+    const submitButton = screen.getByRole('button', { name: 'Create' });
     await user.click(submitButton);
-    waitFor(() => expect(mockOnSubmit).toHaveBeenCalled());
+    await waitFor(() => expect(mockOnSubmit).toHaveBeenCalled());
   });
 
   it('should call onClose when close button is clicked', async () => {
@@ -201,17 +200,17 @@ describe('InputModal', () => {
     );
     const inputModal = screen.getByRole('dialog', { name: 'Create File' });
     const inputTextBox = within(inputModal).getByRole('textbox');
-    const submitButton = within(inputModal).getByRole('button', { name: 'Create' });
-    const cancelButton = within(inputModal).getByRole('button', { name: 'Cancel' });
 
     const inputField = screen.getByRole('textbox');
     await user.type(inputField, 'test-file.txt');
 
     expect(inputTextBox).toHaveFocus();
     await user.tab();
-    waitFor(() => expect(submitButton).toHaveFocus());
+    await waitFor(() =>
+      expect(within(inputModal).getByRole('button', { name: 'Create' })).toHaveFocus()
+    );
     await user.tab();
-    expect(cancelButton).toHaveFocus();
+    expect(within(inputModal).getByRole('button', { name: 'Cancel' })).toHaveFocus();
   });
 
   it('should disable the submit button when isLoading is true', () => {
@@ -247,11 +246,12 @@ describe('InputModal', () => {
       />
     );
 
-    const submitButton = screen.getByRole('button', { name: 'Create' });
-    expect(submitButton).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Create' })).toBeDisabled();
 
     const inputField = screen.getByRole('textbox');
     await user.type(inputField, 'test-file.txt');
-    waitFor(() => expect(submitButton).not.toBeDisabled());
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Create' })).not.toBeDisabled()
+    );
   });
 });

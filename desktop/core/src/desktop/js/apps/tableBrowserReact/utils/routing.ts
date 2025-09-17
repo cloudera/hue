@@ -14,6 +14,8 @@ export interface TableBrowserRoute {
   sourceType?: string;
   database?: string;
   table?: string;
+  column?: string;
+  fields?: string[];
 }
 
 export function parseTableBrowserPath(pathname: string): TableBrowserRoute {
@@ -23,26 +25,38 @@ export function parseTableBrowserPath(pathname: string): TableBrowserRoute {
   }
   const rest = pathname.substring(idx + '/tablebrowser'.length);
   const segments = rest.split('/').filter(Boolean);
-  return {
+  const route = {
     sourceType: segments[0],
     database: segments[1],
-    table: segments[2]
-  };
+    table: segments[2],
+    column: segments[3]
+  } as TableBrowserRoute;
+  if (segments.length > 4) {
+    route.fields = segments.slice(4);
+  }
+  return route;
 }
 
 export function buildTableBrowserPath(
   base: string,
   sourceType?: string,
   database?: string,
-  table?: string
+  table?: string,
+  column?: string,
+  fields?: string[]
 ): string {
-  return [
+  const parts = [
     base,
     '/tablebrowser',
     sourceType ? `/${encodeURIComponent(sourceType)}` : '',
     database ? `/${encodeURIComponent(database)}` : '',
-    table ? `/${encodeURIComponent(table)}` : ''
-  ].join('');
+    table ? `/${encodeURIComponent(table)}` : '',
+    column ? `/${encodeURIComponent(column)}` : ''
+  ];
+  if (fields && fields.length) {
+    fields.forEach(f => parts.push(`/${encodeURIComponent(f)}`));
+  }
+  return parts.join('');
 }
 
 export function getTableBrowserBasePath(pathname: string = window.location.pathname): string {

@@ -10,10 +10,11 @@
 // License for the specific language governing permissions and limitations under
 // the License.
 
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Tabs as AntdTabs } from 'antd';
 import type { TabsProps as AntdTabsProps } from 'antd';
 import { i18nReact } from '../../../utils/i18nReact';
+import './Tabs.scss';
 
 export type TabKey =
   | 'overview'
@@ -36,7 +37,7 @@ export interface TabsProps {
   showPartitions?: boolean;
 }
 
-const Tabs = ({
+const TableBrowserTabs = ({
   activeKey,
   onChange,
   sampleCount,
@@ -45,7 +46,7 @@ const Tabs = ({
   showViewSql,
   showErd,
   showPartitions = true
-}: TabsProps): JSX.Element => {
+}: TabsProps): React.ReactElement | null => {
   const { t } = i18nReact.useTranslation();
   const items: NonNullable<AntdTabsProps['items']> = [
     { key: 'overview', label: t('Overview') },
@@ -65,7 +66,42 @@ const Tabs = ({
     ...(showErd ? [{ key: 'erd', label: t('ERD') }] : [])
   ];
 
-  return <AntdTabs activeKey={activeKey} onChange={key => onChange(key as TabKey)} items={items} />;
+  // Debounced remount key to coalesce multiple label updates into a single recalculation
+  const rawKey = useMemo(
+    () =>
+      JSON.stringify({
+        sampleCount: sampleCount ?? 0,
+        partitionsCount: partitionsCount ?? 0,
+        showQueries: !!showQueries,
+        showViewSql: !!showViewSql,
+        showErd: !!showErd,
+        showPartitions: !!showPartitions
+      }),
+    [sampleCount, partitionsCount, showQueries, showViewSql, showErd, showPartitions]
+  );
+  const [tabsKey, setTabsKey] = useState<string>(rawKey);
+  useEffect(() => {
+    const timeout = window.setTimeout(() => setTabsKey(rawKey), 120);
+    return () => window.clearTimeout(timeout);
+  }, [rawKey]);
+
+  // Suppress ink bar animation until labels stabilize after initial load
+  const [suppressInkAnim, setSuppressInkAnim] = useState<boolean>(true);
+  useEffect(() => {
+    setSuppressInkAnim(true);
+    const timeout = window.setTimeout(() => setSuppressInkAnim(false), 220);
+    return () => window.clearTimeout(timeout);
+  }, [rawKey]);
+
+  return (
+    <AntdTabs
+      key={tabsKey}
+      className={suppressInkAnim ? 'hue-tabs hue-tabs--no-ink-anim' : 'hue-tabs'}
+      activeKey={activeKey}
+      onChange={(key: string) => onChange(key as TabKey)}
+      items={items}
+    />
+  );
 };
 
-export default Tabs;
+export default TableBrowserTabs;

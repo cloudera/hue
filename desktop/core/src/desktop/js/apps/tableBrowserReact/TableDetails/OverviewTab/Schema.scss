@@ -1,0 +1,77 @@
+// Licensed to Cloudera, Inc. under one or more contributor license agreements.
+// Apache License 2.0 applies.
+
+@import '../../../../components/styles/variables';
+@import '../../../../components/styles/typeColors';
+
+// Make schema table rows more compact - only target this specific component
+.cuix.antd {
+  .hue-details-schema {
+    // Fix to get the link buttons in the schema table to be more compact when
+    // combined with the Popover component that messes stuff up.
+    .hue-paginated-table-container {
+      .ant-btn-link {
+        padding-top: 0;
+        padding-bottom: 0;
+        padding-left: 2px;
+        padding-right: 2px;
+        margin-left: -2px;
+        margin-right: -2px;
+        height: auto;
+      }
+    }
+    .schema-sample--loading {
+      color: var(--hue-text-secondary, rgba(0, 0, 0, 0.45));
+      font-style: italic;
+    }
+
+    .schema-sample-popover__pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin: 0;
+      font-family: var(
+        --hue-font-monospace,
+        ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        Monaco,
+        Consolas,
+        'Liberation Mono',
+        'Courier New',
+        monospace
+      );
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .schema-popover-trigger {
+      padding: 0;
+    }
+
+    .schema-type-cell {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    // Use shared type label style
+    .schema-type-label { @extend .hue-type-label; }
+
+    // Reuse shared color classes
+    .schema-type--number { @extend .hue-type--number; }
+    .schema-type--text { @extend .hue-type--text; }
+    .schema-type--boolean { @extend .hue-type--boolean; }
+    .schema-type--time { @extend .hue-type--time; }
+    .schema-type--json { @extend .hue-type--json; }
+    .schema-type--complex { @extend .hue-type--complex; }
+    .schema-type--other { @extend .hue-type--other; }
+  }
+
+  // Make struct type popover wider for better readability
+  .schema-type-popover {
+    .ant-popover-inner-content {
+      min-width: 400px;
+      max-width: 600px;
+    }
+  }
+}

@@ -25,14 +25,14 @@ export { default as TablesList } from './TableListing/TablesList';
 
 // Table Details
 export { default as TableDetails } from './TableDetails/TableDetails';
-export { default as Overview } from './TableDetails/Overview';
-export { default as DetailsProperties } from './TableDetails/DetailsProperties';
-export { default as DetailsSchema } from './TableDetails/DetailsSchema';
-export { default as Partitions } from './TableDetails/Partitions';
-export { default as Privileges } from './TableDetails/Privileges';
-export { default as Queries } from './TableDetails/Queries';
-export { default as ViewSql } from './TableDetails/ViewSql';
-export { default as SampleGrid } from './TableDetails/SampleGrid';
+export { default as Overview } from './TableDetails/OverviewTab/Overview';
+export { default as DetailsProperties } from './TableDetails/DetailsTab/DetailsProperties';
+export { default as DetailsSchema } from './TableDetails/DetailsTab/DetailsSchema';
+export { default as Partitions } from './TableDetails/PartitionsTab/Partitions';
+export { default as Privileges } from './TableDetails/PrivilegesTab/Privileges';
+export { default as Queries } from './TableDetails/QueriesTab/Queries';
+export { default as ViewSql } from './TableDetails/ViewSqlTab/ViewSql';
+export { default as SampleGrid } from './TableDetails/SampleTab/SampleGrid';
 
 // Shared Components
 export { default as Breadcrumbs } from './sharedComponents/Breadcrumbs';

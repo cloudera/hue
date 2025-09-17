@@ -15,7 +15,7 @@ import { Checkbox, Input } from 'antd';
 import { LinkButton } from 'cuix/dist/components/Button';
 import Loading from 'cuix/dist/components/Loading';
 import Modal from 'cuix/dist/components/Modal';
-import EmptyState from 'cuix/dist/components/EmptyState';
+// import EmptyState from 'cuix/dist/components/EmptyState';
 import Filter from 'cuix/dist/components/Filter';
 import DataLakeIcon from '@cloudera/cuix-core/icons/react/DataLakeIcon';
 import InlineDescriptionEditor from '../sharedComponents/InlineDescriptionEditor';
@@ -31,7 +31,7 @@ import { i18nReact } from '../../../utils/i18nReact';
 
 export interface DatabasesListProps {
   databases: string[];
-  loading: boolean;
+  isInitializing: boolean;
   isRefreshing: boolean;
   onRefresh?: () => void;
   dbFilter: string;
@@ -62,7 +62,7 @@ export interface DatabasesListProps {
 
 const DatabasesList = ({
   databases,
-  loading,
+  isInitializing,
   isRefreshing,
   onRefresh,
   dbFilter,
@@ -152,15 +152,6 @@ const DatabasesList = ({
     return actions;
   }, [onCreateDatabase, onDropDatabases, selected.length, t]);
 
-  if (!loading && filtered.length === 0) {
-    return (
-      <div>
-        <div style={{ marginBottom: 8 }}>{t('Databases')}</div>
-        <EmptyState className="hue-table-browser__empty-state" title={t('No databases')} />
-      </div>
-    );
-  }
-
   const columns: PaginatedColumnProps<{ name: string; description?: string }>[] = [
     {
       title: t('Database'),
@@ -206,13 +197,14 @@ const DatabasesList = ({
   const start = (dbPageNumber - 1) * dbPageSize;
   const pageData = data.slice(start, start + dbPageSize);
 
+  console.info('rendering');
   return (
     <div>
       <PageHeader
         title={sourceType?.toUpperCase()}
         icon={<DataLakeIcon />}
         onRefresh={onRefresh}
-        loading={loading}
+        loading={isInitializing || isRefreshing}
         isRefreshing={isRefreshing}
         sourceType={sourceType}
         database={database}
@@ -235,12 +227,12 @@ const DatabasesList = ({
 
       {/* Filter row with filter and toolbar */}
       <div
-        className={`hue-table-browser__filter-and-actions ${!!loading || isRefreshing ? 'disabled' : ''}`}
+        className={`hue-table-browser__filter-and-actions ${!!isInitializing || isRefreshing ? 'disabled' : ''}`}
       >
         <Filter
           search={{ placeholder: t('Filter databases') }}
           onChange={(output: FilterOutput) => {
-            if (!!loading || isRefreshing) {
+            if (!!isInitializing || isRefreshing) {
               return; // Prevent changes while loading
             }
             const searchValue = String(
@@ -256,35 +248,39 @@ const DatabasesList = ({
             <Toolbar
               actions={toolbarActions}
               selectedItems={selected}
-              loading={loading}
+              loading={isInitializing}
               isRefreshing={isRefreshing}
             />
           </div>
         )}
       </div>
-      <Loading spinning={!!loading || isRefreshing}>
-        <PaginatedTable<{ name: string; description?: string }>
-          data={pageData}
-          columns={columns}
-          rowKey="key"
-          sortByColumn={sortByColumn}
-          sortOrder={sortOrder}
-          setSortByColumn={column => setSortByColumn(String(column))}
-          setSortOrder={setSortOrder}
-          onRowSelect={selectedRows =>
-            setSelected((selectedRows as unknown as { name: string }[]).map(r => r.name))
-          }
-          pagination={{
-            pageStats: {
-              pageNumber: dbPageNumber,
-              totalPages,
-              pageSize: dbPageSize,
-              totalSize
-            },
-            setPageNumber: setDbPageNumber,
-            setPageSize: setDbPageSize
-          }}
-        />
+      <Loading spinning={!!isInitializing}>
+        {isInitializing ? null : (
+          <PaginatedTable<{ name: string; description?: string }>
+            loading={isRefreshing}
+            locale={{ emptyText: t('No results found') }}
+            data={pageData}
+            columns={columns}
+            rowKey="key"
+            sortByColumn={sortByColumn}
+            sortOrder={sortOrder}
+            setSortByColumn={column => setSortByColumn(String(column))}
+            setSortOrder={setSortOrder}
+            onRowSelect={selectedRows =>
+              setSelected((selectedRows as unknown as { name: string }[]).map(r => r.name))
+            }
+            pagination={{
+              pageStats: {
+                pageNumber: dbPageNumber,
+                totalPages,
+                pageSize: dbPageSize,
+                totalSize
+              },
+              setPageNumber: setDbPageNumber,
+              setPageSize: setDbPageSize
+            }}
+          />
+        )}
       </Loading>
 
       <Modal

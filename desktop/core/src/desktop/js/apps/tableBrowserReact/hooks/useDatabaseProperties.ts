@@ -53,10 +53,19 @@ export function useDatabaseProperties({
 
       try {
         setLoading(true);
+        const effectiveType = (sourceType || getConnectorIdOrType(connector) || 'hive')
+          .toString()
+          .toLowerCase();
+
+        // Skip Hive Metastore call for connectors that don't use it (e.g. PostgreSQL)
+        if (effectiveType === 'postgresql') {
+          setProperties(undefined);
+          return;
+        }
         const result = await post<{ status: number; data: DatabaseProperties }>(
           `/metastore/databases/${encodeURIComponent(databaseName)}/metadata`,
           {
-            source_type: sourceType || getConnectorIdOrType(connector) || 'hive'
+            source_type: effectiveType
           },
           {
             silenceErrors: true

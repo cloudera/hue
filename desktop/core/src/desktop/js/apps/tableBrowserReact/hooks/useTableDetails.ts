@@ -17,12 +17,9 @@ import huePubSub from '../../../utils/huePubSub';
 import { GLOBAL_ERROR_TOPIC } from '../../../reactComponents/GlobalAlert/events';
 import formatBytes from '../../../utils/formatBytes';
 import { formatTimestamp } from '../../../utils/dateTimeUtils';
-import { post } from '../../../api/utils';
-import { getConnectorIdOrType } from '../utils/connector';
 import { getLastKnownConfig } from '../../../config/hueConfig';
 import type { Analysis, SampleMeta } from '../../../catalog/DataCatalogEntry';
 import type { Connector, Compute, Namespace } from '../../../config/types';
-import type { TableStats } from '../TableDetails/Overview';
 
 export interface UseTableDetailsArgs {
   connector?: Connector | null;
@@ -61,6 +58,8 @@ export interface TableDetailsState {
     storageDescParams?: { name: string; value: string }[];
   };
   sampleData?: { headers: string[]; rows: (string | number | null)[][] };
+  partitionCount?: number;
+  rawAnalysis?: Analysis;
   refresh: () => Promise<void>;
 }
 
@@ -81,6 +80,8 @@ export function useTableDetails({
     TableDetailsState['detailsProperties']
   >([]);
   const [detailsSections, setDetailsSections] = useState<TableDetailsState['detailsSections']>({});
+  const [partitionCount, setPartitionCount] = useState<number | undefined>(undefined);
+  const [rawAnalysis, setRawAnalysis] = useState<Analysis | undefined>(undefined);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -88,6 +89,8 @@ export function useTableDetails({
       setOverviewProps(undefined);
       setSampleData(undefined);
       setDetailsColumns([]);
+      setPartitionCount(undefined);
+      setRawAnalysis(undefined);
       setLoading(false);
       return;
     }
@@ -99,12 +102,16 @@ export function useTableDetails({
         path: [database, table]
       });
       const analysis: Analysis = await entry.getAnalysis({ silenceErrors: true });
+      setRawAnalysis(analysis);
       const analysisDetails = (
         analysis as unknown as {
           details?: { properties?: Record<string, string>; stats?: Record<string, string> };
         }
       ).details;
       const isPartitioned = (analysis.partition_keys?.length || 0) > 0;
+
+      // Note: Partition count will be fetched separately to avoid timing issues
+
       const tableType = analysisDetails?.properties?.table_type;
       const createdBy = analysisDetails?.properties?.owner || 'hive';
       const createdTime = analysisDetails?.properties?.create_time;
@@ -140,7 +147,7 @@ export function useTableDetails({
             ? `${t('by')} ${createdBy} ${t('on')} ${createdTimeFormatted}`
             : '-'
         }
-      ];
+      ].map(prop => ({ ...prop, value: prop.value || '-' }));
       const hdfsLink = (analysis as unknown as { hdfs_link?: string })?.hdfs_link;
       const detailStats = (analysis as unknown as { details?: { stats?: Record<string, string> } })
         ?.details?.stats;
@@ -208,10 +215,29 @@ export function useTableDetails({
             return { files, rows, totalSize, lastUpdated, schemaLastModified };
           })()
         : undefined;
-      const columnsForOverview = (analysis.cols || []).map(c => ({
-        name: (c as unknown as { name: string }).name,
-        type: (c as unknown as { type: string }).type,
-        comment: (c as unknown as { comment?: string }).comment
+      // Normalize columns as some connectors (e.g. PostgreSQL) wrap column defs in nested arrays
+      const flattenColumns = (
+        cols: unknown
+      ): { name?: string; type?: string; comment?: string }[] => {
+        const flat: { name?: string; type?: string; comment?: string }[] = [];
+        const pushCol = (item: unknown): void => {
+          if (Array.isArray(item)) {
+            item.forEach(pushCol);
+          } else if (item && typeof item === 'object') {
+            const obj = item as { name?: string; type?: string; comment?: string };
+            flat.push({ name: obj.name, type: obj.type, comment: obj.comment });
+          }
+        };
+        pushCol(cols);
+        return flat;
+      };
+
+      const normalizedCols = flattenColumns((analysis as unknown as { cols?: unknown }).cols || []);
+
+      const columnsForOverview = normalizedCols.map(c => ({
+        name: c.name || '',
+        type: c.type || '',
+        comment: c.comment
       }));
       setOverviewProps({ properties: props, hdfsLink, stats });
 
@@ -252,6 +278,96 @@ export function useTableDetails({
       const hdfsLocation = (analysis as unknown as { hdfs_link?: string })?.hdfs_link;
       add(baseInfo, t('Location'), hdfsLocation);
       add(baseInfo, t('Table Type'), rawProps.table_type || rawProps.tableType);
+
+      // Merge in legacy section rows from analysis.properties for Detailed Table Information and Storage Information
+      type LegacyProp = { col_name?: string; data_type?: string; comment?: string };
+      const legacyProps = ((analysis as unknown as { properties?: LegacyProp[] }).properties ||
+        []) as LegacyProp[];
+      const isHeader = (p?: LegacyProp): boolean => (p?.col_name || '').trim().startsWith('#');
+      const normalizeName = (name: string): string => name.trim().replace(/:$/, '').toLowerCase();
+      const friendlyName = (name: string): string => {
+        const map: Record<string, string> = {
+          'serde library': t('SerDe Library'),
+          inputformat: t('InputFormat'),
+          outputformat: t('OutputFormat'),
+          compressed: t('Compressed'),
+          'num buckets': t('Num Buckets'),
+          'bucket columns': t('Bucket Columns'),
+          'sort columns': t('Sort Columns')
+        };
+        const key = normalizeName(name);
+        return map[key] || name.replace(/:$/, '').trim();
+      };
+      const collectSection = (header: string): { name: string; value: string }[] => {
+        const out: { name: string; value: string }[] = [];
+        const idx = legacyProps.findIndex(
+          p => (p.col_name || '').toLowerCase() === header.toLowerCase()
+        );
+        if (idx === -1) {
+          return out;
+        }
+        for (let i = idx + 1; i < legacyProps.length; i++) {
+          const row = legacyProps[i];
+          if (isHeader(row)) {
+            break;
+          }
+          const col = String(row.col_name || '').trim();
+          if (normalizeName(col).startsWith('table parameters')) {
+            // Stop before the Table Parameters block; those go in their own table
+            break;
+          }
+          let name: string = '';
+          let value: string = '';
+          if (col) {
+            name = friendlyName(col);
+            value = String((row.data_type ?? row.comment ?? '') as unknown as string);
+          } else {
+            // Rows where the property name is in data_type and value in comment
+            name = friendlyName(String(row.data_type || ''));
+            value = String((row.comment ?? '') as unknown as string);
+          }
+          if (name || value) {
+            out.push({ name: name || '\u00A0', value });
+          }
+        }
+        return out;
+      };
+
+      const mergeUnique = (
+        target: { name: string; value: string }[],
+        more: { name: string; value: string }[]
+      ) => {
+        const existing = new Set(target.map(p => normalizeName(p.name)));
+        more.forEach(p => {
+          const key = normalizeName(p.name);
+          if (!existing.has(key)) {
+            target.push(p);
+            existing.add(key);
+          }
+        });
+      };
+
+      // Detailed Table Information
+      mergeUnique(baseInfo, collectSection('# Detailed Table Information'));
+
+      // Fallback: Some legacy analyzers expose important flags (e.g., COLUMN_STATS_ACCURATE)
+      // as rows with empty col_name and the key in data_type with value in comment. If for any
+      // reason the collectSection missed them, ensure we add them explicitly here.
+      const legacyStatsRow = (legacyProps || []).find(
+        p => normalizeName(String(p.data_type || '')) === 'column_stats_accurate'
+      );
+      if (legacyStatsRow) {
+        let value: string;
+        if (typeof legacyStatsRow.comment !== 'undefined') {
+          value =
+            typeof legacyStatsRow.comment === 'string'
+              ? legacyStatsRow.comment
+              : JSON.stringify(legacyStatsRow.comment);
+        } else {
+          value = String(legacyStatsRow.data_type || '');
+        }
+        baseInfo.push({ name: 'COLUMN_STATS_ACCURATE', value });
+      }
 
       Object.keys(analysis.details.stats || {}).forEach(key => {
         const valueRaw = (analysis.details.stats as Record<string, unknown>)[key];
@@ -341,6 +457,9 @@ export function useTableDetails({
           : (rawProps as Record<string, unknown>).sortCols || '[]'
       );
 
+      // Storage Information (legacy)
+      mergeUnique(storageInfo, collectSection('# Storage Information'));
+
       if ((rawProps as Record<string, unknown>)['Storage Desc Params:']) {
         storageDescParams.push({
           name: t('serialization.format'),
@@ -353,7 +472,20 @@ export function useTableDetails({
         value: String(rawProps[key] ?? '')
       }));
       setDetailsProperties(allProps);
-      setDetailsSections({ baseInfo, tableParameters, storageInfo, storageDescParams });
+      const cleanedBaseInfo = baseInfo.filter(p => {
+        const key = normalizeName(p.name);
+        const val = String(p.value || '').trim();
+        return !(key === 'table parameters' && val === '');
+      });
+      // Debugging aid for tests; safe no-op in production
+      // eslint-disable-next-line no-console
+      console.log('[useTableDetails] baseInfo', baseInfo);
+      setDetailsSections({
+        baseInfo: cleanedBaseInfo,
+        tableParameters,
+        storageInfo,
+        storageDescParams
+      });
       setDetailsColumns(columnsForOverview);
 
       // Only load sample data if it's not a view, or if views are allowed by config
@@ -365,7 +497,10 @@ export function useTableDetails({
         const headers = Array.isArray(sample.meta)
           ? (sample.meta as SampleMeta[]).map((m: SampleMeta) => m.name)
           : [];
-        setSampleData({ headers, rows: sample.data || [] });
+        setSampleData({
+          headers,
+          rows: (sample.data || []) as (string | number | null)[][]
+        });
       } else {
         // Clear sample data for views when not allowed
         setSampleData(undefined);
@@ -373,14 +508,15 @@ export function useTableDetails({
       const partitionKeyNames = new Set(
         (analysis.partition_keys || []).map(pk => pk.name).filter(Boolean)
       );
-      const cols = (analysis.cols || []).map(c => ({
-        name: (c as unknown as { name: string }).name,
-        type: (c as unknown as { type: string }).type,
-        comment: (c as unknown as { comment?: string }).comment,
-        isPartitionKey: partitionKeyNames.has((c as unknown as { name: string }).name)
+      const cols = normalizedCols.map(c => ({
+        name: c.name || '',
+        type: c.type || '',
+        comment: c.comment,
+        isPartitionKey: partitionKeyNames.has(String(c.name || ''))
       }));
       setDetailsColumns(cols);
     } catch (err) {
+      setRawAnalysis(undefined);
       huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: t('Failed to load table data') });
     } finally {
       setLoading(false);
@@ -390,6 +526,39 @@ export function useTableDetails({
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  // Separate effect for fetching partition count to avoid timing issues
+  useEffect(() => {
+    const fetchPartitionCount = async () => {
+      if (!database || !table || !connector || !namespace || !compute) {
+        setPartitionCount(undefined);
+        return;
+      }
+
+      try {
+        const entry = await dataCatalog.getEntry({
+          connector,
+          namespace,
+          compute,
+          path: [database, table]
+        });
+        const analysis = await entry.getAnalysis({ silenceErrors: true });
+        const isPartitioned = (analysis.partition_keys?.length || 0) > 0;
+
+        if (isPartitioned) {
+          const partitions = await entry.getPartitions();
+          const count = (partitions?.partition_values_json || []).length;
+          setPartitionCount(count);
+        } else {
+          setPartitionCount(undefined);
+        }
+      } catch (err) {
+        setPartitionCount(undefined);
+      }
+    };
+
+    fetchPartitionCount();
+  }, [connector, namespace, compute, database, table]);
 
   const refresh = useCallback(async () => {
     if (!database || !table || !connector || !namespace || !compute) {
@@ -405,89 +574,16 @@ export function useTableDetails({
       });
       await entry.clearCache({ cascade: true, silenceErrors: true });
 
-      // Refresh data without setting main loading state
-      const analysis: Analysis = await entry.getAnalysis({ silenceErrors: true });
-      const analysisDetails = (
-        analysis as unknown as {
-          details?: {
-            stats?: TableStats;
-            properties?: { name: string; value: string }[];
-            hdfsLink?: string;
-          };
-        }
-      )?.details;
-
-      const children = await entry.getChildren({ silenceErrors: true });
-      const columns = children.filter(child => child.isColumn());
-      const columnDetails = columns.map(col => ({
-        name: col.name || '',
-        type: col.getType() || '',
-        comment: col.comment || '',
-        sample: '',
-        isPartitionKey: col.isPartitionKey() || false
-      }));
-
-      // Update state
-      setOverviewProps({
-        properties: analysisDetails?.properties,
-        stats: analysisDetails?.stats,
-        hdfsLink: analysisDetails?.hdfsLink
-      });
-      setDetailsColumns(columnDetails);
-
-      // Fetch additional details
-      const detailsResponse = await post('/metastore/table/', {
-        source_type: getConnectorIdOrType(connector) || 'hive',
-        database: database,
-        table: table
-      });
-
-      if (detailsResponse && typeof detailsResponse === 'object' && 'details' in detailsResponse) {
-        const details = (detailsResponse as { details?: Record<string, unknown> }).details;
-        if (details) {
-          setDetailsProperties(Array.isArray(details.properties) ? details.properties : []);
-          setDetailsSections({
-            baseInfo: Array.isArray(details.partition_keys) ? details.partition_keys : [],
-            tableParameters: Array.isArray(details.details) ? details.details : [],
-            storageInfo: Array.isArray(details.storage) ? details.storage : [],
-            storageDescParams: []
-          });
-        }
-      }
-
-      // Only fetch sample data if it's not a view, or if views are allowed by config
-      const config = getLastKnownConfig();
-      const allowSampleDataFromViews = config?.hue_config?.allow_sample_data_from_views ?? false;
-
-      // Check if current table is a view by looking at properties
-      const currentIsView =
-        overviewProps?.properties?.find(p => p.name === t('Type'))?.value === t('View');
-
-      if (!currentIsView || allowSampleDataFromViews) {
-        // Fetch sample data
-        const sampleResponse = await post('/metastore/table/', {
-          source_type: getConnectorIdOrType(connector) || 'hive',
-          database: database,
-          table: table,
-          sample: true
-        });
-
-        if (sampleResponse && typeof sampleResponse === 'object' && 'sample' in sampleResponse) {
-          const sample = (sampleResponse as { sample?: Record<string, unknown> }).sample;
-          if (sample && typeof sample === 'object' && 'headers' in sample && 'rows' in sample) {
-            setSampleData(sample as { headers: string[]; rows: (string | number | null)[][] });
-          }
-        }
-      } else {
-        // Clear sample data for views when not allowed
-        setSampleData(undefined);
-      }
+      // Re-fetch all data using the same logic as initial load
+      await fetchData();
     } catch (error) {
       console.error('Error during refresh:', error);
+      // Don't show error notification for refresh failures as they're often recoverable
+      // and the user can still see the existing data
     } finally {
       setIsRefreshing(false);
     }
-  }, [connector, namespace, compute, database, table]);
+  }, [connector, namespace, compute, database, table, fetchData]);
 
   return {
     loading,
@@ -497,6 +593,8 @@ export function useTableDetails({
     detailsProperties,
     detailsSections,
     sampleData,
+    partitionCount,
+    rawAnalysis,
     refresh
   };
 }

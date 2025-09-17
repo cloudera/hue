@@ -1,0 +1,12 @@
+.hue-tabs.hue-tabs--no-ink-anim {
+  .ant-tabs-ink-bar {
+    transition: none !important;
+  }
+}
+
+.hue-tabs {
+  .ant-tabs-ink-bar {
+    transition: transform 0.3s ease-in-out, width 0.3s ease-in-out;
+  }
+}
+

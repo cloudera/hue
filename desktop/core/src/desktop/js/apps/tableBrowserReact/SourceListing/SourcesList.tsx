@@ -9,7 +9,6 @@
 // WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 // License for the specific language governing permissions and limitations under
 // the License.
-
 import React, { useState } from 'react';
 import { LinkButton } from 'cuix/dist/components/Button/';
 import Loading from 'cuix/dist/components/Loading';
@@ -26,7 +25,7 @@ import { i18nReact } from '../../../utils/i18nReact';
 
 export interface SourcesListProps {
   sources: string[];
-  loading: boolean;
+  isInitializing: boolean;
   isRefreshing: boolean;
   onRefresh?: () => void;
   sourceFilter: string;
@@ -49,7 +48,7 @@ export interface SourcesListProps {
 
 const SourcesList = ({
   sources,
-  loading,
+  isInitializing,
   isRefreshing,
   onRefresh,
   sourceFilter,
@@ -115,7 +114,7 @@ const SourcesList = ({
         title={t('Home')}
         icon={<HomeIcon />}
         onRefresh={onRefresh}
-        loading={loading}
+        loading={isInitializing || isRefreshing}
         isRefreshing={isRefreshing}
         sourceType={sourceType}
         database={database}
@@ -136,42 +135,50 @@ const SourcesList = ({
         </h3>
       </div>
 
-      <Loading spinning={!!loading || isRefreshing}>
-        <div className="hue-table-browser__filter">
-          <Filter
-            search={{ placeholder: t('Filter sources') }}
-            onChange={(output: FilterOutput) => {
-              const searchValue = String(
-                (output as unknown as { search?: unknown[] }).search?.[0] ?? ''
-              );
-              if (searchValue !== sourceFilter) {
-                setSourceFilter(searchValue);
-              }
-            }}
+      <Loading spinning={!!isInitializing}>
+        {isInitializing ? null : sources.length === 0 ? (
+          <EmptyState
+            className="hue-table-browser__empty-state"
+            title={t('No data sources yet')}
+            subtitle={t('Connect a source to start browsing databases.')}
           />
-        </div>
-        {!loading && filtered.length === 0 ? (
-          <EmptyState className="hue-table-browser__empty-state" title={t('No sources')} />
         ) : (
-          <PaginatedTable<{ name: string }>
-            data={pageData}
-            columns={columns}
-            rowKey="key"
-            sortByColumn={sortByColumn}
-            sortOrder={sortOrder}
-            setSortByColumn={column => setSortByColumn(String(column))}
-            setSortOrder={setSortOrder}
-            pagination={{
-              pageStats: {
-                pageNumber: sourcePageNumber,
-                totalPages,
-                pageSize: sourcePageSize,
-                totalSize
-              },
-              setPageNumber: setSourcePageNumber,
-              setPageSize: setSourcePageSize
-            }}
-          />
+          <>
+            <div className="hue-table-browser__filter">
+              <Filter
+                search={{ placeholder: t('Filter sources') }}
+                onChange={(output: FilterOutput) => {
+                  const searchValue = String(
+                    (output as unknown as { search?: unknown[] }).search?.[0] ?? ''
+                  );
+                  if (searchValue !== sourceFilter) {
+                    setSourceFilter(searchValue);
+                  }
+                }}
+              />
+            </div>
+            <PaginatedTable<{ name: string }>
+              loading={isRefreshing}
+              locale={{ emptyText: t('No results found') }}
+              data={pageData}
+              columns={columns}
+              rowKey="key"
+              sortByColumn={sortByColumn}
+              sortOrder={sortOrder}
+              setSortByColumn={column => setSortByColumn(String(column))}
+              setSortOrder={setSortOrder}
+              pagination={{
+                pageStats: {
+                  pageNumber: sourcePageNumber,
+                  totalPages,
+                  pageSize: sourcePageSize,
+                  totalSize
+                },
+                setPageNumber: setSourcePageNumber,
+                setPageSize: setSourcePageSize
+              }}
+            />
+          </>
         )}
       </Loading>
     </div>

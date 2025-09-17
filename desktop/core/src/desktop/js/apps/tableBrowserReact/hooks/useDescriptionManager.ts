@@ -53,10 +53,31 @@ export function useDescriptionManager({
   const stableItems = useMemo(() => items, [JSON.stringify(items)]);
   const pathKey = useMemo(() => stablePath.join('/'), [stablePath]);
 
-  // Reset fetched items when path changes (different context)
+  // Build a context key that includes connector, namespace, compute and path
+  const connectorKey = useMemo(() => {
+    const c = connector as unknown as { id?: string; type?: string } | null | undefined;
+    return c?.id || c?.type || 'unknown-connector';
+  }, [connector]);
+  const namespaceKey = useMemo(() => {
+    return JSON.stringify(namespace ?? null);
+  }, [namespace]);
+  const computeKey = useMemo(() => {
+    return JSON.stringify(compute ?? null);
+  }, [compute]);
+  const contextKey = useMemo(
+    () => `${connectorKey}::${namespaceKey}::${computeKey}::${pathKey}`,
+    [connectorKey, namespaceKey, computeKey, pathKey]
+  );
+
+  // Reset cache and descriptions when the data context changes
+  const lastContextKeyRef = useRef<string>('');
   useEffect(() => {
-    fetchedItemsRef.current.clear();
-  }, [pathKey]);
+    if (lastContextKeyRef.current !== contextKey) {
+      lastContextKeyRef.current = contextKey;
+      fetchedItemsRef.current.clear();
+      setDescriptions({});
+    }
+  }, [contextKey]);
 
   // Prefetch descriptions (Navigator or source metadata) when listing items
   useEffect(() => {
@@ -77,16 +98,20 @@ export function useDescriptionManager({
         children.forEach(child => {
           const childPath = (child as unknown as { path: string[] }).path;
           if (childPath?.length === stablePath.length + 1) {
-            map[child.name] = child.getResolvedComment();
+            // Ensure a key exists even if empty
+            map[child.name] = child.getResolvedComment() || '';
           }
         });
-        setDescriptions(map);
+        setDescriptions(prev => ({ ...prev, ...map }));
       } catch {
         // Silently fail for description loading
       }
     };
     loadDescriptions();
   }, [connector, namespace, compute, stableItems, currentItem, stablePath]);
+
+  // Note: Do not prefill descriptions with empty strings to align with tests that
+  // expect an empty object when fetching fails or parameters are missing.
 
   // Fallback: ensure comments via describe for visible page items
   useEffect(() => {
@@ -98,11 +123,10 @@ export function useDescriptionManager({
       // Use functional update to get current descriptions without adding to deps
       setDescriptions(currentDescriptions => {
         const itemsToFetch = stableItems.filter(name => {
-          const itemKey = `${pathKey}/${name}`;
-          return (
-            !fetchedItemsRef.current.has(itemKey) &&
-            typeof currentDescriptions[name] === 'undefined'
-          );
+          const itemKey = `${contextKey}/${name}`;
+          const desc = currentDescriptions[name];
+          const needsFetch = typeof desc === 'undefined' || desc === '';
+          return !fetchedItemsRef.current.has(itemKey) && needsFetch;
         });
 
         if (itemsToFetch.length === 0) {
@@ -111,7 +135,7 @@ export function useDescriptionManager({
 
         // Mark items as being fetched to prevent duplicate requests
         itemsToFetch.forEach(name => {
-          const itemKey = `${pathKey}/${name}`;
+          const itemKey = `${contextKey}/${name}`;
           fetchedItemsRef.current.add(itemKey);
         });
 

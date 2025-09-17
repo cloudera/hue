@@ -69,12 +69,12 @@ jest.mock('./hooks/useTableBrowserController', () => ({
 }));
 
 // Mock heavy subcomponents before importing the page to avoid ESM issues in tests
-jest.mock('./TableDetails/Partitions', () => ({
+jest.mock('./TableDetails/PartitionsTab/Partitions', () => ({
   __esModule: true,
   default: () => <div data-testid="partitions" />
 }));
 
-jest.mock('./TableDetails/Overview', () => ({
+jest.mock('./TableDetails/OverviewTab/Overview', () => ({
   __esModule: true,
   default: () => <div data-testid="overview" />
 }));

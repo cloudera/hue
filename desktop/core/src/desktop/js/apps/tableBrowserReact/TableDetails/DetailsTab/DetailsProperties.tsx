@@ -6,9 +6,9 @@ import { Card } from 'antd';
 import Filter from 'cuix/dist/components/Filter';
 import PaginatedTable, {
   type ColumnProps as PaginatedColumnProps
-} from '../../../reactComponents/PaginatedTable/PaginatedTable';
+} from '../../../../reactComponents/PaginatedTable/PaginatedTable';
 import type { FilterOutput } from 'cuix/dist/components/Filter/types';
-import { i18nReact } from '../../../utils/i18nReact';
+import { i18nReact } from '../../../../utils/i18nReact';
 
 export interface PropertyRow {
   name: string;
@@ -62,31 +62,39 @@ const DetailsProperties = ({
   const filteredStorageInfo = filterList(storageInfo);
   const filteredStorageParams = filterList(storageDescParams);
 
-  const data = filteredProps.map(p => ({ key: p.name, ...p }));
+  const sortByName = (list: PropertyRow[]): PropertyRow[] =>
+    list.slice().sort((a, b) => a.name.localeCompare(b.name));
+
+  const sortedProps = sortByName(filteredProps);
+  const sortedBase = sortByName(filteredBase);
+  const sortedTableParams = sortByName(filteredTableParams);
+  const sortedStorageInfo = sortByName(filteredStorageInfo);
+  const sortedStorageParams = sortByName(filteredStorageParams);
+  const data = sortedProps.map(p => ({ key: p.name, ...p }));
   const totalSize = data.length;
   const totalPages = Math.max(Math.ceil(totalSize / pageSize), 1);
   const start = (pageNumber - 1) * pageSize;
   const pageData = data.slice(start, start + pageSize);
 
-  const baseData = filteredBase.map(p => ({ key: p.name, ...p }));
+  const baseData = sortedBase.map(p => ({ key: p.name, ...p }));
   const baseTotal = baseData.length;
   const baseTotalPages = Math.max(Math.ceil(baseTotal / pageSize), 1);
   const baseStart = (pageNumber - 1) * pageSize;
   const basePage = baseData.slice(baseStart, baseStart + pageSize);
 
-  const tpData = filteredTableParams.map(p => ({ key: p.name, ...p }));
+  const tpData = sortedTableParams.map(p => ({ key: p.name, ...p }));
   const tpTotal = tpData.length;
   const tpTotalPages = Math.max(Math.ceil(tpTotal / tpSize), 1);
   const tpStart = (tpPage - 1) * tpSize;
   const tpPageData = tpData.slice(tpStart, tpStart + tpSize);
 
-  const siData = filteredStorageInfo.map(p => ({ key: p.name, ...p }));
+  const siData = sortedStorageInfo.map(p => ({ key: p.name, ...p }));
   const siTotal = siData.length;
   const siTotalPages = Math.max(Math.ceil(siTotal / siSize), 1);
   const siStart = (siPage - 1) * siSize;
   const siPageData = siData.slice(siStart, siStart + siSize);
 
-  const sdpData = filteredStorageParams.map(p => ({ key: p.name, ...p }));
+  const sdpData = sortedStorageParams.map(p => ({ key: p.name, ...p }));
   const sdpTotal = sdpData.length;
   const sdpTotalPages = Math.max(Math.ceil(sdpTotal / sdpSize), 1);
   const sdpStart = (sdpPage - 1) * sdpSize;
@@ -120,7 +128,6 @@ const DetailsProperties = ({
       }
     }
   ];
-
   const hasStructured = !!(baseInfo || tableParameters || storageInfo || storageDescParams);
 
   return (
@@ -142,7 +149,6 @@ const DetailsProperties = ({
           }}
         />
       </div>
-
       {!hasStructured && (
         <PaginatedTable<PropertyRow & { key: string }>
           data={pageData}

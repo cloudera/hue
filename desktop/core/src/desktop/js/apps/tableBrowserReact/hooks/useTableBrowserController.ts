@@ -31,6 +31,8 @@ export interface TableBrowserController {
   navigateToSource: (sourceType: string) => void;
   navigateToDatabase: (database: string) => void;
   navigateToTable: (database: string, table: string) => void;
+  navigateToColumn: (database: string, table: string, column: string) => void;
+  navigateToField: (database: string, table: string, column: string, fields: string[]) => void;
 }
 
 export function useTableBrowserController(): TableBrowserController {
@@ -73,34 +75,58 @@ export function useTableBrowserController(): TableBrowserController {
   }, []);
 
   const navigateToSources = useCallback(() => {
-    changeURL(buildTableBrowserPath(basePath));
-    refreshFromLocation();
-  }, [basePath, refreshFromLocation]);
+    const newPath = buildTableBrowserPath(basePath);
+    changeURL(newPath);
+    setLocationPath(newPath);
+  }, [basePath]);
 
   const navigateToSource = useCallback(
     (sourceType: string) => {
-      changeURL(buildTableBrowserPath(basePath, sourceType));
-      refreshFromLocation();
+      const newPath = buildTableBrowserPath(basePath, sourceType);
+      changeURL(newPath);
+      setLocationPath(newPath);
     },
-    [basePath, refreshFromLocation]
+    [basePath]
   );
 
   const navigateToDatabase = useCallback(
     (database: string) => {
       const src = route.sourceType || 'hive';
-      changeURL(buildTableBrowserPath(basePath, src, database));
-      refreshFromLocation();
+      const newPath = buildTableBrowserPath(basePath, src, database);
+      changeURL(newPath);
+      setLocationPath(newPath);
     },
-    [basePath, route.sourceType, refreshFromLocation]
+    [basePath, route.sourceType]
   );
 
   const navigateToTable = useCallback(
     (database: string, table: string) => {
       const src = route.sourceType || 'hive';
-      changeURL(buildTableBrowserPath(basePath, src, database, table));
-      refreshFromLocation();
+      const newPath = buildTableBrowserPath(basePath, src, database, table);
+      changeURL(newPath);
+      setLocationPath(newPath);
     },
-    [basePath, route.sourceType, refreshFromLocation]
+    [basePath, route.sourceType]
+  );
+
+  const navigateToColumn = useCallback(
+    (database: string, table: string, column: string) => {
+      const src = route.sourceType || 'hive';
+      const newPath = buildTableBrowserPath(basePath, src, database, table, column);
+      changeURL(newPath);
+      setLocationPath(newPath);
+    },
+    [basePath, route.sourceType]
+  );
+
+  const navigateToField = useCallback(
+    (database: string, table: string, column: string, fields: string[]) => {
+      const src = route.sourceType || 'hive';
+      const newPath = buildTableBrowserPath(basePath, src, database, table, column, fields);
+      changeURL(newPath);
+      setLocationPath(newPath); // Manually update location path since changeURL doesn't trigger popstate
+    },
+    [basePath, route.sourceType]
   );
 
   return {
@@ -113,6 +139,8 @@ export function useTableBrowserController(): TableBrowserController {
     navigateToSources,
     navigateToSource,
     navigateToDatabase,
-    navigateToTable
+    navigateToTable,
+    navigateToColumn,
+    navigateToField
   };
 }

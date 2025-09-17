@@ -26,11 +26,16 @@ export interface PageHeaderProps {
   sourceType?: string;
   database?: string;
   table?: string;
+  column?: string;
+  fields?: string[];
   sourceOptions?: string[];
   onSelectSource?: (sourceType: string) => void;
   onClickDataSources?: () => void;
   onClickDatabases?: () => void;
   onClickDatabase?: (database: string) => void;
+  onClickTable?: (table: string) => void;
+  onClickColumn?: () => void;
+  onClickField?: (path: string[]) => void;
 }
 
 const PageHeader = ({
@@ -42,16 +47,21 @@ const PageHeader = ({
   sourceType,
   database,
   table,
+  column,
+  fields,
   sourceOptions,
   onSelectSource,
   onClickDataSources,
   onClickDatabases,
-  onClickDatabase
+  onClickDatabase,
+  onClickTable,
+  onClickColumn,
+  onClickField
 }: PageHeaderProps): JSX.Element | null => {
   const { t } = i18nReact.useTranslation();
 
   // Don't render if no title is provided and no breadcrumbs data
-  if (!title && !sourceType && !database && !table) {
+  if (!title && !sourceType && !database && !table && !column) {
     return null;
   }
 
@@ -75,17 +85,22 @@ const PageHeader = ({
       </div>
 
       {/* Second row: Breadcrumbs */}
-      {(sourceType || database || table) && (
+      {(sourceType || database || table || column) && (
         <div className="hue-table-browser__page-header__breadcrumbs-row">
           <Breadcrumbs
             sourceType={sourceType}
             database={database}
             table={table}
+            column={column}
+            fields={fields}
             sourceOptions={sourceOptions}
             onSelectSource={onSelectSource}
             onClickDataSources={onClickDataSources}
             onClickDatabases={onClickDatabases}
             onClickDatabase={onClickDatabase}
+            onClickTable={onClickTable}
+            onClickColumn={onClickColumn}
+            onClickField={onClickField}
           />
         </div>
       )}
