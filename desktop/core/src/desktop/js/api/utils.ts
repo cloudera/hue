@@ -75,9 +75,13 @@ axiosInstance.interceptors.request.use(config => {
   if (baseUrl) {
     config.baseURL = baseUrl;
   }
+  // Ensure headers object exists before setting Authorization
+  const headers = (config.headers || {}) as Record<string, string>;
   if (bearerToken) {
-    config.headers['Authorization'] = `Bearer ${bearerToken}`;
+    headers['Authorization'] = `Bearer ${bearerToken}`;
   }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (config as any).headers = headers;
   return config;
 });
 
@@ -87,6 +91,129 @@ axiosInstance.interceptors.response.use(response => {
   }
   return response;
 });
+
+// Dev-only API mock for Sentry privileges in Table Details Privileges tab
+// Enable by setting window.MOCK_SENTRY_PRIVILEGES = true
+(() => {
+  try {
+    const w = (window as hueWindow) || {};
+
+    type Authorizable = {
+      server?: string;
+      db?: string | null;
+      table?: string | null;
+      column?: string | null;
+    };
+
+    const buildPrivileges = (authorizable: Authorizable) => {
+      const server = authorizable?.server || 'server1';
+      const database = authorizable?.db || '';
+      const table = authorizable?.table || '';
+      const column = authorizable?.column || '';
+      const now = Math.floor(Date.now() / 1000);
+
+      const roles = ['analyst', 'data_scientist'];
+      const privileges: Array<{
+        server: string;
+        database: string;
+        table: string;
+        column: string;
+        URI: string;
+        action: string;
+        timestamp: number;
+        roleName: string;
+        grantOption: boolean;
+        scope: 'SERVER' | 'DATABASE' | 'TABLE' | 'COLUMN' | 'URI';
+      }> = [];
+
+      const add = (
+        roleName: string,
+        scope: 'SERVER' | 'DATABASE' | 'TABLE' | 'COLUMN' | 'URI',
+        action: string,
+        grantOption = false
+      ) => {
+        privileges.push({
+          server,
+          database: database || '',
+          table: table || '',
+          column: column || '',
+          URI: '',
+          action,
+          timestamp: now,
+          roleName,
+          grantOption,
+          scope
+        });
+      };
+
+      roles.forEach(role => {
+        // Always include a SERVER level ALL for visibility
+        add(role, 'SERVER', 'ALL', role === 'data_scientist');
+
+        if (database && !table) {
+          add(role, 'DATABASE', 'CREATE');
+          add(role, 'DATABASE', 'SELECT');
+        }
+        if (database && table && !column) {
+          add(role, 'TABLE', 'SELECT');
+          add(role, 'TABLE', 'INSERT', role === 'analyst');
+          add(role, 'TABLE', 'ALTER');
+        }
+        if (database && table && column) {
+          add(role, 'COLUMN', 'SELECT');
+        }
+      });
+
+      return privileges;
+    };
+
+    axiosInstance.interceptors.request.use(config => {
+      const url = (config && config.url) || '';
+      const method = (config && config.method) || 'get';
+      if (
+        method.toLowerCase() === 'post' &&
+        typeof url === 'string' &&
+        url.indexOf('/security/api/hive/list_sentry_privileges_by_authorizable') !== -1 &&
+        (w as hueWindow).MOCK_SENTRY_PRIVILEGES
+      ) {
+        // Short-circuit the request using a custom adapter
+        config.adapter = async () => {
+          let params: Record<string, unknown> = {};
+          try {
+            params = typeof config.data === 'string' ? qs.parse(config.data) : config.data || {};
+          } catch {}
+
+          let authorizable: Authorizable | undefined = undefined;
+          try {
+            const raw = (params as Record<string, unknown>)['authorizableHierarchy'];
+            if (typeof raw === 'string') {
+              authorizable = JSON.parse(raw) as Authorizable;
+            } else if (raw && typeof raw === 'object') {
+              authorizable = raw as Authorizable;
+            }
+          } catch {}
+
+          const privileges = buildPrivileges(authorizable || {});
+
+          return {
+            data: {
+              status: 0,
+              privileges
+            },
+            status: 200,
+            statusText: 'OK',
+            headers: {},
+            config,
+            request: {}
+          } as AxiosResponse;
+        };
+      }
+      return config;
+    });
+  } catch {
+    // noop
+  }
+})();
 
 export const getAxiosInstance = (): AxiosInstance => axiosInstance;
 

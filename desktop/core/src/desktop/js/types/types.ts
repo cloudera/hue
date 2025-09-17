@@ -69,4 +69,6 @@ export interface hueWindow {
   hueDebug?: HueDebug;
   hueDebugAnalytics?: boolean;
   gtag?: (type: string, name: string, parameters: { action: string; version: string }) => void;
+  // Dev flag to enable frontend-only mock for Sentry privileges
+  MOCK_SENTRY_PRIVILEGES?: boolean;
 }
