@@ -213,7 +213,9 @@ class S3FileSystem:
     except FileNotFoundError:
       # Check if it's a prefix (directory)
       try:
-        response = self.s3_client.list_objects_v2(Bucket=path.bucket, Prefix=path.key, Delimiter=S3_DELIMITER, MaxKeys=1)
+        # For directory check, append '/' to avoid matching files that start with same prefix
+        directory_prefix = path.key.rstrip("/") + "/"
+        response = self.s3_client.list_objects_v2(Bucket=path.bucket, Prefix=directory_prefix, Delimiter=S3_DELIMITER, MaxKeys=1)
         if response.get("CommonPrefixes") or response.get("Contents"):
           return S3Stat.for_directory(path)
         raise FileNotFoundError(f"Path not found: {path}")
