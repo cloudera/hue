@@ -72,20 +72,30 @@ class RazEventHandler:
       headers = dict(request.headers)
       data = request.body
 
-      # CRITICAL FIX: Send clean URL without query params to RAZ
-      # Query params are handled separately by boto3 and RAZ protobuf protocol
+      # CRITICAL FIX: Send clean URL and extract query params separately for RAZ
+      # RAZ expects params in protobuf format, not embedded in URL
       base_url = self._get_request_url(request)
 
-      # Remove query parameters from URL for RAZ signing
+      # Extract query parameters from URL for separate RAZ handling
       parsed_url = urlparse(base_url)
       clean_url = urlunparse((parsed_url.scheme, parsed_url.netloc, parsed_url.path, "", "", ""))
 
+      # Parse query parameters to send separately to RAZ
+      params = {}
+      if parsed_url.query:
+        from urllib.parse import parse_qs
+
+        parsed_params = parse_qs(parsed_url.query)
+        # Convert to flat dict (RAZ expects single values, not lists)
+        params = {key: values[0] if values else "" for key, values in parsed_params.items()}
+
       LOG.debug(f"Original URL with params: {base_url}")
       LOG.debug(f"Clean URL for RAZ: {clean_url}")
+      LOG.debug(f"Extracted params for RAZ: {params}")
 
-      # Get RAZ signed headers using clean URL (params handled by boto3)
-      LOG.debug(f"RAZ Call with CLEAN URL: action={method}, path={clean_url}, headers={headers}, data={data}")
-      raz_headers = self.raz_client.get_url(action=method, path=clean_url, headers=headers, data=data)
+      # Get RAZ signed headers with clean URL and separate params
+      LOG.debug(f"RAZ Call: action={method}, path={clean_url}, params={params}, headers={headers}, data={data}")
+      raz_headers = self.raz_client.get_url(action=method, path=clean_url, params=params, headers=headers, data=data)
 
       if not raz_headers:
         raise Exception("RAZ returned no signed headers")
