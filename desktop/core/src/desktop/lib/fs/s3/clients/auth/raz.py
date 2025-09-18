@@ -73,22 +73,29 @@ class RazEventHandler:
       headers = dict(request.headers)
       data = request.body
 
-      # CRITICAL FIX: Let RAZ handle User-Agent prefix naturally
-      # Don't pre-modify User-Agent - RAZ will add the user prefix during signing
-      # This prevents double-prefix issues where we add it and RAZ adds it again
+      # CRITICAL FIX: Let RAZ sign for original headers, then apply ONLY signed headers
+      # User-Agent is not in SignedHeaders, so RAZ modifications don't affect signature
 
-      # Get RAZ signed headers with FINAL headers that will be sent
-      LOG.debug(f"RAZ Call with final headers: action={method}, path={url}, headers={headers}, data={data}")
+      # Get RAZ signed headers using original headers
+      LOG.debug(f"RAZ Call with ORIGINAL headers: action={method}, path={url}, headers={headers}, data={data}")
       raz_headers = self.raz_client.get_url(action=method, path=url, headers=headers, data=data)
 
       if not raz_headers:
         raise Exception("RAZ returned no signed headers")
 
-      # Apply RAZ headers to the unsigned request
-      LOG.debug(f"Applying RAZ headers to unsigned request: {list(raz_headers.keys())}")
+      # Apply ONLY the signed headers from RAZ, not all headers
+      # User-Agent is not in SignedHeaders, so modifications should not affect signature
+      signed_headers_only = ["Host", "Authorization", "X-Amz-Date", "X-Amz-Security-Token", "x-amz-content-sha256"]
+
+      LOG.debug(f"RAZ returned headers: {list(raz_headers.keys())}")
+      LOG.debug(f"Applying ONLY signed headers to avoid contamination: {signed_headers_only}")
+
       for header_name, header_value in raz_headers.items():
-        request.headers[header_name] = header_value
-        LOG.debug(f"Applied RAZ header: {header_name} = {header_value[:50]}...")
+        if header_name in signed_headers_only:
+          request.headers[header_name] = header_value
+          LOG.debug(f"Applied SIGNED RAZ header: {header_name} = {header_value[:50]}...")
+        else:
+          LOG.debug(f"SKIPPED non-signed header: {header_name} = {header_value[:50]}... (not in SignedHeaders)")
 
       # CRITICAL: Update request URL to match what RAZ signed for
       if self.connector_config.provider.lower() == "aws":
