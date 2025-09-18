@@ -63,11 +63,15 @@ class RazEventHandler:
       if not raz_headers:
         raise Exception("RAZ returned no signed headers")
 
-      # Update request headers with RAZ signed headers
-      request.headers.update(raz_headers)
+      # Update request headers with RAZ signed headers (HTTPHeaders object)
+      LOG.debug(f"Applying RAZ headers to boto3 request: {list(raz_headers.keys())}")
+      for header_name, header_value in raz_headers.items():
+        request.headers[header_name] = header_value
+        LOG.debug(f"Applied RAZ header: {header_name} = {header_value[:50]}...")
 
       # Mark request as pre-signed to skip boto3 signing
-      request.context["pre_signed"] = True
+      request.context["skip_signing"] = True
+      LOG.debug("Marked request as pre-signed to skip boto3 signing")
 
     except Exception as e:
       LOG.error(f"Failed to sign request with RAZ: {e}")
@@ -77,14 +81,34 @@ class RazEventHandler:
     """
     Handle before-send event.
     This is called after signing but before sending.
-    We clean up any leftover AWS headers here.
+    Verify RAZ headers are still present and log final request state.
     """
-    # TODO: Is this needed?
-    # Remove any AWS specific headers that RAZ doesn't need
-    aws_headers = ["X-Amz-Security-Token", "X-Amz-Date", "X-Amz-Content-SHA256", "Authorization"]
+    LOG.debug("Before-send: Verifying RAZ headers are present")
 
-    for header in aws_headers:
-      request.headers.pop(header, None)
+    # Check for key RAZ headers
+    raz_headers = ["Authorization", "X-Amz-Date", "X-Amz-Security-Token", "Host"]
+    missing_headers = []
+
+    for header in raz_headers:
+      if header in request.headers:
+        header_value = request.headers[header]
+        LOG.debug(f"RAZ header present: {header} = {header_value[:50]}...")
+      else:
+        missing_headers.append(header)
+        LOG.error(f"RAZ header MISSING: {header}")
+
+    if missing_headers:
+      LOG.error(f"CRITICAL: Missing RAZ headers: {missing_headers}")
+      LOG.error("This explains the 403 error - request not properly signed")
+    else:
+      LOG.debug("All RAZ headers present in final request")
+
+    # Log final request URL for debugging
+    LOG.debug(f"Final request URL: {request.url}")
+    LOG.debug(f"Final request method: {request.method}")
+    LOG.debug(f"Request context: {request.context}")
+
+    # Don't remove headers - they're needed for RAZ authentication
 
   def _get_request_url(self, request: AWSRequest) -> str:
     """
@@ -180,6 +204,7 @@ class RazAuthProvider(S3AuthProvider):
 
     # Register RAZ handlers with the session's event system
     self.session.events.register("before-sign.*.*", self.raz_event_handler._handle_before_sign)
+    self.session.events.register("before-send.*.*", self.raz_event_handler._handle_before_send)
 
   def get_credentials(self) -> Dict[str, Any]:
     """
