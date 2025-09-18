@@ -56,7 +56,7 @@ class RazEventHandler:
       data = request.body
 
       # Get RAZ signed headers
-      raz_headers = self.raz_client.get_url(action=method, url=url, headers=headers, data=data)
+      raz_headers = self.raz_client.get_url(action=method, path=url, headers=headers, data=data)
 
       if not raz_headers:
         raise Exception("RAZ returned no signed headers")
