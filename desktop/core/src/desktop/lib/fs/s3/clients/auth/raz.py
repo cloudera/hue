@@ -127,7 +127,7 @@ class RazEventHandler:
   def _get_request_url(self, request: AWSRequest) -> str:
     """
     Get request URL in RAZ-compatible format based on provider type.
-    AWS requires virtual-hosted style with :443, generic providers use original format.
+    AWS uses virtual-hosted style (NO :443 port), generic providers use original format.
     """
     provider = self.connector_config.provider.lower()
 
@@ -137,7 +137,7 @@ class RazEventHandler:
       return self._get_generic_provider_url(request)
 
   def _get_aws_virtual_hosted_url(self, request: AWSRequest) -> str:
-    """Convert AWS URLs to virtual-hosted style with :443 port (legacy RAZ requirement)"""
+    """Convert AWS URLs to virtual-hosted style WITHOUT :443 port (for Host header consistency)"""
     url_parts = list(urlparse(request.url))
 
     # Extract bucket and key from path
@@ -151,21 +151,21 @@ class RazEventHandler:
       # Get region from connector config (not hardcoded)
       region = self.connector_config.region or "us-east-1"
 
-      # Build virtual-hosted hostname with explicit :443 port
+      # Build virtual-hosted hostname WITHOUT :443 port (for Host header consistency)
       if "s3." in url_parts[1]:
         # Regional endpoint: s3.us-west-2.amazonaws.com
-        virtual_host = f"{bucket_name}.{url_parts[1]}:443"
+        virtual_host = f"{bucket_name}.{url_parts[1]}"
       else:
         # Standard endpoint: s3.amazonaws.com
-        virtual_host = f"{bucket_name}.s3.{region}.amazonaws.com:443"
+        virtual_host = f"{bucket_name}.s3.{region}.amazonaws.com"
 
       # Set virtual-hosted URL components
       url_parts[1] = virtual_host
       url_parts[2] = f"/{key_path}" if key_path else "/"
     else:
-      # Root or bucket listing - add :443 port for AWS
-      if ":" not in url_parts[1]:
-        url_parts[1] = f"{url_parts[1]}:443"
+      # Root or bucket listing - keep original host (NO :443 port for consistency)
+      # AWS HTTPS is implied, explicit port causes Host header mismatch
+      pass
 
     # Add query parameters
     if request.params:
