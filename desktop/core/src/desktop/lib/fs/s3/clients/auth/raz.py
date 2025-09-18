@@ -73,8 +73,17 @@ class RazEventHandler:
       headers = dict(request.headers)
       data = request.body
 
-      # Get RAZ signed headers
-      LOG.debug(f"RAZ Call: action={method}, path={url}, headers={headers}, data={data}")
+      # CRITICAL FIX: Ensure User-Agent matches what RAZ expects
+      if "User-Agent" in headers:
+        original_ua = headers["User-Agent"]
+        # RAZ expects user prefix in User-Agent for signature calculation
+        if not original_ua.startswith(f"user:{self.user},"):
+          expected_ua = f"user:{self.user},{original_ua}"
+          headers["User-Agent"] = expected_ua
+          LOG.debug(f"Pre-adjusting User-Agent for RAZ: {original_ua[:50]}... → {expected_ua[:50]}...")
+
+      # Get RAZ signed headers with FINAL headers that will be sent
+      LOG.debug(f"RAZ Call with final headers: action={method}, path={url}, headers={headers}, data={data}")
       raz_headers = self.raz_client.get_url(action=method, path=url, headers=headers, data=data)
 
       if not raz_headers:
