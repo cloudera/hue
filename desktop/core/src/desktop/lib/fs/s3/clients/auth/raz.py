@@ -78,7 +78,15 @@ class RazEventHandler:
         request.headers[header_name] = header_value
         LOG.debug(f"Applied RAZ header: {header_name} = {header_value[:50]}...")
 
-      LOG.debug("RAZ headers applied to unsigned request - ready for S3")
+      # CRITICAL: Update request URL to match what RAZ signed for
+      if self.connector_config.provider.lower() == "aws":
+        # For AWS, boto3 request URL must match the virtual-hosted URL that RAZ signed
+        original_url = request.url
+        raz_url = url  # This is the virtual-hosted URL we sent to RAZ
+        request.url = raz_url
+        LOG.debug(f"Updated request URL to match RAZ signature: {original_url} → {raz_url}")
+
+      LOG.debug("RAZ headers applied and URL synchronized - ready for S3")
 
     except Exception as e:
       LOG.error(f"Failed to add RAZ headers to unsigned request: {e}")
