@@ -273,7 +273,12 @@ class RazClient(object):
 
     # Raz signed request proto call expects data as bytes instead of str.
     if data is not None and not isinstance(data, bytes):
-      data = data.encode()
+      try:
+        data = data.encode()
+      except Exception:
+        # Handle any encoding issues (boto3 streaming objects, Unicode errors, etc.)
+        LOG.debug("Data cannot be encoded - using empty bytes for RAZ authorization")
+        data = b""
 
     raz_req = raz_signer.SignRequestProto(
         endpoint_prefix=self.service_params['endpoint_prefix'],
