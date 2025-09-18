@@ -59,6 +59,14 @@ class RazEventHandler:
     Since we use UNSIGNED, this adds RAZ headers to the unsigned request.
     """
     try:
+      # ORIGINAL REQUEST DEBUG
+      LOG.debug("=== ORIGINAL REQUEST DEBUG ===")
+      LOG.debug(f"Original Method: {request.method}")
+      LOG.debug(f"Original URL: {request.url}")
+      LOG.debug(f"Original Host: {request.headers.get('Host', 'MISSING')}")
+      LOG.debug(f"Original User-Agent: {request.headers.get('User-Agent', 'MISSING')[:100]}...")
+      LOG.debug("===============================")
+
       # Get request details
       url = self._get_request_url(request)
       method = request.method
@@ -85,6 +93,17 @@ class RazEventHandler:
         raz_url = url  # This is the virtual-hosted URL we sent to RAZ
         request.url = raz_url
         LOG.debug(f"Updated request URL to match RAZ signature: {original_url} → {raz_url}")
+
+      # CRITICAL DEBUG: Log exact signature components
+      LOG.debug("=== SIGNATURE DEBUG ===")
+      LOG.debug(f"Method: {request.method}")
+      LOG.debug(f"Final URL: {request.url}")
+      LOG.debug(f"Host header: {request.headers.get('Host', 'MISSING')}")
+      LOG.debug(f"Authorization header: {request.headers.get('Authorization', 'MISSING')[:100]}...")
+      LOG.debug(f"User-Agent header: {request.headers.get('User-Agent', 'MISSING')[:100]}...")
+      LOG.debug(f"X-Amz-Date: {request.headers.get('X-Amz-Date', 'MISSING')}")
+      LOG.debug(f"X-Amz-Content-Sha256: {request.headers.get('x-amz-content-sha256', 'MISSING')}")
+      LOG.debug("========================")
 
       LOG.debug("RAZ headers applied and URL synchronized - ready for S3")
 
@@ -121,6 +140,17 @@ class RazEventHandler:
     # Log final request URL for debugging
     LOG.debug(f"Final request URL: {request.url}")
     LOG.debug(f"Final request method: {request.method}")
+
+    # BEFORE-SEND DEBUG: Compare with what we signed
+    LOG.debug("=== BEFORE-SEND SIGNATURE DEBUG ===")
+    LOG.debug(f"Method: {request.method}")
+    LOG.debug(f"Final URL: {request.url}")
+    LOG.debug(f"Host header: {request.headers.get('Host', 'MISSING')}")
+    LOG.debug(f"Authorization: {request.headers.get('Authorization', 'MISSING')[:100]}...")
+    LOG.debug(f"User-Agent: {request.headers.get('User-Agent', 'MISSING')[:100]}...")
+    LOG.debug(f"X-Amz-Date: {request.headers.get('X-Amz-Date', 'MISSING')}")
+    LOG.debug(f"X-Amz-Content-Sha256: {request.headers.get('x-amz-content-sha256', 'MISSING')}")
+    LOG.debug("===================================")
 
     # Don't remove headers - they're needed for RAZ authentication
 
