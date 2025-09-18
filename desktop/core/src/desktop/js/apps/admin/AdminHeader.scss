@@ -20,11 +20,11 @@
   .admin-header {
     display: flex;
     align-items: center;
-    // position: sticky;
-    // top: 0;
-    // background-color: $fluidx-gray-100;
-    // z-index: 100;
-    // padding: 16px 0;
+    position: sticky;
+    top: 0;
+    background-color: $fluidx-gray-100;
+    z-index: 100;
+    padding: 16px 0;
 
     .admin-header__select-dropdown {
       border: 1px solid $fluidx-gray-600;

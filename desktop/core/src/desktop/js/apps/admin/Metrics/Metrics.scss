@@ -20,6 +20,8 @@
   background-color: $fluidx-gray-100;
   padding: 24px;
   min-height: calc(100vh - 120px);
+  max-height: calc(100vh - 120px);
+  overflow: auto;
 
   .metrics-heading {
     font-size: $font-size-base;
@@ -31,7 +33,11 @@
     display: flex;
     flex-direction: column;
     gap: $font-size-base;
-    margin-top: 20px;
-    position: relative;
+    margin-top: 16px;
+
+    .hue-paginated-table-container {
+      background-color: $fluidx-white;
+      border-radius: 4px;
+    }
   }
 }
