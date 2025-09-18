@@ -68,17 +68,24 @@ class RazEventHandler:
       LOG.debug("===============================")
 
       # Get request details
-      url = self._get_request_url(request)
       method = request.method
       headers = dict(request.headers)
       data = request.body
 
-      # CRITICAL FIX: Let RAZ sign for original headers, then apply ONLY signed headers
-      # User-Agent is not in SignedHeaders, so RAZ modifications don't affect signature
+      # CRITICAL FIX: Send clean URL without query params to RAZ
+      # Query params are handled separately by boto3 and RAZ protobuf protocol
+      base_url = self._get_request_url(request)
 
-      # Get RAZ signed headers using original headers
-      LOG.debug(f"RAZ Call with ORIGINAL headers: action={method}, path={url}, headers={headers}, data={data}")
-      raz_headers = self.raz_client.get_url(action=method, path=url, headers=headers, data=data)
+      # Remove query parameters from URL for RAZ signing
+      parsed_url = urlparse(base_url)
+      clean_url = urlunparse((parsed_url.scheme, parsed_url.netloc, parsed_url.path, "", "", ""))
+
+      LOG.debug(f"Original URL with params: {base_url}")
+      LOG.debug(f"Clean URL for RAZ: {clean_url}")
+
+      # Get RAZ signed headers using clean URL (params handled by boto3)
+      LOG.debug(f"RAZ Call with CLEAN URL: action={method}, path={clean_url}, headers={headers}, data={data}")
+      raz_headers = self.raz_client.get_url(action=method, path=clean_url, headers=headers, data=data)
 
       if not raz_headers:
         raise Exception("RAZ returned no signed headers")
@@ -101,9 +108,25 @@ class RazEventHandler:
       if self.connector_config.provider.lower() == "aws":
         # For AWS, boto3 request URL must match the virtual-hosted URL that RAZ signed
         original_url = request.url
-        raz_url = url  # This is the virtual-hosted URL we sent to RAZ
-        request.url = raz_url
-        LOG.debug(f"Updated request URL to match RAZ signature: {original_url} → {raz_url}")
+
+        # Build the clean URL but preserve query parameters from original request
+        parsed_original = urlparse(original_url)
+        parsed_clean = urlparse(clean_url)
+
+        # Use RAZ's virtual-hosted URL but keep original query parameters
+        final_url = urlunparse(
+          (
+            parsed_clean.scheme,
+            parsed_clean.netloc,
+            parsed_clean.path,
+            parsed_original.params,
+            parsed_original.query,
+            parsed_original.fragment,
+          )
+        )
+
+        request.url = final_url
+        LOG.debug(f"Updated request URL to match RAZ signature: {original_url} → {final_url}")
 
       # CRITICAL DEBUG: Log exact signature components
       LOG.debug("=== SIGNATURE DEBUG ===")
