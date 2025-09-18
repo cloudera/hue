@@ -20,6 +20,7 @@ from typing import Any, Dict, TYPE_CHECKING
 from urllib.parse import urlencode, urlparse, urlunparse
 
 import boto3
+from botocore import UNSIGNED
 from botocore.awsrequest import AWSRequest
 
 from desktop.lib.fs.s3.clients.base import S3AuthProvider
@@ -43,11 +44,19 @@ class RazEventHandler:
     # Use existing S3RazClient which has the correct get_url() interface
     self.raz_client = S3RazClient(username=user)
 
+  def _handle_choose_signer(self, **kwargs):
+    """
+    Handle choose-signer event.
+    Tell boto3 to use no signer - RAZ handles all signing.
+    """
+
+    LOG.debug("choose-signer: Using UNSIGNED (RAZ will handle signing)")
+    return UNSIGNED
+
   def _handle_before_sign(self, request: AWSRequest, **kwargs) -> None:
     """
     Handle before-sign event.
-    This is called before boto3 would normally sign the request.
-    We intercept here to get RAZ to sign instead.
+    Since we use UNSIGNED, this adds RAZ headers to the unsigned request.
     """
     try:
       # Get request details
@@ -57,24 +66,22 @@ class RazEventHandler:
       data = request.body
 
       # Get RAZ signed headers
-      LOG.debug(f"NEW RAZ Call: action={method}, path={url}, headers={headers}, data={data}")
+      LOG.debug(f"RAZ Call: action={method}, path={url}, headers={headers}, data={data}")
       raz_headers = self.raz_client.get_url(action=method, path=url, headers=headers, data=data)
 
       if not raz_headers:
         raise Exception("RAZ returned no signed headers")
 
-      # Update request headers with RAZ signed headers (HTTPHeaders object)
-      LOG.debug(f"Applying RAZ headers to boto3 request: {list(raz_headers.keys())}")
+      # Apply RAZ headers to the unsigned request
+      LOG.debug(f"Applying RAZ headers to unsigned request: {list(raz_headers.keys())}")
       for header_name, header_value in raz_headers.items():
         request.headers[header_name] = header_value
         LOG.debug(f"Applied RAZ header: {header_name} = {header_value[:50]}...")
 
-      # Mark request as pre-signed to skip boto3 signing
-      request.context["skip_signing"] = True
-      LOG.debug("Marked request as pre-signed to skip boto3 signing")
+      LOG.debug("RAZ headers applied to unsigned request - ready for S3")
 
     except Exception as e:
-      LOG.error(f"Failed to sign request with RAZ: {e}")
+      LOG.error(f"Failed to add RAZ headers to unsigned request: {e}")
       raise
 
   def _handle_before_send(self, request: AWSRequest, **kwargs) -> None:
@@ -106,7 +113,6 @@ class RazEventHandler:
     # Log final request URL for debugging
     LOG.debug(f"Final request URL: {request.url}")
     LOG.debug(f"Final request method: {request.method}")
-    LOG.debug(f"Request context: {request.context}")
 
     # Don't remove headers - they're needed for RAZ authentication
 
@@ -199,26 +205,29 @@ class RazAuthProvider(S3AuthProvider):
     # Create RAZ event handler with connector config for provider-aware URL formatting
     self.raz_event_handler = RazEventHandler(user=user, connector_config=connector_config)
 
-    # Store boto3 session with RAZ event handlers
-    self.session = boto3.Session(aws_access_key_id="dummy", aws_secret_access_key="dummy", region_name=connector_config.region)
+    # Create boto3 session with RAZ event handlers (clean approach with UNSIGNED signer)
+    self.session = boto3.Session(region_name=connector_config.region)
 
     # Register RAZ handlers with the session's event system
+    self.session.events.register("choose-signer.*.*", self.raz_event_handler._handle_choose_signer)
     self.session.events.register("before-sign.*.*", self.raz_event_handler._handle_before_sign)
     self.session.events.register("before-send.*.*", self.raz_event_handler._handle_before_send)
 
+    LOG.debug("Created RAZ session with choose-signer=UNSIGNED and before-sign=RAZ headers")
+
   def get_credentials(self) -> Dict[str, Any]:
     """
-    Return dummy credentials.
-    Real signing is done via event handlers.
+    Return no credentials - UNSIGNED signer handles authentication.
+    Real signing is done via RAZ event handlers.
     """
-    return {"access_key_id": "dummy", "secret_access_key": "dummy"}
+    return {}
 
   def get_session_kwargs(self) -> Dict[str, Any]:
     """
     Get kwargs for creating boto3 session.
-    Returns pre-configured session with RAZ event handlers.
+    Returns minimal kwargs since we use UNSIGNED signer.
     """
-    return {"aws_access_key_id": "dummy", "aws_secret_access_key": "dummy", "region_name": self.connector_config.region}
+    return {"region_name": self.connector_config.region}
 
   def get_session(self):
     """
