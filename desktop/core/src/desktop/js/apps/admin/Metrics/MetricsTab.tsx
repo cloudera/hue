@@ -14,59 +14,53 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import MetricsTable, { MetricsResponse, MetricsTableProps } from './MetricsTable';
 import Loading from 'cuix/dist/components/Loading';
 import Alert from 'cuix/dist/components/Alert';
-import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
+import { get } from '../../../api/utils';
 import { i18nReact } from '../../../utils/i18nReact';
 import AdminHeader from '../AdminHeader';
 
 import './Metrics.scss';
 
 const Metrics: React.FC = (): JSX.Element => {
+  const [metrics, setMetrics] = useState<MetricsResponse>();
   const [filteredKeys, setFilteredKeys] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>();
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedMetric, setSelectedMetric] = useState<string>('All');
   const [filteredMetricsData, setFilteredMetricsData] = useState<MetricsTableProps[]>([]);
 
-  const {
-    data: metrics,
-    loading,
-    error
-  } = useLoadData<MetricsResponse>('/desktop/metrics/', {
-    params: { format: 'json' },
-    onSuccess: response => {
-      const keys = Object.keys(response.metric).filter(
-        key =>
-          !key.startsWith('auth') &&
-          !key.startsWith('multiprocessing') &&
-          !key.startsWith('python.gc')
-      );
-      setFilteredKeys(keys);
-    }
-  });
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await get<MetricsResponse>('/desktop/metrics/', { format: 'json' });
+        setMetrics(response);
+        const keys = Object.keys(response.metric).filter(
+          key =>
+            !key.startsWith('auth') &&
+            !key.startsWith('multiprocessing') &&
+            !key.startsWith('python.gc')
+        );
+        setFilteredKeys(keys);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const parseMetricsData = useCallback(
-    (data: MetricsResponse) => {
-      return filteredKeys.map(key => ({
-        caption: key,
-        dataSource: Object.keys(data.metric[key]).map(subKey => ({
-          name: subKey,
-          value: data.metric[key][subKey]
-        }))
-      }));
-    },
-    [filteredKeys]
-  );
+    fetchData();
+  }, []);
 
-  const processedData = useMemo(() => {
+  useEffect(() => {
     if (!metrics) {
-      return [];
+      return;
     }
 
-    const parsedData = parseMetricsData(metrics);
-    return parsedData
+    const filteredData = parseMetricsData(metrics)
       .map(tableData => ({
         ...tableData,
         dataSource: tableData.dataSource.filter(data =>
@@ -74,11 +68,19 @@ const Metrics: React.FC = (): JSX.Element => {
         )
       }))
       .filter(tableData => tableData.dataSource.length > 0);
-  }, [metrics, parseMetricsData, searchQuery]);
 
-  useEffect(() => {
-    setFilteredMetricsData(processedData);
-  }, [processedData]);
+    setFilteredMetricsData(filteredData);
+  }, [searchQuery, metrics]);
+
+  const parseMetricsData = (data: MetricsResponse) => {
+    return filteredKeys.map(key => ({
+      caption: key,
+      dataSource: Object.keys(data.metric[key]).map(subKey => ({
+        name: subKey,
+        value: data.metric[key][subKey]
+      }))
+    }));
+  };
 
   const handleMetricChange = (value: string) => {
     setSelectedMetric(value);
