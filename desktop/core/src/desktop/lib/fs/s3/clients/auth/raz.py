@@ -37,8 +37,9 @@ class RazEventHandler:
   Intercepts requests before they're signed and sent to S3.
   """
 
-  def __init__(self, user: str):
+  def __init__(self, user: str, connector_config: "ConnectorConfig"):
     self.user = user
+    self.connector_config = connector_config
     # Use existing S3RazClient which has the correct get_url() interface
     self.raz_client = S3RazClient(username=user)
 
@@ -56,6 +57,7 @@ class RazEventHandler:
       data = request.body
 
       # Get RAZ signed headers
+      LOG.debug(f"NEW RAZ Call: action={method}, path={url}, headers={headers}, data={data}")
       raz_headers = self.raz_client.get_url(action=method, path=url, headers=headers, data=data)
 
       if not raz_headers:
@@ -86,24 +88,79 @@ class RazEventHandler:
 
   def _get_request_url(self, request: AWSRequest) -> str:
     """
-    Get full request URL including query parameters.
-    Handles virtual hosted and path style URLs.
+    Get request URL in RAZ-compatible format based on provider type.
+    AWS requires virtual-hosted style with :443, generic providers use original format.
     """
+    provider = self.connector_config.provider.lower()
+
+    if provider == "aws":
+      return self._get_aws_virtual_hosted_url(request)
+    else:
+      return self._get_generic_provider_url(request)
+
+  def _get_aws_virtual_hosted_url(self, request: AWSRequest) -> str:
+    """Convert AWS URLs to virtual-hosted style with :443 port (legacy RAZ requirement)"""
     url_parts = list(urlparse(request.url))
+
+    # Extract bucket and key from path
+    path = url_parts[2].lstrip("/")
+    path_parts = path.split("/", 1) if path else ["", ""]
+    bucket_name = path_parts[0] if path_parts[0] else None
+    key_path = path_parts[1] if len(path_parts) > 1 else ""
+
+    # Convert to virtual-hosted style URL for AWS
+    if bucket_name:
+      # Get region from connector config (not hardcoded)
+      region = self.connector_config.region or "us-east-1"
+
+      # Build virtual-hosted hostname with explicit :443 port
+      if "s3." in url_parts[1]:
+        # Regional endpoint: s3.us-west-2.amazonaws.com
+        virtual_host = f"{bucket_name}.{url_parts[1]}:443"
+      else:
+        # Standard endpoint: s3.amazonaws.com
+        virtual_host = f"{bucket_name}.s3.{region}.amazonaws.com:443"
+
+      # Set virtual-hosted URL components
+      url_parts[1] = virtual_host
+      url_parts[2] = f"/{key_path}" if key_path else "/"
+    else:
+      # Root or bucket listing - add :443 port for AWS
+      if ":" not in url_parts[1]:
+        url_parts[1] = f"{url_parts[1]}:443"
 
     # Add query parameters
     if request.params:
       query = urlencode(request.params)
       url_parts[4] = query
 
-    # Handle virtual hosted style URLs
-    if "s3." in url_parts[1] and request.context.get("bucket_name"):
-      bucket = request.context["bucket_name"]
-      url_parts[1] = f"{bucket}.{url_parts[1]}"
-      # Remove bucket from path
-      url_parts[2] = url_parts[2].replace(f"/{bucket}", "", 1)
+    final_url = urlunparse(url_parts)
+    LOG.debug(f"AWS URL conversion for RAZ: {request.url} → {final_url}")
+    return final_url
 
-    return urlunparse(url_parts)
+  def _get_generic_provider_url(self, request: AWSRequest) -> str:
+    """Get URL for generic S3 providers - preserve original format with correct port"""
+    url_parts = list(urlparse(request.url))
+
+    # For generic providers, use the configured endpoint format
+    # Extract port from connector endpoint if available
+    if self.connector_config.endpoint:
+      endpoint_parts = urlparse(self.connector_config.endpoint)
+
+      # Use the port from connector endpoint if specified
+      if endpoint_parts.port:
+        if ":" not in url_parts[1]:
+          url_parts[1] = f"{url_parts[1]}:{endpoint_parts.port}"
+        LOG.debug(f"Added port {endpoint_parts.port} for generic provider")
+
+    # Add query parameters
+    if request.params:
+      query = urlencode(request.params)
+      url_parts[4] = query
+
+    final_url = urlunparse(url_parts)
+    LOG.debug(f"Generic provider URL for RAZ: {request.url} → {final_url}")
+    return final_url
 
 
 class RazAuthProvider(S3AuthProvider):
@@ -115,8 +172,8 @@ class RazAuthProvider(S3AuthProvider):
   def __init__(self, connector_config: "ConnectorConfig", user: str):
     super().__init__(connector_config, user)
 
-    # Create RAZ event handler (uses global RAZ configuration internally)
-    self.raz_event_handler = RazEventHandler(user=user)
+    # Create RAZ event handler with connector config for provider-aware URL formatting
+    self.raz_event_handler = RazEventHandler(user=user, connector_config=connector_config)
 
     # Store boto3 session with RAZ event handlers
     self.session = boto3.Session(aws_access_key_id="dummy", aws_secret_access_key="dummy", region_name=connector_config.region)
