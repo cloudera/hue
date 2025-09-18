@@ -138,6 +138,14 @@ class RazAuthProvider(S3AuthProvider):
     """
     return {"aws_access_key_id": "dummy", "aws_secret_access_key": "dummy", "region_name": self.connector_config.region}
 
+  def get_session(self):
+    """
+    Return the pre-configured session with RAZ event handlers.
+    This session should be used directly, not recreated.
+    """
+    LOG.debug(f"RazAuthProvider.get_session() called - returning session ID: {id(self.session)}")
+    return self.session
+
   def refresh(self) -> None:
     """No refresh needed as we sign per-request"""
     pass
