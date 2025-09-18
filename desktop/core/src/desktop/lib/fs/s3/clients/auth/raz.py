@@ -100,8 +100,7 @@ class RazEventHandler:
       if not raz_headers:
         raise Exception("RAZ returned no signed headers")
 
-      # Apply ALL headers from RAZ - they're all needed for proper signature verification
-      # RAZ only returns headers that are required for the signature
+      # Apply ALL headers from RAZ - they're all required for signature verification
       LOG.debug(f"RAZ returned headers: {list(raz_headers.keys())}")
       LOG.debug("Applying ALL RAZ headers (all are required for signature)")
 
