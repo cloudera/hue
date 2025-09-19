@@ -154,7 +154,7 @@ const EditColumnsModal = ({
 
     if (duplicateNames.size > 0) {
       duplicateNames.forEach(name => {
-        messages.push(t('Duplicate column name: {{name}}', { name }));
+        messages.push(t('Column name "{{name}}" must be unique', { name }));
       });
     }
 
