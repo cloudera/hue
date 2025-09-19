@@ -9,11 +9,32 @@
 // WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 // License for the specific language governing permissions and limitations under
 // the License.
-
+@use 'variables' as vars;
 .cuix.antd {
   .hue-table-browser-breadcrumbs {
-    li {
-      font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: vars.$cdl-spacing-tiny;
+
+    nav {
+      flex: 1;
+      min-width: 0;
+    }
+
+    ol {
+      display: inline-flex;
+      vertical-align: middle;
+      align-items: center;
+      gap: vars.$cdl-spacing-tiny;
+      white-space: nowrap;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      overflow: hidden;
+    }
+
+    a {
+      text-decoration: none;
     }
   }
 }

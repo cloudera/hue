@@ -9,6 +9,7 @@ import PaginatedTable, {
 } from '../../../../reactComponents/PaginatedTable/PaginatedTable';
 import type { FilterOutput } from 'cuix/dist/components/Filter/types';
 import { i18nReact } from '../../../../utils/i18nReact';
+import './DetailsProperties.scss';
 
 export interface PropertyRow {
   name: string;
@@ -118,7 +119,7 @@ const DetailsProperties = ({
               href={value}
               target="_blank"
               rel="noopener noreferrer"
-              style={{ color: '#1890ff', textDecoration: 'underline' }}
+              className="hue-details-props__location"
             >
               {value}
             </a>

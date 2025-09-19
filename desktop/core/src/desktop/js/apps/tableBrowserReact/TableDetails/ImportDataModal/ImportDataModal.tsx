@@ -10,7 +10,7 @@
 // License for the specific language governing permissions and limitations under
 // the License.
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Input, Alert, Checkbox } from 'antd';
 import Modal from 'cuix/dist/components/Modal';
 import PathBrowser from '../../../../reactComponents/PathBrowser/PathBrowser';
@@ -20,6 +20,8 @@ import huePubSub from '../../../../utils/huePubSub';
 import { notifyError } from '../../utils/notifier';
 import { getConnectorIdOrType } from '../../utils/connector';
 import type { Connector, Namespace, Compute } from '../../../../config/types';
+import './ImportDataModal.scss';
+import { useImportDataForm } from './useImportDataForm';
 
 interface PartitionColumn {
   name: string;
@@ -50,33 +52,16 @@ const ImportDataModal = ({
   partitionColumns = []
 }: ImportDataModalProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
-  const [filePath, setFilePath] = useState('');
-  const [overwrite, setOverwrite] = useState(false);
-  const [partitionValues, setPartitionValues] = useState<Record<string, string>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string>('');
-
-  // Initialize partition values when modal opens
-  useEffect(() => {
-    if (open && partitionColumns.length > 0) {
-      const initialValues: Record<string, string> = {};
-      partitionColumns.forEach(col => {
-        initialValues[col.name] = col.value || '';
-      });
-      setPartitionValues(initialValues);
-    }
-  }, [open, partitionColumns]);
-
-  // Reset form when modal closes
-  useEffect(() => {
-    if (!open) {
-      setFilePath('');
-      setOverwrite(false);
-      setPartitionValues({});
-      setError('');
-      setIsSubmitting(false);
-    }
-  }, [open]);
+  const {
+    filePath,
+    setFilePath,
+    overwrite,
+    setOverwrite,
+    partitionValues,
+    setPartitionValue
+  } = useImportDataForm({ open, partitionColumns });
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [error, setError] = React.useState<string>('');
 
   const handleSubmit = async (): Promise<void> => {
     if (!filePath.trim()) {
@@ -111,7 +96,12 @@ const ImportDataModal = ({
         formData.append('cluster', JSON.stringify(compute));
       }
 
-      const result = await post<{ status: number; data?: string; history_uuid?: string; message?: string }>(
+      const result = await post<{
+        status: number;
+        data?: string;
+        history_uuid?: string;
+        message?: string;
+      }>(
         `/metastore/table/${encodeURIComponent(database)}/${encodeURIComponent(table)}/load`,
         formData,
         {
@@ -134,7 +124,7 @@ const ImportDataModal = ({
         setError(result.message || t('Failed to import data'));
       }
     } catch (err) {
-      console.error('Import data error:', err);
+      // debug: import data error
       notifyError(t('Failed to import data'));
     } finally {
       setIsSubmitting(false);
@@ -151,14 +141,14 @@ const ImportDataModal = ({
       cancelText={t('Cancel')}
       onCancel={onCancel}
       onOk={handleSubmit}
-      okButtonProps={{ 
+      okButtonProps={{
         disabled: isSubmitDisabled,
         loading: isSubmitting
       }}
       width={680}
     >
-      <div style={{ marginBottom: 16 }}>
-        <label style={{ display: 'block', marginBottom: 8, fontWeight: 'bold' }}>
+      <div className="import-data-modal__section">
+        <label className="import-data-modal__label">
           {t('Path')} *
         </label>
         <PathBrowser
@@ -166,27 +156,20 @@ const ImportDataModal = ({
           onFilepathChange={setFilePath}
           testId="import-data-path-browser"
         />
-        <div style={{ fontSize: '12px', color: '#666', marginTop: 4 }}>
+        <div className="import-data-modal__note">
           {t('Path to the file or directory to import')}
         </div>
       </div>
 
       {partitionColumns.length > 0 && (
-        <div style={{ marginBottom: 16 }}>
-          <div style={{ fontWeight: 'bold', marginBottom: 8 }}>
-            {t('Partition Values')}
-          </div>
+        <div className="import-data-modal__section">
+          <div className="import-data-modal__label">{t('Partition Values')}</div>
           {partitionColumns.map(col => (
-            <div key={col.name} style={{ marginBottom: 8 }}>
-              <label style={{ display: 'block', marginBottom: 4 }}>
-                {col.name}
-              </label>
+            <div key={col.name} className="import-data-modal__partition-field">
+              <label className="import-data-modal__partition-label">{col.name}</label>
               <Input
                 value={partitionValues[col.name] || ''}
-                onChange={e => setPartitionValues(prev => ({
-                  ...prev,
-                  [col.name]: e.target.value
-                }))}
+                onChange={e => setPartitionValue(col.name, e.target.value)}
                 placeholder={t('Enter value for {{columnName}}', { columnName: col.name })}
               />
             </div>
@@ -194,30 +177,22 @@ const ImportDataModal = ({
         </div>
       )}
 
-      <div style={{ marginBottom: 16 }}>
-        <Checkbox
-          checked={overwrite}
-          onChange={e => setOverwrite(e.target.checked)}
-        >
+      <div className="import-data-modal__section">
+        <Checkbox checked={overwrite} onChange={e => setOverwrite(e.target.checked)}>
           {t('Overwrite existing data')}
         </Checkbox>
       </div>
 
       <Alert
-        message={t('Note that loading data will move data from its location into the table\'s storage location.')}
+        message={t(
+          "Note that loading data will move data from its location into the table's storage location."
+        )}
         type="warning"
         showIcon
-        style={{ marginBottom: 16 }}
+        className="import-data-modal__alert"
       />
 
-      {error && (
-        <Alert
-          message={error}
-          type="error"
-          showIcon
-          style={{ marginBottom: 16 }}
-        />
-      )}
+      {error && <Alert message={error} type="error" showIcon className="import-data-modal__alert" />}
     </Modal>
   );
 };

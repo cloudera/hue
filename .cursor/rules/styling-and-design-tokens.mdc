@@ -1,21 +1,36 @@
 ---
 description: SCSS + BEM rules; forbid hardcoded colors; attach to style files.
-globs: ["**/*.scss", "**/*.less"]
+globs: ['**/*.scss', '**/*.less']
 alwaysApply: false
 ---
 
 # Styling Rules
+
 - **Primary:** SCSS with BEM; avoid adding new Less. Do not automigrate when touching unless you can easily migrate the entire file.
-- **No hardcoded colors**; use SCSS variables/tokens (cuix/antd) from 
+- **No hardcoded colors**; use SCSS variables/tokens (cuix/antd) from
 - Co-locate `ComponentName.scss` with the component; keep selectors BEM-scoped.
 - Prefer BEM modifiers over state classes
 - Prefer classes over using HTML element selectors
 
 ## Example
+
 ```scss
+// Prefer using the $cdl variables. 
+// See source file for available tokens: node_modules/@cloudera/cuix-core/variables.scss
 @use 'variables' as vars;
-.component-name {
-  &__title {  color: vars.$hue-primary-color-dark;; }
-  &--disabled { opacity: .5; cursor: not-allowed; }
+
+// Wrap component in .cuix.antd to override existing legacy styles and resets
+.cuix.antd {
+  .component-name {
+    margin: vars.$cdl-spacing-xs;
+    &__title {
+      color: vars.$hue-primary-color-dark;
+      font-weight: vars.$cdl-text-default-bold-weight;
+    }
+    &--disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
 }
 ```

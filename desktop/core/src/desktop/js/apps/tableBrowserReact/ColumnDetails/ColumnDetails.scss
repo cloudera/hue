@@ -14,6 +14,13 @@
 
 .cuix.antd {
   .hue-column-details {
+    .hue-column-details__meta { margin-bottom: vars.$fluidx-spacing-m; }
+
+    .hue-column-details__flatten {
+      display: inline-flex;
+      align-items: center;
+      gap: vars.$fluidx-spacing-s;
+    }
     // Alternate band for flattened top-level struct groups
     .struct-group--alt {
       background-color: var(--hue-row-alt-bg, rgba(0, 0, 0, 0.03));
@@ -56,7 +63,7 @@
       align-items: stretch;
       background-color: vars.$fluidx-white;
       padding: vars.$fluidx-spacing-s;
-      min-height: 100px;
+      min-height: 6.25rem; // 100px -> 6.25rem, consider tokenizing if needed
     }
 
   }

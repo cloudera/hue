@@ -1,0 +1,31 @@
+// Licensed to Cloudera, Inc. under one or more contributor license agreements.
+// Apache License 2.0 applies.
+
+@use '../../components/styles/variables' as vars;
+
+.cuix.antd {
+  .hue-tables-list__desc-actions {
+    margin-top: vars.$cdl-spacing-xs;
+    > * + * {
+      margin-left: vars.$cdl-spacing-s;
+    }
+  }
+
+  .hue-tables-list__desc-skeleton {
+    width: 60%;
+  }
+
+  .hue-tables-list__desc-text {
+    white-space: pre-wrap;
+  }
+
+  .hue-tables-list__desc-edit { margin-left: vars.$cdl-spacing-s; }
+
+  .hue-tables-list__confirm-text { margin-bottom: vars.$cdl-spacing-m; }
+
+  .hue-tables-list__confirm-list { margin-bottom: vars.$cdl-spacing-m; }
+
+  .hue-tables-list__confirm-more { margin-bottom: vars.$cdl-spacing-m; }
+
+  .hue-tables-list__confirm-skip { display: flex; align-items: center; gap: vars.$cdl-spacing-s; }
+}

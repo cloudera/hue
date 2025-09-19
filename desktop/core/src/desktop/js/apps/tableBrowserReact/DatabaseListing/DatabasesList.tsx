@@ -10,7 +10,7 @@
 // License for the specific language governing permissions and limitations under
 // the License.
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { Checkbox, Input } from 'antd';
 import { LinkButton } from 'cuix/dist/components/Button';
 import Loading from 'cuix/dist/components/Loading';
@@ -26,27 +26,18 @@ import PaginatedTable, {
   type ColumnProps as PaginatedColumnProps
 } from '../../../reactComponents/PaginatedTable/PaginatedTable';
 import type { FilterOutput } from 'cuix/dist/components/Filter/types';
-import type { SortOrder } from 'antd/lib/table/interface';
+// import type { SortOrder } from 'antd/lib/table/interface';
 import { i18nReact } from '../../../utils/i18nReact';
+import './DatabasesList.scss';
+import type { DatabasesListState } from './useDatabasesListState';
 
 export interface DatabasesListProps {
   databases: string[];
-  isInitializing: boolean;
   isRefreshing: boolean;
   onRefresh?: () => void;
-  dbFilter: string;
-  setDbFilter: (value: string) => void;
-  dbPageNumber: number;
-  setDbPageNumber: (n: number) => void;
-  dbPageSize: number;
-  setDbPageSize: (s: number) => void;
-  dbDescriptions: Record<string, string>;
-  editingDb: string | null;
-  editingValue: string;
-  setEditingDb: (name: string | null) => void;
-  setEditingValue: (v: string) => void;
+  state: DatabasesListState;
   onOpenDatabase: (name: string) => void;
-  onSaveDescription: (name: string, value: string) => void;
+  // onSaveDescription now provided inside descriptionsState
   onDropDatabases?: (names: string[]) => Promise<void> | void;
   onCreateDatabase?: (name: string, comment?: string, location?: string) => Promise<void> | void;
   sourceType?: string;
@@ -55,52 +46,45 @@ export interface DatabasesListProps {
   table?: string;
   sourceOptions?: string[];
   onSelectSource?: (sourceType: string) => void;
-  onClickDataSources?: () => void;
-  onClickDatabases?: () => void;
-  onClickDatabase?: (database: string) => void;
 }
 
 const DatabasesList = ({
   databases,
-  isInitializing,
   isRefreshing,
   onRefresh,
-  dbFilter,
-  setDbFilter,
-  dbPageNumber,
-  setDbPageNumber,
-  dbPageSize,
-  setDbPageSize,
-  dbDescriptions,
-  editingDb,
-  editingValue,
-  setEditingDb,
-  setEditingValue,
+  state,
   onOpenDatabase,
-  onSaveDescription,
   onDropDatabases,
   onCreateDatabase,
   sourceType,
   database,
   table,
   sourceOptions,
-  onSelectSource,
-  onClickDataSources,
-  onClickDatabases,
-  onClickDatabase
+  onSelectSource
 }: DatabasesListProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
-  const [selected, setSelected] = useState<string[]>([]);
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const [createModalOpen, setCreateModalOpen] = useState(false);
-  const [sortByColumn, setSortByColumn] = useState<string | undefined>(undefined);
-  const [sortOrder, setSortOrder] = useState<SortOrder>(null);
-  const [createForm, setCreateForm] = useState({
-    name: '',
-    comment: '',
-    location: '',
-    useDefaultLocation: true
-  });
+  const {
+    isInitializing,
+    dbFilter,
+    setDbFilter,
+    dbPageNumber,
+    setDbPageNumber,
+    dbPageSize,
+    setDbPageSize,
+    selected,
+    setSelected,
+    confirmOpen,
+    setConfirmOpen,
+    createModalOpen,
+    setCreateModalOpen,
+    sortByColumn,
+    setSortByColumn,
+    sortOrder,
+    setSortOrder,
+    createForm,
+    setCreateForm,
+    editState
+  } = state;
 
   const filtered = (databases || []).filter(db =>
     dbFilter ? db.toLowerCase().includes(dbFilter.toLowerCase()) : true
@@ -169,23 +153,23 @@ const DatabasesList = ({
       dataIndex: 'description',
       key: 'description',
       render: (_: string | undefined, record: { name: string }) => {
-        const hasValue = Object.prototype.hasOwnProperty.call(dbDescriptions, record.name);
+        const hasValue = Object.prototype.hasOwnProperty.call(editState.values, record.name);
 
         return (
           <InlineDescriptionEditor
             itemId={record.name}
-            currentDescription={dbDescriptions[record.name]}
+            currentDescription={editState.values[record.name]}
             originalDescription={undefined}
-            isEditing={editingDb === record.name}
-            editingValue={editingValue}
+            isEditing={editState.editingId === record.name}
+            editingValue={editState.editingValue}
             hasLoadedDescription={hasValue}
             onStartEdit={(itemId, initialValue) => {
-              setEditingDb(itemId);
-              setEditingValue(initialValue);
+              editState.setEditingId(itemId);
+              editState.setEditingValue(initialValue);
             }}
-            onCancelEdit={() => setEditingDb(null)}
-            onSave={onSaveDescription}
-            onEditingValueChange={setEditingValue}
+            onCancelEdit={() => editState.setEditingId(null)}
+            onSave={editState.save}
+            onEditingValueChange={editState.setEditingValue}
           />
         );
       }
@@ -197,7 +181,7 @@ const DatabasesList = ({
   const start = (dbPageNumber - 1) * dbPageSize;
   const pageData = data.slice(start, start + dbPageSize);
 
-  console.info('rendering');
+  // debug: rendering
   return (
     <div>
       <PageHeader
@@ -211,9 +195,6 @@ const DatabasesList = ({
         table={table}
         sourceOptions={sourceOptions}
         onSelectSource={onSelectSource}
-        onClickDataSources={onClickDataSources}
-        onClickDatabases={onClickDatabases}
-        onClickDatabase={onClickDatabase}
       />
 
       <div className="hue-table-browser__header-with-actions">
@@ -301,7 +282,7 @@ const DatabasesList = ({
           }
         }}
       >
-        <div style={{ marginBottom: 8 }}>
+        <div className="hue-db-list__confirm-text">
           {t('Do you really want to delete the following database(s)?')}
         </div>
         <ul>
@@ -309,11 +290,7 @@ const DatabasesList = ({
             <li key={name}>{name}</li>
           ))}
         </ul>
-        <div
-          role="alert"
-          className="label label-important"
-          style={{ display: 'inline-block', marginTop: 5 }}
-        >
+        <div role="alert" className="label label-important hue-db-list__warning">
           {t('Warning: This will drop all tables and objects within the database.')}
         </div>
       </Modal>
@@ -355,24 +332,20 @@ const DatabasesList = ({
           }
         }}
       >
-        <div style={{ marginBottom: 16 }}>
-          <label style={{ display: 'block', marginBottom: 4, fontWeight: 'bold' }}>
-            {t('Database Name')} *
-          </label>
+        <div className="hue-db-list__field">
+          <label className="hue-db-list__label">{t('Database Name')} *</label>
           <Input
             placeholder={t('Database name')}
             value={createForm.name}
             onChange={e => setCreateForm({ ...createForm, name: e.target.value })}
           />
-          <div style={{ fontSize: '12px', color: '#666', marginTop: 4 }}>
+          <div className="hue-db-list__hint">
             {t('Name of the new database. Database names must be globally unique.')}
           </div>
         </div>
 
-        <div style={{ marginBottom: 16 }}>
-          <label style={{ display: 'block', marginBottom: 4, fontWeight: 'bold' }}>
-            {t('Description')}
-          </label>
+        <div className="hue-db-list__field">
+          <label className="hue-db-list__label">{t('Description')}</label>
           <Input.TextArea
             placeholder={t('Optional description')}
             value={createForm.comment}
@@ -381,26 +354,24 @@ const DatabasesList = ({
           />
         </div>
 
-        <div style={{ marginBottom: 16 }}>
+        <div className="hue-db-list__field">
           <Checkbox
             checked={createForm.useDefaultLocation}
             onChange={e => setCreateForm({ ...createForm, useDefaultLocation: e.target.checked })}
-            style={{ marginBottom: 8 }}
+            className="hue-db-list__checkbox"
           >
             {t('Use default location')}
           </Checkbox>
 
           {!createForm.useDefaultLocation && (
             <div>
-              <label style={{ display: 'block', marginBottom: 4, fontWeight: 'bold' }}>
-                {t('Location')}
-              </label>
+              <label className="hue-db-list__label">{t('Location')}</label>
               <Input
                 placeholder={t('Path to HDFS directory')}
                 value={createForm.location}
                 onChange={e => setCreateForm({ ...createForm, location: e.target.value })}
               />
-              <div style={{ fontSize: '12px', color: '#666', marginTop: 4 }}>
+              <div className="hue-db-list__hint">
                 {t('Path to HDFS directory or file of database data.')}
               </div>
             </div>

@@ -3,7 +3,6 @@
 
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { ConfigProvider } from 'antd';
-import i18n from 'cuix/dist/utils/i18n';
 import Button from 'cuix/dist/components/Button/Button';
 import { BorderlessButton } from 'cuix/dist/components/Button';
 import Tooltip from 'cuix/dist/components/Tooltip';
@@ -100,23 +99,6 @@ const Partitions = ({
   }, [connector, namespace, compute, database, table, isRefreshing]);
 
   const { t } = i18nReact.useTranslation();
-
-  // Initialize cuix i18n system
-  useEffect(() => {
-    try {
-      if (i18n && typeof i18n.extend === 'function') {
-        i18n.extend({
-          'label.more': 'More',
-          'label.filterBy': 'Filter by',
-          'label.clear': 'Clear',
-          'label.search': 'Search',
-          'label.selected': 'Selected'
-        });
-      }
-    } catch (error) {
-      console.warn('Failed to initialize cuix i18n:', error);
-    }
-  }, []);
 
   const isImpala = useMemo(() => {
     const id = (connector as unknown as { id?: string })?.id;

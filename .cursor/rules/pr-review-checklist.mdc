@@ -12,7 +12,7 @@ alwaysApply: false
 
 ## Always check for
 - Architecture: lift/split state; keep components cohesive.
-- Naming clarity: components, functions, variables.
+- Naming clarity: components, functions, variables. Important, verify that the name reflects the actual usage/function.
 - Edge cases: loading/empty/error; network failures.
 - Accessibility: roles, labels, focus, contrast. Only comment where needed, 
 - Check for aria- attributes ONLY when needed. e.g. 

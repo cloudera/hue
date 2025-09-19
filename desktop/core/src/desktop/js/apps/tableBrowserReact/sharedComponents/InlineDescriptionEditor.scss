@@ -1,0 +1,27 @@
+// Licensed to Cloudera, Inc. under one or more contributor license agreements.
+// Apache License 2.0 applies.
+
+@use 'variables' as vars;
+@import '../../../components/styles/typeColors';
+
+.cuix.antd {
+  .inline-desc-editor {
+    &__skeleton {
+      width: 60%;
+    }
+
+    &__actions {
+      margin-top: vars.$cdl-spacing-xs;
+    }
+
+    &--display {
+      .inline-desc-editor__text {
+        margin-right: vars.$cdl-spacing-m;
+      }
+    }
+
+    &__button--is-editing {
+      margin-left: vars.$cdl-spacing-s;
+    }
+  }
+}

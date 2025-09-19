@@ -29,10 +29,6 @@ export interface TypeDetailsProps {
   fields: string[]; // path into the column type (e.g., ["a","b"])
   tableDetails: TableDetailsState;
   onOpenField?: (nextFields: string[]) => void;
-  onClickDataSources?: () => void;
-  onClickDatabases?: () => void;
-  onClickDatabase?: (database: string) => void;
-  onClickTable?: (table: string) => void;
 }
 
 type FieldRow = {
@@ -50,11 +46,7 @@ const TypeDetails = ({
   column,
   fields,
   tableDetails,
-  onOpenField,
-  onClickDataSources,
-  onClickDatabases,
-  onClickDatabase,
-  onClickTable
+  onOpenField
 }: TypeDetailsProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const { isRefreshing, loading, detailsColumns, sampleData } = tableDetails;
@@ -479,10 +471,6 @@ const TypeDetails = ({
         fields={fields}
         onClickColumn={() => onOpenField && onOpenField([])}
         onClickField={next => onOpenField && onOpenField(next)}
-        onClickDataSources={onClickDataSources}
-        onClickDatabases={onClickDatabases}
-        onClickDatabase={onClickDatabase}
-        onClickTable={onClickTable}
       />
 
       <div className="hue-table-browser__header-with-actions">

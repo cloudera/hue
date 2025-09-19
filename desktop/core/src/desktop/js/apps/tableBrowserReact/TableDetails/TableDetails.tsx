@@ -10,7 +10,7 @@
 // License for the specific language governing permissions and limitations under
 // the License.
 
-import React, { useState, useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import Loading from 'cuix/dist/components/Loading';
 import Modal from 'cuix/dist/components/Modal';
 import DataSetsIcon from '@cloudera/cuix-core/icons/react/DataSetsIcon';
@@ -18,9 +18,11 @@ import ViewIcon from '@cloudera/cuix-core/icons/react/ViewIcon';
 import PageHeader from '../sharedComponents/PageHeader';
 
 import { i18nReact } from '../../../utils/i18nReact';
+import { post } from '../../../api/utils';
+import { notifyError } from '../utils/notifier';
 import huePubSub from '../../../utils/huePubSub';
 import type { Connector, Namespace, Compute } from '../../../config/types';
-import Tabs, { type TabKey } from '../sharedComponents/Tabs';
+import Tabs from '../sharedComponents/Tabs';
 import Toolbar, { type ToolbarAction } from '../sharedComponents/Toolbar';
 import Overview from './OverviewTab/Overview';
 import SampleGrid from './SampleTab/SampleGrid';
@@ -30,64 +32,125 @@ import ViewSql from './ViewSqlTab/ViewSql';
 import Queries from './QueriesTab/Queries';
 import Privileges from './PrivilegesTab/Privileges';
 import ImportDataModal from './ImportDataModal/ImportDataModal';
-import { notifyError } from '../utils/notifier';
-import { getConnectorIdOrType } from '../utils/connector';
-import { post } from '../../../api/utils';
-import type { TableDetailsState } from '../hooks/useTableDetails';
+import type { TableDetailsState } from './useTableDetailsState';
+import './TableDetails.scss';
 
 export interface TableDetailsProps {
   // Route and navigation
   sourceType?: string;
   database: string;
   table: string;
-  activeTab: TabKey;
-  onTabChange: (tab: TabKey) => void;
-  onBackToTables: () => void;
 
   // Data catalog context
   connector: Connector | null;
   namespace: Namespace | null;
   compute: Compute | null;
 
-  // Table data
-  tableDetails: TableDetailsState;
-
-  // Actions
-  onReloadTables: () => Promise<void>;
-
   // Breadcrumbs props
   sourceOptions?: string[];
   onSelectSource?: (sourceType: string) => void;
-  onClickDataSources?: () => void;
-  onClickDatabases?: () => void;
-  onClickDatabase?: (database: string) => void;
   onOpenColumn?: (column: string) => void;
+  state: TableDetailsState;
+  onReloadTables: () => Promise<void>;
+  onBackToTables: () => void;
 }
 
 const TableDetails = ({
   sourceType,
   database,
   table,
-  activeTab,
-  onTabChange,
-  onBackToTables,
   connector,
   namespace,
   compute,
-  tableDetails,
-  onReloadTables,
   sourceOptions,
   onSelectSource,
-  onClickDataSources,
-  onClickDatabases,
-  onClickDatabase,
-  onOpenColumn
+  onOpenColumn,
+  state,
+  onReloadTables,
+  onBackToTables
 }: TableDetailsProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
-  const [isDropping, setIsDropping] = useState(false);
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const [skipTrash, setSkipTrash] = useState(false);
-  const [importModalOpen, setImportModalOpen] = useState(false);
+  const {
+    activeTab,
+    setActiveTab,
+    tableDetails,
+    isDropping,
+    setIsDropping,
+    confirmOpen,
+    setConfirmOpen,
+    skipTrash,
+    setSkipTrash,
+    importModalOpen,
+    setImportModalOpen
+  } = state;
+
+  // Helper functions for modal actions
+  const openConfirm = useCallback(() => setConfirmOpen(true), [setConfirmOpen]);
+  const closeConfirm = useCallback(() => setConfirmOpen(false), [setConfirmOpen]);
+  const openImport = useCallback(() => setImportModalOpen(true), [setImportModalOpen]);
+  const closeImport = useCallback(() => setImportModalOpen(false), [setImportModalOpen]);
+
+  // Drop table handler
+  const handleDropTable = useCallback(
+    async (skip = false): Promise<void> => {
+      if (isDropping) {
+        return;
+      }
+
+      setIsDropping(true);
+      try {
+        const formData = new URLSearchParams();
+        formData.append('table_selection', table);
+        formData.append('is_embeddable', 'true');
+        formData.append('skip_trash', skip ? 'on' : 'off');
+        formData.append('source_type', sourceType || connector?.dialect || connector?.id || 'hive');
+        formData.append('start_time', Date.now().toString());
+
+        if (namespace) {
+          formData.append('namespace', JSON.stringify(namespace));
+        }
+
+        if (compute) {
+          formData.append('cluster', JSON.stringify(compute));
+        }
+
+        const result = await post<{ history_uuid?: string; message?: string }>(
+          `/metastore/tables/drop/${encodeURIComponent(database)}`,
+          formData,
+          { silenceErrors: false, qsEncodeData: false }
+        );
+
+        if (result?.message) {
+          notifyError(result.message);
+          await onReloadTables();
+          return;
+        }
+
+        await onReloadTables();
+        onBackToTables();
+      } catch (error) {
+        notifyError(t('Failed to drop table'));
+        await onReloadTables();
+        throw error;
+      } finally {
+        setIsDropping(false);
+      }
+    },
+    [
+      compute,
+      connector,
+      database,
+      isDropping,
+      namespace,
+      onBackToTables,
+      onReloadTables,
+      setIsDropping,
+      sourceType,
+      table,
+      t
+    ]
+  );
+
   const {
     loading: loadingData,
     isRefreshing,
@@ -109,61 +172,7 @@ const TableDetails = ({
   // Determine if this is a view to show appropriate icon and View SQL tab
   const isView = properties.find(p => p.name === t('Type'))?.value === t('View');
 
-  const handleDropTable = async (skipTrash = false): Promise<void> => {
-    // Prevent multiple simultaneous drop operations
-    if (isDropping) {
-      return;
-    }
-
-    setIsDropping(true);
-
-    try {
-      // Create URLSearchParams for proper form encoding without qs array notation
-      const formData = new URLSearchParams();
-      formData.append('table_selection', table);
-      formData.append('is_embeddable', 'true');
-      formData.append('skip_trash', skipTrash ? 'on' : 'off');
-      formData.append('source_type', sourceType || getConnectorIdOrType(connector) || 'hive');
-      formData.append('start_time', Date.now().toString());
-
-      if (namespace) {
-        formData.append('namespace', JSON.stringify(namespace));
-      }
-
-      if (compute) {
-        formData.append('cluster', JSON.stringify(compute));
-      }
-
-      const result = await post<{ history_uuid?: string; message?: string }>(
-        `/metastore/tables/drop/${encodeURIComponent(database)}`,
-        formData,
-        {
-          silenceErrors: false,
-          qsEncodeData: false // Don't use qs.stringify, send URLSearchParams directly
-        }
-      );
-
-      // Handle the task execution response
-      if (result?.message) {
-        notifyError(result.message);
-        // If there's an error message, reload tables to restore state
-        await onReloadTables();
-        return;
-      }
-
-      // For successful operations (with or without history_uuid), reload tables
-      await onReloadTables();
-      // Only navigate back after successful completion
-      onBackToTables();
-    } catch (error) {
-      notifyError(t('Failed to drop table'));
-      // On error, reload tables to restore the correct state
-      await onReloadTables();
-      throw error;
-    } finally {
-      setIsDropping(false);
-    }
-  };
+  // moved to useTableDetailsState
 
   const openQuery = (): void => {
     const type = sourceType || 'hive';
@@ -206,7 +215,7 @@ const TableDetails = ({
   }, [overviewProps?.properties, connector, t]);
 
   const showImportData = (): void => {
-    setImportModalOpen(true);
+    openImport();
   };
 
   // Extract partition columns for import modal
@@ -246,7 +255,7 @@ const TableDetails = ({
     actions.push({
       key: 'drop',
       label: t('Drop'),
-      onClick: () => setConfirmOpen(true),
+      onClick: () => openConfirm(),
       variant: 'danger',
       disabled: !database || !table || isDropping,
       tooltip: t('Drop table')
@@ -268,9 +277,6 @@ const TableDetails = ({
         table={table}
         sourceOptions={sourceOptions}
         onSelectSource={onSelectSource}
-        onClickDataSources={onClickDataSources}
-        onClickDatabases={onClickDatabases}
-        onClickDatabase={onClickDatabase}
       />
 
       <div className="hue-table-browser__header-with-actions-only">
@@ -279,7 +285,7 @@ const TableDetails = ({
 
       <Tabs
         activeKey={activeTab}
-        onChange={onTabChange}
+        onChange={setActiveTab}
         sampleCount={sampleData?.rows?.length}
         partitionsCount={partitionCount}
         showPartitions={!!hasPartitions}
@@ -385,22 +391,22 @@ const TableDetails = ({
         okButtonProps={{ danger: true }}
         cancelText={t('Cancel')}
         onCancel={() => {
-          setConfirmOpen(false);
+          closeConfirm();
           setSkipTrash(false);
         }}
         onOk={async () => {
           try {
             await handleDropTable(skipTrash);
           } finally {
-            setConfirmOpen(false);
+            closeConfirm();
             setSkipTrash(false);
           }
         }}
       >
-        <div style={{ marginBottom: 16 }}>
+        <div className="tb-table-details__confirm-text">
           {t('Do you really want to drop table "{{tableName}}"?', { tableName: table })}
         </div>
-        <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <label className="tb-table-details__skip-trash">
           <input
             type="checkbox"
             checked={skipTrash}
@@ -412,7 +418,7 @@ const TableDetails = ({
 
       <ImportDataModal
         open={importModalOpen}
-        onCancel={() => setImportModalOpen(false)}
+        onCancel={closeImport}
         database={database}
         table={table}
         connector={connector}

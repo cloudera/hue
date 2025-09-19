@@ -23,6 +23,8 @@ export interface UseDescriptionManagerArgs {
   items?: string[];
   path?: string[];
   currentItem?: string;
+  /** When true, do not fall back to per-item describe calls if description is missing */
+  disableDescribeFallback?: boolean;
 }
 
 export interface DescriptionManagerState {
@@ -40,7 +42,8 @@ export function useDescriptionManager({
   compute,
   items,
   path = [],
-  currentItem
+  currentItem,
+  disableDescribeFallback
 }: UseDescriptionManagerArgs): DescriptionManagerState {
   const { t } = i18nReact.useTranslation();
   const [descriptions, setDescriptions] = useState<Record<string, string>>({});
@@ -87,9 +90,9 @@ export function useDescriptionManager({
       }
       try {
         const sourceEntry = await dataCatalog.getEntry({
-          connector,
-          namespace,
-          compute,
+          connector: connector as Connector,
+          namespace: namespace as Namespace,
+          compute: compute as Compute,
           path: stablePath
         });
         await sourceEntry.getChildren({ silenceErrors: true });
@@ -115,7 +118,14 @@ export function useDescriptionManager({
 
   // Fallback: ensure comments via describe for visible page items
   useEffect(() => {
-    if (!stableItems || currentItem || !connector || !namespace || !compute) {
+    if (
+      !stableItems ||
+      currentItem ||
+      !connector ||
+      !namespace ||
+      !compute ||
+      disableDescribeFallback
+    ) {
       return;
     }
 
@@ -144,9 +154,9 @@ export function useDescriptionManager({
           const fetchPromises = itemsToFetch.map(async name => {
             try {
               const entry = await dataCatalog.getEntry({
-                connector,
-                namespace,
-                compute,
+                connector: connector as Connector,
+                namespace: namespace as Namespace,
+                compute: compute as Compute,
                 path: [...stablePath, name]
               });
               const describe: unknown = await entry.getAnalysis({ silenceErrors: true });
@@ -186,9 +196,9 @@ export function useDescriptionManager({
       setDescriptions(prev => ({ ...prev, [name]: value }));
       try {
         const entry = await dataCatalog.getEntry({
-          connector,
-          namespace,
-          compute,
+          connector: connector as Connector,
+          namespace: namespace as Namespace,
+          compute: compute as Compute,
           path: [...stablePath, name]
         });
         await entry.setComment(value, { silenceErrors: true });

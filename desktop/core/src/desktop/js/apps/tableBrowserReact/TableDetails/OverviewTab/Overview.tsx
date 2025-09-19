@@ -51,6 +51,8 @@ export interface OverviewProps {
   compute?: Compute | null;
   database?: string;
   table?: string;
+  // will be set by Schema via onCountChange
+  // not exposed to parent props
 }
 
 const Overview = ({
@@ -149,6 +151,8 @@ const Overview = ({
   const showProperties = loadingProperties || hasValidData(propertiesGroups);
   const showStats = loadingStats || hasValidData(statsGroups);
 
+  const [visibleColumnCount, setVisibleColumnCount] = React.useState<number>(columns?.length || 0);
+
   return (
     <div className="hue-table-details-overview">
       {(showProperties || showStats) && (
@@ -177,7 +181,7 @@ const Overview = ({
               <h3 className="hue-h3">
                 {t('{{label}} ({{count}})', {
                   label: t('Schema'),
-                  count: columns.length
+                  count: visibleColumnCount
                 })}
               </h3>
             </div>
@@ -191,6 +195,7 @@ const Overview = ({
               compute={compute}
               database={database}
               table={table}
+              onCountChange={setVisibleColumnCount}
             />
           </>
         )}

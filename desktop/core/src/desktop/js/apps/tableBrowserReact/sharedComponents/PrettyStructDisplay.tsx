@@ -1,4 +1,17 @@
+// Licensed to Cloudera, Inc. under one or more contributor license agreements.
+// See the NOTICE file distributed with this work for additional information
+// regarding copyright ownership. Cloudera, Inc. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may not use this file
+// except in compliance with the License. You may obtain a copy of the License at
+// http://www.apache.org/licenses/LICENSE-2.0
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+// License for the specific language governing permissions and limitations under
+// the License.
+
 import React, { useMemo } from 'react';
+import { i18nReact } from '../../../utils/i18nReact';
 import './PrettyStructDisplay.scss';
 
 export type FormatOptions = {
@@ -240,9 +253,10 @@ export default function PrettyStructDisplay({
   uppercaseTypes = false,
   className,
   style,
-  ariaLabel = 'Struct type pretty print',
+  ariaLabel,
   compact = false
 }: PrettyStructDisplayProps): JSX.Element {
+  const { t } = i18nReact.useTranslation();
   const formatted = useMemo(
     () => prettyPrintStructType(structType, { indentSize, uppercaseTypes }),
     [structType, indentSize, uppercaseTypes]
@@ -484,8 +498,10 @@ export default function PrettyStructDisplay({
     .filter(Boolean)
     .join(' ');
 
+  const computedAria = ariaLabel ?? t('Struct type pretty print');
+
   return (
-    <div className={cssClasses} style={style} aria-label={ariaLabel}>
+    <div className={cssClasses} style={style} aria-label={computedAria}>
       <pre>
         <code>{nodes.length ? nodes : formatted}</code>
       </pre>

@@ -15,6 +15,8 @@ import { i18nReact } from '../../../utils/i18nReact';
 // import changeURL from '../../../utils/url/changeURL';
 
 import './Breadcrumbs.scss';
+import { useNavigation } from './NavigationContext';
+import { buildTableBrowserPath, getTableBrowserBasePath } from '../utils/routing';
 
 export interface BreadcrumbsProps {
   sourceType?: string;
@@ -48,40 +50,28 @@ const Breadcrumbs = ({
   onClickField
 }: BreadcrumbsProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
+  const nav = useNavigation();
 
   // noop helper removed; directly calling changeURL
 
-  const base = window.location.pathname.split('/tablebrowser')[0] || '';
+  const base = getTableBrowserBasePath();
 
   // no-op retained for compatibility
 
   const { sourcesHref, databasesHref, databaseHref, tableHref } = useMemo(() => {
-    const dh = `${base}/tablebrowser/${encodeURIComponent(sourceType || 'hive')}`;
-    const dbh = `${dh}${database ? `/${encodeURIComponent(database)}` : ''}`;
-    const th = `${dbh}${table ? `/${encodeURIComponent(table)}` : ''}`;
-    const sh = `${base}/tablebrowser`;
-    return { sourcesHref: sh, databasesHref: dh, databaseHref: dbh, tableHref: th };
-  }, [base, sourceType, database, table, t]);
+    const src = sourceType || 'hive';
+    return {
+      sourcesHref: buildTableBrowserPath(base),
+      databasesHref: buildTableBrowserPath(base, src),
+      databaseHref: buildTableBrowserPath(base, src, database),
+      tableHref: buildTableBrowserPath(base, src, database, table)
+    };
+  }, [base, sourceType, database, table]);
 
   return (
-    <div
-      className="hue-table-browser-breadcrumbs"
-      style={{ display: 'flex', gap: 8, alignItems: 'center' }}
-    >
-      <nav aria-label={t('Breadcrumbs')} style={{ flex: 1, minWidth: 0 }}>
-        <ol
-          style={{
-            display: 'inline-flex',
-            verticalAlign: 'middle',
-            alignItems: 'center',
-            gap: 8,
-            whiteSpace: 'nowrap',
-            margin: 0,
-            padding: 0,
-            listStyle: 'none',
-            overflow: 'hidden'
-          }}
-        >
+    <div className="hue-table-browser-breadcrumbs">
+      <nav aria-label={t('Breadcrumbs')}>
+        <ol>
           <li>
             {!sourceType ? (
               <span aria-current="page">{t('Data sources')}</span>
@@ -89,12 +79,9 @@ const Breadcrumbs = ({
               <a
                 href={sourcesHref}
                 aria-label={t('Data sources')}
-                style={{ textDecoration: 'none' }}
                 onClick={e => {
-                  if (onClickDataSources) {
-                    e.preventDefault();
-                    onClickDataSources();
-                  }
+                  e.preventDefault();
+                  (onClickDataSources || nav.navigateToSources)();
                 }}
               >
                 {t('Data sources')}
@@ -110,12 +97,9 @@ const Breadcrumbs = ({
                 <a
                   href={databasesHref}
                   aria-label={(sourceType || 'hive').toUpperCase()}
-                  style={{ textDecoration: 'none' }}
                   onClick={e => {
-                    if (onClickDatabases) {
-                      e.preventDefault();
-                      onClickDatabases();
-                    }
+                    e.preventDefault();
+                    (onClickDatabases || (() => nav.navigateToSource(sourceType || 'hive')))();
                   }}
                 >
                   {(sourceType || 'hive').toUpperCase()}
@@ -133,12 +117,9 @@ const Breadcrumbs = ({
                   <a
                     href={databaseHref}
                     aria-label={database}
-                    style={{ textDecoration: 'none' }}
                     onClick={e => {
-                      if (onClickDatabase) {
-                        e.preventDefault();
-                        onClickDatabase(database);
-                      }
+                      e.preventDefault();
+                      (onClickDatabase || ((db: string) => nav.navigateToDatabase(db)))(database);
                     }}
                   >
                     {database}
@@ -161,12 +142,11 @@ const Breadcrumbs = ({
                   <a
                     href={tableHref}
                     aria-label={table}
-                    style={{ textDecoration: 'none' }}
                     onClick={e => {
-                      if (onClickTable) {
-                        e.preventDefault();
-                        onClickTable(table);
-                      }
+                      e.preventDefault();
+                      (onClickTable || ((tbl: string) => nav.navigateToTable(database!, tbl)))(
+                        table
+                      );
                     }}
                   >
                     {table}
@@ -189,10 +169,9 @@ const Breadcrumbs = ({
                   <a
                     href={`${tableHref}/${encodeURIComponent(column)}`}
                     aria-label={column}
-                    style={{ textDecoration: 'none' }}
                     onClick={e => {
                       e.preventDefault();
-                      onClickColumn();
+                      (onClickColumn || (() => nav.navigateToColumn(database!, table!, column!)))();
                     }}
                   >
                     {column}
@@ -214,17 +193,20 @@ const Breadcrumbs = ({
                   /
                 </li>
                 <li>
-                  {idx < fields.length - 1 && onClickField ? (
+                  {idx < fields.length - 1 ? (
                     <a
                       href={`${tableHref}/${encodeURIComponent(column!)}/${fields
                         .slice(0, idx + 1)
                         .map(encodeURIComponent)
                         .join('/')}`}
                       aria-label={f}
-                      style={{ textDecoration: 'none' }}
                       onClick={e => {
                         e.preventDefault();
-                        onClickField(fields.slice(0, idx + 1));
+                        const handler =
+                          onClickField ||
+                          ((path: string[]) =>
+                            nav.navigateToField(database!, table!, column!, path));
+                        handler(fields.slice(0, idx + 1));
                       }}
                     >
                       {f}

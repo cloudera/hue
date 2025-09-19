@@ -10,9 +10,10 @@
 // License for the specific language governing permissions and limitations under
 // the License.
 
-import React, { Component, ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import { Result } from 'antd';
 import Button from 'cuix/dist/components/Button/Button';
+import { ErrorBoundary } from 'react-error-boundary';
 import { i18nReact } from '../../../utils/i18nReact';
 
 interface Props {
@@ -21,61 +22,45 @@ interface Props {
   onRetry?: () => void;
 }
 
-interface State {
-  hasError: boolean;
-  error?: Error;
-}
+// Functional fallback content with i18n
+const DefaultFallback = ({ onRetry }: { onRetry?: () => void }): JSX.Element => {
+  const { t } = i18nReact.useTranslation();
+  return (
+    <Result
+      status="error"
+      title={t('Something went wrong')}
+      subTitle={t(
+        'An error occurred while loading the table browser. Please try refreshing the page.'
+      )}
+      extra={[
+        <Button key="retry" onClick={onRetry}>
+          {t('Try Again')}
+        </Button>,
+        <Button key="refresh" onClick={() => window.location.reload()}>
+          {t('Refresh Page')}
+        </Button>
+      ]}
+    />
+  );
+};
 
-class TableBrowserErrorBoundary extends Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    this.state = { hasError: false };
-  }
-
-  static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('TableBrowser Error Boundary caught an error:', error, errorInfo);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      if (this.props.fallback) {
-        return this.props.fallback;
+const TableBrowserErrorBoundary = ({ children, fallback, onRetry }: Props): JSX.Element => {
+  return (
+    <ErrorBoundary
+      fallbackRender={({ resetErrorBoundary }) =>
+        fallback ?? <DefaultFallback onRetry={() => resetErrorBoundary()} />
       }
-
-      const { t } = i18nReact.useTranslation();
-      
-      return (
-        <Result
-          status="error"
-          title={t('Something went wrong')}
-          subTitle={t('An error occurred while loading the table browser. Please try refreshing the page.')}
-          extra={[
-            <Button
-              key="retry"
-              onClick={() => {
-                this.setState({ hasError: false, error: undefined });
-                this.props.onRetry?.();
-              }}
-            >
-              {t('Try Again')}
-            </Button>,
-            <Button
-              key="refresh"
-              onClick={() => window.location.reload()}
-            >
-              {t('Refresh Page')}
-            </Button>
-          ]}
-        />
-      );
-    }
-
-    return this.props.children;
-  }
-}
+      onError={(error, info) => {
+        // eslint-disable-next-line no-console
+        console.error('TableBrowser Error Boundary caught an error:', error, info);
+      }}
+      onReset={() => {
+        onRetry?.();
+      }}
+    >
+      {children}
+    </ErrorBoundary>
+  );
+};
 
 export default TableBrowserErrorBoundary;

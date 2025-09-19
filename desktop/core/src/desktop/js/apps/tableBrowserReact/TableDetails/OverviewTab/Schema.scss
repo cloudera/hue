@@ -7,6 +7,16 @@
 // Make schema table rows more compact - only target this specific component
 .cuix.antd {
   .hue-details-schema {
+    .schema-column-name {
+      display: inline-flex;
+      align-items: center;
+      gap: $fluidx-spacing-xs;
+    }
+
+    .schema-key-icon {
+      font-size: $font-size-sm;
+      color: $hue-action-primary;
+    }
     // Fix to get the link buttons in the schema table to be more compact when
     // combined with the Popover component that messes stuff up.
     .hue-paginated-table-container {
@@ -40,7 +50,7 @@
         'Courier New',
         monospace
       );
-      font-size: 12px;
+      font-size: $font-size-sm;
       line-height: 1.4;
     }
 
@@ -51,7 +61,7 @@
     .schema-type-cell {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: $fluidx-spacing-s;
     }
 
     // Use shared type label style
@@ -70,8 +80,8 @@
   // Make struct type popover wider for better readability
   .schema-type-popover {
     .ant-popover-inner-content {
-      min-width: 400px;
-      max-width: 600px;
+      min-width: 25rem; // 400px
+      max-width: 37.5rem; // 600px
     }
   }
 }

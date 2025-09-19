@@ -1,0 +1,11 @@
+// Licensed to Cloudera, Inc. under one or more contributor license agreements.
+// Apache License 2.0 applies.
+
+@use 'variables' as vars;
+
+.cuix.antd {
+  .hue-details-props__location {
+    color: vars.$hue-action-primary;
+    text-decoration: underline;
+  }
+}

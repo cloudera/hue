@@ -67,6 +67,7 @@ const TableBrowserTabs = ({
   ];
 
   // Debounced remount key to coalesce multiple label updates into a single recalculation
+  // This is a workaround to prevent the tabs from remounting multiple times when the labels change
   const rawKey = useMemo(
     () =>
       JSON.stringify({
@@ -86,6 +87,7 @@ const TableBrowserTabs = ({
   }, [rawKey]);
 
   // Suppress ink bar animation until labels stabilize after initial load
+  // This is a workaround to prevent the ink bar from animating multiple times when the labels change
   const [suppressInkAnim, setSuppressInkAnim] = useState<boolean>(true);
   useEffect(() => {
     setSuppressInkAnim(true);

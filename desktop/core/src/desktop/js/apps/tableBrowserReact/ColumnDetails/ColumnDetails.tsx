@@ -41,6 +41,11 @@ export interface ColumnDetailsProps {
   tableDetails: TableDetailsState;
   onBackToTable: () => void;
   onOpenField?: (nextFields: string[]) => void;
+  // Breadcrumb navigation callbacks (optional). If not provided, fall back to onBackToTable where applicable
+  onClickDataSources?: () => void;
+  onClickDatabases?: () => void;
+  onClickDatabase?: (database: string) => void;
+  onClickTable?: (table: string) => void;
 }
 
 const ColumnDetails = ({
@@ -51,7 +56,11 @@ const ColumnDetails = ({
   fields = [],
   tableDetails,
   onBackToTable,
-  onOpenField
+  onOpenField,
+  onClickDataSources,
+  onClickDatabases,
+  onClickDatabase,
+  onClickTable
 }: ColumnDetailsProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const { loading: loadingData, isRefreshing, detailsColumns, sampleData } = tableDetails;
@@ -474,16 +483,17 @@ const ColumnDetails = ({
         fields={fields}
         onClickColumn={() => onOpenField && onOpenField([])}
         onClickField={next => onOpenField && onOpenField(next)}
-        onClickTable={() => onBackToTable()}
-        onClickDatabases={() => onBackToTable()}
-        onClickDatabase={() => onBackToTable()}
+        onClickTable={() => (onClickTable ? onClickTable(table) : onBackToTable())}
+        onClickDatabases={() => (onClickDatabases ? onClickDatabases() : onBackToTable())}
+        onClickDatabase={() => (onClickDatabase ? onClickDatabase(database) : onBackToTable())}
+        onClickDataSources={onClickDataSources}
       />
 
       <div className="hue-table-browser__header-with-actions">
         <h3 className="hue-h3">{t('Column details')}</h3>
       </div>
 
-      <div style={{ marginBottom: 16 }}>
+      <div className="hue-column-details__meta">
         <MetaDataDisplay
           groups={[
             {
@@ -530,7 +540,7 @@ const ColumnDetails = ({
           <div className="hue-table-browser__header-with-actions">
             <h3 className="hue-h3">{t('Fields')}</h3>
             {hasStructChildren && (
-              <div style={{ display: 'inline-flex', gap: 8, alignItems: 'center' }}>
+              <div className="hue-column-details__flatten">
                 <Switch checked={flattened} onChange={() => setFlattened(prev => !prev)} />
                 <span>{t('Show flattened')}</span>
               </div>

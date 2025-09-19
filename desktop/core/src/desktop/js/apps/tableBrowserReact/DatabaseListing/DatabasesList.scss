@@ -1,0 +1,36 @@
+// Licensed to Cloudera, Inc. under one or more contributor license agreements.
+// See the NOTICE file distributed with this work for additional information.
+// Apache License 2.0 applies.
+
+@use 'variables' as vars;
+
+.cuix.antd {
+  .hue-db-list__confirm-text {
+    margin-bottom: vars.$cdl-spacing-s;
+  }
+
+  .hue-db-list__warning {
+    display: inline-block;
+    margin-top: vars.$cdl-spacing-xs;
+  }
+
+  .hue-db-list__field {
+    margin-bottom: vars.$cdl-spacing-m;
+  }
+
+  .hue-db-list__label {
+    display: block;
+    margin-bottom: vars.$cdl-spacing-xs;
+    font-weight: vars.$cdl-text-default-bold-weight;
+  }
+
+  .hue-db-list__hint {
+    font-size: vars.$font-size-sm;
+    color: vars.$fluidx-gray-700;
+    margin-top: vars.$cdl-spacing-xs;
+  }
+
+  .hue-db-list__checkbox {
+    margin-bottom: vars.$cdl-spacing-s;
+  }
+}

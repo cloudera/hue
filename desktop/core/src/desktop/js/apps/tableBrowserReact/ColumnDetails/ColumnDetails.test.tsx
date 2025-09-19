@@ -179,7 +179,7 @@ describe('ColumnDetails', () => {
     render(<ColumnDetails {...defaultProps} />);
 
     // Should show the toggle since there are nested structs
-    expect(screen.getByText('Show Flattened')).toBeInTheDocument();
+    expect(screen.getByText(/show flattened/i)).toBeInTheDocument();
   });
 
   it('does not show flatten toggle for non-struct columns', () => {
@@ -200,7 +200,7 @@ describe('ColumnDetails', () => {
     render(<ColumnDetails {...nonStructProps} />);
 
     // Should not show the toggle for non-struct columns
-    expect(screen.queryByText('Show Flattened')).not.toBeInTheDocument();
+    expect(screen.queryByText(/show flattened/i)).not.toBeInTheDocument();
   });
 
   it('filters out struct containers in flattened view', async () => {

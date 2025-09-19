@@ -1,22 +1,24 @@
 // Licensed to Cloudera, Inc. under one or more contributor license agreements.
 // Apache License 2.0 applies.
 
+@use 'variables' as vars;
+
 .tb-privileges {
-  padding: 8px 0;
+  padding: vars.$fluidx-spacing-s 0;
 
   &__loading {
     color: var(--hue-text-muted, #666);
   }
 
   &__meta {
-    margin-bottom: 8px;
+    margin-bottom: vars.$fluidx-spacing-s;
   }
 
   &__list {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr 1fr 2fr;
-    row-gap: 4px;
-    column-gap: 8px;
+    row-gap: vars.$fluidx-spacing-xs;
+    column-gap: vars.$fluidx-spacing-s;
   }
 
   &__row {
@@ -29,7 +31,7 @@
   }
 
   &__cell {
-    padding: 6px 0;
+    padding: vars.$fluidx-spacing-xs 0;
     border-bottom: 1px solid var(--hue-border-default, #e8e8e8);
   }
 }

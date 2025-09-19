@@ -78,8 +78,9 @@ export function useDatabaseProperties({
           setProperties(undefined);
         }
       } catch (error) {
-        console.warn('Failed to fetch database properties:', error);
         setProperties(undefined);
+        // eslint-disable-next-line no-console
+        console.warn('Failed to fetch database properties:', error);
       } finally {
         setLoading(false);
       }

@@ -2,12 +2,13 @@
 // Apache License 2.0 applies.
 
 import React from 'react';
-import { Skeleton } from 'antd';
-import Input from 'cuix/dist/components/Input';
+import { Skeleton, Input as AntdInput } from 'antd';
 import BorderlessButton from 'cuix/dist/components/Button/BorderlessButton';
 import Button from 'cuix/dist/components/Button/Button';
 import PrimaryButton from 'cuix/dist/components/Button/PrimaryButton';
 import { i18nReact } from '../../../utils/i18nReact';
+import classNames from 'classnames';
+import './InlineDescriptionEditor.scss';
 
 interface InlineDescriptionEditorProps {
   /** The unique identifier for this item */
@@ -54,14 +55,15 @@ const InlineDescriptionEditor = ({
 
   // Show skeleton while loading
   if (!hasLoadedDescription && !originalDescription) {
-    return <Skeleton.Input active size="small" style={{ width: '60%' }} />;
+    return <Skeleton.Input active size="small" className="inline-desc-editor__skeleton" />;
   }
 
   // Edit mode
   if (isEditing) {
     return (
-      <div>
-        <Input
+      <div className="inline-desc-editor">
+        <AntdInput.TextArea
+          className="inline-desc-editor__input"
           value={editingValue}
           onChange={e => onEditingValueChange(e.target.value)}
           onPressEnter={e => {
@@ -69,13 +71,14 @@ const InlineDescriptionEditor = ({
             onSave(itemId, editingValue);
           }}
           placeholder={defaultPlaceholder}
-          size="small"
+          size="middle"
+          autoSize={{ minRows: 1, maxRows: 4 }}
         />
-        <div style={{ marginTop: 2 }}>
+        <div className="inline-desc-editor__actions">
           <PrimaryButton size="small" onClick={() => onSave(itemId, editingValue)}>
             {t('Save')}
           </PrimaryButton>
-          <Button size="small" onClick={onCancelEdit} style={{ marginLeft: 4 }}>
+          <Button size="small" onClick={onCancelEdit} className="inline-desc-editor__cancel">
             {t('Cancel')}
           </Button>
         </div>
@@ -85,11 +88,11 @@ const InlineDescriptionEditor = ({
 
   // Display mode
   return (
-    <span>
-      {displayValue && <span style={{ marginRight: 8 }}>{displayValue}</span>}
+    <span className="inline-desc-editor inline-desc-editor--display">
+      {displayValue && <span className="inline-desc-editor__text">{displayValue}</span>}
       <BorderlessButton
         size="small"
-        style={{ opacity: 0.7, fontSize: '12px', padding: 0, height: 'auto', lineHeight: 1 }}
+        className={classNames({ 'inline-desc-editor__button--is-editing': displayValue })}
         onClick={() => onStartEdit(itemId, displayValue)}
       >
         {displayValue ? t('Edit') : t('Add')}

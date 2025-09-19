@@ -7,23 +7,23 @@
     @include mixins.fillAbsolute;
     @include mixins.flexRowLayout;
 
-    min-width: 300px;
+    min-width: 18.75rem; // 300px
 
     &__container {
       height: 100%;
       background-color: vars.$fluidx-gray-100;
-      padding: 16px;
+      padding: vars.$fluidx-spacing-m;
       overflow: auto; // Allow page-level scroll so inner tables can expand
     }
 
     &__page-header {
-      margin-bottom: 16px;
+      margin-bottom: vars.$fluidx-spacing-m;
 
       &__top-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        gap: 12px;
+        gap: vars.$fluidx-spacing-s;
       }
 
       &__icon {
@@ -44,7 +44,7 @@
 
     // For filter-only components (backwards compatibility)
     &__filter {
-      margin-bottom: 16px;
+      margin-bottom: vars.$fluidx-spacing-m;
 
       &.disabled {
         pointer-events: none;
@@ -57,7 +57,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
+      margin-bottom: vars.$fluidx-spacing-m;
 
       &.disabled {
         pointer-events: none;
@@ -67,7 +67,7 @@
       // Filter component takes available space
       .cuix-filter {
         flex: 1;
-        margin-right: 16px;
+        margin-right: vars.$fluidx-spacing-m;
       }
 
       // Actions container aligned to the right
@@ -78,7 +78,7 @@
     }
 
     &__empty-state {
-      margin-top: 16px;
+      margin-top: vars.$fluidx-spacing-m;
       max-width: 100%;
     }
 
@@ -87,13 +87,13 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
+      margin-bottom: vars.$fluidx-spacing-m;
     }
 
     // Action buttons container (for lists without headers)
     &__actions {
       display: flex;
-      gap: 8px;
+      gap: vars.$fluidx-spacing-s;
       justify-content: flex-end;
       margin-bottom: 8px;
     }
@@ -102,8 +102,8 @@
 
     &__details-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(22.5rem, 1fr));
+      gap: vars.$fluidx-spacing-m;
     }
 
     // Fixes for For Breadcrumbs
@@ -122,9 +122,9 @@
 
     .cuix-empty-state {
       max-width: 100%;
-      margin-top: 32px;
+      margin-top: 2rem;
       div {
-        margin-bottom: 24px;
+        margin-bottom: 1.5rem;
       }
       p {
         margin-bottom: 1em;

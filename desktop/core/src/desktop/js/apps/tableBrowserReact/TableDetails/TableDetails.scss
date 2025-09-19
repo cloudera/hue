@@ -1,0 +1,18 @@
+// Licensed to Cloudera, Inc. under one or more contributor license agreements.
+// Apache License 2.0 applies.
+
+@use 'variables' as vars;
+
+.cuix.antd {
+  .tb-table-details__confirm-text {
+    margin-bottom: vars.$fluidx-spacing-m;
+  }
+
+  .tb-table-details__skip-trash {
+    display: flex;
+    align-items: center;
+    gap: vars.$fluidx-spacing-s;
+  }
+}
+
+

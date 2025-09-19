@@ -10,16 +10,14 @@
 // License for the specific language governing permissions and limitations under
 // the License.
 
-import React, { useMemo, useState } from 'react';
-import { Input, Skeleton } from 'antd';
+import React, { useMemo } from 'react';
+import { ConfigProvider } from 'antd';
 import { LinkButton } from 'cuix/dist/components/Button';
-import PrimaryButton from 'cuix/dist/components/Button/PrimaryButton';
-import Button from 'cuix/dist/components/Button/Button';
 import Loading from 'cuix/dist/components/Loading';
 import Modal from 'cuix/dist/components/Modal';
-// import EmptyState from 'cuix/dist/components/EmptyState';
 import Filter from 'cuix/dist/components/Filter';
 import DatabaseIcon from '@cloudera/cuix-core/icons/react/DatabaseIcon';
+import InlineDescriptionEditor from '../sharedComponents/InlineDescriptionEditor';
 import Toolbar, { type ToolbarAction } from '../sharedComponents/Toolbar';
 import DatabasePropertiesComponent, {
   type DatabaseProperties
@@ -28,9 +26,11 @@ import PageHeader from '../sharedComponents/PageHeader';
 import PaginatedTable, {
   type ColumnProps as PaginatedColumnProps
 } from '../../../reactComponents/PaginatedTable/PaginatedTable';
-import type { FilterOutput } from 'cuix/dist/components/Filter/types';
-import type { SortOrder } from 'antd/lib/table/interface';
+import type { FilterOutput, BasicFacet } from 'cuix/dist/components/Filter/types';
+// import type { SortOrder } from 'antd/lib/table/interface';
 import { i18nReact } from '../../../utils/i18nReact';
+import './TablesList.scss';
+import type { TablesListState } from './useTablesListState';
 
 export interface TableRowItem {
   name: string;
@@ -40,22 +40,9 @@ export interface TableRowItem {
 
 export interface TablesListProps {
   tables: TableRowItem[];
-  isInitializing: boolean;
   isRefreshing: boolean;
   onRefresh?: () => void;
-  tableFilter: string;
-  setTableFilter: (value: string) => void;
-  tablePageNumber: number;
-  setTablePageNumber: (n: number) => void;
-  tablePageSize: number;
-  setTablePageSize: (s: number) => void;
-  tableDescriptions: Record<string, string>;
-  editingTableName: string | null;
-  editingTableValue: string;
-  setEditingTableName: (name: string | null) => void;
-  setEditingTableValue: (v: string) => void;
   onOpenTable: (name: string) => void;
-  onSaveDescription: (name: string, value: string) => void;
   onViewSelection?: (name: string) => void;
   onQuerySelection?: (name: string) => void;
   onDropSelection?: (names: string[], skipTrash?: boolean) => Promise<void> | void;
@@ -63,34 +50,18 @@ export interface TablesListProps {
   databaseName?: string;
   databaseProperties?: DatabaseProperties;
   loadingDatabaseProperties?: boolean;
-  // Breadcrumbs props
   sourceType?: string;
   table?: string;
   sourceOptions?: string[];
   onSelectSource?: (sourceType: string) => void;
-  onClickDataSources?: () => void;
-  onClickDatabases?: () => void;
-  onClickDatabase?: (database: string) => void;
+  state: TablesListState;
 }
 
 const TablesList = ({
   tables,
-  isInitializing,
   isRefreshing,
   onRefresh,
-  tableFilter,
-  setTableFilter,
-  tablePageNumber,
-  setTablePageNumber,
-  tablePageSize,
-  setTablePageSize,
-  tableDescriptions,
-  editingTableName,
-  editingTableValue,
-  setEditingTableName,
-  setEditingTableValue,
   onOpenTable,
-  onSaveDescription,
   onViewSelection,
   onQuerySelection,
   onDropSelection,
@@ -102,20 +73,77 @@ const TablesList = ({
   table,
   sourceOptions,
   onSelectSource,
-  onClickDataSources,
-  onClickDatabases,
-  onClickDatabase
+  state
+  // deprecated props intentionally not destructured/used; kept in type for compatibility
 }: TablesListProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
-  const [selected, setSelected] = useState<string[]>([]);
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const [skipTrash, setSkipTrash] = useState(false);
-  const [sortByColumn, setSortByColumn] = useState<string | undefined>(undefined);
-  const [sortOrder, setSortOrder] = useState<SortOrder>(null);
+  const {
+    isInitializing,
+    tableFilter,
+    setTableFilter,
+    tablePageSize,
+    setTablePageSize,
+    tablePageNumber,
+    setTablePageNumber,
+    selected,
+    setSelected,
+    confirmOpen,
+    setConfirmOpen,
+    skipTrash,
+    setSkipTrash,
+    sortByColumn,
+    setSortByColumn,
+    sortOrder,
+    setSortOrder,
+    selectedTypes,
+    setSelectedTypes,
+    editState
+  } = state;
 
-  const filtered = (tables || []).filter(item =>
-    tableFilter ? item.name.toLowerCase().includes(tableFilter.toLowerCase()) : true
-  );
+  // Build a deterministic key from available types to stabilize facets identity across renders
+  const typesKey = useMemo(() => {
+    const set = new Set<string>();
+    (tables || []).forEach(item => {
+      if (item.type) {
+        set.add(String(item.type));
+      }
+    });
+    return Array.from(set).sort().join('|');
+  }, [tables]);
+
+  const allTypes = useMemo(() => (typesKey ? typesKey.split('|') : []), [typesKey]);
+
+  const typeFacetLabel = t('Type');
+  const facets = useMemo((): BasicFacet[] => {
+    if (!allTypes.length) {
+      return [];
+    }
+    return [
+      {
+        label: typeFacetLabel,
+        items: allTypes,
+        multiple: true
+      }
+    ];
+  }, [allTypes, typeFacetLabel]);
+
+  const filtered = useMemo(() => {
+    let list = tables || [];
+    if (tableFilter) {
+      const lower = tableFilter.toLowerCase();
+      list = list.filter(item => {
+        const nameMatches = item.name.toLowerCase().includes(lower);
+        const desc = (editState.values[item.name] || item.comment || '').toLowerCase();
+        const descMatches = desc.includes(lower);
+        return nameMatches || descMatches;
+      });
+    }
+    if (selectedTypes.length > 0) {
+      const allowed = new Set(selectedTypes.map(String));
+      list = list.filter(item => allowed.has(String(item.type)));
+    }
+    return list;
+  }, [tables, tableFilter, selectedTypes, editState.values]);
 
   // Apply sorting
   const sorted = useMemo(() => {
@@ -234,55 +262,23 @@ const TablesList = ({
       dataIndex: 'comment',
       key: 'description',
       render: (_: string, record: { name: string }) => {
-        const hasValue = Object.prototype.hasOwnProperty.call(tableDescriptions, record.name);
-        const current = tableDescriptions[record.name] || '';
-        if (editingTableName === record.name) {
-          return (
-            <div>
-              <Input.TextArea
-                autoSize={{ minRows: 1, maxRows: 4 }}
-                value={editingTableValue}
-                onChange={e => setEditingTableValue(e.target.value)}
-                onPressEnter={e => {
-                  e.preventDefault();
-                  onSaveDescription(record.name, editingTableValue);
-                }}
-              />
-              <div style={{ marginTop: 4 }}>
-                <PrimaryButton
-                  size="small"
-                  onClick={() => onSaveDescription(record.name, editingTableValue)}
-                >
-                  {t('Save')}
-                </PrimaryButton>
-                <Button
-                  size="small"
-                  onClick={() => setEditingTableName(null)}
-                  style={{ marginLeft: 8 }}
-                >
-                  {t('Cancel')}
-                </Button>
-              </div>
-            </div>
-          );
-        }
-        if (!hasValue) {
-          return <Skeleton.Input active size="small" style={{ width: '60%' }} />;
-        }
+        const hasValue = Object.prototype.hasOwnProperty.call(editState.values, record.name);
         return (
-          <div>
-            <span style={{ whiteSpace: 'pre-wrap' }}>{current || ''}</span>
-            <LinkButton
-              size="small"
-              onClick={() => {
-                setEditingTableName(record.name);
-                setEditingTableValue(current);
-              }}
-              style={{ marginLeft: current ? 8 : 0 }}
-            >
-              {current ? t('Edit') : t('Add')}
-            </LinkButton>
-          </div>
+          <InlineDescriptionEditor
+            itemId={record.name}
+            currentDescription={editState.values[record.name]}
+            originalDescription={undefined}
+            isEditing={editState.editingId === record.name}
+            editingValue={editState.editingValue}
+            hasLoadedDescription={hasValue}
+            onStartEdit={(itemId, initialValue) => {
+              editState.setEditingId(itemId);
+              editState.setEditingValue(initialValue);
+            }}
+            onCancelEdit={() => editState.setEditingId(null)}
+            onSave={editState.save}
+            onEditingValueChange={editState.setEditingValue}
+          />
         );
       }
     }
@@ -307,9 +303,6 @@ const TablesList = ({
         table={table}
         sourceOptions={sourceOptions}
         onSelectSource={onSelectSource}
-        onClickDataSources={onClickDataSources}
-        onClickDatabases={onClickDatabases}
-        onClickDatabase={onClickDatabase}
       />
 
       {/* Database Properties Section */}
@@ -334,20 +327,39 @@ const TablesList = ({
       <div
         className={`hue-table-browser__filter-and-actions ${!!isInitializing || isRefreshing ? 'disabled' : ''}`}
       >
-        <Filter
-          search={{ placeholder: t('Filter tables & views') }}
-          onChange={(output: FilterOutput) => {
-            if (!!isInitializing || isRefreshing) {
-              return; // Prevent changes while loading
-            }
-            const searchValue = String(
-              (output as unknown as { search?: unknown[] }).search?.[0] ?? ''
-            );
-            if (searchValue !== tableFilter) {
-              setTableFilter(searchValue);
-            }
-          }}
-        />
+        <div className="cuix-filter">
+          <ConfigProvider getPopupContainer={trigger => trigger?.parentElement || document.body}>
+            <Filter
+              key={`filter-${facets.length}`}
+              search={{ placeholder: t('Filter tables & views') }}
+              facets={facets}
+              onChange={(output: FilterOutput) => {
+                if (!!isInitializing || isRefreshing) {
+                  return; // Prevent changes while loading
+                }
+                const out = (output || {}) as Record<string, unknown[]>;
+                const nextTypes = Array.isArray(out[typeFacetLabel])
+                  ? (out[typeFacetLabel] as unknown[]).map(String)
+                  : [];
+                // Only update when the selection meaningfully changes
+                const prev = selectedTypes;
+                const changed =
+                  prev.length !== nextTypes.length ||
+                  prev.some(v => !nextTypes.includes(v)) ||
+                  nextTypes.some(v => !prev.includes(v));
+                if (changed) {
+                  setSelectedTypes(nextTypes);
+                }
+                const searchValue = String(
+                  (output as unknown as { search?: unknown[] }).search?.[0] ?? ''
+                );
+                if (searchValue !== tableFilter) {
+                  setTableFilter(searchValue);
+                }
+              }}
+            />
+          </ConfigProvider>
+        </div>
         {toolbarActions.length > 0 && (
           <div className="hue-table-browser__actions">
             <Toolbar
@@ -409,20 +421,20 @@ const TablesList = ({
           }
         }}
       >
-        <div style={{ marginBottom: 16 }}>
+        <div className="hue-tables-list__confirm-text">
           {t('Do you really want to drop the selected table(s)?')}
         </div>
-        <ul style={{ marginBottom: 16 }}>
+        <ul className="hue-tables-list__confirm-list">
           {selected.slice(0, 10).map(name => (
             <li key={name}>{name}</li>
           ))}
         </ul>
         {selected.length > 10 && (
-          <div style={{ marginBottom: 16 }}>
+          <div className="hue-tables-list__confirm-more">
             {t('and')} {selected.length - 10} {t('others')}.
           </div>
         )}
-        <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <label className="hue-tables-list__confirm-skip">
           <input
             type="checkbox"
             checked={skipTrash}

@@ -9,7 +9,7 @@
 // WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 // License for the specific language governing permissions and limitations under
 // the License.
-import React, { useState } from 'react';
+import React from 'react';
 import { LinkButton } from 'cuix/dist/components/Button/';
 import Loading from 'cuix/dist/components/Loading';
 import EmptyState from 'cuix/dist/components/EmptyState';
@@ -20,20 +20,15 @@ import PaginatedTable, {
   type ColumnProps as PaginatedColumnProps
 } from '../../../reactComponents/PaginatedTable/PaginatedTable';
 import type { FilterOutput } from 'cuix/dist/components/Filter/types';
-import type { SortOrder } from 'antd/lib/table/interface';
+// import type { SortOrder } from 'antd/lib/table/interface';
+import type { SourcesListState } from './useSourcesListState';
 import { i18nReact } from '../../../utils/i18nReact';
 
 export interface SourcesListProps {
   sources: string[];
-  isInitializing: boolean;
   isRefreshing: boolean;
   onRefresh?: () => void;
-  sourceFilter: string;
-  setSourceFilter: (value: string) => void;
-  sourcePageNumber: number;
-  setSourcePageNumber: (num: number) => void;
-  sourcePageSize: number;
-  setSourcePageSize: (size: number) => void;
+  state: SourcesListState;
   onOpenSource: (sourceType: string) => void;
   // Breadcrumbs props
   sourceType?: string;
@@ -48,15 +43,9 @@ export interface SourcesListProps {
 
 const SourcesList = ({
   sources,
-  isInitializing,
   isRefreshing,
   onRefresh,
-  sourceFilter,
-  setSourceFilter,
-  sourcePageNumber,
-  setSourcePageNumber,
-  sourcePageSize,
-  setSourcePageSize,
+  state,
   onOpenSource,
   sourceType,
   database,
@@ -68,8 +57,19 @@ const SourcesList = ({
   onClickDatabase
 }: SourcesListProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
-  const [sortByColumn, setSortByColumn] = useState<string | undefined>(undefined);
-  const [sortOrder, setSortOrder] = useState<SortOrder>(null);
+  const {
+    isInitializing,
+    sourceFilter,
+    setSourceFilter,
+    sourcePageNumber,
+    setSourcePageNumber,
+    sourcePageSize,
+    setSourcePageSize,
+    sortByColumn,
+    setSortByColumn,
+    sortOrder,
+    setSortOrder
+  } = state;
 
   const filtered = sources.filter(src =>
     sourceFilter ? src.toLowerCase().includes(sourceFilter.toLowerCase()) : true

@@ -260,10 +260,10 @@ export function useTableDetails({
       const lastAccessRaw =
         (rawProps as Record<string, unknown>).last_access_time ||
         (rawProps as Record<string, unknown>).lastAccessTime ||
-        'UNKNOWN';
+        t('UNKNOWN');
       const lastAccessFormatted = (() => {
-        if (lastAccessRaw === 'UNKNOWN') {
-          return 'UNKNOWN';
+        if (lastAccessRaw === t('UNKNOWN')) {
+          return t('UNKNOWN');
         }
         const n = Number(lastAccessRaw as unknown as string);
         if (!isNaN(n) && isFinite(n)) {
@@ -477,9 +477,6 @@ export function useTableDetails({
         const val = String(p.value || '').trim();
         return !(key === 'table parameters' && val === '');
       });
-      // Debugging aid for tests; safe no-op in production
-      // eslint-disable-next-line no-console
-      console.log('[useTableDetails] baseInfo', baseInfo);
       setDetailsSections({
         baseInfo: cleanedBaseInfo,
         tableParameters,
@@ -577,6 +574,8 @@ export function useTableDetails({
       // Re-fetch all data using the same logic as initial load
       await fetchData();
     } catch (error) {
+      // Log refresh errors for easier debugging and test assertions
+      // eslint-disable-next-line no-console
       console.error('Error during refresh:', error);
       // Don't show error notification for refresh failures as they're often recoverable
       // and the user can still see the existing data

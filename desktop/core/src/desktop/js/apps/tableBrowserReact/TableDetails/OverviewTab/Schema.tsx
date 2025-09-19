@@ -1,8 +1,9 @@
 // Licensed to Cloudera, Inc. under one or more contributor license agreements.
 // Apache License 2.0 applies.
 
-import React, { useMemo, useState } from 'react';
-import { Popover } from 'antd';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Popover, ConfigProvider } from 'antd';
+import Tooltip from 'cuix/dist/components/Tooltip';
 import Filter from 'cuix/dist/components/Filter';
 import BorderlessButton from 'cuix/dist/components/Button/BorderlessButton';
 import KeyIcon from '@cloudera/cuix-core/icons/react/KeyIcon';
@@ -10,7 +11,7 @@ import InlineDescriptionEditor from '../../sharedComponents/InlineDescriptionEdi
 import PaginatedTable, {
   type ColumnProps as PaginatedColumnProps
 } from '../../../../reactComponents/PaginatedTable/PaginatedTable';
-import type { FilterOutput } from 'cuix/dist/components/Filter/types';
+import type { FilterOutput, BasicFacet } from 'cuix/dist/components/Filter/types';
 import type { SortOrder } from 'antd/lib/table/interface';
 import { i18nReact } from '../../../../utils/i18nReact';
 import { useDescriptionManager } from '../../hooks/useDescriptionManager';
@@ -40,6 +41,7 @@ export interface DetailsSchemaProps {
   table?: string;
   loadingSamples?: boolean;
   onOpenColumn?: (column: string) => void;
+  onCountChange?: (count: number) => void;
 }
 
 const DetailsSchema = ({
@@ -51,7 +53,8 @@ const DetailsSchema = ({
   database,
   table,
   loadingSamples,
-  onOpenColumn
+  onOpenColumn,
+  onCountChange
 }: DetailsSchemaProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const [filter, setFilter] = useState('');
@@ -59,6 +62,8 @@ const DetailsSchema = ({
   const [pageSize, setPageSize] = useState(25);
   const [sortByColumn, setSortByColumn] = useState<string | undefined>('name');
   const [sortOrder, setSortOrder] = useState<SortOrder>('ascend');
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const [selectedPartitionStates, setSelectedPartitionStates] = useState<string[]>([]);
 
   const isStructType = (type: string): boolean => {
     const lower = (type || '').toLowerCase();
@@ -128,6 +133,8 @@ const DetailsSchema = ({
   // Colors are applied via SCSS classes using cuix variables.
 
   // Description management
+  const columnNames = useMemo(() => (columns || []).map(c => c.name), [columns]);
+
   const {
     descriptions,
     editingItem: editingColumn,
@@ -139,22 +146,91 @@ const DetailsSchema = ({
     connector,
     namespace,
     compute,
-    // Avoid prefetching per-column descriptions to prevent N describe/stats calls
-    // We rely on provided column comments and lazy load on explicit actions
-    items: undefined,
+    // Prefetch descriptions for visible columns using Navigator metadata (single request)
+    items: columnNames,
     path: database && table ? [database, table] : [],
-    currentItem: undefined // We're editing columns, not navigating to them
+    currentItem: undefined, // We're editing columns, not navigating to them
+    disableDescribeFallback: true
   });
 
-  const filtered = useMemo(() => {
-    if (!filter) {
-      return columns;
+  // Build a deterministic key from available base types to stabilize facets identity
+  const typesKey = useMemo(() => {
+    const set = new Set<string>();
+    (columns || []).forEach(col => {
+      const base = getBaseType(col.type);
+      if (base) {
+        set.add(String(base));
+      }
+    });
+    return Array.from(set).sort().join('|');
+  }, [columns]);
+
+  const allTypes = useMemo(() => (typesKey ? typesKey.split('|') : []), [typesKey]);
+
+  const typeFacetLabel = t('Type');
+  const partitionFacetLabel = t('Partition key');
+  const yesLabel = t('Yes');
+  const noLabel = t('No');
+  const facets = useMemo((): BasicFacet[] => {
+    if (!allTypes.length) {
+      return [
+        {
+          label: partitionFacetLabel,
+          items: [yesLabel, noLabel],
+          multiple: true
+        }
+      ];
     }
-    const q = filter.toLowerCase();
-    return columns.filter(
-      c => c.name.toLowerCase().includes(q) || (c.comment || '').toLowerCase().includes(q)
-    );
-  }, [columns, filter]);
+    return [
+      {
+        label: typeFacetLabel,
+        items: allTypes,
+        multiple: true
+      },
+      {
+        label: partitionFacetLabel,
+        items: [yesLabel, noLabel],
+        multiple: true
+      }
+    ];
+  }, [allTypes, typeFacetLabel, partitionFacetLabel, yesLabel, noLabel]);
+
+  const filtered = useMemo(() => {
+    let list = columns || [];
+    if (filter) {
+      const q = filter.toLowerCase();
+      list = list.filter(
+        c => c.name.toLowerCase().includes(q) || (c.comment || '').toLowerCase().includes(q)
+      );
+    }
+    if (selectedTypes.length > 0) {
+      const allowed = new Set(selectedTypes.map(String));
+      list = list.filter(c => allowed.has(getBaseType(c.type)));
+    }
+    if (selectedPartitionStates.length > 0) {
+      const includeYes = selectedPartitionStates.includes(yesLabel);
+      const includeNo = selectedPartitionStates.includes(noLabel);
+      if (includeYes && !includeNo) {
+        list = list.filter(c => !!c.isPartitionKey);
+      } else if (!includeYes && includeNo) {
+        list = list.filter(c => !c.isPartitionKey);
+      } else {
+        // both selected -> no additional filtering
+      }
+    }
+    return list;
+  }, [columns, filter, selectedTypes, selectedPartitionStates, yesLabel, noLabel]);
+
+  // Notify parent about filtered count changes (for header)
+  useEffect(() => {
+    try {
+      if (onCountChange) {
+        onCountChange(filtered.length);
+      }
+    } catch {
+      // noop
+    }
+  }, [filtered, onCountChange]);
 
   // Apply sorting
   const sorted = useMemo(() => {
@@ -249,8 +325,12 @@ const DetailsSchema = ({
         const columnSampleData = getColumnSampleData(name);
 
         const columnNameWithIcon = (
-          <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            {record.isPartitionKey && <KeyIcon style={{ fontSize: '12px', color: '#1890ff' }} />}
+          <span className="schema-column-name">
+            {record.isPartitionKey ? (
+              <Tooltip title={t('Partition key')} placement="top">
+                <KeyIcon aria-label={t('Partition key')} className="schema-key-icon" />
+              </Tooltip>
+            ) : null}
             {name}
           </span>
         );
@@ -269,10 +349,10 @@ const DetailsSchema = ({
                       <div>
                         <div className="sample-popover__no-data-icon"></div>
                         {t('Column not found in sample data')}
-                        <div style={{ fontSize: '12px', marginTop: '8px' }}>
-                          <strong>Looking for:</strong> "{name}"
+                        <div className="sample-popover__note">
+                          <strong>{t('Looking for:')}</strong> "{name}"
                           <br />
-                          <strong>Available headers:</strong>
+                          <strong>{t('Available headers:')}</strong>
                           <br />
                           {sampleData.headers?.map((h, i) => <div key={i}>• "{h}"</div>)}
                         </div>
@@ -362,7 +442,8 @@ const DetailsSchema = ({
       dataIndex: 'comment',
       key: 'description',
       render: (_: string | undefined, record: ColumnDef & { key: string }) => {
-        const hasValue = Object.prototype.hasOwnProperty.call(descriptions, record.name);
+        // Avoid perpetual skeletons: treat description as loaded even if empty
+        const hasValue = true;
 
         return (
           <InlineDescriptionEditor
@@ -451,18 +532,50 @@ const DetailsSchema = ({
   return (
     <div className="hue-details-schema">
       <div className="hue-table-browser__filter">
-        <Filter
-          search={{ placeholder: t('Filter columns') }}
-          onChange={(output: FilterOutput) => {
-            const searchValue = String(
-              (output as unknown as { search?: unknown[] }).search?.[0] ?? ''
-            );
-            if (searchValue !== filter) {
-              setFilter(searchValue);
-              setPageNumber(1);
-            }
-          }}
-        />
+        <ConfigProvider getPopupContainer={trigger => trigger?.parentElement || document.body}>
+          <Filter
+            key={`filter-${facets.length}`}
+            search={{ placeholder: t('Filter columns') }}
+            facets={facets}
+            onChange={(output: FilterOutput) => {
+              const out = (output || {}) as Record<string, unknown[]>;
+              const nextTypes = Array.isArray(out[typeFacetLabel])
+                ? (out[typeFacetLabel] as unknown[]).map(String)
+                : [];
+
+              const prev = selectedTypes;
+              const changedTypes =
+                prev.length !== nextTypes.length ||
+                prev.some(v => !nextTypes.includes(v)) ||
+                nextTypes.some(v => !prev.includes(v));
+              if (changedTypes) {
+                setSelectedTypes(nextTypes);
+                setPageNumber(1);
+              }
+
+              const nextPartitions = Array.isArray(out[partitionFacetLabel])
+                ? (out[partitionFacetLabel] as unknown[]).map(String)
+                : [];
+              const prevPartitions = selectedPartitionStates;
+              const changedPartitions =
+                prevPartitions.length !== nextPartitions.length ||
+                prevPartitions.some(v => !nextPartitions.includes(v)) ||
+                nextPartitions.some(v => !prevPartitions.includes(v));
+              if (changedPartitions) {
+                setSelectedPartitionStates(nextPartitions);
+                setPageNumber(1);
+              }
+
+              const searchValue = String(
+                (output as unknown as { search?: unknown[] }).search?.[0] ?? ''
+              );
+              if (searchValue !== filter) {
+                setFilter(searchValue);
+                setPageNumber(1);
+              }
+            }}
+          />
+        </ConfigProvider>
       </div>
       <PaginatedTable<ColumnDef & { key: string }>
         data={pageData}
