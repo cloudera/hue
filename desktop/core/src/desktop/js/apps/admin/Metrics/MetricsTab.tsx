@@ -117,13 +117,13 @@ const Metrics: React.FC = (): JSX.Element => {
 
         <div className="metrics-component__table-group">
           {!error &&
-            filteredMetricsData.map((tableData, index) => (
-              <div key={index}>
-                {(showAllTables || selectedMetric === tableData.caption) && (
+            filteredMetricsData
+              .filter(tableData => showAllTables || selectedMetric === tableData.caption)
+              .map((tableData, index) => (
+                <div key={index}>
                   <MetricsTable caption={tableData.caption} dataSource={tableData.dataSource} />
-                )}
-              </div>
-            ))}
+                </div>
+              ))}
         </div>
       </Loading>
     </div>
