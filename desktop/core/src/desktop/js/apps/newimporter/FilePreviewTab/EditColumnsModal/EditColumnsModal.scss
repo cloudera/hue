@@ -40,4 +40,15 @@
   }
 }
 
-// Fix for unresolved GitHub conversation - ensuring all selectors are properly defined
+// Modal styling optimizations
+.hue-importer-edit-columns-modal {
+  // Additional accessibility and UX improvements
+  .ant-modal-header {
+    border-bottom: 1px solid vars.$fluidx-gray-200;
+  }
+  
+  .ant-table {
+    // Ensure proper table spacing
+    margin-top: 16px;
+  }
+}
