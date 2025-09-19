@@ -20,6 +20,7 @@
   .config-component {
     background-color: $fluidx-gray-100;
     padding: 24px;
+    min-height: 100vh;
 
     .config__section-dropdown-label {
       color: $fluidx-gray-700;
