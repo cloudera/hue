@@ -197,7 +197,7 @@ describe('EditColumnsModal', () => {
       const { setColumns } = renderModal({ columns: duplicateColumns });
 
       await waitFor(() => {
-        expect(screen.getByText('Duplicate column name: col1')).toBeInTheDocument();
+        expect(screen.getByText('Column name "col1" must be unique')).toBeInTheDocument();
       });
 
       const doneButton = screen.getByRole('button', { name: 'Done' });
@@ -241,7 +241,7 @@ describe('EditColumnsModal', () => {
 
       // Initially should show error and disable button
       await waitFor(() => {
-        expect(screen.getByText('Duplicate column name: col1')).toBeInTheDocument();
+        expect(screen.getByText('Column name "col1" must be unique')).toBeInTheDocument();
       });
       expect(screen.getByRole('button', { name: 'Done' })).toBeDisabled();
 
@@ -252,7 +252,7 @@ describe('EditColumnsModal', () => {
 
       // Error should disappear and button should be enabled
       await waitFor(() => {
-        expect(screen.queryByText('Duplicate column name: col1')).not.toBeInTheDocument();
+        expect(screen.queryByText('Column name "col1" must be unique')).not.toBeInTheDocument();
       });
 
       const doneButton = screen.getByRole('button', { name: 'Done' });
@@ -329,7 +329,7 @@ describe('EditColumnsModal', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText('Duplicate column name: duplicate. 1 column(s) have empty names')
+          screen.getByText('Column name "duplicate" must be unique. 1 column(s) have empty names')
         ).toBeInTheDocument();
       });
 
@@ -351,7 +351,7 @@ describe('EditColumnsModal', () => {
       renderModal({ columns: columnsWithWhitespace });
 
       await waitFor(() => {
-        expect(screen.getByText('Duplicate column name: col1')).toBeInTheDocument();
+        expect(screen.getByText('Column name "col1" must be unique')).toBeInTheDocument();
       });
 
       const doneButton = screen.getByRole('button', { name: 'Done' });
