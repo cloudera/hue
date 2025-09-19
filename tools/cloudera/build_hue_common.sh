@@ -44,14 +44,8 @@ function install_build_dependencies() {
             libbz2-dev libncurses5-dev libgdbm-dev libreadline-dev libkrb5-dev \
             liblzma-dev uuid-dev libldap2-dev libffi-dev zlib1g-dev libssl-dev wget curl'
           ;;
-      redhat9|redhat8|centos7)
+      redhat9|redhat8|redhat8-arm64|centos7)
           sudo -- sh -c 'yum groupinstall -y "Development Tools" && \
-            yum install -y \
-            bzip2-devel ncurses-devel gdbm-devel readline-devel krb5-devel \
-            xz-devel libuuid-devel openldap-devel libffi-devel zlib-devel openssl-devel wget curl'
-          ;;
-      redhat8-arm64)
-          sudo -- sh -c 'yum groupinstall -y "Development Tools" --nobest && \
             yum install -y \
             bzip2-devel ncurses-devel gdbm-devel readline-devel krb5-devel \
             xz-devel libuuid-devel openldap-devel libffi-devel zlib-devel openssl-devel wget curl'
