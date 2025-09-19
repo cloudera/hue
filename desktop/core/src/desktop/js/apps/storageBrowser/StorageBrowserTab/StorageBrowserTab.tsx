@@ -83,7 +83,7 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
     error,
     reloadData
   } = useLoadData<FileStats, { path: string }, AxiosError>(FILE_STATS_API_URL, {
-    fetchOptions: { isRawError: true },
+    options: { isRawError: true },
     params: { path: filePath },
     skip: !filePath
   });

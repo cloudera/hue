@@ -209,6 +209,4 @@ class S3ConnectorUploadHandler(FileUploadHandler):
     if self.destination:
       if "://" in self.destination:
         return self.destination.split("://")[0].upper()
-      else:
-        raise S3ConnectorUploadError("Destination does not have a valid scheme")
     return None
