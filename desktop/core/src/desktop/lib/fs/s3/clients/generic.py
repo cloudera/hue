@@ -22,7 +22,7 @@ import boto3
 from boto3.session import Session
 from botocore.credentials import Credentials
 
-from desktop.conf import RAZ
+from desktop.conf import default_ssl_cacerts, default_ssl_validate, RAZ
 from desktop.lib.fs.s3.clients.auth.key import KeyAuthProvider
 from desktop.lib.fs.s3.clients.auth.raz import RazAuthProvider
 from desktop.lib.fs.s3.clients.base import S3AuthProvider, S3ClientInterface
@@ -41,19 +41,11 @@ class GenericS3Client(S3ClientInterface):
   """
 
   def __init__(self, connector_config: "ConnectorConfig", user: str):
+    # Store options for pre-configuration
+    self._options = connector_config.options or {}
+
+    # Initialize with proper configuration applied BEFORE client creation
     super().__init__(connector_config, user)
-
-    # Override client config for generic providers
-    self.client_config.signature_version = self._get_signature_version()
-    self.client_config.s3.update(
-      {
-        "addressing_style": "path",  # Always use path style
-        "payload_signing_enabled": True,
-      }
-    )
-
-    # Apply provider-specific settings
-    self._setup_provider_specific_config()
 
   def _create_auth_provider(self) -> S3AuthProvider:
     """Create appropriate auth provider for generic providers"""
@@ -76,20 +68,15 @@ class GenericS3Client(S3ClientInterface):
   def _setup_provider_specific_config(self) -> None:
     """Setup provider-specific configurations"""
     provider = self.connector_config.provider.lower()
-    options = self.connector_config.options or {}
 
     if provider == "netapp":
-      self._setup_netapp_config(options)
+      self._setup_netapp_config(self._options)
     elif provider == "dell":
-      self._setup_dell_config(options)
+      self._setup_dell_config(self._options)
     # Add more providers as needed
 
   def _setup_netapp_config(self, options: Dict[str, Any]) -> None:
-    """Setup Netapp StorageGRID specific config"""
-    # SSL verification
-    if "ssl_verify" in options:
-      self.client_config.verify = options["ssl_verify"]
-
+    """Setup Netapp StorageGRID specific config (SSL handled separately)"""
     # Custom headers
     if "custom_headers" in options:
       self.client_config.s3["custom_headers"] = options["custom_headers"]
@@ -105,6 +92,57 @@ class GenericS3Client(S3ClientInterface):
       self.transfer_config["multipart_threshold"] = options["multipart_threshold"]
     if "multipart_chunksize" in options:
       self.transfer_config["multipart_chunksize"] = options["multipart_chunksize"]
+
+  def _configure_client_settings(self) -> None:
+    """Configure Generic S3 client settings before client creation"""
+    # Generic provider config
+    self.client_config.signature_version = self._get_signature_version()
+    self.client_config.s3.update(
+      {
+        "addressing_style": "path",  # Always use path style
+        "payload_signing_enabled": True,
+      }
+    )
+
+    # Apply provider-specific settings
+    self._setup_provider_specific_config()
+
+    # Apply SSL configuration (using global Hue SSL settings)
+    self._setup_ssl_config()
+
+  def _setup_ssl_config(self) -> None:
+    """Setup SSL verification configuration using global SSL settings with connector overrides"""
+    # Start with global Hue SSL settings
+    ssl_validate = default_ssl_validate()
+    ssl_cacerts = default_ssl_cacerts()
+
+    # Allow connector-specific overrides via options
+    if "ssl_cert_ca_verify" in self._options:
+      ssl_validate = self._options["ssl_cert_ca_verify"]
+      LOG.debug(f"Connector overrides SSL verification: {ssl_validate}")
+
+    if "ca_bundle" in self._options:
+      ssl_cacerts = self._options["ca_bundle"]
+      LOG.debug(f"Connector overrides CA bundle: {ssl_cacerts}")
+
+    # Apply SSL configuration
+    if ssl_validate:
+      if ssl_cacerts:
+        # Use custom CA bundle if specified
+        self.client_config.verify = ssl_cacerts
+        LOG.debug(f"Using CA bundle for SSL verification: {ssl_cacerts}")
+      else:
+        # Use default system CA certificates
+        self.client_config.verify = True
+        LOG.debug("Using system CA certificates for SSL verification")
+    else:
+      # Disable SSL verification
+      self.client_config.verify = False
+      LOG.warning("SSL certificate verification is DISABLED - use only for testing!")
+
+    # Client-side certificates (if needed)
+    if "client_cert" in self._options:
+      self.client_config.client_cert = self._options["client_cert"]
 
   def _create_session(self) -> Session:
     """Create boto3 session"""
