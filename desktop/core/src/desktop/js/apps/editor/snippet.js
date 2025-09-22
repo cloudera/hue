@@ -805,10 +805,19 @@ export default class Snippet {
   }
 
   async close() {
-    $.post('/notebook/api/close_statement', {
-      notebook: await this.parentNotebook.toContextJson(),
-      snippet: this.toContextJson()
-    });
+    // Simple fix: Wait for any active fetch to complete
+    const doClose = () => {
+      $.post('/notebook/api/close_statement', {
+        notebook: this.parentNotebook.toContextJson(),
+        snippet: this.toContextJson()
+      });
+    };
+
+    if (this.isFetchingData) {
+      setTimeout(doClose, 100);
+    } else {
+      doClose();
+    }
   }
 
   execute() {

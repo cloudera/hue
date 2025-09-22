@@ -2511,23 +2511,33 @@ class Snippet {
       }
     };
 
+    
     self.close = function () {
       self.clearActiveExecuteRequests();
 
-      $.post(
-        '/notebook/api/close_statement',
-        {
-          notebook: komapping.toJSON(notebook.getContext()),
-          snippet: komapping.toJSON(self.getContext())
-        },
-        data => {
-          if (data.status == 0) {
-            // self.status('closed'); // Keep as 'running' as currently it happens before running a new query
-          } else {
-            // self._ajaxError(data);
+      // Simple fix: Wait for any active fetch to complete
+      const doClose = () => {
+        $.post(
+          '/notebook/api/close_statement',
+          {
+            notebook: komapping.toJSON(notebook.getContext()),
+            snippet: komapping.toJSON(self.getContext())
+          },
+          data => {
+            if (data.status == 0) {
+              // self.status('closed'); // Keep as 'running' as currently it happens before running a new query
+            } else {
+              // self._ajaxError(data);
+            }
           }
-        }
-      );
+        );
+      };
+
+      if (self.isFetchingData) {
+        setTimeout(doClose, 100);
+      } else {
+        doClose();
+      }
     };
 
     self.clearActiveExecuteRequests = function () {
