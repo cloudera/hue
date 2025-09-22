@@ -21,6 +21,7 @@ import Alert from 'cuix/dist/components/Alert';
 import { get } from '../../../api/utils';
 import { i18nReact } from '../../../utils/i18nReact';
 import AdminHeader from '../AdminHeader';
+import { metricLabels, labelToKey } from './constants';
 
 import './Metrics.scss';
 
@@ -83,8 +84,9 @@ const Metrics: React.FC = (): JSX.Element => {
     }));
   };
   const handleMetricChange = (value: string) => {
-    setSelectedMetric(value);
-    setShowAllTables(value === 'All');
+    const key = value === 'All' ? 'All' : labelToKey[value] || value;
+    setSelectedMetric(key);
+    setShowAllTables(key === 'All');
   };
 
   const handleFilterInputChange = (filterValue: string) => {
@@ -98,8 +100,10 @@ const Metrics: React.FC = (): JSX.Element => {
       <Loading spinning={loading}>
         {!error && (
           <AdminHeader
-            options={['All', ...filteredKeys]}
-            selectedValue={selectedMetric}
+            options={['All', ...filteredKeys.map(key => metricLabels[key] || key)]}
+            selectedValue={
+              selectedMetric === 'All' ? 'All' : metricLabels[selectedMetric] || selectedMetric
+            }
             onSelectChange={handleMetricChange}
             filterValue={searchQuery}
             onFilterChange={handleFilterInputChange}
