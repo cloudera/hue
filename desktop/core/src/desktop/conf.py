@@ -170,6 +170,18 @@ def is_custom_jwt_auth_enabled():
   return bool(AUTH.JWT.KEY_SERVER_URL.get())
 
 
+GUNICORN_MAX_REQUESTS = Config(
+  key="gunicorn_max_requests",
+  help=_("The maximum number of requests a worker will process before restarting."),
+  type=int,
+  default=1200)
+
+GUNICORN_MAX_REQUESTS_JITTER = Config(
+  key="gunicorn_max_requests_jitter",
+  help=_("The maximum jitter to add to the max_requests setting."),
+  type=int,
+  default=0)
+
 USE_CHERRYPY_SERVER = Config(
   key="use_cherrypy_server",
   help=_("If set to true, CherryPy will be used. Otherwise, Gunicorn will be used as the webserver."),
