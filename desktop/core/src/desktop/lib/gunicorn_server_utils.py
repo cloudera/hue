@@ -318,8 +318,9 @@ def create_gunicorn_options(options):
     'limit_request_fields': conf.LIMIT_REQUEST_FIELDS.get(),
     'limit_request_line': conf.LIMIT_REQUEST_LINE.get(),
     'loglevel': 'DEBUG' if conf.DJANGO_DEBUG_MODE.get() else 'INFO',
-    'max_requests': 1200,          # The maximum number of requests a worker will process before restarting.
-    'max_requests_jitter': 0,
+    # The maximum number of requests a worker will process before restarting.
+    'max_requests': conf.GUNICORN_MAX_REQUESTS.get(),
+    'max_requests_jitter': conf.GUNICORN_MAX_REQUESTS_JITTER.get(),
     'paste': None,
     'pidfile': None,
     'preload_app': False,
