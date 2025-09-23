@@ -35,6 +35,7 @@ SESSION_KEY = '%(username)s-%(connector_name)s'
 OPERATION_TOKEN = '%(username)s-%(connector_name)s' + '-operation-token'
 DEFAULT_CATALOG_PARAM = "default_catalog"
 DEFAULT_DATABASE_PARAM = "default_database"
+LIST_ALL_FUNCTIONS_PARAM = "list_all_functions"
 
 
 def query_error_handler(func):
@@ -74,6 +75,7 @@ class FlinkSqlApi(Api):
     api_url = self.options['url']
     self.default_catalog = self.options.get(DEFAULT_CATALOG_PARAM)
     self.default_database = self.options.get(DEFAULT_DATABASE_PARAM)
+    self.list_all_functions = self.options.get(LIST_ALL_FUNCTIONS_PARAM)
 
     self.db = FlinkSqlClient(user=user, api_url=api_url)
 
@@ -418,12 +420,18 @@ class FlinkSqlApi(Api):
     data = [i['fields'] for i in resp['results']['data'] if resp and resp['results'] and resp['results']['data']]
     return data
 
-  def _show_databases(self):
+  def _show_catalogs(self):
     session = self._get_session()
-    session_handle = session['id']
+    operation_handle = self.db.execute_statement(session_handle=session['id'], statement='SHOW CATALOGS')
+    catalog_list = self._check_status_and_fetch_result(session['id'], operation_handle['operationHandle'])
 
-    operation_handle = self.db.execute_statement(session_handle=session_handle, statement='SHOW DATABASES')
-    db_list = self._check_status_and_fetch_result(session_handle, operation_handle['operationHandle'])
+    return [catalog[0] for catalog in catalog_list]
+
+  def _show_databases(self, catalog=None):
+    session = self._get_session()
+    statement = 'SHOW DATABASES IN `%(catalog)s`' % {'catalog': catalog} if catalog else 'SHOW DATABASES'
+    operation_handle = self.db.execute_statement(session_handle=session['id'], statement=statement)
+    db_list = self._check_status_and_fetch_result(session['id'], operation_handle['operationHandle'])
 
     return [db[0] for db in db_list]
 
@@ -461,8 +469,47 @@ class FlinkSqlApi(Api):
     ]
 
   def _show_functions(self, database):
+    if self.list_all_functions:
+      return self._show_all_functions()
+    else:
+      return self._show_functions_in_current_db(database)
+
+  def _show_functions_in_current_db(self, database):
     session = self._get_session()
     statement = 'SHOW FUNCTIONS IN `%(database)s`' % {'database': database} if database else 'SHOW FUNCTIONS'
+    operation_handle = self.db.execute_statement(session['id'], statement)
+    function_list = self._check_status_and_fetch_result(session['id'], operation_handle['operationHandle'])
+    return [{'name': function[0]} for function in function_list]
+
+  def _show_all_functions(self):
+    # Flink UDFs can be registered in any catalog in any database. This function iterates through all catalogs
+    # and databases to lists all defined functions. The results are then extended with Flink system functions.
+    # Returned user functions names are fully qualified (<catalog_name>.<database_name>.<function_name>).
+    result = []
+
+    for catalog in self._show_catalogs():
+      for database in self._show_databases(catalog):
+        user_functions = self._list_user_functions(catalog, database)
+        result.extend([{'name': f'{catalog}.{database}.{function["name"]}'} for function in user_functions])
+
+    result.extend(self._list_system_functions())
+    return result
+
+  def _list_system_functions(self):
+    # Flink allows to either list all functions or only user functions.
+    all_functions = self._list_functions(catalog=self.default_catalog, database=self.default_database, user_scope=False)
+    user_functions = self._list_user_functions(catalog=self.default_catalog, database=self.default_database)
+    system_functions = [f for f in all_functions if f not in user_functions]
+    return system_functions
+
+  def _list_user_functions(self, catalog, database):
+    return self._list_functions(catalog, database, user_scope=True)
+
+  def _list_functions(self, catalog, database, user_scope):
+    session = self._get_session()
+    statement = 'SHOW USER FUNCTIONS' if user_scope else 'SHOW FUNCTIONS'
+    if database:
+      statement = statement + ' IN `%(catalog)s`.`%(database)s`' % {'catalog': catalog, 'database': database}
     operation_handle = self.db.execute_statement(session['id'], statement)
     function_list = self._check_status_and_fetch_result(session['id'], operation_handle['operationHandle'])
     return [{'name': function[0]} for function in function_list]
@@ -476,9 +523,11 @@ class FlinkSqlApi(Api):
         statement='DESCRIBE FUNCTION EXTENDED %(function_name)s' % {'function_name': function_name})
       properties = dict(self._check_status_and_fetch_result(session['id'], operation_handle['operationHandle']))
 
+      # Function can be overloaded (multiple signatures). But only the first signature will be returned.
+      signatures = properties.get('signature').split('\n')
       return {
         'name': function_name,
-        'signature': properties.get('signature'),
+        'signature': signatures[0],
       }
     else:
       return {'name': function_name}
