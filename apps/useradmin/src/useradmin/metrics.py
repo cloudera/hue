@@ -17,6 +17,7 @@
 import logging
 from datetime import datetime, timedelta
 
+from cx_Oracle import DatabaseError as OracleDatabaseError
 from django.db import connection
 from django.db.utils import DatabaseError, OperationalError
 from prometheus_client import Gauge
@@ -35,7 +36,7 @@ def active_users():
         first_login=False,
         hostname__isnull=False
     ).count()
-  except (OperationalError, DatabaseError) as oe:
+  except (OperationalError, DatabaseError, OracleDatabaseError) as oe:
     LOG.debug('active_users recovering from %s' % str(oe))
     connection.close()
     connection.connect()
@@ -45,7 +46,7 @@ def active_users():
         hostname__isnull=False
     ).count()
   except Exception as e:
-    LOG.exception('Could not get active_users')
+    LOG.exception('Could not get active_users: %s' % str(e))
     count = 0
   return count
 
@@ -67,14 +68,14 @@ def active_users_per_instance():
   try:
     count = UserProfile.objects.filter(last_activity__gt=datetime.now() - timedelta(hours=1),
                                        hostname=get_localhost_name()).count()
-  except (OperationalError, DatabaseError) as oe:
+  except (OperationalError, DatabaseError, OracleDatabaseError) as oe:
     LOG.debug('active_users_per_instance recovering from %s' % str(oe))
     connection.close()
     connection.connect()
     count = UserProfile.objects.filter(last_activity__gt=datetime.now() - timedelta(hours=1),
                                        hostname=get_localhost_name()).count()
   except Exception as e:
-    LOG.exception('Could not get active_users per instance')
+    LOG.exception('Could not get active_users per instance: %s' % str(e))
     count = 0
   return count
 
