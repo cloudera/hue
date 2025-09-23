@@ -15,20 +15,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import re
 import json
-import time
 import logging
+import re
 import threading
+import time
 from builtins import object
 
+from azure.abfs import abfspath
 from django.core.cache import caches
-from django.urls import reverse
 from django.utils.encoding import force_str
 from django.utils.translation import gettext as _
 from kazoo.client import KazooClient
 
-from azure.abfs import abfspath
 from beeswax.common import apply_natural_sort, is_compute
 from beeswax.conf import (
   APPLY_NATURAL_SORT_MAX,
@@ -67,7 +66,6 @@ from beeswax.hive_site import (
 )
 from beeswax.models import QUERY_TYPES, Compute, QueryHistory
 from desktop.conf import has_connectors
-from desktop.lib.django_util import format_preserving_redirect
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.parameterization import substitute_variables
 from desktop.lib.view_util import location_to_url
