@@ -21,6 +21,7 @@ import ConfigStatus from './ConfigStatus';
 import Analytics from './Analytics';
 import { i18nReact } from '../../../utils/i18nReact';
 import './Overview.scss';
+import { hueWindow } from 'types/types';
 
 const Overview = (): JSX.Element => {
   const { t } = i18nReact.useTranslation();
@@ -46,7 +47,12 @@ const Overview = (): JSX.Element => {
   return (
     <div className="hue-overview-component">
       <Tabs tabPosition="left" items={items} />
-      <div className="overview__trademark-text">
+      <div className="overview__footer-text">
+        {(window as hueWindow).PYTHON_VERSION && (
+          <div>
+            {t('Python version: {{version}}', { version: (window as hueWindow).PYTHON_VERSION })}
+          </div>
+        )}
         {t('Hue and the Hue logo are trademarks of Cloudera, Inc.')}
       </div>
     </div>
