@@ -77,14 +77,14 @@ const getHeaderText = (t: TFunction, uploadQueue: RegularFile[], isCheckingConfl
 
   const { failed, pending } = getCountByStatus(uploadQueue);
   const fileText = uploadQueue.length > 1 ? t('files') : t('file');
-  const failedText = failed > 0 ? t(`, ${failed} failed`) : '';
+  const failedText = failed > 0 ? `, ${failed} ${t('failed')}` : '';
 
   if (pending > 0) {
-    const pendingText = t(`${pending} ${fileText} remaining`);
+    const pendingText = `${pending} ${fileText} ${t('remaining')}`;
     return `${pendingText}${failedText}`;
   }
 
-  const uploadedText = t(`${uploadQueue.length} ${fileText} uploaded`);
+  const uploadedText = `${uploadQueue.length} ${fileText} ${t('uploaded')}`;
   return `${uploadedText}${failedText}`;
 };
 
@@ -174,10 +174,17 @@ const FileUploadQueue = (): JSX.Element => {
       return;
     }
     setIsCheckingConflicts(true);
-    const { conflicts, nonConflictingFiles } = await detectFileConflicts(newFiles, uploadQueue);
-    setIsCheckingConflicts(false);
-    setConflictingFiles(conflicts);
-    addFiles(nonConflictingFiles);
+    try {
+      const { conflicts, nonConflictingFiles } = await detectFileConflicts(newFiles, uploadQueue);
+      setConflictingFiles(conflicts);
+      addFiles(nonConflictingFiles);
+    } catch (error) {
+      huePubSub.publish('hue.global.error', {
+        message: t('Failed to check for file conflicts. Please try again.')
+      });
+    } finally {
+      setIsCheckingConflicts(false);
+    }
   };
 
   useHuePubSub<FileUploadEvent>({

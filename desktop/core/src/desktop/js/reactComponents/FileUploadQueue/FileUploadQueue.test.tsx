@@ -67,6 +67,12 @@ describe('FileUploadQueue', () => {
 
     huePubSub.removeAll(FILE_UPLOAD_START_EVENT);
     huePubSub.removeAll('set.current.app.name');
+    huePubSub.removeAll('get.current.app.name');
+
+    // Set up the get.current.app.name subscription to return storagebrowser by default
+    huePubSub.subscribe('get.current.app.name', (callback: (appName: string) => void) => {
+      callback('storagebrowser');
+    });
 
     mockUseFileUpload.mockReturnValue({
       uploadQueue: mockFilesQueue,
@@ -75,17 +81,17 @@ describe('FileUploadQueue', () => {
       removeAllFiles: mockRemoveAllFiles,
       isLoading: false
     });
+  });
 
-    setTimeout(() => {
-      huePubSub.publish('set.current.app.name', 'storagebrowser');
-    }, 0);
+  afterEach(() => {
+    huePubSub.removeAll('get.current.app.name');
   });
 
   it('should not render when current app is not storagebrowser', async () => {
-    huePubSub.removeAll('set.current.app.name');
-    setTimeout(() => {
-      huePubSub.publish('set.current.app.name', 'editor');
-    }, 0);
+    huePubSub.removeAll('get.current.app.name');
+    huePubSub.subscribe('get.current.app.name', (callback: (appName: string) => void) => {
+      callback('editor');
+    });
 
     const { container } = render(<FileUploadQueue />);
 
@@ -146,13 +152,13 @@ describe('FileUploadQueue', () => {
     const files: RegularFile[] = [
       {
         uuid: 'c1',
-        filePath: '/dir', // conflict file
+        filePath: '/dir',
         status: FileStatus.Pending,
         file: new File([], 'conflict.txt')
       },
       {
         uuid: 'n1',
-        filePath: '/dir', // non-conflict file
+        filePath: '/dir',
         status: FileStatus.Pending,
         file: new File([], 'new.txt')
       }
@@ -160,9 +166,6 @@ describe('FileUploadQueue', () => {
 
     mockGet.mockImplementation((_url: string, data?: unknown) => {
       const params = data as { path: string };
-      if (params.path === files[0].filePath) {
-        return CancellablePromise.reject({ path: params.path });
-      }
       return CancellablePromise.resolve({ path: params.path });
     });
 

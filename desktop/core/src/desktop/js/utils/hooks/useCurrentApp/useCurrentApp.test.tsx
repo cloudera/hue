@@ -22,9 +22,11 @@ import { useCurrentApp } from './useCurrentApp';
 describe('useCurrentApp', () => {
   beforeEach(() => {
     huePubSub.removeAll('set.current.app.name');
+    huePubSub.removeAll('set.current.app.name');
   });
 
   afterEach(() => {
+    huePubSub.removeAll('set.current.app.name');
     huePubSub.removeAll('set.current.app.name');
   });
 
@@ -35,7 +37,7 @@ describe('useCurrentApp', () => {
     expect(result.current.isApp('storagebrowser')).toBe(false);
   });
 
-  it('should update when app name is published', async () => {
+  it('should update when app name is published', () => {
     const { result } = renderHook(useCurrentApp);
 
     act(() => {
