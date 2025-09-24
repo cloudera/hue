@@ -59,6 +59,7 @@ export interface hueWindow {
   HUE_BASE_URL?: string;
   HUE_LANG?: string;
   HUE_VERSION?: string;
+  PYTHON_VERSION?: string;
   LOGGED_USERNAME?: string;
   SQL_ANALYZER_MODE?: string;
   USER_IS_ADMIN?: boolean;
