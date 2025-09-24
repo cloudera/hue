@@ -39,7 +39,7 @@
 
     &__button-group {
       display: flex;
-      gap: 8px;
+      gap: vars.$cdl-spacing-xxs;
 
       button {
         color: vars.$fluidx-black;
@@ -47,13 +47,21 @@
     }
   }
 
+  .hue-upload-queue-container__actions {
+    background-color: vars.$fluidx-white;
+    text-align: right;
+    padding: vars.$cdl-spacing-xxs vars.$cdl-spacing-l;
+    border-bottom: 1px solid vars.$fluidx-gray-300;
+  }
+
   .hue-upload-queue-container__list {
     display: flex;
     flex-direction: column;
+    min-height: 85px;
     max-height: 40vh;
     background-color: vars.$fluidx-white;
     overflow: auto;
-    padding: 16px;
+    padding: vars.$cdl-spacing-s;
     gap: 16px;
   }
 }
@@ -64,22 +72,22 @@
   &__body {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: vars.$cdl-spacing-xxs;
   }
 }
 
 .conflict-files__container {
-  margin-top: 8px;
+  margin-top: vars.$cdl-spacing-xxs;
   overflow-y: auto;
   max-height: calc(50vh - 100px);
   border-top: 1px solid vars.$fluidx-gray-400;
-  padding-top: 8px;
+  padding-top: vars.$cdl-spacing-xxs;
 }
 
 .conflict-files__item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: vars.$cdl-spacing-xxs;
 }
 
 .conflict-files__icon {

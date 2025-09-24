@@ -18,7 +18,7 @@ import React, { useState } from 'react';
 import FileIcon from '@cloudera/cuix-core/icons/react/DocumentationIcon';
 import CloseIcon from '@cloudera/cuix-core/icons/react/CloseIcon';
 import CaratDownIcon from '@cloudera/cuix-core/icons/react/CaratDownIcon';
-import { BorderlessButton } from 'cuix/dist/components/Button';
+import { BorderlessButton, LinkButton } from 'cuix/dist/components/Button';
 import CaratUpIcon from '@cloudera/cuix-core/icons/react/CaratUpIcon';
 import Modal from 'cuix/dist/components/Modal';
 import { TFunction } from 'i18next';
@@ -31,9 +31,11 @@ import { get } from '../../api/utils';
 import { getLastKnownConfig } from '../../config/hueConfig';
 import FileUploadRow from './FileUploadRow/FileUploadRow';
 import { useHuePubSub } from '../../utils/hooks/useHuePubSub/useHuePubSub';
+import { useCurrentApp } from '../../utils/hooks/useCurrentApp/useCurrentApp';
 import huePubSub from '../../utils/huePubSub';
 import { FILE_UPLOAD_START_EVENT, FILE_UPLOAD_SUCCESS_EVENT } from './event';
 import { FILE_STATS_API_URL } from '../../apps/storageBrowser/api';
+import LoadingErrorWrapper from '../LoadingErrorWrapper/LoadingErrorWrapper';
 
 import './FileUploadQueue.scss';
 
@@ -68,34 +70,31 @@ const getCountByStatus = (uploadQueue: RegularFile[]) => {
   );
 };
 
-const getHeaderText = (t: TFunction, uploadQueue: RegularFile[]) => {
-  const uploadCountByStatus = getCountByStatus(uploadQueue);
-  const fileText = uploadQueue.length > 1 ? t('files') : t('file');
-  const failedText =
-    uploadCountByStatus.failed > 0
-      ? t(', {{failed}} failed', { failed: uploadCountByStatus.failed })
-      : '';
+const getHeaderText = (t: TFunction, uploadQueue: RegularFile[], isCheckingConflicts: boolean) => {
+  if (isCheckingConflicts) {
+    return t('Preparing to upload...');
+  }
 
-  const pendingText = t('{{pending}} {{fileText}} remaining', {
-    pending: uploadCountByStatus.pending,
-    fileText
-  });
-  if (uploadCountByStatus.pending > 0) {
+  const { failed, pending } = getCountByStatus(uploadQueue);
+  const fileText = uploadQueue.length > 1 ? t('files') : t('file');
+  const failedText = failed > 0 ? t(`, ${failed} failed`) : '';
+
+  if (pending > 0) {
+    const pendingText = t(`${pending} ${fileText} remaining`);
     return `${pendingText}${failedText}`;
   }
 
-  const uploadedText = t('{{uploaded}} {{fileText}} uploaded', {
-    uploaded: uploadQueue.length,
-    fileText
-  });
+  const uploadedText = t(`${uploadQueue.length} ${fileText} uploaded`);
   return `${uploadedText}${failedText}`;
 };
 
 const FileUploadQueue = (): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const config = getLastKnownConfig();
+  const { isApp } = useCurrentApp();
 
   const [expandQueue, setExpandQueue] = useState<boolean>(true);
+  const [isCheckingConflicts, setIsCheckingConflicts] = useState<boolean>(false);
   const [conflictingFiles, setConflictingFiles] = useState<RegularFile[]>([]);
 
   // TODO: Need to change this function with a new endpoint once available.
@@ -123,7 +122,7 @@ const FileUploadQueue = (): JSX.Element => {
     (config?.storage_browser.enable_chunked_file_upload ?? DEFAULT_ENABLE_CHUNK_UPLOAD) &&
     !!config?.hue_config.enable_task_server;
 
-  const { uploadQueue, cancelFile, addFiles, removeAllFiles } = useFileUpload({
+  const { uploadQueue, cancelFile, addFiles, removeAllFiles, isLoading } = useFileUpload({
     isChunkUpload,
     onComplete
   });
@@ -174,15 +173,11 @@ const FileUploadQueue = (): JSX.Element => {
       huePubSub.publish('hue.global.error', { message: t('No new files to upload!') });
       return;
     }
-
-    if (newFiles.length > 0) {
-      const { conflicts, nonConflictingFiles } = await detectFileConflicts(newFiles, uploadQueue);
-      setConflictingFiles(conflicts);
-
-      if (nonConflictingFiles.length > 0) {
-        addFiles(nonConflictingFiles);
-      }
-    }
+    setIsCheckingConflicts(true);
+    const { conflicts, nonConflictingFiles } = await detectFileConflicts(newFiles, uploadQueue);
+    setIsCheckingConflicts(false);
+    setConflictingFiles(conflicts);
+    addFiles(nonConflictingFiles);
   };
 
   useHuePubSub<FileUploadEvent>({
@@ -201,7 +196,11 @@ const FileUploadQueue = (): JSX.Element => {
     setConflictingFiles([]);
   };
 
-  if (!uploadQueue.length && conflictingFiles.length === 0) {
+  // Only render in storage browser app
+  if (
+    (!uploadQueue.length && !conflictingFiles.length && !isCheckingConflicts) ||
+    !isApp('storagebrowser')
+  ) {
     return <></>;
   }
 
@@ -242,7 +241,7 @@ const FileUploadQueue = (): JSX.Element => {
 
       <div className="hue-upload-queue-container antd cuix">
         <div className="hue-upload-queue-container__header">
-          {getHeaderText(t, uploadQueue)}
+          {getHeaderText(t, uploadQueue, isCheckingConflicts)}
           <div className="hue-upload-queue-container__header__button-group">
             <BorderlessButton
               onClick={() => setExpandQueue(!expandQueue)}
@@ -250,22 +249,33 @@ const FileUploadQueue = (): JSX.Element => {
               aria-label={t('Toggle upload queue')}
               data-testid="hue-upload-queue-container__expand-button"
             />
-            <BorderlessButton onClick={removeAllFiles} icon={<CloseIcon />} />
+            <BorderlessButton
+              onClick={removeAllFiles}
+              icon={<CloseIcon />}
+              hidden={isLoading || isCheckingConflicts}
+            />
           </div>
         </div>
 
         {expandQueue && (
-          <div className="hue-upload-queue-container__list">
-            {uploadQueue
-              .sort((a, b) => sortOrder[a.status] - sortOrder[b.status])
-              .map((row: RegularFile, index: number) => (
-                <FileUploadRow
-                  key={`${row.filePath}__${row.file.name}__${index}`}
-                  data={row}
-                  onCancel={() => cancelFile(row)}
-                />
-              ))}
-          </div>
+          <>
+            <div className="hue-upload-queue-container__actions" hidden={!isLoading}>
+              <LinkButton onClick={removeAllFiles}>{t('Cancel All')}</LinkButton>
+            </div>
+            <div className="hue-upload-queue-container__list">
+              <LoadingErrorWrapper loading={isCheckingConflicts}>
+                {uploadQueue
+                  .sort((a, b) => sortOrder[a.status] - sortOrder[b.status])
+                  .map((row: RegularFile, index: number) => (
+                    <FileUploadRow
+                      key={`${row.filePath}__${row.file.name}__${index}`}
+                      data={row}
+                      onCancel={() => cancelFile(row)}
+                    />
+                  ))}
+              </LoadingErrorWrapper>
+            </div>
+          </>
         )}
       </div>
     </>
