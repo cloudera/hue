@@ -16,8 +16,26 @@
 
 @use 'variables' as vars;
 
-.antd.cuix {
-  .hue-importer-edit-columns {
-    padding: vars.$fluidx-spacing-s;
+.hue-importer-edit-columns-modal {
+  .ant-modal-content {
+    width: 800px;
+  }
+
+  &__input-title {
+    width: 100px;
+  }
+
+  &__type-select {
+    width: 100px;
+
+    .ant-select-selector {
+      border: 1px solid vars.$fluidx-gray-600;
+      border-radius: vars.$border-radius-base;
+    }
+  }
+
+  &__no-sample {
+    color: vars.$fluidx-gray-500;
+    font-style: italic;
   }
 }

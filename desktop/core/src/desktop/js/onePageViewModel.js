@@ -465,7 +465,7 @@ class OnePageViewModel {
               self.extraEmbeddableURLParams('');
               const currentPath = window.location.pathname; // Retrieve the current path from the window location
               const basePath = currentPath.split('=')[0];
-              const inlineScriptsUrls = ['oozie', 'beeswax', 'jobsub'].some(segment =>
+              const inlineScriptsUrls = ['oozie', 'beeswax', 'jobsub', 'dashboard'].some(segment =>
                 basePath.includes(segment)
               );
               if (inlineScriptsUrls) {

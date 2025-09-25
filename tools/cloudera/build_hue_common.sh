@@ -44,8 +44,14 @@ function install_build_dependencies() {
             libbz2-dev libncurses5-dev libgdbm-dev libreadline-dev libkrb5-dev \
             liblzma-dev uuid-dev libldap2-dev libffi-dev zlib1g-dev libssl-dev wget curl'
           ;;
-      redhat9|redhat8|redhat8-arm64|centos7)
+      redhat9|redhat8|centos7)
           sudo -- sh -c 'yum groupinstall -y "Development Tools" && \
+            yum install -y \
+            bzip2-devel ncurses-devel gdbm-devel readline-devel krb5-devel \
+            xz-devel libuuid-devel openldap-devel libffi-devel zlib-devel openssl-devel wget curl'
+          ;;
+      redhat8-arm64|redhat9-arm64)
+          sudo -- sh -c 'yum groupinstall -y "Development Tools" --nobest && \
             yum install -y \
             bzip2-devel ncurses-devel gdbm-devel readline-devel krb5-devel \
             xz-devel libuuid-devel openldap-devel libffi-devel zlib-devel openssl-devel wget curl'
@@ -438,6 +444,48 @@ function redhat9_install() {
 
     if [[ -z ${PYTHON38_PATH+x} ]]; then
       install_sqlite_python "$os" "$REQ_PYTHON38"
+    fi
+  fi
+}
+
+function redhat9_arm64_install() {
+  local os=${1:-"redhat9-arm64"}
+
+  if [[ $FORCEINSTALL -eq 1 ]]; then
+    # pre-req install
+    sudo -- sh -c 'yum install -y \
+      java-11-openjdk \
+      java-11-openjdk-devel \
+      java-11-openjdk-headless \
+      krb5-workstation \
+      ncurses-devel \
+      nmap-ncat \
+      xmlsec1 \
+      xmlsec1-openssl \
+      libss \
+      ncurses-c++-libs \
+      postgresql-devel'
+    # Ensure pg_config is available
+    export PG_CONFIG=$(which pg_config)
+    if [ -z "$PG_CONFIG" ]; then
+      echo "Error: pg_config not found. Ensure PostgreSQL development libraries are installed."
+      exit 1
+    fi
+    echo "PG_CONFIG is set to $PG_CONFIG"
+    # MySQLdb install
+    sudo -- sh -c 'yum install -y python3-mysqlclient mariadb-devel'
+    # NODEJS 20 install
+    sudo -- sh -c 'cd /tmp && curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash - && \
+      yum install -y nodejs'
+
+    unset PYTHON311_PATH
+    if [[ -z ${PYTHON311_PATH+x} ]]; then
+      install_sqlite_python "$os" "$REQ_PYTHON311"
+    fi
+
+    unset PYTHON39_PATH
+    if [[ -z ${PYTHON39_PATH+x} ]]; then
+      install_sqlite_python "$os" "$REQ_PYTHON39"
     fi
   fi
 }

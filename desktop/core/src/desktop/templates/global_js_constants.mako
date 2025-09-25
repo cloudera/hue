@@ -774,6 +774,9 @@
   };
 
   window.HUE_VERSION = '${ hue_version() }';
+  % if is_admin(user):
+  window.PYTHON_VERSION = '${ sys.version.split(' ')[0] }';
+  % endif
 
   %if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
     window.IS_NEW_INDEXER_ENABLED = true;
