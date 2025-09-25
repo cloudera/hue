@@ -359,7 +359,11 @@ export class DataCatalog {
     if (!cacheEnabled || !confTtl.default || confTtl.default <= 0) {
       return;
     }
-    const identifier = generateEntryCacheId(dataCatalogEntry);
+    const identifier = generateEntryCacheId({
+      namespace: dataCatalogEntry.namespace,
+      path: dataCatalogEntry.path,
+      computeName: dataCatalogEntry.compute.name
+    });
 
     await this.store.setItem<StoreEntry>(identifier, {
       version: DATA_CATALOG_VERSION,
