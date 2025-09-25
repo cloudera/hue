@@ -18,15 +18,16 @@ from __future__ import absolute_import
 
 import gc
 import logging
-import threading
 import multiprocessing
+import threading
 from builtins import range
 from datetime import datetime, timedelta
 
+from cx_Oracle import DatabaseError as OracleDatabaseError
 from django.db import connection
 from django.db.utils import DatabaseError, OperationalError
 from future import standard_library
-from prometheus_client import REGISTRY, Gauge
+from prometheus_client import Gauge, REGISTRY
 
 from desktop.conf import ENABLE_PROMETHEUS
 from desktop.lib.metrics import global_registry
@@ -149,13 +150,13 @@ def user_count():
   users = 0
   try:
     users = User.objects.count()
-  except (OperationalError, DatabaseError) as oe:
+  except (OperationalError, DatabaseError, OracleDatabaseError) as oe:
     LOG.debug('user_count recovering from %s' % str(oe))
     connection.close()
     connection.connect()
     users = User.objects.count()
   except Exception as e:
-    LOG.exception('Metrics: Failed to get number of user accounts')
+    LOG.exception('Metrics: Failed to get number of user accounts: %s' % str(e))
   return users
 
 
@@ -207,7 +208,7 @@ def num_of_queries():
       is_history=True,
       last_modified__gt=datetime.now() - timedelta(minutes=10)
     ).count()
-  except (OperationalError, DatabaseError) as oe:
+  except (OperationalError, DatabaseError, OracleDatabaseError) as oe:
     LOG.debug('num_of_queries recovering from %s' % str(oe))
     connection.close()
     connection.connect()
@@ -217,7 +218,7 @@ def num_of_queries():
       last_modified__gt=datetime.now() - timedelta(minutes=10)
     ).count()
   except Exception as e:
-    LOG.exception('Could not get num_of_queries')
+    LOG.exception('Could not get num_of_queries: %s' % str(e))
     count = 0
   return count
 

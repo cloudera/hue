@@ -24,6 +24,7 @@ $icon-margin: 5px;
     display: flex;
     flex-direction: column;
     flex: 1;
+    margin-bottom: vars.$cdl-spacing-xl;
 
     &__actions-bar {
       display: flex;
