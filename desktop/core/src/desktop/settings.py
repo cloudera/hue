@@ -67,7 +67,8 @@ if ENV_HUE_PROCESS_NAME not in os.environ:
 
 desktop.log.basic_logging(os.environ[ENV_HUE_PROCESS_NAME])
 
-logging.info("Welcome to Hue " + HUE_DESKTOP_VERSION)
+logging.info("Welcome to Hue %s" % HUE_DESKTOP_VERSION)
+logging.info("Python version: %s" % sys.version.split(' ')[0])
 
 
 # Add fancy logging
