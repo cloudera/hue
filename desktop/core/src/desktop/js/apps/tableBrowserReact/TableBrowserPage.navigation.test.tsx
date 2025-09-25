@@ -32,7 +32,11 @@ jest.useFakeTimers();
 // Mock cuix DescriptionList to avoid ES module import issues
 jest.mock('cuix/dist/components/DescriptionList', () => ({
   __esModule: true,
-  default: function MockDescriptionList({ items }: { items: Array<{ label: string; value: string }> }) {
+  default: function MockDescriptionList({
+    items
+  }: {
+    items: Array<{ label: string; value: string }>;
+  }) {
     return (
       <div data-testid="description-list">
         {items?.map((item, index) => (
@@ -44,7 +48,13 @@ jest.mock('cuix/dist/components/DescriptionList', () => ({
       </div>
     );
   },
-  DescriptionListItem: function MockDescriptionListItem({ label, value }: { label: string; value: string }) {
+  DescriptionListItem: function MockDescriptionListItem({
+    label,
+    value
+  }: {
+    label: string;
+    value: string;
+  }) {
     return (
       <div data-testid="description-item">
         <span data-testid="description-label">{label}</span>

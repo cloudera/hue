@@ -13,6 +13,8 @@
 import React, { useMemo } from 'react';
 import { ConfigProvider } from 'antd';
 import { LinkButton } from 'cuix/dist/components/Button';
+import Tag from 'cuix/dist/components/Tag';
+import { Color } from 'cuix/dist/types/types';
 import Loading from 'cuix/dist/components/Loading';
 import Modal from 'cuix/dist/components/Modal';
 import Filter from 'cuix/dist/components/Filter';
@@ -56,6 +58,28 @@ export interface TablesListProps {
   onSelectSource?: (sourceType: string) => void;
   state: TablesListState;
 }
+
+// Function to determine tag color based on table type
+const getTableTypeColor = (type: string): Color => {
+  const typeUpper = type.toUpperCase();
+  switch (typeUpper) {
+    case 'TABLE':
+      return Color.Blue;
+    case 'VIEW':
+      return Color.Green;
+    case 'EXTERNAL_TABLE':
+      return Color.Orange;
+    case 'MATERIALIZED_VIEW':
+      return Color.Purple;
+    case 'TEMPORARY':
+    case 'TEMP':
+      return Color.Red;
+    case 'VIRTUAL_VIEW':
+      return Color.Spearmint;
+    default:
+      return Color.Gray;
+  }
+};
 
 const TablesList = ({
   tables,
@@ -256,7 +280,16 @@ const TablesList = ({
         </LinkButton>
       )
     },
-    { title: t('Type'), dataIndex: 'type', key: 'type', sorter: true },
+    {
+      title: t('Type'),
+      dataIndex: 'type',
+      key: 'type',
+      sorter: true,
+      width: 120,
+      render: (type: string) => (
+        <Tag color={getTableTypeColor(type)} value={type} className="hue-table-type-tag" />
+      )
+    },
     {
       title: t('Description'),
       dataIndex: 'comment',
@@ -393,7 +426,8 @@ const TablesList = ({
                 totalSize
               },
               setPageNumber: setTablePageNumber,
-              setPageSize: setTablePageSize
+              setPageSize: setTablePageSize,
+              pageSizeOptions: [10, 50, 100, 500]
             }}
           />
         )}

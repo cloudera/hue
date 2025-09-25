@@ -47,7 +47,9 @@ const fetchSourceMeta = async (
     path,
     definition: { type: 'source' }
   });
-  return dataEntry.getSourceMeta();
+  const result = await dataEntry.getSourceMeta();
+
+  return result;
 };
 
 interface UseDataCatalog {
@@ -66,6 +68,10 @@ interface UseDataCatalog {
   setDatabase: (database: string | undefined) => void;
   reloadDatabases: () => Promise<void>;
   reloadTables: () => Promise<void>;
+  // Optimistic update methods
+  optimisticallyRemoveDatabases: (databaseNames: string[]) => void;
+  optimisticallyAddDatabase: (databaseName: string) => void;
+  revertOptimisticUpdates: () => void;
 }
 
 interface UseDataCatalogOptions {
@@ -91,6 +97,9 @@ export const useDataCatalog = (options?: UseDataCatalogOptions): UseDataCatalog 
     table: false
   });
 
+  // Track original databases for optimistic updates
+  const [originalDatabases, setOriginalDatabases] = useState<string[] | null>(null);
+
   const loadDatabases = async (
     namespace: Namespace,
     compute: Compute,
@@ -99,14 +108,17 @@ export const useDataCatalog = (options?: UseDataCatalogOptions): UseDataCatalog 
     try {
       setLoading(prev => ({ ...prev, database: true }));
       const databaseEntries = await fetchSourceMeta(connector, namespace, compute);
-      setDatabases(databaseEntries?.databases ?? []);
+      const newDatabases = databaseEntries?.databases ?? [];
+      setDatabases(newDatabases);
+      setOriginalDatabases(null); // Reset optimistic state
       if (autoSelectFirstDatabase) {
-        setDatabase(databaseEntries.databases?.[0]);
+        setDatabase(newDatabases[0]);
       }
     } catch (error) {
       setDatabases([]);
       setDatabase(undefined);
       setTables([]);
+      setOriginalDatabases(null);
     } finally {
       setLoading(prev => ({ ...prev, database: false }));
     }
@@ -140,10 +152,13 @@ export const useDataCatalog = (options?: UseDataCatalogOptions): UseDataCatalog 
     try {
       setLoading(prev => ({ ...prev, database: true }));
       const databaseEntries = await fetchSourceMeta(connector, namespace, compute);
-      setDatabases(databaseEntries?.databases ?? []);
+      const newDatabases = databaseEntries?.databases ?? [];
+      setDatabases(newDatabases);
+      setOriginalDatabases(null); // Reset optimistic state
       // Do not auto-select a database on reload; preserve current selection
     } catch (error) {
       setDatabases([]);
+      setOriginalDatabases(null);
     } finally {
       setLoading(prev => ({ ...prev, database: false }));
     }
@@ -218,9 +233,58 @@ export const useDataCatalog = (options?: UseDataCatalogOptions): UseDataCatalog 
   // Reload namespaces, computes and databases when connector changes (e.g., source switch)
   useEffect(() => {
     if (connector) {
+      // Clear old data immediately to prevent stale data flash
+      setDatabases([]);
+      setDatabase(undefined);
+      setTables([]);
+      setOriginalDatabases(null);
+
       loadNamespaces(connector);
     }
   }, [connector]);
+
+  // Optimistic update methods
+  const optimisticallyRemoveDatabases = (databaseNames: string[]): void => {
+    if (originalDatabases === null) {
+      // Store original state before first optimistic update
+      setOriginalDatabases(databases);
+    }
+
+    // Remove databases optimistically
+    const updatedDatabases = databases.filter(db => !databaseNames.includes(db));
+    setDatabases(updatedDatabases);
+
+    // If current database was deleted, clear it
+    if (database && databaseNames.includes(database)) {
+      setDatabase(undefined);
+    }
+  };
+
+  const optimisticallyAddDatabase = (databaseName: string): void => {
+    if (originalDatabases === null) {
+      // Store original state before first optimistic update
+      setOriginalDatabases(databases);
+    }
+
+    // Add database optimistically (avoid duplicates)
+    if (!databases.includes(databaseName)) {
+      const updatedDatabases = [...databases, databaseName].sort();
+      setDatabases(updatedDatabases);
+    }
+  };
+
+  const revertOptimisticUpdates = (): void => {
+    if (originalDatabases !== null) {
+      // Restore original state
+      setDatabases(originalDatabases);
+      setOriginalDatabases(null);
+
+      // If current database is not in original list, clear it
+      if (database && !originalDatabases.includes(database)) {
+        setDatabase(undefined);
+      }
+    }
+  };
 
   return {
     loading,
@@ -237,6 +301,10 @@ export const useDataCatalog = (options?: UseDataCatalogOptions): UseDataCatalog 
     setCompute,
     setDatabase,
     reloadDatabases,
-    reloadTables
+    reloadTables,
+    // Optimistic update methods
+    optimisticallyRemoveDatabases,
+    optimisticallyAddDatabase,
+    revertOptimisticUpdates
   };
 };

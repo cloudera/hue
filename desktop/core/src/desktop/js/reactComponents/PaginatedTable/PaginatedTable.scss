@@ -18,12 +18,23 @@
 @use 'mixins';
 
 .antd.cuix {
-  .hue-paginated-table-container {
+  $sticky-header-offset: -24px;
+  .hue-paginated-table-container {    
     display: flex;
     flex-direction: column;
     flex: 1;
+    
     &.hue-paginated-table-container--hscroll {
-      overflow-x: auto;
+      // Hide duplicate scrollbars by targeting specific Ant Design elements
+      // that create secondary scroll contexts
+      .ant-table-body {
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE/Edge */
+        
+        &::-webkit-scrollbar {
+          display: none; /* Chrome/Safari */
+        }
+      }
     }
   }
 
@@ -57,9 +68,15 @@
     // Ensure sticky header overlays body content when page scrolls
     .ant-table-header {
       position: sticky;
-      top: -18px !important;
+      top: $sticky-header-offset !important; // Prevent bleeding through when scrolling
       z-index: 2;
       background: vars.$fluidx-white;
+    }
+
+    .ant-table-sticky-scroll {
+      // Prevent horizontal scrollbar from being positioned with a gap at the bottom of the table
+      // with the table content bleeding through
+      bottom: $sticky-header-offset !important; 
     }
 
     .ant-table-body {

@@ -84,7 +84,7 @@ describe('Breadcrumbs', () => {
           database="default"
           table="customers"
           column="id"
-          fields={["a", "b"]}
+          fields={['a', 'b']}
         />
       </NavigationProvider>
     );

@@ -60,8 +60,10 @@ export function useTablesListState(options: {
   compute?: Compute;
   database?: string;
   tables?: string[];
+  /** When true, bypass cache and force fresh API calls for descriptions */
+  refreshCache?: boolean;
 }): TablesListState {
-  const { connector, namespace, compute, database, tables } = options;
+  const { connector, namespace, compute, database, tables, refreshCache = false } = options;
 
   // Page-level (filter/pagination)
   const [tableFilter, setTableFilter] = useState('');
@@ -89,7 +91,8 @@ export function useTablesListState(options: {
     compute,
     items: tables || [],
     path: database ? [database] : [],
-    currentItem: undefined // Tables don't have a single "current" item
+    currentItem: undefined, // Tables don't have a single "current" item
+    refreshCache
   });
 
   const editState: ListCellEditState = {
@@ -107,8 +110,9 @@ export function useTablesListState(options: {
     if (!connector || !namespace || !compute || !database) {
       return true;
     }
-    // If tables is undefined or empty (and we expect tables), we're still loading
-    if (!tables || tables.length === 0) {
+    // If tables is undefined (not loaded yet), we're still loading
+    // Note: Empty array (tables.length === 0) is a valid state for empty databases
+    if (tables === undefined) {
       return true;
     }
     return false;

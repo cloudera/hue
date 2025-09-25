@@ -250,8 +250,6 @@ describe('InputModal', () => {
 
     const inputField = screen.getByRole('textbox');
     await user.type(inputField, 'test-file.txt');
-    await waitFor(() =>
-      expect(screen.getByRole('button', { name: 'Create' })).not.toBeDisabled()
-    );
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Create' })).not.toBeDisabled());
   });
 });

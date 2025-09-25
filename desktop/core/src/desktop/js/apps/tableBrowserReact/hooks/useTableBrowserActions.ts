@@ -45,6 +45,11 @@ export interface UseTableBrowserActionsArgs {
   updatePath: (database?: string, table?: string) => void;
   navigateToSource: (sourceType: string) => void;
   navigateToDatabase: (database: string) => void;
+
+  // Optimistic update methods
+  optimisticallyRemoveDatabases: (databaseNames: string[]) => void;
+  optimisticallyAddDatabase: (databaseName: string) => void;
+  revertOptimisticUpdates: () => void;
 }
 
 export interface TableBrowserActions {
@@ -86,7 +91,10 @@ export function useTableBrowserActions(args: UseTableBrowserActionsArgs): TableB
     reloadTables,
     updatePath,
     navigateToSource,
-    navigateToDatabase
+    navigateToDatabase,
+    optimisticallyRemoveDatabases,
+    optimisticallyAddDatabase,
+    revertOptimisticUpdates
   } = args;
 
   const { t } = i18nReact.useTranslation();
@@ -243,6 +251,9 @@ export function useTableBrowserActions(args: UseTableBrowserActionsArgs): TableB
 
   const handleDropDatabases = useCallback(
     async (names: string[]) => {
+      // Optimistically remove databases from the list immediately
+      optimisticallyRemoveDatabases(names);
+
       try {
         // Create URLSearchParams for proper form encoding without qs array notation
         const formData = new URLSearchParams();
@@ -277,24 +288,39 @@ export function useTableBrowserActions(args: UseTableBrowserActionsArgs): TableB
         // Handle the task execution response
         if (result?.message) {
           notifyError(result.message);
-          // If there's an error message, reload databases to restore state
+          // If there's an error message, revert optimistic update and reload
+          revertOptimisticUpdates();
           await reloadDatabases();
           return;
         }
 
-        // For successful operations (with or without history_uuid), reload databases
+        // For successful operations, reload databases to get the authoritative state
+        // This will reset the optimistic state and confirm the deletion
         await reloadDatabases();
       } catch (error) {
         notifyError(t('Failed to drop databases'));
-        // On error, reload databases to restore the correct state
+        // On error, revert optimistic update and reload to restore correct state
+        revertOptimisticUpdates();
         await reloadDatabases();
       }
     },
-    [route.sourceType, connector, namespace, compute, reloadDatabases, t]
+    [
+      route.sourceType,
+      connector,
+      namespace,
+      compute,
+      reloadDatabases,
+      optimisticallyRemoveDatabases,
+      revertOptimisticUpdates,
+      t
+    ]
   );
 
   const handleCreateDatabase = useCallback(
     async (name: string, comment?: string, location?: string) => {
+      // Optimistically add the database to the list immediately
+      optimisticallyAddDatabase(name);
+
       try {
         // Use the beeswax create database endpoint with proper API utils
         const formData: Record<string, string> = {
@@ -324,16 +350,23 @@ export function useTableBrowserActions(args: UseTableBrowserActionsArgs): TableB
         // Check if there was an error
         if (result?.status === -1) {
           notifyError(result.message || t('Failed to create database'));
+          // Revert optimistic update and reload to restore correct state
+          revertOptimisticUpdates();
+          await reloadDatabases();
           return;
         }
 
-        // Reload databases to show the new one
+        // For successful operations, reload databases to get the authoritative state
+        // This will reset the optimistic state and confirm the creation
         await reloadDatabases();
       } catch (error) {
         notifyError(t('Failed to create database'));
+        // On error, revert optimistic update and reload to restore correct state
+        revertOptimisticUpdates();
+        await reloadDatabases();
       }
     },
-    [reloadDatabases, t]
+    [reloadDatabases, optimisticallyAddDatabase, revertOptimisticUpdates, t]
   );
 
   // ===== SOURCE ACTIONS =====

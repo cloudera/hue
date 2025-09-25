@@ -37,7 +37,9 @@ jest.mock('../TableDetails/SampleTab/SampleGrid', () => ({
 jest.mock('../sharedComponents/PrettyStructDisplay', () => ({
   __esModule: true,
   default: ({ structType, compact }: { structType?: string; compact?: boolean }) => (
-    <div data-testid="pretty-struct-display" data-compact={compact}>{structType}</div>
+    <div data-testid="pretty-struct-display" data-compact={compact}>
+      {structType}
+    </div>
   )
 }));
 
@@ -56,9 +58,7 @@ const tableDetails: TableDetailsState = {
   detailsSections: {},
   sampleData: {
     headers: ['nested_struct'],
-    rows: [[
-      '{"level1":"a","mid":{"level2":"b","core":{"level3":"c","value":1}}}'
-    ]]
+    rows: [['{"level1":"a","mid":{"level2":"b","core":{"level3":"c","value":1}}}']]
   },
   partitionCount: undefined,
   rawAnalysis: undefined,

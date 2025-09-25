@@ -29,7 +29,11 @@ jest.mock('cuix/dist/components/Filter', () => ({
 jest.mock('../../../../reactComponents/PaginatedTable/PaginatedTable', () => ({
   __esModule: true,
   default: ({ data }: { data: Array<{ key: string }> }) => (
-    <div data-testid="rows">{data.map(r => <div key={r.key}>{r.key}</div>)}</div>
+    <div data-testid="rows">
+      {data.map(r => (
+        <div key={r.key}>{r.key}</div>
+      ))}
+    </div>
   )
 }));
 
@@ -61,15 +65,15 @@ describe('DetailsProperties', () => {
       { name: 'Database', value: 'default' },
       { name: 'Location', value: 'http://example.com/path' }
     ];
-    const storageInfo: PropertyRow[] = [
-      { name: 'SerDe Library', value: 'serde' }
-    ];
-    const storageDescParams: PropertyRow[] = [
-      { name: 'serialization.format', value: '1' }
-    ];
+    const storageInfo: PropertyRow[] = [{ name: 'SerDe Library', value: 'serde' }];
+    const storageDescParams: PropertyRow[] = [{ name: 'serialization.format', value: '1' }];
 
     render(
-      <DetailsProperties baseInfo={baseInfo} storageInfo={storageInfo} storageDescParams={storageDescParams} />
+      <DetailsProperties
+        baseInfo={baseInfo}
+        storageInfo={storageInfo}
+        storageDescParams={storageDescParams}
+      />
     );
 
     // Should render three PaginatedTables (Detailed Table Info, Storage Info, Storage Desc Params)
@@ -77,5 +81,3 @@ describe('DetailsProperties', () => {
     expect(tables.length).toBeGreaterThanOrEqual(1);
   });
 });
-
-

@@ -28,11 +28,13 @@ import { post } from '../../../api/utils';
 import { getConnectorIdOrType } from '../utils/connector';
 
 const mockedPost = post as jest.MockedFunction<typeof post>;
-const mockedGetConnectorIdOrType = getConnectorIdOrType as jest.MockedFunction<typeof getConnectorIdOrType>;
+const mockedGetConnectorIdOrType = getConnectorIdOrType as jest.MockedFunction<
+  typeof getConnectorIdOrType
+>;
 
 describe('useDatabaseProperties', () => {
-  const mockConnector: Connector = { 
-    id: 'hive', 
+  const mockConnector: Connector = {
+    id: 'hive',
     dialect: 'hive',
     type: 'hive'
   } as Connector;
@@ -40,7 +42,7 @@ describe('useDatabaseProperties', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockedGetConnectorIdOrType.mockReturnValue('hive');
-    
+
     // Mock console.warn to avoid noise in tests
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });

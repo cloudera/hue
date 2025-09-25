@@ -53,9 +53,7 @@ describe('Privileges', () => {
     const { post } = require('../../../../api/utils');
     post.mockResolvedValueOnce({ status: 0, privileges: [] });
     render(<Privileges database="default" table="customers" />);
-    await waitFor(() =>
-      expect(screen.getByText('No permissions found')).toBeInTheDocument()
-    );
+    await waitFor(() => expect(screen.getByText('No permissions found')).toBeInTheDocument());
   });
 
   it('renders privileges table when data present', async () => {
@@ -88,5 +86,3 @@ describe('Privileges', () => {
     expect(screen.getByText('Yes')).toBeInTheDocument();
   });
 });
-
-

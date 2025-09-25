@@ -9,6 +9,11 @@ alwaysApply: false
 - Import order: externals → internal utils/hooks → types → styles (last).
 - Keep components cohesive; lift state; split large parts into small pure pieces.
 
+# Components and reuse
+- Always check to see if there are existing components in Hue that we can reuse.
+- Always prefer cuix components over antd if the cuix when possible.
+- Prefer native HTML features over writing custom ones 
+
 ## New react components 
 - Component folder: `ComponentName/ComponentName.tsx` + `ComponentName.test.tsx` + `ComponentName.scss`.
 - Do not create an index.ts file 

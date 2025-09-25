@@ -6,6 +6,7 @@
 .cuix.antd {
   .hue-tables-list__desc-actions {
     margin-top: vars.$cdl-spacing-xs;
+
     > * + * {
       margin-left: vars.$cdl-spacing-s;
     }
@@ -19,13 +20,31 @@
     white-space: pre-wrap;
   }
 
-  .hue-tables-list__desc-edit { margin-left: vars.$cdl-spacing-s; }
+  .hue-tables-list__desc-edit {
+    margin-left: vars.$cdl-spacing-s;
+  }
 
-  .hue-tables-list__confirm-text { margin-bottom: vars.$cdl-spacing-m; }
+  .hue-tables-list__confirm-text {
+    margin-bottom: vars.$cdl-spacing-m;
+  }
 
-  .hue-tables-list__confirm-list { margin-bottom: vars.$cdl-spacing-m; }
+  .hue-tables-list__confirm-list {
+    margin-bottom: vars.$cdl-spacing-m;
+  }
 
-  .hue-tables-list__confirm-more { margin-bottom: vars.$cdl-spacing-m; }
+  .hue-tables-list__confirm-more {
+    margin-bottom: vars.$cdl-spacing-m;
+  }
 
-  .hue-tables-list__confirm-skip { display: flex; align-items: center; gap: vars.$cdl-spacing-s; }
+  .hue-tables-list__confirm-skip {
+    display: flex;
+    align-items: center;
+    gap: vars.$cdl-spacing-s;
+  }
+
+  // Table type tag styling
+  .hue-table-type-tag {
+    // Ensure proper padding that won't be overridden by reset CSS
+    padding: vars.$cdl-spacing-xxs !important;
+  }
 }

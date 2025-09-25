@@ -17,6 +17,9 @@
     gap: vars.$fluidx-spacing-s;
     border-right: 1px solid vars.$fluidx-gray-300;
     padding-right: vars.$fluidx-spacing-s;
+    min-width: 10%; // Allow flex items to shrink below their content size
+    flex: 0 1 auto; // Don't grow, allow shrink, size based on content
+    width: 100%;
 
     &:last-child {
       border-right: none;
@@ -26,6 +29,8 @@
   .meta-data__column {
     display: flex;
     flex-direction: column;
+    min-width: 10%;
+    flex: 0 1 auto; // Don't grow, allow shrink, size based on content
   }
 
   .meta-data__column-label {
@@ -37,5 +42,9 @@
   .meta-data__column-value {
     font-size: vars.$font-size-base;
     color: vars.$fluidx-gray-900;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    max-width: 100%;
   }
 }

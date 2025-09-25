@@ -66,7 +66,10 @@ const TableBrowserPage = (): JSX.Element => {
     connectors,
     setConnector,
     reloadDatabases,
-    reloadTables
+    reloadTables,
+    optimisticallyRemoveDatabases,
+    optimisticallyAddDatabase,
+    revertOptimisticUpdates
   } = useDataCatalog({
     autoSelectFirstDatabase: false,
     autoSelectFirstConnector: !!route.sourceType // don't auto-select on sources page
@@ -86,14 +89,16 @@ const TableBrowserPage = (): JSX.Element => {
     namespace: namespace || undefined,
     compute: compute || undefined,
     databases,
-    currentDatabase: currentDb
+    currentDatabase: currentDb,
+    refreshCache: isRefreshing
   });
   const tablesListState = useTablesListState({
     connector: connector || undefined,
     namespace: namespace || undefined,
     compute: compute || undefined,
     database: currentDb,
-    tables: tableNames
+    tables: tableNames,
+    refreshCache: isRefreshing
   });
   const tableDetailsState = useTableDetailsState({
     database: currentDb as string,
@@ -161,11 +166,14 @@ const TableBrowserPage = (): JSX.Element => {
     reloadTables,
     updatePath,
     navigateToSource,
-    navigateToDatabase
+    navigateToDatabase,
+    optimisticallyRemoveDatabases,
+    optimisticallyAddDatabase,
+    revertOptimisticUpdates
   });
 
   // ===== EFFECTS =====
-  // Initialize cuix i18n labels similar to Partitions tab so "Filter by" shows
+  // Initialize cuix i18n labels, but should better be done in the main app.
   useEffect(() => {
     try {
       if (i18nCuix && typeof i18nCuix.extend === 'function') {

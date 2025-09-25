@@ -10,6 +10,8 @@
 // License for the specific language governing permissions and limitations under
 // the License.
 
+/* eslint-disable no-console */
+
 import { useCallback, useEffect, useState, useRef, useMemo } from 'react';
 import { i18nReact } from '../../../utils/i18nReact';
 import dataCatalog from '../../../catalog/dataCatalog';
@@ -25,6 +27,8 @@ export interface UseDescriptionManagerArgs {
   currentItem?: string;
   /** When true, do not fall back to per-item describe calls if description is missing */
   disableDescribeFallback?: boolean;
+  /** When true, bypass cache and force fresh API calls for descriptions */
+  refreshCache?: boolean;
 }
 
 export interface DescriptionManagerState {
@@ -43,7 +47,8 @@ export function useDescriptionManager({
   items,
   path = [],
   currentItem,
-  disableDescribeFallback
+  disableDescribeFallback,
+  refreshCache = false
 }: UseDescriptionManagerArgs): DescriptionManagerState {
   const { t } = i18nReact.useTranslation();
   const [descriptions, setDescriptions] = useState<Record<string, string>>({});
@@ -72,15 +77,17 @@ export function useDescriptionManager({
     [connectorKey, namespaceKey, computeKey, pathKey]
   );
 
-  // Reset cache and descriptions when the data context changes
+  // Reset cache and descriptions when the data context changes or refresh is requested
   const lastContextKeyRef = useRef<string>('');
+  const lastRefreshCacheRef = useRef<boolean>(false);
   useEffect(() => {
-    if (lastContextKeyRef.current !== contextKey) {
+    if (lastContextKeyRef.current !== contextKey || lastRefreshCacheRef.current !== refreshCache) {
       lastContextKeyRef.current = contextKey;
+      lastRefreshCacheRef.current = refreshCache;
       fetchedItemsRef.current.clear();
       setDescriptions({});
     }
-  }, [contextKey]);
+  }, [contextKey, refreshCache]);
 
   // Prefetch descriptions (Navigator or source metadata) when listing items
   useEffect(() => {
@@ -130,16 +137,39 @@ export function useDescriptionManager({
     }
 
     const fetchDescriptionsForItems = async () => {
+      console.log(`[useDescriptionManager] fetchDescriptionsForItems called with:`, {
+        stableItems,
+        connector: connector?.id || connector?.type,
+        namespace,
+        compute,
+        refreshCache,
+        contextKey
+      });
+
+      // Check cache configuration
+      const cacheConfig = (window as unknown as { CACHEABLE_TTL?: { default?: number } }).CACHEABLE_TTL;
+      console.log(`[useDescriptionManager] Cache configuration:`, cacheConfig);
+
+      // Also check if caching is enabled globally
+      const dataCatalogModule = await import('../../../catalog/dataCatalog');
+      console.log(`[useDescriptionManager] DataCatalog module:`, dataCatalogModule);
+
       // Use functional update to get current descriptions without adding to deps
       setDescriptions(currentDescriptions => {
         const itemsToFetch = stableItems.filter(name => {
           const itemKey = `${contextKey}/${name}`;
           const desc = currentDescriptions[name];
           const needsFetch = typeof desc === 'undefined' || desc === '';
+          console.log(
+            `[useDescriptionManager] Item ${name}: desc="${desc}", needsFetch=${needsFetch}, alreadyFetched=${fetchedItemsRef.current.has(itemKey)}`
+          );
           return !fetchedItemsRef.current.has(itemKey) && needsFetch;
         });
 
+        console.log(`[useDescriptionManager] Items to fetch:`, itemsToFetch);
+
         if (itemsToFetch.length === 0) {
+          console.log(`[useDescriptionManager] No items to fetch`);
           return currentDescriptions; // No changes needed
         }
 
@@ -159,10 +189,53 @@ export function useDescriptionManager({
                 compute: compute as Compute,
                 path: [...stablePath, name]
               });
-              const describe: unknown = await entry.getAnalysis({ silenceErrors: true });
-              const comment = (describe as unknown as { comment?: string }).comment || '';
+
+              // Check if entry already has cached data
+              if (entry.analysis) {
+                const cachedComment = (entry.analysis as unknown as { comment?: string }).comment || '';
+                return { name, comment: cachedComment };
+              }
+
+              // Let DataCatalog handle caching properly - try Navigator metadata first
+              let comment = '';
+              let metadataFound = false;
+
+              try {
+                const navigatorMeta: unknown = await entry.getNavigatorMeta({
+                  silenceErrors: true,
+                  refreshCache
+                });
+                
+                if (navigatorMeta && typeof navigatorMeta === 'object' && 'description' in navigatorMeta) {
+                  comment = (navigatorMeta as { description?: string | null }).description || '';
+                  metadataFound = true;
+                }
+              } catch (navError) {
+                // Navigator metadata not available, fall back to Analysis API
+              }
+
+              // If Navigator metadata not found, use Analysis API (which has its own caching)
+              if (!metadataFound) {
+                try {
+                  const describe: unknown = await entry.getAnalysis({
+                    silenceErrors: true,
+                    refreshCache
+                  });
+                  comment = (describe as unknown as { comment?: string }).comment || '';
+                } catch (analysisError) {
+                  comment = '';
+                }
+              }
+
+              // Save immediately to persistent storage (don't wait for saveLater timeout)
+              await entry.save();
+
               return { name, comment };
-            } catch {
+            } catch (error) {
+              console.log(
+                `[useDescriptionManager] Failed to fetch description for ${name}:`,
+                error
+              );
               return { name, comment: '' };
             }
           });
@@ -187,7 +260,17 @@ export function useDescriptionManager({
     };
 
     fetchDescriptionsForItems();
-  }, [stableItems, connector, namespace, compute, currentItem, pathKey, stablePath]);
+  }, [
+    stableItems,
+    connector,
+    namespace,
+    compute,
+    currentItem,
+    pathKey,
+    stablePath,
+    refreshCache,
+    contextKey
+  ]);
 
   const saveDescription = useCallback(
     async (name: string, value: string) => {

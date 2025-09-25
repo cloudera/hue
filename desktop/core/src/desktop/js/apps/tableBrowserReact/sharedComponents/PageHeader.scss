@@ -10,30 +10,36 @@
 // License for the specific language governing permissions and limitations under
 // the License.
 
-import { useState } from 'react';
+@use 'variables' as vars;
+@use 'mixins';
 
-export interface UseTablesPageState {
-  tableFilter: string;
-  setTableFilter: (value: string) => void;
-  tablePageSize: number;
-  setTablePageSize: (size: number) => void;
-  tablePageNumber: number;
-  setTablePageNumber: (page: number) => void;
+.cuix.antd {
+  .hue-table-browser {
+    &__page-header {
+      margin-bottom: vars.$fluidx-spacing-m;
+
+      &__top-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: vars.$fluidx-spacing-s;
+      }
+
+      &__icon {
+        font-size: vars.$font-size-xl;
+        flex-shrink: 0;
+      }
+
+      &__text {
+        margin-bottom: 0;
+        flex: 1;
+        min-width: 0; // Allow flex item to shrink below content size
+        @include mixins.nowrap-ellipsis;
+      }
+
+      &__breadcrumbs-row {
+        margin-top: vars.$fluidx-spacing-s;
+      }
+    }
+  }
 }
-
-export function useTablesPageState(): UseTablesPageState {
-  const [tableFilter, setTableFilter] = useState('');
-  const [tablePageSize, setTablePageSize] = useState(50);
-  const [tablePageNumber, setTablePageNumber] = useState(1);
-
-  return {
-    tableFilter,
-    setTableFilter,
-    tablePageSize,
-    setTablePageSize,
-    tablePageNumber,
-    setTablePageNumber
-  };
-}
-
-export default useTablesPageState;

@@ -16,28 +16,6 @@
       overflow: auto; // Allow page-level scroll so inner tables can expand
     }
 
-    &__page-header {
-      margin-bottom: vars.$fluidx-spacing-m;
-
-      &__top-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: vars.$fluidx-spacing-s;
-      }
-
-      &__icon {
-        font-size: vars.$font-size-xl;
-        flex-shrink: 0;
-      }
-
-      &__text {
-        margin-bottom: 0;
-        flex: 1;
-        @include mixins.nowrap-ellipsis;
-      }
-    }
-
     &__header-with-actions-only {
       text-align: right;
     }

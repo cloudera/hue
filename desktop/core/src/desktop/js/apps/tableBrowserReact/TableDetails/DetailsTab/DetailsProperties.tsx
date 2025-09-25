@@ -158,7 +158,8 @@ const DetailsProperties = ({
           pagination={{
             pageStats: { pageNumber, totalPages, pageSize, totalSize },
             setPageNumber,
-            setPageSize
+            setPageSize,
+            pageSizeOptions: [10, 50, 100, 500]
           }}
         />
       )}
@@ -178,7 +179,8 @@ const DetailsProperties = ({
                   totalSize: baseTotal
                 },
                 setPageNumber,
-                setPageSize
+                setPageSize,
+                pageSizeOptions: [10, 50, 100, 500]
               }}
             />
           </Card>
@@ -197,7 +199,8 @@ const DetailsProperties = ({
                     totalSize: tpTotal
                   },
                   setPageNumber: setTpPage,
-                  setPageSize: setTpSize
+                  setPageSize: setTpSize,
+                  pageSizeOptions: [10, 50, 100, 500]
                 }}
               />
             </Card>
@@ -217,7 +220,8 @@ const DetailsProperties = ({
                     totalSize: siTotal
                   },
                   setPageNumber: setSiPage,
-                  setPageSize: setSiSize
+                  setPageSize: setSiSize,
+                  pageSizeOptions: [10, 50, 100, 500]
                 }}
               />
             </Card>
@@ -237,7 +241,8 @@ const DetailsProperties = ({
                     totalSize: sdpTotal
                   },
                   setPageNumber: setSdpPage,
-                  setPageSize: setSdpSize
+                  setPageSize: setSdpSize,
+                  pageSizeOptions: [10, 50, 100, 500]
                 }}
               />
             </Card>

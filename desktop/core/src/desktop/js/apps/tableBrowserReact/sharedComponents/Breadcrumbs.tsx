@@ -11,12 +11,14 @@
 // the License.
 
 import React, { useMemo } from 'react';
+import { Tooltip } from 'antd';
 import { i18nReact } from '../../../utils/i18nReact';
 // import changeURL from '../../../utils/url/changeURL';
 
 import './Breadcrumbs.scss';
 import { useNavigation } from './NavigationContext';
 import { buildTableBrowserPath, getTableBrowserBasePath } from '../utils/routing';
+import { truncateMiddle } from '../utils/textUtils';
 
 export interface BreadcrumbsProps {
   sourceType?: string;
@@ -114,20 +116,54 @@ const Breadcrumbs = ({
               </li>
               {table ? (
                 <li>
-                  <a
-                    href={databaseHref}
-                    aria-label={database}
-                    onClick={e => {
-                      e.preventDefault();
-                      (onClickDatabase || ((db: string) => nav.navigateToDatabase(db)))(database);
-                    }}
-                  >
-                    {database}
-                  </a>
+                  {(() => {
+                    const { truncated, isTruncated } = truncateMiddle(database);
+                    const linkElement = (
+                      <a
+                        href={databaseHref}
+                        aria-label={database}
+                        onClick={e => {
+                          e.preventDefault();
+                          (onClickDatabase || ((db: string) => nav.navigateToDatabase(db)))(
+                            database
+                          );
+                        }}
+                        className={isTruncated ? 'hue-breadcrumb-truncated' : ''}
+                      >
+                        {truncated}
+                      </a>
+                    );
+
+                    return isTruncated ? (
+                      <Tooltip title={database} placement="bottom">
+                        {linkElement}
+                      </Tooltip>
+                    ) : (
+                      linkElement
+                    );
+                  })()}
                 </li>
               ) : (
                 <li>
-                  <span aria-current="page">{database}</span>
+                  {(() => {
+                    const { truncated, isTruncated } = truncateMiddle(database);
+                    const spanElement = (
+                      <span
+                        aria-current="page"
+                        className={isTruncated ? 'hue-breadcrumb-truncated' : ''}
+                      >
+                        {truncated}
+                      </span>
+                    );
+
+                    return isTruncated ? (
+                      <Tooltip title={database} placement="bottom">
+                        {spanElement}
+                      </Tooltip>
+                    ) : (
+                      spanElement
+                    );
+                  })()}
                 </li>
               )}
             </>
@@ -139,22 +175,54 @@ const Breadcrumbs = ({
               </li>
               {column ? (
                 <li>
-                  <a
-                    href={tableHref}
-                    aria-label={table}
-                    onClick={e => {
-                      e.preventDefault();
-                      (onClickTable || ((tbl: string) => nav.navigateToTable(database!, tbl)))(
-                        table
-                      );
-                    }}
-                  >
-                    {table}
-                  </a>
+                  {(() => {
+                    const { truncated, isTruncated } = truncateMiddle(table);
+                    const linkElement = (
+                      <a
+                        href={tableHref}
+                        aria-label={table}
+                        onClick={e => {
+                          e.preventDefault();
+                          (onClickTable || ((tbl: string) => nav.navigateToTable(database!, tbl)))(
+                            table
+                          );
+                        }}
+                        className={isTruncated ? 'hue-breadcrumb-truncated' : ''}
+                      >
+                        {truncated}
+                      </a>
+                    );
+
+                    return isTruncated ? (
+                      <Tooltip title={table} placement="bottom">
+                        {linkElement}
+                      </Tooltip>
+                    ) : (
+                      linkElement
+                    );
+                  })()}
                 </li>
               ) : (
                 <li>
-                  <span aria-current="page">{table}</span>
+                  {(() => {
+                    const { truncated, isTruncated } = truncateMiddle(table);
+                    const spanElement = (
+                      <span
+                        aria-current="page"
+                        className={isTruncated ? 'hue-breadcrumb-truncated' : ''}
+                      >
+                        {truncated}
+                      </span>
+                    );
+
+                    return isTruncated ? (
+                      <Tooltip title={table} placement="bottom">
+                        {spanElement}
+                      </Tooltip>
+                    ) : (
+                      spanElement
+                    );
+                  })()}
                 </li>
               )}
             </>

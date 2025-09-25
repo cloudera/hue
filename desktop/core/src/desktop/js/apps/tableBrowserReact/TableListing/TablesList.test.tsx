@@ -42,7 +42,11 @@ jest.mock('../DatabaseListing/DatabaseProperties', () => ({
 
 jest.mock('../sharedComponents/Toolbar', () => ({
   __esModule: true,
-  default: ({ actions }: { actions: Array<{ key: string; label: string; onClick: () => void; disabled?: boolean }> }) => (
+  default: ({
+    actions
+  }: {
+    actions: Array<{ key: string; label: string; onClick: () => void; disabled?: boolean }>;
+  }) => (
     <div>
       {actions.map(a => (
         <button key={a.key} onClick={a.onClick} disabled={a.disabled}>
@@ -55,7 +59,13 @@ jest.mock('../sharedComponents/Toolbar', () => ({
 
 jest.mock('../../../reactComponents/PaginatedTable/PaginatedTable', () => ({
   __esModule: true,
-  default: ({ data, onRowSelect }: { data: Array<TableRowItem & { key: string }>; onRowSelect?: (rows: any[]) => void }) => (
+  default: ({
+    data,
+    onRowSelect
+  }: {
+    data: Array<TableRowItem & { key: string }>;
+    onRowSelect?: (rows: any[]) => void;
+  }) => (
     <div>
       <div data-testid="rows">
         {data.map((r, i) => (

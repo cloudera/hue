@@ -10,11 +10,15 @@
 // License for the specific language governing permissions and limitations under
 // the License.
 
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import BorderlessButton from 'cuix/dist/components/Button/BorderlessButton';
 import RefreshIcon from '@cloudera/cuix-core/icons/react/RefreshIcon';
 import { i18nReact } from '../../../utils/i18nReact';
 import Breadcrumbs from './Breadcrumbs';
+import OverflowTooltip from '../../../reactComponents/PathBrowser/OverflowingItem/OverflowTooltip';
+import isOverflowing from '../../../utils/html/isOverflowing';
+
+import './PageHeader.scss';
 
 export interface PageHeaderProps {
   title?: string;
@@ -59,6 +63,23 @@ const PageHeader = ({
   onClickField
 }: PageHeaderProps): JSX.Element | null => {
   const { t } = i18nReact.useTranslation();
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const [isOverflown, setIsOverflown] = useState(false);
+
+  const checkOverflow = () => {
+    const element = titleRef.current;
+    if (element) {
+      setIsOverflown(isOverflowing(element));
+    }
+  };
+
+  useEffect(() => {
+    checkOverflow();
+    window.addEventListener('resize', checkOverflow);
+    return () => {
+      window.removeEventListener('resize', checkOverflow);
+    };
+  }, [title]); // Re-check when title changes
 
   // Don't render if no title is provided and no breadcrumbs data
   if (!title && !sourceType && !database && !table && !column) {
@@ -70,7 +91,13 @@ const PageHeader = ({
       {/* Top row: Title and Refresh Button */}
       <div className="hue-table-browser__page-header__top-row">
         {icon && React.cloneElement(icon, { className: 'hue-table-browser__page-header__icon' })}
-        {title && <h3 className="hue-h3 hue-table-browser__page-header__text">{title}</h3>}
+        {title && (
+          <OverflowTooltip isOverflowing={isOverflown} title={title} toolTipTriggers={['hover']}>
+            <h3 ref={titleRef} className="hue-h3 hue-table-browser__page-header__text">
+              {title}
+            </h3>
+          </OverflowTooltip>
+        )}
         {onRefresh && (
           <BorderlessButton
             onClick={onRefresh}

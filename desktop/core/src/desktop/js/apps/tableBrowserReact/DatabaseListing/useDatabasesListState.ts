@@ -10,7 +10,7 @@
 // License for the specific language governing permissions and limitations under
 // the License.
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import type { SortOrder } from 'antd/lib/table/interface';
 import { useDescriptionManager } from '../hooks/useDescriptionManager';
 import type { Connector, Namespace, Compute } from '../../../config/types';
@@ -67,12 +67,21 @@ export function useDatabasesListState(options: {
   compute?: Compute;
   databases?: string[];
   currentDatabase?: string;
+  /** When true, bypass cache and force fresh API calls for descriptions */
+  refreshCache?: boolean;
 }): DatabasesListState {
-  const { connector, namespace, compute, databases, currentDatabase } = options;
+  const {
+    connector,
+    namespace,
+    compute,
+    databases,
+    currentDatabase,
+    refreshCache = false
+  } = options;
 
   // Page-level
   const [dbFilter, setDbFilter] = useState('');
-  const [dbPageSize, setDbPageSize] = useState(50);
+  const [dbPageSize, setDbPageSize] = useState(10);
   const [dbPageNumber, setDbPageNumber] = useState(1);
 
   const [selected, setSelected] = useState<string[]>([]);
@@ -88,6 +97,25 @@ export function useDatabasesListState(options: {
   });
 
   // Description editing using the shared hook
+  // Prevent stale data: track connector changes and clear databases immediately when connector changes
+  const connectorKey = useMemo(() => {
+    return connector?.id || connector?.type || 'no-connector';
+  }, [connector?.id, connector?.type]);
+
+  const lastConnectorKeyRef = useRef(connectorKey);
+  const safeDatabases = useMemo(() => {
+    // If connector has changed, immediately return empty array to prevent stale data
+    if (connectorKey !== lastConnectorKeyRef.current) {
+      lastConnectorKeyRef.current = connectorKey;
+      return [];
+    }
+
+    if (!connector || !namespace || !compute) {
+      return [];
+    }
+    return databases || [];
+  }, [connector, namespace, compute, databases, connectorKey]);
+
   const {
     descriptions,
     editingItem,
@@ -99,9 +127,10 @@ export function useDatabasesListState(options: {
     connector,
     namespace,
     compute,
-    items: databases || [],
+    items: safeDatabases,
     path: [],
-    currentItem: currentDatabase
+    currentItem: currentDatabase,
+    refreshCache
   });
 
   const editState: ListCellEditState = {
@@ -125,6 +154,31 @@ export function useDatabasesListState(options: {
     }
     return false;
   }, [connector, namespace, compute, databases]);
+
+  // Clear all state when connector changes to prevent stale data when switching sources
+  useEffect(() => {
+    // Reset pagination
+    setDbPageNumber(1);
+    setDbPageSize(10);
+
+    // Reset filters and selections
+    setDbFilter('');
+    setSelected([]);
+
+    // Reset sort
+    setSortByColumn('');
+    setSortOrder(null);
+
+    // Reset modals and forms
+    setConfirmOpen(false);
+    setCreateModalOpen(false);
+    setCreateForm({
+      name: '',
+      comment: '',
+      location: '',
+      useDefaultLocation: true
+    });
+  }, [connector?.id]);
 
   return {
     isInitializing,

@@ -83,7 +83,10 @@ const Privileges = ({ database, table }: PrivilegesProps): JSX.Element => {
 
   if (error) {
     return (
-      <EmptyState title={t('Failed to load privileges')} subtitle={t('Error: {{msg}}', { msg: error })} />
+      <EmptyState
+        title={t('Failed to load privileges')}
+        subtitle={t('Error: {{msg}}', { msg: error })}
+      />
     );
   }
 
@@ -105,19 +108,39 @@ const Privileges = ({ database, table }: PrivilegesProps): JSX.Element => {
       </div>
       <div className="tb-privileges__list" role="table" aria-label={t('Privileges list')}>
         <div className="tb-privileges__row tb-privileges__row--header" role="row">
-          <div className="tb-privileges__cell" role="columnheader">{t('Role')}</div>
-          <div className="tb-privileges__cell" role="columnheader">{t('Scope')}</div>
-          <div className="tb-privileges__cell" role="columnheader">{t('Action')}</div>
-          <div className="tb-privileges__cell" role="columnheader">{t('Grant')}</div>
-          <div className="tb-privileges__cell" role="columnheader">{t('When')}</div>
+          <div className="tb-privileges__cell" role="columnheader">
+            {t('Role')}
+          </div>
+          <div className="tb-privileges__cell" role="columnheader">
+            {t('Scope')}
+          </div>
+          <div className="tb-privileges__cell" role="columnheader">
+            {t('Action')}
+          </div>
+          <div className="tb-privileges__cell" role="columnheader">
+            {t('Grant')}
+          </div>
+          <div className="tb-privileges__cell" role="columnheader">
+            {t('When')}
+          </div>
         </div>
         {privileges.map((p, idx) => (
           <div className="tb-privileges__row" role="row" key={`${p.roleName}-${idx}`}>
-            <div className="tb-privileges__cell" role="cell">{p.roleName}</div>
-            <div className="tb-privileges__cell" role="cell">{p.scope}</div>
-            <div className="tb-privileges__cell" role="cell">{p.action}</div>
-            <div className="tb-privileges__cell" role="cell">{p.grantOption ? t('Yes') : t('No')}</div>
-            <div className="tb-privileges__cell" role="cell">{new Date(p.timestamp * 1000).toLocaleString()}</div>
+            <div className="tb-privileges__cell" role="cell">
+              {p.roleName}
+            </div>
+            <div className="tb-privileges__cell" role="cell">
+              {p.scope}
+            </div>
+            <div className="tb-privileges__cell" role="cell">
+              {p.action}
+            </div>
+            <div className="tb-privileges__cell" role="cell">
+              {p.grantOption ? t('Yes') : t('No')}
+            </div>
+            <div className="tb-privileges__cell" role="cell">
+              {new Date(p.timestamp * 1000).toLocaleString()}
+            </div>
           </div>
         ))}
       </div>

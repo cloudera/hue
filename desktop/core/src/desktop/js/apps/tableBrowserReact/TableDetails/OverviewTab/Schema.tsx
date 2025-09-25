@@ -593,7 +593,8 @@ const DetailsSchema = ({
             totalSize
           },
           setPageNumber,
-          setPageSize
+          setPageSize,
+          pageSizeOptions: [10, 50, 100, 500]
         }}
       />
     </div>

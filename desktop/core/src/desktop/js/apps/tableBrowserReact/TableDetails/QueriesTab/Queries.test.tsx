@@ -69,9 +69,7 @@ describe('Queries tab', () => {
     const dataCatalog = require('../../../../catalog/dataCatalog').default;
     dataCatalog.getEntry.mockResolvedValueOnce({
       getAnalysis: jest.fn().mockResolvedValue({
-        top_joins: [
-          { leftTable: 'a', leftColumn: 'id', rightTable: 'b', rightColumn: 'id' }
-        ]
+        top_joins: [{ leftTable: 'a', leftColumn: 'id', rightTable: 'b', rightColumn: 'id' }]
       })
     });
     render(
@@ -86,5 +84,3 @@ describe('Queries tab', () => {
     expect(await screen.findByText('a.id = b.id')).toBeInTheDocument();
   });
 });
-
-

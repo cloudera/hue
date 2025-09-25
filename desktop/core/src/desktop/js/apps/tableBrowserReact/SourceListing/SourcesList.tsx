@@ -175,7 +175,8 @@ const SourcesList = ({
                   totalSize
                 },
                 setPageNumber: setSourcePageNumber,
-                setPageSize: setSourcePageSize
+                setPageSize: setSourcePageSize,
+                pageSizeOptions: [10, 50, 100, 500]
               }}
             />
           </>

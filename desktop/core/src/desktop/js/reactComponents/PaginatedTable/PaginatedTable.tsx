@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { HTMLAttributes, useEffect, useRef, useState } from 'react';
+import React, { HTMLAttributes, useEffect, useMemo, useRef, useState } from 'react';
 import Table, { type ColumnProps } from 'cuix/dist/components/Table';
 import { TablePaginationConfig } from 'antd/es/table';
 import {
@@ -129,15 +129,69 @@ const PaginatedTable = <T extends object>({
     }
   };
 
-  const getColumnsFromConfig = (columnsConfig: ColumnProps<T>[]) => {
-    return columnsConfig.map(col => {
+  // Function to detect if a value is numerical (including formatted numbers)
+  const isNumericalValue = (value: unknown): boolean => {
+    if (value == null) {
+      return false;
+    }
+    const str = String(value).trim();
+    if (str === '') {
+      return false;
+    }
+
+    // Remove common formatting characters and check if what remains is a number
+    const cleanedStr = str
+      .replace(/[$€£¥₹]/g, '') // Currency symbols
+      .replace(/[,\s]/g, '') // Commas and spaces (thousand separators)
+      .replace(/[KMGTPB]+$/i, '') // Unit suffixes (K, M, G, T, P, B for sizes/quantities)
+      .replace(/%$/, ''); // Percentage symbol
+
+    return !isNaN(Number(cleanedStr)) && cleanedStr !== '';
+  };
+
+  // Function to determine if a column contains primarily numerical data
+  const isNumericalColumn = (col: ColumnProps<T>): boolean => {
+    const dataIndex = col.dataIndex as unknown;
+    if (!dataIndex || (typeof dataIndex !== 'string' && typeof dataIndex !== 'number')) {
+      return false;
+    }
+
+    // Sample up to 50 rows to determine if column is numerical
+    const sampleSize = Math.min(data.length, 50);
+    let numericalCount = 0;
+    let nonNullCount = 0;
+
+    for (let i = 0; i < sampleSize; i++) {
+      const record = data[i] as unknown as Record<string | number, unknown>;
+      const value = record?.[dataIndex as string | number];
+
+      if (value != null && String(value).trim() !== '') {
+        nonNullCount++;
+        if (isNumericalValue(value)) {
+          numericalCount++;
+        }
+      }
+    }
+
+    // Consider it numerical if at least 70% of non-null values are numerical
+    return nonNullCount > 0 && numericalCount / nonNullCount >= 0.7;
+  };
+
+  const processedColumns = useMemo(() => {
+    return columns.map(col => {
       const key = String(
         (col as unknown as { key?: React.Key }).key ?? (col.dataIndex as React.Key)
       );
+      const isNumerical = isNumericalColumn(col);
+
       const enhanced: Record<string, unknown> = {
         ...col,
         defaultSortOrder: sortByColumn === col.dataIndex ? sortOrder : undefined,
-        showSorterTooltip: false
+        showSorterTooltip: false,
+        // Right align numerical columns
+        align: isNumerical
+          ? 'right'
+          : (col as unknown as { align?: 'left' | 'right' | 'center' }).align
       };
 
       if (enableHorizontalScroll) {
@@ -156,7 +210,8 @@ const PaginatedTable = <T extends object>({
               whiteSpace: 'nowrap',
               minWidth: headerWidths[key] ? Math.ceil(headerWidths[key]) : undefined,
               width: headerWidths[key] ? Math.ceil(headerWidths[key]) : undefined,
-              maxWidth: headerWidths[key] ? Math.ceil(headerWidths[key]) : undefined
+              maxWidth: headerWidths[key] ? Math.ceil(headerWidths[key]) : undefined,
+              textAlign: isNumerical ? 'right' : undefined
             }
           }) as unknown as HeaderCellAttr;
 
@@ -203,26 +258,24 @@ const PaginatedTable = <T extends object>({
           style: {
             minWidth: finalWidth,
             width: finalWidth,
-            maxWidth: finalWidth
+            maxWidth: finalWidth,
+            textAlign: isNumerical ? 'right' : undefined
           }
         });
       }
 
       return enhanced as ColumnProps<T>;
     });
-  };
+  }, [columns, data, sortByColumn, sortOrder, enableHorizontalScroll, headerWidths]);
 
-  // Show pagination if there are multiple pages OR if the user selected a page size
-  // larger than the smallest available option (so they can change it back), as requested.
-  const smallestPageSizeOption = pagination?.pageSizeOptions?.[0] ?? 25;
-  const isNonMinimumSelected =
-    typeof pagination?.pageStats?.pageSize === 'number' &&
-    pagination?.pageStats?.pageSize > smallestPageSizeOption;
+  // Show pagination if there are multiple pages OR if page size selection is available
+  // (users should always be able to change page size when options are provided)
+  const hasPageSizeSelection = !!(pagination?.setPageSize && pagination?.pageSizeOptions?.length);
 
   const isPaginationEnabled =
     !!pagination?.pageStats &&
     !!pagination.setPageNumber &&
-    (pagination?.pageStats?.totalPages > 1 || isNonMinimumSelected);
+    (pagination?.pageStats?.totalPages > 1 || hasPageSizeSelection);
 
   const [tableRef, rect] = useResizeObserver();
 
@@ -302,7 +355,7 @@ const PaginatedTable = <T extends object>({
         title={title}
         className={`hue-paginated-table ${enableHorizontalScroll ? 'hue-paginated-table--nowrap' : ''}`}
         onChange={onColumnClick}
-        columns={getColumnsFromConfig(columns)}
+        columns={processedColumns}
         dataSource={data}
         onRow={mergedOnRow as unknown as (record: T, index?: number) => HTMLAttributes<HTMLElement>}
         pagination={false}

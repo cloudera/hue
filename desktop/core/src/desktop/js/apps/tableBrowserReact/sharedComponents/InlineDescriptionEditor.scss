@@ -12,16 +12,109 @@
 
     &__actions {
       margin-top: vars.$cdl-spacing-xs;
+      display: flex;
+      gap: vars.$cdl-spacing-xs;
     }
 
     &--display {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: vars.$cdl-spacing-s;
+
       .inline-desc-editor__text {
-        margin-right: vars.$cdl-spacing-m;
+        flex: 1;
+        
+        &--truncated {
+          display: -webkit-box;
+          -webkit-line-clamp: 1;
+          line-clamp: 1;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: normal;
+        }
+
+        &--expanded {
+          white-space: pre-wrap;
+          word-break: break-word;
+        }
+
+        &--clickable {
+          cursor: pointer;
+          transition: color 0.2s ease;
+
+          &:hover {
+            color: vars.$cdl-blue-500;
+          }
+
+          &:focus {
+            outline: 2px solid vars.$cdl-blue-500;
+            outline-offset: 2px;
+            border-radius: 2px;
+          }
+        }
       }
     }
 
-    &__button--is-editing {
-      margin-left: vars.$cdl-spacing-s;
+    &__buttons {
+      display: flex;
+      align-items: center;
+      gap: vars.$cdl-spacing-xs;
+      flex-shrink: 0;
+      margin-left: auto; // Ensure buttons are always right-aligned
     }
+
+    &__expand-button {
+      background: none;
+      border: none;
+      padding: 2px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 2px;
+      transition: background-color 0.2s ease;
+      
+      &:hover {
+        background-color: vars.$cdl-gray-100;
+      }
+
+      &:focus {
+        outline: 2px solid vars.$cdl-blue-500;
+        outline-offset: 2px;
+      }
+
+      // Style the icon inside
+      svg {
+        color: vars.$cdl-gray-600;
+        transition: color 0.2s ease;
+        width: 16px;
+        height: 16px;
+      }
+
+      &:hover svg {
+        color: vars.$cdl-blue-500;
+      }
+    }
+
+    &__edit-button {
+      // Style the edit icon
+      svg {
+        color: vars.$cdl-gray-900;
+        transition: color 0.2s ease;
+        width: 16px;
+        height: 16px;
+      }
+
+      &:hover svg {
+        color: vars.$cdl-blue-500;
+      }
+
+      &:focus svg {
+        color: vars.$cdl-blue-500;
+      }
+    }
+
   }
 }

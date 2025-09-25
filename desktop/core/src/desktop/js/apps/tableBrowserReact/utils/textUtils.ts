@@ -10,30 +10,25 @@
 // License for the specific language governing permissions and limitations under
 // the License.
 
-import { useState } from 'react';
+/**
+ * Utility function to truncate text in the middle
+ * @param text - The text to truncate
+ * @param maxLength - Maximum length before truncation (default: 20)
+ * @returns Object with truncated text and whether it was truncated
+ */
+export const truncateMiddle = (
+  text: string,
+  maxLength: number = 20
+): { truncated: string; isTruncated: boolean } => {
+  if (text.length <= maxLength) {
+    return { truncated: text, isTruncated: false };
+  }
 
-export interface UseTablesPageState {
-  tableFilter: string;
-  setTableFilter: (value: string) => void;
-  tablePageSize: number;
-  setTablePageSize: (size: number) => void;
-  tablePageNumber: number;
-  setTablePageNumber: (page: number) => void;
-}
-
-export function useTablesPageState(): UseTablesPageState {
-  const [tableFilter, setTableFilter] = useState('');
-  const [tablePageSize, setTablePageSize] = useState(50);
-  const [tablePageNumber, setTablePageNumber] = useState(1);
+  const start = Math.ceil(maxLength / 2) - 1;
+  const end = Math.floor(maxLength / 2) - 2;
 
   return {
-    tableFilter,
-    setTableFilter,
-    tablePageSize,
-    setTablePageSize,
-    tablePageNumber,
-    setTablePageNumber
+    truncated: `${text.substring(0, start)}...${text.substring(text.length - end)}`,
+    isTruncated: true
   };
-}
-
-export default useTablesPageState;
+};

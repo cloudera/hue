@@ -4,35 +4,69 @@
   .hue-database-properties {
     margin-bottom: 16px;
 
+    &__property-type {
+      opacity: 0.7;
+      margin-left: vars.$fluidx-spacing-xs;
+      font-size: 0.9em;
+    }
 
-    // Minimal custom styling only where needed
-    // &__property-type {
-    //   opacity: 0.7;
-    //   margin-left: 4px;
-    //   font-size: 0.9em;
-    // }
+    &__property-empty {
+      opacity: 0.6;
+      font-style: italic;
+    }
 
-    // &__property-empty {
-    //   opacity: 0.6;
-    //   font-style: italic;
-    // }
+    &__property-link {
+      color: vars.$fluidx-blue-600;
+      text-decoration: none;
 
-    // &__property-path {
-    //   font-family: monospace;
-    //   font-size: 0.85em;
-    //   word-break: break-all;
-    // }
+      &:hover {
+        text-decoration: underline;
+      }
+    }
 
-    // &__parameters {
-    //   background-color: vars.$fluidx-gray-050;
-    //   border: 1px solid vars.$fluidx-gray-200;
-    //   padding: 8px;
-    //   border-radius: 4px;
-    //   font-family: monospace;
-    //   font-size: 0.85em;
-    //   max-height: 120px;
-    //   overflow: auto;
-    //   white-space: pre-wrap;
-    // }
+    &__parameters-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    &__parameter-item {
+      border-bottom: 1px solid vars.$fluidx-gray-100;
+      display: flex;
+      gap: vars.$fluidx-spacing-xs;
+      align-items: flex-start;
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+
+    &__parameter-key {
+      color: vars.$fluidx-gray-900;
+      font-weight: 700;
+      min-width: fit-content;
+      flex-shrink: 0;
+    }
+
+    &__parameter-value {
+      color: vars.$fluidx-gray-900;
+      word-break: break-word;
+      overflow-wrap: break-word;
+      flex: 1;
+    }
+
+    // Fallback for unparseable parameters
+    &__parameters {
+      background-color: vars.$fluidx-gray-050;
+      border: 1px solid vars.$fluidx-gray-200;
+      padding: vars.$fluidx-spacing-s;
+      border-radius: vars.$border-radius-base;
+      font-family: monospace;
+      font-size: 0.85em;
+      max-height: 120px;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
   }
 }

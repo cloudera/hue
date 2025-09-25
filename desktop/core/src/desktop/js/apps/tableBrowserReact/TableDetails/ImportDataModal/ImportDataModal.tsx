@@ -52,14 +52,8 @@ const ImportDataModal = ({
   partitionColumns = []
 }: ImportDataModalProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
-  const {
-    filePath,
-    setFilePath,
-    overwrite,
-    setOverwrite,
-    partitionValues,
-    setPartitionValue
-  } = useImportDataForm({ open, partitionColumns });
+  const { filePath, setFilePath, overwrite, setOverwrite, partitionValues, setPartitionValue } =
+    useImportDataForm({ open, partitionColumns });
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [error, setError] = React.useState<string>('');
 
@@ -148,9 +142,7 @@ const ImportDataModal = ({
       width={680}
     >
       <div className="import-data-modal__section">
-        <label className="import-data-modal__label">
-          {t('Path')} *
-        </label>
+        <label className="import-data-modal__label">{t('Path')} *</label>
         <PathBrowser
           filePath={filePath}
           onFilepathChange={setFilePath}
@@ -171,6 +163,7 @@ const ImportDataModal = ({
                 value={partitionValues[col.name] || ''}
                 onChange={e => setPartitionValue(col.name, e.target.value)}
                 placeholder={t('Enter value for {{columnName}}', { columnName: col.name })}
+                maxLength={512}
               />
             </div>
           ))}
@@ -192,7 +185,9 @@ const ImportDataModal = ({
         className="import-data-modal__alert"
       />
 
-      {error && <Alert message={error} type="error" showIcon className="import-data-modal__alert" />}
+      {error && (
+        <Alert message={error} type="error" showIcon className="import-data-modal__alert" />
+      )}
     </Modal>
   );
 };

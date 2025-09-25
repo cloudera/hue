@@ -40,12 +40,12 @@ jest.mock('../TableDetails/SampleTab/SampleGrid', () => {
 
 // Mock PrettyStructDisplay component
 jest.mock('../sharedComponents/PrettyStructDisplay', () => {
-  return function MockPrettyStructDisplay({ 
-    structType, 
-    compact 
-  }: { 
-    structType?: string; 
-    compact?: boolean; 
+  return function MockPrettyStructDisplay({
+    structType,
+    compact
+  }: {
+    structType?: string;
+    compact?: boolean;
   }) {
     return (
       <div data-testid="pretty-struct-display" data-compact={compact}>
@@ -243,15 +243,16 @@ describe('ColumnDetails', () => {
     expect(structDisplays.length).toBeGreaterThan(0);
 
     // Check if any displays are in compact mode (for table cells)
-    const compactDisplays = structDisplays.filter(display => 
-      display.getAttribute('data-compact') === 'true'
+    const compactDisplays = structDisplays.filter(
+      display => display.getAttribute('data-compact') === 'true'
     );
-    
+
     // At least the main display should not be compact, but table cell displays should be compact
-    const nonCompactDisplays = structDisplays.filter(display => 
-      display.getAttribute('data-compact') === 'false' || !display.getAttribute('data-compact')
+    const nonCompactDisplays = structDisplays.filter(
+      display =>
+        display.getAttribute('data-compact') === 'false' || !display.getAttribute('data-compact')
     );
-    
+
     expect(nonCompactDisplays.length).toBeGreaterThan(0);
   });
 });

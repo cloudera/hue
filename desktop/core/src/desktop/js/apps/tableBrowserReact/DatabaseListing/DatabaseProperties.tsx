@@ -45,6 +45,71 @@ const DatabasePropertiesComponent = ({
     );
   };
 
+  // Helper function to parse database parameters string into key-value pairs
+  const parseParameters = (parametersString: string): React.ReactNode => {
+    try {
+      // Remove outer braces and split by comma, but be careful with commas inside values
+      const cleaned = parametersString.trim().replace(/^{|}$/g, '');
+      if (!cleaned) {
+        return <span className="hue-database-properties__property-empty">{t('None')}</span>;
+      }
+
+      // Split by comma but preserve commas within values (simple approach)
+      const pairs: { key: string; value: string }[] = [];
+      let current = '';
+      let depth = 0;
+
+      for (let i = 0; i < cleaned.length; i++) {
+        const char = cleaned[i];
+        if (char === '{' || char === '[') {
+          depth++;
+        } else if (char === '}' || char === ']') {
+          depth--;
+        } else if (char === ',' && depth === 0) {
+          if (current.trim()) {
+            const equalIndex = current.indexOf('=');
+            if (equalIndex > 0) {
+              const key = current.substring(0, equalIndex).trim();
+              const value = current.substring(equalIndex + 1).trim();
+              pairs.push({ key, value });
+            }
+          }
+          current = '';
+          continue;
+        }
+        current += char;
+      }
+
+      // Handle the last pair
+      if (current.trim()) {
+        const equalIndex = current.indexOf('=');
+        if (equalIndex > 0) {
+          const key = current.substring(0, equalIndex).trim();
+          const value = current.substring(equalIndex + 1).trim();
+          pairs.push({ key, value });
+        }
+      }
+
+      if (pairs.length === 0) {
+        return <span className="hue-database-properties__property-empty">{t('None')}</span>;
+      }
+
+      return (
+        <ul className="hue-database-properties__parameters-list">
+          {pairs.map(({ key, value }, index) => (
+            <li key={`${key}-${index}`} className="hue-database-properties__parameter-item">
+              <strong className="hue-database-properties__parameter-key">{key}:</strong>
+              <span className="hue-database-properties__parameter-value">{value}</span>
+            </li>
+          ))}
+        </ul>
+      );
+    } catch (error) {
+      // Fallback to original display if parsing fails
+      return <div className="hue-database-properties__parameters">{parametersString}</div>;
+    }
+  };
+
   // Prepare database properties data for MetaDataDisplay
   const propertiesGroups: MetaDataGroup[] = [
     {
@@ -80,9 +145,7 @@ const DatabasePropertiesComponent = ({
                     {t('location')}
                   </a>
                 ) : (
-                  <span className="hue-database-properties__property-path">
-                    {properties.location}
-                  </span>
+                  <span>{properties.location}</span>
                 )
               }
             ]
@@ -92,9 +155,7 @@ const DatabasePropertiesComponent = ({
               {
                 key: 'parameters',
                 label: t('Parameters'),
-                value: (
-                  <div className="hue-database-properties__parameters">{properties.parameters}</div>
-                )
+                value: parseParameters(properties.parameters)
               }
             ]
           : [])

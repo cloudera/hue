@@ -10,31 +10,49 @@
 // License for the specific language governing permissions and limitations under
 // the License.
 @use 'variables' as vars;
+
 .cuix.antd {
   .hue-table-browser-breadcrumbs {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: vars.$cdl-spacing-tiny;
+    width: 100%;
 
     nav {
       flex: 1;
       min-width: 0;
+      width: 100%;
     }
 
     ol {
-      display: inline-flex;
+      display: flex;
+      flex-wrap: wrap;
       vertical-align: middle;
       align-items: center;
       gap: vars.$cdl-spacing-tiny;
-      white-space: nowrap;
       margin: 0;
       padding: 0;
       list-style: none;
-      overflow: hidden;
+      // Remove white-space: nowrap and overflow: hidden to allow wrapping
     }
 
     a {
       text-decoration: none;
+    }
+
+    // Breadcrumb list items
+    li {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    // Truncated breadcrumb items
+    .hue-breadcrumb-truncated {
+      cursor: help !important;
+      max-width: 200px !important;
+      display: inline-block !important;
+      vertical-align: bottom !important;
     }
   }
 }

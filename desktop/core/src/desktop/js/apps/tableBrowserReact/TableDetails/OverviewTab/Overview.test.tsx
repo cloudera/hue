@@ -57,5 +57,3 @@ describe('Overview', () => {
     expect(screen.getByText(/\{\{label\}\} \(\{\{count\}\}\)/)).toBeInTheDocument();
   });
 });
-
-

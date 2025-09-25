@@ -6,6 +6,7 @@ import { ConfigProvider } from 'antd';
 import Button from 'cuix/dist/components/Button/Button';
 import { BorderlessButton } from 'cuix/dist/components/Button';
 import Tooltip from 'cuix/dist/components/Tooltip';
+import SpinnerIcon from 'cuix/dist/components/SpinnerIcon';
 import Modal from 'cuix/dist/components/Modal';
 import EmptyState from 'cuix/dist/components/EmptyState';
 import { i18nReact } from '../../../../utils/i18nReact';
@@ -14,7 +15,7 @@ import dataCatalog from '../../../../catalog/dataCatalog';
 import type { Connector, Compute, Namespace } from '../../../../config/types';
 import type { Analysis, Partitions as PartitionsType } from '../../../../catalog/DataCatalogEntry';
 import huePubSub from '../../../../utils/huePubSub';
-import { post } from '../../../../api/utils';
+import { post, get } from '../../../../api/utils';
 // import { PrimaryButton } from 'cuix/dist/components/Button';
 import PaginatedTable, {
   type ColumnProps as PaginatedColumnProps,
@@ -23,6 +24,11 @@ import PaginatedTable, {
 import Filter from 'cuix/dist/components/Filter';
 import type { FilterOutput, BasicFacet } from 'cuix/dist/components/Filter/types';
 import './Partitions.scss';
+
+interface BrowsePartitionResponse {
+  uri_path?: string;
+  message?: string;
+}
 
 export interface PartitionsProps {
   connector?: Connector | null;
@@ -52,6 +58,7 @@ const Partitions = ({
   const [selectedSpecs, setSelectedSpecs] = useState<string[]>([]);
   const [filterOutput, setFilterOutput] = useState<FilterOutput>({});
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [browsingUrl, setBrowsingUrl] = useState<string | null>(null);
 
   const [keyDefs, setKeyDefs] = useState<{ name: string; type?: string }[]>([]);
 
@@ -234,13 +241,23 @@ const Partitions = ({
             title: t('Browse'),
             dataIndex: 'browseUrl',
             key: 'browse',
-            render: (url: string) => (
-              <Tooltip title={t('Browse partition files')}>
-                <BorderlessButton onClick={() => browsePartitionFolder(url)}>
-                  {t('Files')}
-                </BorderlessButton>
-              </Tooltip>
-            )
+            render: (url: string) => {
+              const isLoading = browsingUrl === url;
+              return (
+                <Tooltip title={t('Browse partition files')}>
+                  <BorderlessButton onClick={() => browsePartitionFolder(url)} disabled={isLoading}>
+                    {isLoading ? (
+                      <>
+                        <SpinnerIcon size="small" style={{ marginRight: 4 }} />
+                        {t('Loading Storage Browser url...')}
+                      </>
+                    ) : (
+                      t('Files')
+                    )}
+                  </BorderlessButton>
+                </Tooltip>
+              );
+            }
           }
         ] as PaginatedColumnProps<PartitionRow>[])
       : [])
@@ -321,11 +338,31 @@ const Partitions = ({
     });
   };
 
-  const browsePartitionFolder = (url: string): void => {
+  const browsePartitionFolder = async (url: string): Promise<void> => {
     if (!url) {
       return;
     }
-    window.open(url, '_blank');
+    setBrowsingUrl(url);
+    try {
+      const params = new URLSearchParams();
+      params.set('format', 'json');
+      const response = await get<BrowsePartitionResponse>(url, params, { silenceErrors: false });
+      if (response.uri_path && typeof response.uri_path === 'string') {
+        huePubSub.publish('open.link', response.uri_path);
+      } else if (response.message && typeof response.message === 'string') {
+        huePubSub.publish('hue.global.error', { message: response.message });
+      } else if (response.uri_path === null) {
+        huePubSub.publish('hue.global.warning', {
+          message: t('Could not retrieve browse partition folder. ')
+        });
+      }
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to browse partition folder';
+      huePubSub.publish('hue.global.error', { message: errorMessage });
+    } finally {
+      setBrowsingUrl(null);
+    }
   };
 
   return (
@@ -410,6 +447,8 @@ const Partitions = ({
         onOk={onConfirmDrop}
         onCancel={() => setConfirmOpen(false)}
         okButtonProps={{ danger: true }}
+        okText={t('Delete')}
+        cancelText={t('Cancel')}
       >
         {t('Do you really want to delete the selected partitions?')}
       </Modal>

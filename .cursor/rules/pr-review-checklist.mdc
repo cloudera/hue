@@ -14,12 +14,19 @@ alwaysApply: false
 - Architecture: lift/split state; keep components cohesive.
 - Naming clarity: components, functions, variables. Important, verify that the name reflects the actual usage/function.
 - Edge cases: loading/empty/error; network failures.
-- Accessibility: roles, labels, focus, contrast. Only comment where needed, 
+- Accessibility: roles, labels, focus, contrast. Only comment where needed,
+- Correct use of labels, placeholders, tooltips  and mandatory input indicators.
+  - Labels: Names the input. Always required. Use visible labels for clarity and accessibility.
+  - Placeholders: Shows an example or hint inside the input. Use for format examples (e.g., e.g. name@example.com). Keep short.
+  - Tooltips: Provides a tooltip on hover/focus. Use only for optional extra clarification not covered by the label.
+  - Mandatory input is marked with an asterisk in front of the label.
 - Check for aria- attributes ONLY when needed. e.g. 
   - DO: comment if an icon inly button is missing aria-label. 
   - DON'T: comment about missing aria-disabled if a native disabled attribute is used.
 - Copy: concise, consistent; i18n everywhere.
 - All files must start with the Cloudera copyright statement
+- cuix components are used instead of antd components where possible
+
 
 ## Make sure that test files
 - test main flows

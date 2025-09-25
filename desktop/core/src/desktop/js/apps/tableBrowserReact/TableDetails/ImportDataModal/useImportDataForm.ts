@@ -30,7 +30,10 @@ export interface UseImportDataForm {
   resetForm: () => void;
 }
 
-export function useImportDataForm({ open, partitionColumns }: UseImportDataFormArgs): UseImportDataForm {
+export function useImportDataForm({
+  open,
+  partitionColumns
+}: UseImportDataFormArgs): UseImportDataForm {
   const initialPartitionValues = useMemo(() => {
     const init: Record<string, string> = {};
     (partitionColumns || []).forEach(col => {
@@ -41,7 +44,8 @@ export function useImportDataForm({ open, partitionColumns }: UseImportDataFormA
 
   const [filePath, setFilePath] = useState<string>('');
   const [overwrite, setOverwrite] = useState<boolean>(false);
-  const [partitionValues, setPartitionValues] = useState<Record<string, string>>(initialPartitionValues);
+  const [partitionValues, setPartitionValues] =
+    useState<Record<string, string>>(initialPartitionValues);
 
   // Initialize/refresh partition values when dialog opens or when columns change while open
   useEffect(() => {
@@ -81,5 +85,3 @@ export function useImportDataForm({ open, partitionColumns }: UseImportDataFormA
     resetForm
   };
 }
-
-

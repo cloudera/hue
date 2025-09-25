@@ -14,23 +14,17 @@
     margin-top: vars.$cdl-spacing-xs;
   }
 
-  .hue-db-list__field {
-    margin-bottom: vars.$cdl-spacing-m;
-  }
-
-  .hue-db-list__label {
-    display: block;
-    margin-bottom: vars.$cdl-spacing-xs;
-    font-weight: vars.$cdl-text-default-bold-weight;
-  }
-
-  .hue-db-list__hint {
-    font-size: vars.$font-size-sm;
-    color: vars.$fluidx-gray-700;
+  .hue-db-list__link {
     margin-top: vars.$cdl-spacing-xs;
-  }
 
-  .hue-db-list__checkbox {
-    margin-bottom: vars.$cdl-spacing-s;
+    // Handle long database names that don't contain spaces
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    white-space: normal !important;
+
+    // Ensure the link button doesn't expand beyond its container
+    max-width: 100% !important;
+    display: inline-block !important;
+    text-align: left !important;
   }
 }

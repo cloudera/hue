@@ -10,12 +10,10 @@
 // License for the specific language governing permissions and limitations under
 // the License.
 
-import React, { useMemo } from 'react';
-import { Checkbox, Input } from 'antd';
+import React, { useMemo, useRef } from 'react';
 import { LinkButton } from 'cuix/dist/components/Button';
 import Loading from 'cuix/dist/components/Loading';
 import Modal from 'cuix/dist/components/Modal';
-// import EmptyState from 'cuix/dist/components/EmptyState';
 import Filter from 'cuix/dist/components/Filter';
 import DataLakeIcon from '@cloudera/cuix-core/icons/react/DataLakeIcon';
 import InlineDescriptionEditor from '../sharedComponents/InlineDescriptionEditor';
@@ -26,8 +24,8 @@ import PaginatedTable, {
   type ColumnProps as PaginatedColumnProps
 } from '../../../reactComponents/PaginatedTable/PaginatedTable';
 import type { FilterOutput } from 'cuix/dist/components/Filter/types';
-// import type { SortOrder } from 'antd/lib/table/interface';
 import { i18nReact } from '../../../utils/i18nReact';
+import CreateDatabaseModal from './CreateDatabaseModal';
 import './DatabasesList.scss';
 import type { DatabasesListState } from './useDatabasesListState';
 
@@ -63,6 +61,8 @@ const DatabasesList = ({
   onSelectSource
 }: DatabasesListProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const {
     isInitializing,
     dbFilter,
@@ -81,8 +81,6 @@ const DatabasesList = ({
     setSortByColumn,
     sortOrder,
     setSortOrder,
-    createForm,
-    setCreateForm,
     editState
   } = state;
 
@@ -143,7 +141,11 @@ const DatabasesList = ({
       key: 'name',
       sorter: true,
       render: (text: string, record: { name: string }) => (
-        <LinkButton aria-label={t('Open database')} onClick={() => onOpenDatabase(record.name)}>
+        <LinkButton
+          className="hue-db-list__link"
+          aria-label={t('Open database')}
+          onClick={() => onOpenDatabase(record.name)}
+        >
           {text}
         </LinkButton>
       )
@@ -183,7 +185,7 @@ const DatabasesList = ({
 
   // debug: rendering
   return (
-    <div>
+    <div ref={containerRef}>
       <PageHeader
         title={sourceType?.toUpperCase()}
         icon={<DataLakeIcon />}
@@ -258,7 +260,8 @@ const DatabasesList = ({
                 totalSize
               },
               setPageNumber: setDbPageNumber,
-              setPageSize: setDbPageSize
+              setPageSize: setDbPageSize,
+              pageSizeOptions: [10, 50, 100, 500]
             }}
           />
         )}
@@ -271,6 +274,7 @@ const DatabasesList = ({
         okButtonProps={{ danger: true }}
         cancelText={t('Cancel')}
         onCancel={() => setConfirmOpen(false)}
+        getContainer={() => containerRef.current || document.body}
         onOk={async () => {
           try {
             if (onDropDatabases) {
@@ -295,89 +299,18 @@ const DatabasesList = ({
         </div>
       </Modal>
 
-      <Modal
+      <CreateDatabaseModal
         open={createModalOpen}
-        title={t('Create a new database')}
-        okText={t('Create')}
-        cancelText={t('Cancel')}
-        onCancel={() => {
+        sourceType={sourceType}
+        getContainer={() => containerRef.current || document.body}
+        onCancel={() => setCreateModalOpen(false)}
+        onSubmit={async (name, comment, location) => {
+          if (onCreateDatabase) {
+            await onCreateDatabase(name, comment, location);
+          }
           setCreateModalOpen(false);
-          setCreateForm({
-            name: '',
-            comment: '',
-            location: '',
-            useDefaultLocation: true
-          });
         }}
-        onOk={async () => {
-          if (!createForm.name.trim()) {
-            return;
-          }
-          try {
-            if (onCreateDatabase) {
-              await onCreateDatabase(
-                createForm.name.trim(),
-                createForm.comment.trim() || undefined,
-                createForm.useDefaultLocation ? undefined : createForm.location.trim() || undefined
-              );
-            }
-            setCreateForm({
-              name: '',
-              comment: '',
-              location: '',
-              useDefaultLocation: true
-            });
-          } finally {
-            setCreateModalOpen(false);
-          }
-        }}
-      >
-        <div className="hue-db-list__field">
-          <label className="hue-db-list__label">{t('Database Name')} *</label>
-          <Input
-            placeholder={t('Database name')}
-            value={createForm.name}
-            onChange={e => setCreateForm({ ...createForm, name: e.target.value })}
-          />
-          <div className="hue-db-list__hint">
-            {t('Name of the new database. Database names must be globally unique.')}
-          </div>
-        </div>
-
-        <div className="hue-db-list__field">
-          <label className="hue-db-list__label">{t('Description')}</label>
-          <Input.TextArea
-            placeholder={t('Optional description')}
-            value={createForm.comment}
-            onChange={e => setCreateForm({ ...createForm, comment: e.target.value })}
-            rows={2}
-          />
-        </div>
-
-        <div className="hue-db-list__field">
-          <Checkbox
-            checked={createForm.useDefaultLocation}
-            onChange={e => setCreateForm({ ...createForm, useDefaultLocation: e.target.checked })}
-            className="hue-db-list__checkbox"
-          >
-            {t('Use default location')}
-          </Checkbox>
-
-          {!createForm.useDefaultLocation && (
-            <div>
-              <label className="hue-db-list__label">{t('Location')}</label>
-              <Input
-                placeholder={t('Path to HDFS directory')}
-                value={createForm.location}
-                onChange={e => setCreateForm({ ...createForm, location: e.target.value })}
-              />
-              <div className="hue-db-list__hint">
-                {t('Path to HDFS directory or file of database data.')}
-              </div>
-            </div>
-          )}
-        </div>
-      </Modal>
+      />
     </div>
   );
 };

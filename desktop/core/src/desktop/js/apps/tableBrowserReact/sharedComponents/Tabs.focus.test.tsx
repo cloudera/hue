@@ -30,9 +30,7 @@ describe('Tabs focus behavior', () => {
     const user = userEvent.setup();
     const onChange = jest.fn();
 
-    const { rerender } = render(
-      <Tabs activeKey="overview" onChange={onChange} sampleCount={0} />
-    );
+    const { rerender } = render(<Tabs activeKey="overview" onChange={onChange} sampleCount={0} />);
 
     // Switch to Sample tab
     await user.click(screen.getByRole('tab', { name: /sample/i }));
