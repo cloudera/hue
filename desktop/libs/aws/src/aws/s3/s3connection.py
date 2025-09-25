@@ -126,6 +126,7 @@ class RazS3Connection(S3Connection):
     # Do not send the xml data for signing for upload operation
     xml_data = '' if query_args and 'uploadId=' in query_args else data
 
+    LOG.debug(f"LEGACY RAZ Call: action={method}, url={url}, headers={headers}, data={xml_data}")
     raz_headers = self.get_signed_url(action=method, url=url, headers=headers, data=xml_data)
     LOG.debug('Raz returned those headers: %s' % raz_headers)
 
