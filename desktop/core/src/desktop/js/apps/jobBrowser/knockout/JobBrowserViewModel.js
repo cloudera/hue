@@ -80,10 +80,8 @@ export default class JobBrowserViewModel {
 
       const livyInterfaceCondition = () =>
         !this.isMini() &&
-        this.appConfig()?.editor &&
-        (this.appConfig().editor.interpreter_names.includes('pyspark') ||
-          this.appConfig().editor.interpreter_names.includes('sparksql'));
-
+        (this.appConfig()?.editor?.interpreter_names?.includes('pyspark') ||
+          this.appConfig()?.editor?.interpreter_names?.includes('sparksql'));
       const queryInterfaceCondition = () =>
         window.ENABLE_QUERY_BROWSER &&
         !getLastKnownConfig().has_computes &&
