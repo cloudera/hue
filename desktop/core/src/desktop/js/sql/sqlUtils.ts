@@ -42,8 +42,7 @@ const autocompleteFilter = (filter: string, entries: Suggestion[]): Suggestion[]
     if (foundIndex !== -1) {
       if (
         foundIndex === 0 ||
-        (suggestion.filterValue &&
-          suggestion.filterValue.toLowerCase().indexOf(lowerCaseFilter) === 0)
+        (suggestion.filterValue && suggestion.filterValue.toLowerCase().startsWith(lowerCaseFilter))
       ) {
         suggestion.filterWeight = 3;
       } else {
@@ -52,7 +51,7 @@ const autocompleteFilter = (filter: string, entries: Suggestion[]): Suggestion[]
     } else if (
       suggestion.details &&
       (<CommentDetails>suggestion.details).comment &&
-      lowerCaseFilter.indexOf(' ') === -1
+      !lowerCaseFilter.includes(' ')
     ) {
       foundIndex = (<CommentDetails>suggestion.details).comment
         .toLowerCase()

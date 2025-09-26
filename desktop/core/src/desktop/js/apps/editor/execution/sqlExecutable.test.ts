@@ -101,12 +101,12 @@ describe('sqlExecutable.js', () => {
 
     jest.spyOn(ApiUtils, 'post').mockImplementation((url: string): CancellablePromise<unknown> => {
       currentApiHit++;
-      if (url.indexOf('/create_session') !== -1) {
+      if (url.includes('/create_session')) {
         createSessionApiHit = currentApiHit;
         return new CancellablePromise<unknown>(resolve => {
           resolve({ session: { type: 'foo' } });
         });
-      } else if (url.indexOf('/execute') !== -1) {
+      } else if (url.includes('/execute')) {
         executeApiHit = currentApiHit;
         expect(url).toContain('/execute/impala');
         return new CancellablePromise<unknown>(resolve => {
@@ -117,11 +117,11 @@ describe('sqlExecutable.js', () => {
             history_parent_uuid: 'some_history_parent_uuid'
           });
         });
-      } else if (url.indexOf('/check_status') !== -1) {
+      } else if (url.includes('/check_status')) {
         checkStatusApiHit = currentApiHit;
         statusResolve({ query_status: { status: ExecutionStatus.available } });
         return statusPromise;
-      } else if (url.indexOf('/get_logs') !== -1) {
+      } else if (url.includes('/get_logs')) {
         getLogsApiHit = currentApiHit;
         logsResolve({ status: 0, logs: '' });
         return logsPromise;
@@ -153,10 +153,10 @@ describe('sqlExecutable.js', () => {
     });
 
     jest.spyOn(ApiUtils, 'post').mockImplementation((url: string): CancellablePromise<unknown> => {
-      if (url.indexOf('/create_session') !== -1) {
+      if (url.includes('/create_session')) {
         return CancellablePromise.resolve({ session: { type: 'foo' } });
       }
-      if (url.indexOf('/execute') !== -1) {
+      if (url.includes('/execute')) {
         expect(url).toContain('/execute/impala');
         return CancellablePromise.resolve({
           handle: {
@@ -167,17 +167,17 @@ describe('sqlExecutable.js', () => {
           history_parent_uuid: 'some_history_parent_uuid'
         });
       }
-      if (url.indexOf('/check_status') !== -1) {
+      if (url.includes('/check_status')) {
         statusResolve({
           query_status: { status: ExecutionStatus.available, has_result_set: true }
         });
         return statusPromise;
       }
-      if (url.indexOf('/get_logs') !== -1) {
+      if (url.includes('/get_logs')) {
         return CancellablePromise.resolve({ status: 0, logs: '' });
       }
 
-      if (url.indexOf('/fetch_result_data')) {
+      if (url.includes('/fetch_result_data')) {
         return CancellablePromise.resolve({});
       }
       fail('fail for URL: ' + url);

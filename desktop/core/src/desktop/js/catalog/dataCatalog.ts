@@ -334,7 +334,7 @@ export class DataCatalog {
       computeName: compute.name
     });
     Object.keys(this.entries).forEach(key => {
-      if (key.indexOf(keyPrefix) === 0) {
+      if (key.startsWith(keyPrefix)) {
         delete this.entries[key];
       }
     });
@@ -343,7 +343,7 @@ export class DataCatalog {
     try {
       const keys = await this.store.keys();
       keys.forEach(key => {
-        if (key.indexOf(keyPrefix) === 0) {
+        if (key.startsWith(keyPrefix)) {
           deletePromises.push(this.store.removeItem(key));
         }
       });

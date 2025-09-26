@@ -32,10 +32,10 @@ const changeURL = (
   const hashSplit = newURL.split('#');
   const hueBaseUrl = (<hueWindow>window).HUE_BASE_URL;
   const base =
-    hueBaseUrl && hashSplit[0].length && hashSplit[0].indexOf(hueBaseUrl) !== 0 ? hueBaseUrl : '';
+    hueBaseUrl && hashSplit[0].length && !hashSplit[0].startsWith(hueBaseUrl) ? hueBaseUrl : '';
   let newUrl = base + hashSplit[0];
   if (extraSearch) {
-    newUrl += (newUrl.indexOf('?') === -1 ? '?' : '&') + extraSearch;
+    newUrl += (newUrl.includes('?') ? '&' : '?') + extraSearch;
   }
   if (hashSplit.length > 1) {
     //the foldername may contain # , so create substring ignoring first #

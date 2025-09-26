@@ -297,7 +297,7 @@ export const fetchPartitions = ({
         if (
           errorResponse.response &&
           errorResponse.response.data &&
-          errorResponse.response.data.indexOf('is not partitioned') !== -1
+          errorResponse.response.data.includes('is not partitioned')
         ) {
           resolve({
             hueTimestamp: Date.now(),
@@ -583,7 +583,7 @@ export const fetchSourceMetadata = ({
           !!response &&
           response.status === 0 &&
           response.code === 500 &&
-          (message.indexOf('Error 10001') !== -1 || message.indexOf('AnalysisException') !== -1);
+          (message.includes('Error 10001') || message.includes('AnalysisException'));
 
         adjustedResponse.hueTimestamp = Date.now();
 

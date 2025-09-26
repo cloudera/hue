@@ -18,10 +18,10 @@ import { hueWindow } from 'types/types';
 import huePubSub from 'utils/huePubSub';
 
 const onHueLinkClick = (event: Event, url: string, target?: string): void => {
-  if (url.indexOf('http') === 0) {
+  if (url.startsWith('http')) {
     window.open(url, target);
   } else {
-    const prefix = (<hueWindow>window).HUE_BASE_URL + '/hue' + (url.indexOf('/') === 0 ? '' : '/');
+    const prefix = (<hueWindow>window).HUE_BASE_URL + '/hue' + (url.startsWith('/') ? '' : '/');
     if (target) {
       window.open(prefix + url, target);
     } else if (
