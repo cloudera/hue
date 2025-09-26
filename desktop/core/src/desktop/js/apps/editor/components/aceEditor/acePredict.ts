@@ -141,7 +141,7 @@ export const attachPredictTypeahead = (
         activePredict &&
         (!editorText.length ||
           activePredict.text === editorText ||
-          activePredict.text.indexOf(editorText) !== 0)
+          !activePredict.text.startsWith(editorText))
       ) {
         removeActivePredict();
       }

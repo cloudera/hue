@@ -387,9 +387,9 @@ export default class AceLocationHandler implements Disposable {
               token !== null &&
               !token.notFound &&
               token.parseLocation &&
-              ['alias', 'whereClause', 'limitClause', 'selectList'].indexOf(
+              !['alias', 'whereClause', 'limitClause', 'selectList'].includes(
                 token.parseLocation.type
-              ) === -1
+              )
             ) {
               markLocation(token.parseLocation);
             }
@@ -441,9 +441,9 @@ export default class AceLocationHandler implements Disposable {
         if (
           token &&
           ((token.parseLocation &&
-            ['alias', 'whereClause', 'limitClause', 'selectList'].indexOf(
+            !['alias', 'whereClause', 'limitClause', 'selectList'].includes(
               token.parseLocation.type
-            ) === -1) ||
+            )) ||
             token.syntaxError)
         ) {
           let range: Ace.Range | undefined = undefined;
@@ -768,7 +768,7 @@ export default class AceLocationHandler implements Disposable {
   clearMarkedErrors(type?: string): void {
     const markers = this.editor.getSession().$backMarkers;
     for (const markerId in markers) {
-      if (markers[markerId].clazz.indexOf('hue-ace-syntax-' + (type || '')) === 0) {
+      if (markers[markerId].clazz.startsWith('hue-ace-syntax-' + (type || ''))) {
         markers[markerId].dispose();
       }
     }
@@ -1180,8 +1180,7 @@ export default class AceLocationHandler implements Disposable {
                 const nameLower = entry.name.toLowerCase();
                 if (
                   nameLower === tokenValLower ||
-                  (tokenValLower.indexOf('`') === 0 &&
-                    tokenValLower.replace(/`/g, '') === nameLower)
+                  (tokenValLower.startsWith('`') && tokenValLower.replace(/`/g, '') === nameLower)
                 ) {
                   // Break if found
                   this.verifyThrottle = window.setTimeout(verify, VERIFY_DELAY);
@@ -1323,8 +1322,7 @@ export default class AceLocationHandler implements Disposable {
             return;
           }
           if (
-            ['statement', 'selectList', 'whereClause', 'limitClause'].indexOf(location.type) !==
-              -1 ||
+            ['statement', 'selectList', 'whereClause', 'limitClause'].includes(location.type) ||
             ((location.type === 'table' || location.type === 'column') &&
               typeof location.identifierChain === 'undefined')
           ) {

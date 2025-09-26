@@ -1542,7 +1542,7 @@ export default class DataCatalogEntry {
    */
   getType(): string {
     let type = this.getRawType();
-    if (type.indexOf('<') !== -1) {
+    if (type.includes('<')) {
       type = type.substring(0, type.indexOf('<'));
     }
     return type.toLowerCase();

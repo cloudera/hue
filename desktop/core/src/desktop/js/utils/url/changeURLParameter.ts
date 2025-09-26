@@ -35,7 +35,7 @@ const changeURLParameter = (param: string, value: string | null): void => {
   } else {
     newSearch =
       window.location.search +
-      (value ? (window.location.search.indexOf('?') > -1 ? '&' : '?') + param + '=' + value : '');
+      (value ? (window.location.search.includes('?') ? '&' : '?') + param + '=' + value : '');
   }
 
   if (newSearch === '?') {

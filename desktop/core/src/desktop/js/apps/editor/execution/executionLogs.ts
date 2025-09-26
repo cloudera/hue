@@ -63,7 +63,7 @@ export default class ExecutionLogs {
       jobs: this.jobs
     });
 
-    if (logDetails.logs.indexOf('Unable to locate') === -1 || logDetails.isFullLogs) {
+    if (!logDetails.logs.includes('Unable to locate') || logDetails.isFullLogs) {
       this.fullLog = logDetails.logs;
     } else {
       this.fullLog += '\n' + logDetails.logs;

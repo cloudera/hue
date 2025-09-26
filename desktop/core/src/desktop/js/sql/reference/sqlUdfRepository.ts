@@ -269,7 +269,7 @@ huePubSub.subscribe(
   async (details: { connector: Connector; callback: () => void }) => {
     await clearUdfCache(details.connector);
     Object.keys(mergedUdfPromises).forEach(key => {
-      if (key === details.connector.id || key.indexOf(details.connector.id + '_') === 0) {
+      if (key === details.connector.id || key.startsWith(details.connector.id + '_')) {
         delete mergedUdfPromises[key];
       }
     });
