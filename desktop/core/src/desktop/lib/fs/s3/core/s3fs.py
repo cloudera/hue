@@ -722,7 +722,14 @@ class S3FileSystem:
             temp_path = parent.join(temp_filename)
 
         try:
-          self.s3_client.put_object(Bucket=temp_path.bucket, Key=temp_path.key, Body=b"")
+          # Create temporary file to verify write access (like legacy implementation)
+          # Use explicit ContentLength=0 to avoid boto3 chunked upload complexity
+          self.s3_client.put_object(
+            Bucket=temp_path.bucket,
+            Key=temp_path.key,
+            Body=b"",
+            ContentLength=0,  # Explicit length prevents chunked upload
+          )
           self.s3_client.delete_object(Bucket=temp_path.bucket, Key=temp_path.key)  # Delete the temporary file
           return True
         except ClientError as e:

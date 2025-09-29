@@ -75,8 +75,19 @@ class AWSS3Client(S3ClientInterface):
 
   def _create_session(self) -> Session:
     """Create boto3 session with credentials from auth provider"""
+    # For RAZ auth, use the pre-configured session with event handlers
+    if hasattr(self.auth_provider, "get_session"):
+      raz_session = self.auth_provider.get_session()
+      if raz_session is not None:
+        LOG.debug(f"Using pre-configured RAZ session with event handlers - ID: {id(raz_session)}")
+        return raz_session
+
+    # For other auth types, create new session
+    LOG.debug("Creating new session from auth provider kwargs")
     session_kwargs = self.auth_provider.get_session_kwargs()
-    return boto3.Session(**session_kwargs)
+    new_session = boto3.Session(**session_kwargs)
+    LOG.debug(f"Created new session - ID: {id(new_session)}")
+    return new_session
 
   def _create_client(self) -> Any:
     """Create boto3 S3 client"""

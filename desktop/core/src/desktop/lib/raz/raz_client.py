@@ -166,10 +166,23 @@ class RazClient(object):
       try:
         raz_response = requests.post(r_url, **params)
       except Exception as e:
+        LOG.error('Error connecting to RAZ URL: %s' % r_url)
+        LOG.error('Error: %s' % e)
+
         if 'Failed to establish a new connection' in str(e):
           LOG.debug('Raz URL %s is not available.' % r_url)
 
       # Check response for None and if response code is successful (200), return the raz response.
+      LOG.debug('-------------------------------------------------------------')
+      LOG.debug('Raz response: %s' % raz_response)
+      LOG.debug('Raz response status code: %s' % raz_response.status_code)
+      LOG.debug('Raz response text: %s' % raz_response.text)
+      LOG.debug('Raz response headers: %s' % raz_response.headers)
+      LOG.debug('Raz response content: %s' % raz_response.content)
+      LOG.debug('Raz response ok: %s' % raz_response.ok)
+      LOG.debug('Raz response reason: %s' % raz_response.reason)
+      LOG.debug('Raz response url: %s' % raz_response.url)
+      LOG.debug('-------------------------------------------------------------')
       if (raz_response is not None) and (raz_response.status_code == 200):
         return raz_response
 
@@ -260,7 +273,12 @@ class RazClient(object):
 
     # Raz signed request proto call expects data as bytes instead of str.
     if data is not None and not isinstance(data, bytes):
-      data = data.encode()
+      try:
+        data = data.encode()
+      except Exception:
+        # Handle any encoding issues (boto3 streaming objects, Unicode errors, etc.)
+        LOG.debug("Data cannot be encoded - using empty bytes for RAZ authorization")
+        data = b""
 
     raz_req = raz_signer.SignRequestProto(
         endpoint_prefix=self.service_params['endpoint_prefix'],

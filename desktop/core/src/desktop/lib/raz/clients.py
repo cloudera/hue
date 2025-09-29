@@ -28,7 +28,7 @@ class S3RazClient():
   def __init__(self, username):
     self.username = username
 
-  def get_url(self, action='GET', path=None, headers=None, data=None):
+  def get_url(self, action='GET', path=None, params=None, headers=None, data=None):
     '''
     Example of headers:
     {
@@ -49,7 +49,7 @@ class S3RazClient():
       service='s3',
     )
 
-    return c.check_access(method=action, url=path, headers=headers, data=data)
+    return c.check_access(method=action, url=path, params=params, headers=headers, data=data)
 
 
 class GSRazClient():
