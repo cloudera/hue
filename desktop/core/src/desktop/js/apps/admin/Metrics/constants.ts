@@ -14,22 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@import '../../components/styles/variables';
+export const metricLabels: { [key: string]: string } = {
+  'queries.number': 'Number of Queries',
+  'requests.active': 'Active Requests',
+  'requests.exceptions': 'Request Exceptions',
+  'requests.response-time': 'Request Response Time',
+  'threads.daemon': 'Daemon Threads',
+  'threads.total': 'Total Threads',
+  users: 'Users',
+  'users.active': 'Active Users',
+  'users.active.total': 'Total Active Users'
+};
 
-.metrics-component.antd.cuix {
-  background-color: $fluidx-gray-100;
-  padding: 24px;
-  min-height: 100vh;
-
-  .metrics-heading {
-    font-size: $font-size-base;
-    font-weight: 500;
-    color: $fluidx-gray-900;
-  }
-
-  .metrics-component__table-group {
-    display: flex;
-    flex-direction: column;
-    gap: $font-size-base;
-  }
-}
+export const labelToKey: { [key: string]: string } = Object.fromEntries(
+  Object.entries(metricLabels).map(([key, label]) => [label, key])
+);
