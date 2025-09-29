@@ -85,7 +85,7 @@ class RazEventHandler:
       if parsed_url.query:
         from urllib.parse import parse_qs
 
-        parsed_params = parse_qs(parsed_url.query)
+        parsed_params = parse_qs(parsed_url.query, keep_blank_values=True)  # CRITICAL: Keep empty params like prefix=
         # Convert to flat dict (RAZ expects single values, not lists)
         params = {key: values[0] if values else "" for key, values in parsed_params.items()}
 
@@ -100,13 +100,69 @@ class RazEventHandler:
       if not raz_headers:
         raise Exception("RAZ returned no signed headers")
 
-      # Apply ALL headers from RAZ - they're all required for signature verification
+      # Apply RAZ headers and handle missing signed headers (RAZ client bug workaround)
       LOG.debug(f"RAZ returned headers: {list(raz_headers.keys())}")
-      LOG.debug("Applying ALL RAZ headers (all are required for signature)")
+      LOG.debug("Applying RAZ headers with missing header detection")
 
+      # Extract SignedHeaders from Authorization header to detect missing headers
+      signed_headers_list = []
+      LOG.debug(f"RAZ headers keys for Authorization check: {list(raz_headers.keys())}")
+
+      if "Authorization" in raz_headers:
+        auth_header = raz_headers["Authorization"]
+        LOG.debug(f"Found Authorization header: {auth_header[:100]}...")
+
+        if "SignedHeaders=" in auth_header:
+          signed_headers_part = auth_header.split("SignedHeaders=")[1].split(",")[0]
+          signed_headers_list = signed_headers_part.split(";")
+          LOG.debug(f"Expected signed headers from Authorization: {signed_headers_list}")
+        else:
+          LOG.error("No SignedHeaders found in Authorization header")
+      else:
+        LOG.error("No Authorization header found in RAZ response")
+
+      # Apply all RAZ headers
       for header_name, header_value in raz_headers.items():
         request.headers[header_name] = header_value
         LOG.debug(f"Applied RAZ header: {header_name} = {header_value[:50]}...")
+
+      # CRITICAL WORKAROUND: Add missing signed headers that RAZ signed for but didn't return
+      missing_headers = []
+      LOG.debug(f"Starting missing header detection for {len(signed_headers_list)} expected headers")
+
+      for expected_header in signed_headers_list:
+        LOG.debug(f"Checking expected header: {expected_header}")
+
+        # Check if this signed header is missing from what RAZ returned
+        header_variants = [expected_header, expected_header.title(), expected_header.upper(), expected_header.lower()]
+        found = any(variant in raz_headers for variant in header_variants)
+
+        LOG.debug(f"  Variants checked: {header_variants}")
+        LOG.debug(f"  Found in RAZ response: {found}")
+
+        if not found and expected_header not in ["authorization"]:  # Skip Authorization as it's always returned
+          missing_headers.append(expected_header)
+          LOG.debug(f"  → MISSING: {expected_header}")
+
+          # Add the missing header with its original value from the request
+          added = False
+          for variant in header_variants:
+            if variant in headers:
+              request.headers[expected_header] = headers[variant]
+              LOG.debug(f"WORKAROUND: Added missing signed header: {expected_header} = {headers[variant][:50]}...")
+              added = True
+              break
+
+          if not added:
+            LOG.error(f"WORKAROUND FAILED: Could not find original value for missing header: {expected_header}")
+            LOG.debug(f"Available original headers: {list(headers.keys())}")
+        else:
+          LOG.debug(f"  → Found or skipped: {expected_header}")
+
+      if missing_headers:
+        LOG.warning(f"RAZ client bug: Signed for headers but didn't return them: {missing_headers}")
+      else:
+        LOG.debug("All signed headers returned by RAZ - no workaround needed")
 
       # CRITICAL: Update request URL to match what RAZ signed for
       if self.connector_config.provider.lower() == "aws":
