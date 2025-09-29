@@ -72,8 +72,22 @@ class RazEventHandler:
       headers = dict(request.headers)
       data = request.body
 
+      # Detect if this is a chunked upload. The presence of AwsChunkedWrapper is a clear sign.
+      is_streaming_upload = "AwsChunkedWrapper" in str(type(data))
+
+      if is_streaming_upload:
+        # For streaming uploads, boto3 will use a specific sha256 hash.
+        # We need to tell RAZ to sign for this exact hash value.
+        headers["x-amz-content-sha256"] = "STREAMING-UNSIGNED-PAYLOAD-TRAILER"
+
+        # The actual content is streamed, so for signing purposes, the body is considered empty.
+        data_for_raz = b""
+        LOG.debug("Detected streaming upload. Forcing RAZ to sign for STREAMING-UNSIGNED-PAYLOAD-TRAILER.")
+      else:
+        # For non-streaming requests, use the provided data.
+        data_for_raz = data
+
       # CRITICAL FIX: Send clean URL and extract query params separately for RAZ
-      # RAZ expects params in protobuf format, not embedded in URL
       base_url = self._get_request_url(request)
 
       # Extract query parameters from URL for separate RAZ handling
@@ -85,17 +99,15 @@ class RazEventHandler:
       if parsed_url.query:
         from urllib.parse import parse_qs
 
-        parsed_params = parse_qs(parsed_url.query, keep_blank_values=True)  # CRITICAL: Keep empty params like prefix=
-        # Convert to flat dict (RAZ expects single values, not lists)
+        parsed_params = parse_qs(parsed_url.query, keep_blank_values=True)  # CRITICAL: Keep empty params
         params = {key: values[0] if values else "" for key, values in parsed_params.items()}
 
-      LOG.debug(f"Original URL with params: {base_url}")
       LOG.debug(f"Clean URL for RAZ: {clean_url}")
       LOG.debug(f"Extracted params for RAZ: {params}")
 
       # Get RAZ signed headers with clean URL and separate params
-      LOG.debug(f"RAZ Call: action={method}, path={clean_url}, params={params}, headers={headers}, data={data}")
-      raz_headers = self.raz_client.get_url(action=method, path=clean_url, params=params, headers=headers, data=data)
+      LOG.debug(f"RAZ Call: action={method}, path={clean_url}, params={params}, headers={headers}, data={data_for_raz}")
+      raz_headers = self.raz_client.get_url(action=method, path=clean_url, params=params, headers=headers, data=data_for_raz)
 
       if not raz_headers:
         raise Exception("RAZ returned no signed headers")
