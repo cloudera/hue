@@ -251,7 +251,7 @@ class BucketConfig:
   region: Optional[str] = None
   options: Optional[Dict[str, any]] = None
 
-  def get_effective_home_path(self, user: str = None) -> str:
+  def get_effective_home_path(self, user: str = None, auth_type: str = None) -> str:
     """
     Get effective home path for this bucket, handling relative paths and user context.
 
@@ -274,7 +274,7 @@ class BucketConfig:
         path += "/"
 
     # Handle RAZ user directory logic
-    if user and RAZ.IS_ENABLED.get():
+    if user and RAZ.IS_ENABLED.get() and auth_type == "raz":
       from desktop.models import _handle_user_dir_raz
 
       path = _handle_user_dir_raz(user, path)
@@ -490,7 +490,7 @@ def get_s3_home_directory(user: Optional[str] = None, connector_id: str = None, 
 
     if bucket_name:
       bucket_config = connector.get_bucket_config(bucket_name)
-      return bucket_config.get_effective_home_path(user)
+      return bucket_config.get_effective_home_path(user, connector.auth_type)
 
     # No bucket available, return generic path
     return "s3a://"
@@ -609,7 +609,7 @@ def get_default_bucket_home_path(connector_id: str = None, user: str = None) -> 
       # Single bucket - use its home path as default
       bucket_name = bucket_names[0]
       bucket_config = connector.get_bucket_config(bucket_name)
-      home_path = bucket_config.get_effective_home_path(user)
+      home_path = bucket_config.get_effective_home_path(user, connector.auth_type)
       LOG.debug(f"Using single bucket '{bucket_name}' home path: {home_path}")
       return home_path
 
