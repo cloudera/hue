@@ -90,24 +90,31 @@ def get_request_session(url, logger):
       CACHE_SESSION[url] = requests.Session()
       logger.debug("Setting request Session")
 
-      # Use TLS 1.3 supporting adapter
-      tls13_adapter = TLS13HTTPAdapter(
-        pool_connections=conf.CHERRYPY_SERVER_THREADS.get(),
-        pool_maxsize=conf.CHERRYPY_SERVER_THREADS.get()
-      )
+      # Check if TLS is enabled by testing SSL context creation
+      ssl_context = create_http_ssl_context()
+      if ssl_context is not None:
+        # Use TLS 1.3 supporting adapter when TLS is enabled
+        tls13_adapter = TLS13HTTPAdapter(
+          pool_connections=conf.CHERRYPY_SERVER_THREADS.get(),
+          pool_maxsize=conf.CHERRYPY_SERVER_THREADS.get()
+        )
 
-      # Mount the adapter for both HTTP and HTTPS
-      CACHE_SESSION[url].mount('https://', tls13_adapter)
-      CACHE_SESSION[url].mount('http://', tls13_adapter)
+        # Mount the adapter for both HTTP and HTTPS
+        CACHE_SESSION[url].mount('https://', tls13_adapter)
+        CACHE_SESSION[url].mount('http://', tls13_adapter)
+        # Configure SSL verification
+        CACHE_SESSION[url].verify = conf.SSL_VALIDATE.get()
 
-      # Configure SSL verification
-      CACHE_SESSION[url].verify = conf.SSL_VALIDATE.get()
-
-      # Set CA certificates if configured
-      if conf.SSL_CACERTS.get() and conf.SSL_VALIDATE.get():
-        CACHE_SESSION[url].verify = conf.SSL_CACERTS.get()
-
-      logger.debug(f"Configured HTTP session with TLS 1.3 support for {url}")
+        # Set CA certificates if configured
+        if conf.SSL_CACERTS.get() and conf.SSL_VALIDATE.get():
+          CACHE_SESSION[url].verify = conf.SSL_CACERTS.get()
+      else:
+        # Fall back to standard HTTP adapter when TLS is disabled
+        standard_adapter = HTTPAdapter(
+          pool_connections=conf.CHERRYPY_SERVER_THREADS.get(),
+          pool_maxsize=conf.CHERRYPY_SERVER_THREADS.get()
+        )
+        CACHE_SESSION[url].mount(url, standard_adapter)
 
   return CACHE_SESSION
 

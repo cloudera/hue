@@ -40,13 +40,17 @@ def get_tls_settings():
   """
   from desktop import conf
 
+  # Check for both TLS 1.3 and TLS 1.2
+  tls13_enabled = conf.SSL_TLS13_ENABLED.get()
+  tls12_enabled = conf.SSL_TLS12_ENABLED.get()
+
+  if not tls13_enabled and not tls12_enabled:
+    LOG.warning("TLS 1.3 and TLS 1.2 are disabled, returning empty TLS settings")
+    return None
+
   tls_settings = {}
   try:
     import ssl
-
-    # Check for both TLS 1.3 and TLS 1.2
-    tls13_enabled = conf.SSL_TLS13_ENABLED.get()
-    tls12_enabled = conf.SSL_TLS12_ENABLED.get()
 
     # Set default values for minimum and maximum versions
     min_version = "TLSv1.2"
@@ -91,11 +95,13 @@ def create_ssl_context(validate=True, ca_certs=None, keyfile=None, certfile=None
   Returns:
     ssl.SSLContext: Configured SSL context or None if creation failed
   """
+  # Get TLS settings from centralized configuration
+  tls_settings = get_tls_settings()
+  if not tls_settings:
+    return None
+
   try:
     import ssl
-
-    # Get TLS settings from centralized configuration
-    tls_settings = get_tls_settings()
 
     # Check for errors in TLS settings
     if "error" in tls_settings:
@@ -234,6 +240,8 @@ def create_thrift_ssl_context(validate=True, ca_certs=None, keyfile=None, certfi
     ssl.SSLContext configured for Thrift connections or None if creation failed
   """
   context = create_ssl_context(validate, ca_certs, keyfile, certfile)
+  if context is None:
+    return None
 
   if context and validate:
     # Thrift handles hostname validation separately
@@ -251,7 +259,12 @@ def create_http_ssl_context():
   """
   from desktop import conf
 
-  return create_ssl_context(
+  context = create_ssl_context(
     validate=conf.SSL_VALIDATE.get(),
     ca_certs=conf.SSL_CACERTS.get() if conf.SSL_VALIDATE.get() else None
   )
+  if context is None:
+    LOG.warning("HTTP SSL context is not available, returning None")
+    return None
+
+  return context
