@@ -333,7 +333,6 @@ def create_gunicorn_options(options):
     'reload_engine': None,
     'sendfile': True,
     'spew': None,
-    'ssl_context': gunicorn_ssl_context,
     'statsd_host': None,
     'statsd_prefix': None,
     'suppress_ragged_eofs': None,      # Suppress ragged EOFs (see stdlib ssl module)
@@ -353,6 +352,9 @@ def create_gunicorn_options(options):
     'post_worker_init': post_worker_init,
     'worker_int': worker_int
   }
+
+  if tls_settings:
+    gunicorn_options.update({'ssl_context': gunicorn_ssl_context})
 
   return gunicorn_options
 
