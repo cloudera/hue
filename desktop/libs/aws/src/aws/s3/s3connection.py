@@ -142,7 +142,7 @@ class RazS3Connection(S3Connection):
   def get_signed_url(self, action='GET', url=None, headers=None, data=None):
     raz_client = S3RazClient(username=self.username)
 
-    return raz_client.get_url(action, url, headers, data)
+    return raz_client.get_url(action=action, path=url, headers=headers, data=data)
 
   def _required_auth_capability(self):
     """

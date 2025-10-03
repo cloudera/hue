@@ -63,8 +63,8 @@ class RazClient(object):
 
     path = lib_urlparse(url)
     url_params = dict([p.split('=') if '=' in p else (p, '') for p in path.query.split('&') if path.query])  # ?delete, ?prefix=/hue
-    params = params if params is not None else {}
-    headers = headers if headers is not None else {}
+    params = params if params and isinstance(params, dict) else {}
+    headers = headers if headers and isinstance(headers, dict) else {}
 
     endpoint = "%s://%s" % (path.scheme, path.netloc)
     resource_path = path.path.lstrip("/")
