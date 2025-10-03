@@ -23,7 +23,7 @@ import { TYPE_CONVERSION as SPARKSQL_TYPE_CONVERSION } from './sparksql/typeConv
 const stripPrecision = (types: string[]): string[] => {
   const result: string[] = [];
   types.forEach(type => {
-    if (type.indexOf('(') > -1) {
+    if (type.includes('(')) {
       result.push(type.substring(0, type.indexOf('(')));
     } else {
       result.push(type);
@@ -57,11 +57,7 @@ export const matchesType = (
     return true;
   }
   const actualTypes = stripPrecision(actualRawTypes);
-  if (
-    actualTypes.indexOf('ARRAY') !== -1 ||
-    actualTypes.indexOf('MAP') !== -1 ||
-    actualTypes.indexOf('STRUCT') !== -1
-  ) {
+  if (['ARRAY', 'MAP', 'STRUCT'].some(type => actualTypes.includes(type))) {
     return true;
   }
   const conversionTable = getTypeConversion(dialect);

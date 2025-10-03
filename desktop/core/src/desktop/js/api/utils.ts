@@ -154,7 +154,7 @@ const notifyError = <T>(
 ): void => {
   if (!options || !options.silenceErrors) {
     logError(response);
-    if (message.indexOf('AuthorizationException') === -1) {
+    if (!message.includes('AuthorizationException')) {
       huePubSub.publish<HueAlert>(GLOBAL_ERROR_TOPIC, { message });
     }
   }

@@ -309,7 +309,7 @@ class AutocompleteResults {
     }
 
     const foundVarRef = this.parseResult.colRef.identifierChain.some(
-      identifier => typeof identifier.name !== 'undefined' && identifier.name.indexOf('${') === 0
+      identifier => typeof identifier.name !== 'undefined' && identifier.name.startsWith('${')
     );
 
     if (!foundVarRef) {
@@ -1007,10 +1007,9 @@ class AutocompleteResults {
           complexExtras
         ) {
           complexExtras.forEach(field => {
-            const fieldType =
-              field.type.indexOf('<') !== -1
-                ? field.type.substring(0, field.type.indexOf('<'))
-                : field.type;
+            const fieldType = field.type.includes('<')
+              ? field.type.substring(0, field.type.indexOf('<'))
+              : field.type;
             columnSuggestions.push({
               value: field.name,
               meta: fieldType,
@@ -2039,7 +2038,7 @@ class AutocompleteResults {
       } else if (tables[i].identifierChain.length === 1) {
         tablePath = this.activeDatabase + '.' + tables[i].identifierChain[0].name;
       }
-      if (path.indexOf(tablePath) === 0) {
+      if (path.startsWith(tablePath)) {
         path = path.substring(tablePath.length + 1);
         if (tables[i].alias) {
           path = tables[i].alias + '.' + path;
@@ -2116,12 +2115,12 @@ class AutocompleteResults {
     });
 
     for (let i = 0; i < aliases.length; i++) {
-      if (qualifiedIdentifier.toLowerCase().indexOf(aliases[i].qualifiedName) === 0) {
+      if (qualifiedIdentifier.toLowerCase().startsWith(aliases[i].qualifiedName)) {
         return aliases[i].alias + qualifiedIdentifier.substring(aliases[i].qualifiedName.length);
       } else if (
         qualifiedIdentifier
           .toLowerCase()
-          .indexOf(this.activeDatabase.toLowerCase() + '.' + aliases[i].qualifiedName) === 0
+          .startsWith(this.activeDatabase.toLowerCase() + '.' + aliases[i].qualifiedName)
       ) {
         return (
           aliases[i].alias +
@@ -2133,7 +2132,7 @@ class AutocompleteResults {
     }
 
     if (
-      qualifiedIdentifier.toLowerCase().indexOf(this.activeDatabase.toLowerCase()) === 0 &&
+      qualifiedIdentifier.toLowerCase().startsWith(this.activeDatabase.toLowerCase()) &&
       !tablesHasDefaultDatabase
     ) {
       return qualifiedIdentifier.substring(this.activeDatabase.length + 1);
