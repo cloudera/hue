@@ -17,15 +17,8 @@
 import logging
 from urllib.parse import parse_qs, unquote, urlencode
 
-import boto
-from boto.connection import HTTPRequest
-from boto.exception import BotoClientError
-from boto.regioninfo import connect
-from boto.resultset import ResultSet
-from boto.s3 import S3RegionInfo
 from boto.s3.bucket import Bucket, Key
 from boto.s3.connection import NoHostProvided, S3Connection
-from boto.s3.prefix import Prefix
 
 from desktop.conf import RAZ
 from desktop.lib.raz.clients import S3RazClient

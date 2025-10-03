@@ -16,11 +16,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
-import json
-import uuid
 import base64
 import logging
+import uuid
 from urllib.parse import unquote as lib_urlunquote, urlparse as lib_urlparse
 
 import requests
