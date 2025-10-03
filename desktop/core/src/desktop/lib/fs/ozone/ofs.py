@@ -426,3 +426,15 @@ class OzoneFS(WebHdfs):
     from desktop.lib.fs.ozone.upload import OFSNewFileUploadHandler
 
     return OFSNewFileUploadHandler(self, destination_path, overwrite)
+
+  def restore(self, path):
+    raise NotImplementedError("Moving to trash is not implemented for OFS")
+
+  def trash_path(self, path):
+    raise NotImplementedError("trash_path is not implemented for OFS")
+
+  def current_trash_path(self, trash_path):
+    return NotImplementedError("current_trash_path is not implemented for OFS")
+
+  def purge_trash(self):
+    raise NotImplementedError("purge_trash is not implemented for OFS")
