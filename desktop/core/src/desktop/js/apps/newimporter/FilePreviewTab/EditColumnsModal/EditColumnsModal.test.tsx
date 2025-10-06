@@ -159,8 +159,14 @@ describe('EditColumnsModal', () => {
 
       await waitFor(() => {
         expect(setColumns).toHaveBeenCalledWith([
-          { ...DEFAULT_COLUMNS[0], title: 'newCol1', type: 'STRING', comment: 'new comment' },
-          { ...DEFAULT_COLUMNS[1], type: 'INT' }
+          {
+            ...DEFAULT_COLUMNS[0],
+            title: 'newCol1',
+            type: 'STRING',
+            comment: 'new comment',
+            isPrimaryKey: true
+          },
+          { ...DEFAULT_COLUMNS[1], type: 'INT', isPrimaryKey: false }
         ]);
         expect(closeModal).toHaveBeenCalled();
       });
@@ -263,8 +269,8 @@ describe('EditColumnsModal', () => {
 
       await waitFor(() => {
         expect(setColumns).toHaveBeenCalledWith([
-          { ...duplicateColumns[0], title: 'col1', type: 'STRING' },
-          { ...duplicateColumns[1], title: 'col2_fixed', type: 'INT' }
+          { ...duplicateColumns[0], title: 'col1', type: 'STRING', isPrimaryKey: true },
+          { ...duplicateColumns[1], title: 'col2_fixed', type: 'INT', isPrimaryKey: false }
         ]);
       });
     });
@@ -312,8 +318,14 @@ describe('EditColumnsModal', () => {
 
       await waitFor(() => {
         expect(setColumns).toHaveBeenCalledWith([
-          { ...columnsWithEmpty[0], title: 'fixed_name', type: 'STRING' },
-          { ...columnsWithEmpty[1], type: 'INT' }
+          {
+            ...columnsWithEmpty[0],
+            title: 'fixed_name',
+            type: 'STRING',
+            comment: 'comment1',
+            isPrimaryKey: true
+          },
+          { ...columnsWithEmpty[1], type: 'INT', comment: 'comment2', isPrimaryKey: false }
         ]);
       });
     });
