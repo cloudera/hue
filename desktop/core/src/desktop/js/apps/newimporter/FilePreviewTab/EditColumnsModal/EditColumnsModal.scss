@@ -38,4 +38,13 @@
     color: vars.$fluidx-gray-500;
     font-style: italic;
   }
+
+  &__primary-key {
+    text-align: center;
+    white-space: nowrap;
+
+    .ant-radio-wrapper {
+      margin: 0;
+    }
+  }
 }

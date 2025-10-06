@@ -20,7 +20,7 @@ import Modal from 'cuix/dist/components/Modal';
 import Table from 'cuix/dist/components/Table';
 import Input from 'cuix/dist/components/Input';
 import Select from 'cuix/dist/components/Select';
-import { Alert } from 'antd';
+import { Alert, Radio } from 'antd';
 import { SQL_TYPE_MAPPING_API_URL } from '../../../admin/Components/utils';
 import useLoadData from '../../../../utils/hooks/useLoadData/useLoadData';
 import LoadingErrorWrapper from '../../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
@@ -39,6 +39,7 @@ interface EditableRow extends Required<BaseColumnProperties> {
   type: string;
   sample: string;
   comment: string;
+  isPrimaryKey: boolean;
 }
 
 interface EditColumnsModalProps {
@@ -190,15 +191,25 @@ const EditColumnsModal = ({
         title: col.title,
         type: (col.type || 'string').toUpperCase(),
         sample: sample && sample[col.dataIndex] !== undefined ? String(sample[col.dataIndex]) : '',
-        comment: col.comment || ''
+        comment: col.comment || '',
+        isPrimaryKey: col.isPrimaryKey || (idx === 0 && !columns.some(c => c.isPrimaryKey))
       }))
     );
   }, [columns, sample]);
 
-  const handleChange = (rowIndex: number, field: keyof EditableRow, value: string) => {
-    setEditableRows(rows =>
-      rows.map((row, i) => (i === rowIndex ? { ...row, [field]: value } : row))
-    );
+  const handleChange = (rowIndex: number, field: keyof EditableRow, value: string | boolean) => {
+    if (field === 'isPrimaryKey' && value === true) {
+      setEditableRows(rows =>
+        rows.map((row, i) => ({
+          ...row,
+          isPrimaryKey: i === rowIndex ? true : false
+        }))
+      );
+    } else {
+      setEditableRows(rows =>
+        rows.map((row, i) => (i === rowIndex ? { ...row, [field]: value } : row))
+      );
+    }
   };
 
   const handleDone = async () => {
@@ -210,7 +221,8 @@ const EditColumnsModal = ({
       ...columns[row.key],
       title: row.title.trim(),
       type: row.type,
-      comment: row.comment
+      comment: row.comment,
+      isPrimaryKey: row.isPrimaryKey
     }));
     setColumns(updatedColumns);
     closeModal();
@@ -229,6 +241,19 @@ const EditColumnsModal = ({
           }
           aria-label={t('Column title')}
           status={validateColumnNames.errors.has(rowIndex) ? 'error' : undefined}
+        />
+      )
+    },
+    {
+      title: t('Primary Key'),
+      dataIndex: 'isPrimaryKey',
+      width: 100,
+      className: 'hue-importer-edit-columns-modal__primary-key',
+      render: (isPrimaryKey: boolean, _: EditableRow, rowIndex: number) => (
+        <Radio
+          checked={isPrimaryKey}
+          onChange={() => handleChange(rowIndex, 'isPrimaryKey', true)}
+          aria-label={t('Set as primary key')}
         />
       )
     },
