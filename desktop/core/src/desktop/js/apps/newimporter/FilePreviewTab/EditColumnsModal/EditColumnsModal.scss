@@ -21,6 +21,10 @@
     width: 800px;
   }
 
+  .ant-table-thead > tr > th {
+    text-align: center;
+  }
+
   &__input-title {
     width: 100px;
   }
@@ -42,9 +46,5 @@
   &__primary-key {
     text-align: center;
     white-space: nowrap;
-
-    .ant-radio-wrapper {
-      margin: 0;
-    }
   }
 }
