@@ -32,14 +32,12 @@
 
     .ant-tabs-content-holder {
       overflow: auto;
-      max-height: calc(100vh - 200px);
     }
 
     .config__spin {
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
     }
 
     .config__address-value {
@@ -70,11 +68,6 @@
       border: 1px solid $fluidx-gray-400;
     }
 
-    .overview-examples,
-    .overview-analytics {
-      height: 100vh;
-    }
-
     .examples__install-btn {
       margin: 10px;
     }
@@ -87,7 +80,6 @@
     .analytics__checkbox-icon {
       width: auto;
       height: auto;
-      min-height: 0;
     }
 
     .usage__analytics {
