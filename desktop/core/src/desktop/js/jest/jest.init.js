@@ -111,6 +111,11 @@ $.ajaxSetup({
   }
 });
 
+/**
+ * Interceptor for axios requests in tests
+ * @param {import('axios').InternalAxiosRequestConfig} config
+ * @returns {import('axios').InternalAxiosRequestConfig}
+ */
 const axiosConfigInterceptor = config => {
   console.warn('Actual axios ajax request made to url: ' + config.url);
   console.trace();
