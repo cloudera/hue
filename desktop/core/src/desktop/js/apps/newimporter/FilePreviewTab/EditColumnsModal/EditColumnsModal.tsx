@@ -20,7 +20,7 @@ import Modal from 'cuix/dist/components/Modal';
 import Table from 'cuix/dist/components/Table';
 import Input from 'cuix/dist/components/Input';
 import Select from 'cuix/dist/components/Select';
-import { Alert, Radio } from 'antd';
+import { Alert, Checkbox } from 'antd';
 import { SQL_TYPE_MAPPING_API_URL } from '../../../admin/Components/utils';
 import useLoadData from '../../../../utils/hooks/useLoadData/useLoadData';
 import LoadingErrorWrapper from '../../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
@@ -230,6 +230,18 @@ const EditColumnsModal = ({
 
   const modalColumns = [
     {
+      title: t('P Key'),
+      dataIndex: 'isPrimaryKey',
+      className: 'hue-importer-edit-columns-modal__primary-key',
+      render: (isPrimaryKey: boolean, _: EditableRow, rowIndex: number) => (
+        <Checkbox
+          checked={isPrimaryKey}
+          onChange={() => handleChange(rowIndex, 'isPrimaryKey', true)}
+          aria-label={t('Set as primary key')}
+        />
+      )
+    },
+    {
       title: t('Title'),
       dataIndex: 'title',
       render: (text: string, _: EditableRow, rowIndex: number) => (
@@ -241,19 +253,6 @@ const EditColumnsModal = ({
           }
           aria-label={t('Column title')}
           status={validateColumnNames.errors.has(rowIndex) ? 'error' : undefined}
-        />
-      )
-    },
-    {
-      title: t('Primary Key'),
-      dataIndex: 'isPrimaryKey',
-      width: 100,
-      className: 'hue-importer-edit-columns-modal__primary-key',
-      render: (isPrimaryKey: boolean, _: EditableRow, rowIndex: number) => (
-        <Radio
-          checked={isPrimaryKey}
-          onChange={() => handleChange(rowIndex, 'isPrimaryKey', true)}
-          aria-label={t('Set as primary key')}
         />
       )
     },
