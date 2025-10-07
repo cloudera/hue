@@ -192,7 +192,7 @@ const EditColumnsModal = ({
         type: (col.type || 'string').toUpperCase(),
         sample: sample && sample[col.dataIndex] !== undefined ? String(sample[col.dataIndex]) : '',
         comment: col.comment || '',
-        isPrimaryKey: col.isPrimaryKey || (idx === 0 && !columns.some(c => c.isPrimaryKey))
+        isPrimaryKey: col.isPrimaryKey || false
       }))
     );
   }, [columns, sample]);

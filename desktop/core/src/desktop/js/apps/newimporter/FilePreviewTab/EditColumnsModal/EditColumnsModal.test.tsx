@@ -164,7 +164,7 @@ describe('EditColumnsModal', () => {
             title: 'newCol1',
             type: 'STRING',
             comment: 'new comment',
-            isPrimaryKey: true
+            isPrimaryKey: false
           },
           { ...DEFAULT_COLUMNS[1], type: 'INT', isPrimaryKey: false }
         ]);
@@ -269,7 +269,7 @@ describe('EditColumnsModal', () => {
 
       await waitFor(() => {
         expect(setColumns).toHaveBeenCalledWith([
-          { ...duplicateColumns[0], title: 'col1', type: 'STRING', isPrimaryKey: true },
+          { ...duplicateColumns[0], title: 'col1', type: 'STRING', isPrimaryKey: false },
           { ...duplicateColumns[1], title: 'col2_fixed', type: 'INT', isPrimaryKey: false }
         ]);
       });
@@ -323,7 +323,7 @@ describe('EditColumnsModal', () => {
             title: 'fixed_name',
             type: 'STRING',
             comment: 'comment1',
-            isPrimaryKey: true
+            isPrimaryKey: false
           },
           { ...columnsWithEmpty[1], type: 'INT', comment: 'comment2', isPrimaryKey: false }
         ]);
