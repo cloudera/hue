@@ -16,11 +16,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
-import json
-import uuid
 import base64
 import logging
+import uuid
 from urllib.parse import unquote as lib_urlunquote, urlparse as lib_urlparse
 
 import requests
@@ -63,8 +61,8 @@ class RazClient(object):
 
     path = lib_urlparse(url)
     url_params = dict([p.split('=') if '=' in p else (p, '') for p in path.query.split('&') if path.query])  # ?delete, ?prefix=/hue
-    params = params if params is not None else {}
-    headers = headers if headers is not None else {}
+    params = params if params and isinstance(params, dict) else {}
+    headers = headers if headers and isinstance(headers, dict) else {}
 
     endpoint = "%s://%s" % (path.scheme, path.netloc)
     resource_path = path.path.lstrip("/")

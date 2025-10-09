@@ -98,7 +98,7 @@ A live demo with the SQL Scratchpad is coming. In the meantime:
         // Util to check if cached token is still valid before asking to auth for a new one
         axios.post('v1/iam/verify/auth-token/', {token: data['data']['token']});
 
-        axios.defaults.headers.common['Authorization'] = 'JWT ' + data['data']['token'];
+        axios.defaults.headers['Authorization'] = 'JWT ' + data['data']['token'];
       }).then(function() {
         axios.post('/v1/editor/query/sqlite', {snippet: "{\"statement\":\"SELECT 1000, 1001\""}).then(function(data) {
           console.log(data['data']);
