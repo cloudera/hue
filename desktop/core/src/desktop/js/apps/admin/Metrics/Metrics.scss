@@ -17,6 +17,8 @@
 @import '../../components/styles/variables';
 
 .metrics-component.antd.cuix {
+  height: 100%;
+  overflow-y: auto;
   background-color: $fluidx-gray-100;
   padding: 24px;
 

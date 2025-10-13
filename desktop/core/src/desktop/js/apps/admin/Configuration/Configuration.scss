@@ -18,6 +18,8 @@
 
 .antd.cuix {
   .config-component {
+    height: 100%;
+    overflow-y: auto;
     background-color: $fluidx-gray-100;
     padding: 24px;
 

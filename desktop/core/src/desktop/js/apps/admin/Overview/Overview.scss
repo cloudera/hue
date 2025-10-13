@@ -18,14 +18,17 @@
 
 .antd.cuix {
   .hue-overview-component {
+    height: 100%;
+    overflow-y: auto;
     background-color: $fluidx-gray-100;
     padding: 24px;
 
     .config__spin {
       display: flex;
+      flex: 1;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      height: 100%;
     }
 
     .config__address-value {
@@ -58,7 +61,7 @@
 
     .overview-examples,
     .overview-analytics {
-      height: 100vh;
+      height: 100%;
     }
 
     .examples__install-btn {

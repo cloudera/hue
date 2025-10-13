@@ -1,3 +1,3 @@
 (function () {
-  window.createReactComponents('#ServerLogs');
+  window.createReactComponents('#serverlogs-container');
 })();

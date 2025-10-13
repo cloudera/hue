@@ -1,3 +1,3 @@
 (function () {
-  window.createReactComponents('#Overview');
+  window.createReactComponents('#admin-wizard-container');
 })();

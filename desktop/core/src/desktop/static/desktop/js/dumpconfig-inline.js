@@ -1,3 +1,3 @@
 (function () {
-window.createReactComponents('#Configuration');
+  window.createReactComponents('#configuration-container');
 })();

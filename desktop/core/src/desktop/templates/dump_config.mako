@@ -18,8 +18,23 @@
 
 ${ layout.menubar(section='dump_config') }
 
-<script src="${ static('desktop/js/dumpconfig-inline.js') }" type="text/javascript"></script>
-
-<div id="Configuration">
-<Configuration class='antd cuix' data-reactcomponent='Configuration'></Configuration>
+<div id="configuration-container" class="admin-page-full-height">
+  <Configuration class='antd cuix' data-reactcomponent='Configuration'></Configuration>
 </div>
+
+<style type="text/css">
+  .admin-page-full-height {
+    position: absolute;
+    top: 50px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+  }
+
+  .admin-page-full-height > * {
+    height: 100%;
+  }
+</style>
+
+<script src="${ static('desktop/js/dumpconfig-inline.js') }" type="text/javascript"></script>

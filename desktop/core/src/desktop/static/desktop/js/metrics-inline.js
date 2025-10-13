@@ -1,3 +1,3 @@
-  (function () {
-    window.createReactComponents('#Metrics');
-  })();
+(function () {
+  window.createReactComponents('#metrics-container');
+})();

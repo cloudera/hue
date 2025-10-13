@@ -19,8 +19,19 @@
 
 ${ layout.menubar(section='quick_start') }
 
-<div id="Overview">
+<div id="admin-wizard-container" class="admin-wizard-full-height">
   <OverviewTab class='antd cuix' data-reactcomponent='Overview'></OverviewTab>
 </div>
+
+<style type="text/css">
+  .admin-wizard-full-height {
+    position: absolute;
+    top: 50px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+  }
+</style>
 
 <script src="${ static('desktop/js/admin-wizard-inline.js') }" type="text/javascript"></script>

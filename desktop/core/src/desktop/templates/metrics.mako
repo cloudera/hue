@@ -18,9 +18,24 @@
 
 ${layout.menubar(section='metrics')}
 
+<div id="metrics-container" class="admin-page-full-height">
+  <Metrics data-reactcomponent='Metrics'></Metrics>
+</div>
+
+<style type="text/css">
+  .admin-page-full-height {
+    position: absolute;
+    top: 50px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+  }
+
+  .admin-page-full-height > * {
+    height: 100%;
+  }
+</style>
+
 <script src="${ static('desktop/js/metrics-inline.js') }" type="text/javascript"></script>
 
-<div id="Metrics">
-<Metrics data-reactcomponent='Metrics'></Metrics>
-</div>
-  
