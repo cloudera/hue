@@ -1069,6 +1069,14 @@ class HiveServerClient(object):
   def execute_statement(self, statement, max_rows=1000, configuration=None, orientation=TFetchOrientation.FETCH_NEXT, session=None):
     if configuration is None:
       configuration = {}
+
+    # Ensure proxy user is set for every statement execution to maintain consistent impersonation
+    if self.query_server["server_name"] == "beeswax" or (
+      self.query_server.get("is_compute") and self.query_server.get("dialect") == "hive"
+    ):
+      if self.user and "hive.server2.proxy.user" not in configuration:
+        configuration["hive.server2.proxy.user"] = self.user.username
+
     if self.query_server.get('dialect') == 'impala' and self.query_server['QUERY_TIMEOUT_S'] > 0:
       configuration['QUERY_TIMEOUT_S'] = str(self.query_server['QUERY_TIMEOUT_S'])
 
@@ -1081,6 +1089,14 @@ class HiveServerClient(object):
   def execute_async_statement(self, statement=None, thrift_function=None, thrift_request=None, conf_overlay=None, session=None):
     if conf_overlay is None:
       conf_overlay = {}
+
+    # Ensure proxy user is set for every statement execution to maintain consistent impersonation
+    if self.query_server["server_name"] == "beeswax" or (
+      self.query_server.get("is_compute") and self.query_server.get("dialect") == "hive"
+    ):
+      if self.user and "hive.server2.proxy.user" not in conf_overlay:
+        conf_overlay["hive.server2.proxy.user"] = self.user.username
+
     if thrift_function is None:
       thrift_function = self._client.ExecuteStatement
     if thrift_request is None:
@@ -1261,7 +1277,16 @@ class HiveServerClient(object):
     return configuration
 
   def _get_query_configuration(self, query):
-    return dict([(setting['key'], setting['value']) for setting in query.settings])
+    configuration = dict([(setting["key"], setting["value"]) for setting in query.settings])
+
+    # Ensure proxy user is set for every statement execution to maintain consistent impersonation
+    if self.query_server["server_name"] == "beeswax" or (
+      self.query_server.get("is_compute") and self.query_server.get("dialect") == "hive"
+    ):
+      if self.user:
+        configuration["hive.server2.proxy.user"] = self.user.username
+
+    return configuration
 
   def get_functions(self):
     '''
