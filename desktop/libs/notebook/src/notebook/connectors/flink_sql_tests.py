@@ -86,18 +86,7 @@ class TestFlinkApi(TestCase):
     mock_client_instance.create_session.return_value = {'sessionHandle': self.TEST_SESSION_HANDLE}
     mock_client_instance.info.return_value = {'version': '2.0.0'}
     mock_client_instance.execute_statement.return_value = {'operationHandle': self.TEST_OPERATION_HANDLE}
-    mock_client_instance.fetch_results.return_value = {
-      'resultType': 'PAYLOAD',
-      'resultKind': 'SUCCESS_WITH_CONTENT',
-      'results': {
-        'columns': [{'name': 'function name', 'logicalType': {'type': 'VARCHAR', 'nullable': True, 'length': 1000}}],
-        'rowFormat': 'JSON',
-        'data': [
-          {'kind': 'INSERT', 'fields': ['lower']},
-          {'kind': 'INSERT', 'fields': ['upper']}
-        ]},
-      'nextResultUri': f'/v3/sessions/{self.TEST_SESSION_HANDLE}/operations/{self.TEST_OPERATION_HANDLE}/result/1?rowFormat=JSON'
-    }
+    mock_client_instance.fetch_results.return_value = self._list_function_payload(['lower', 'upper'])
 
     # and: FlinkSqlApi instance with configuration
     flink_api = FlinkSqlApi(self.user, interpreter=self.interpreter)
@@ -111,7 +100,54 @@ class TestFlinkApi(TestCase):
 
     # then
     mock_client_instance.execute_statement.assert_called_once_with(self.TEST_SESSION_HANDLE, 'SHOW FUNCTIONS')
-    assert autocomplete_result == {'functions': [{'name': 'lower'}, {'name': 'upper'}]}
+    self._assert_autocomplete_functions(autocomplete_result, ['lower', 'upper'])
+
+  @patch('notebook.connectors.flink_sql.FlinkSqlClient')
+  def test_autocomplete_operation_functions_list_all(self, client_mock):
+    # given: mock interactions
+    def mock_execute_statement(session_handle, statement):
+      responses = {
+        'SHOW CATALOGS': {'operationHandle': 'show-catalogs'},
+        'SHOW DATABASES IN `test_catalog`': {'operationHandle': 'show-databases'},
+        'SHOW FUNCTIONS IN `test_catalog`.`db_a`': {'operationHandle': 'show-fns-dba'},
+        'SHOW USER FUNCTIONS IN `test_catalog`.`db_a`': {'operationHandle': 'show-user-fns-dba'},
+        'SHOW USER FUNCTIONS IN `test_catalog`.`db_b`': {'operationHandle': 'show-user-fns-dbb'},
+      }
+      return responses.get(statement)
+
+    def mock_fetch_results(session_handle, operation_handle, token):
+      responses = {
+        'show-catalogs': self._list_function_payload(['test_catalog']),
+        'show-databases': self._list_function_payload(['db_a', 'db_b']),
+        'show-fns-dba': self._list_function_payload(['test_fun_a', 'lower', 'upper']),
+        'show-user-fns-dba': self._list_function_payload(['test_fun_a']),
+        'show-user-fns-dbb': self._list_function_payload(['test_fun_b']),
+      }
+      return responses.get(operation_handle)
+
+    mock_client_instance = MagicMock()
+    client_mock.return_value = mock_client_instance
+    mock_client_instance.create_session.return_value = {'sessionHandle': self.TEST_SESSION_HANDLE}
+    mock_client_instance.info.return_value = {'version': '2.0.0'}
+    mock_client_instance.execute_statement.side_effect = mock_execute_statement
+    mock_client_instance.fetch_results.side_effect = mock_fetch_results
+
+    # and: FlinkSqlApi instance with configuration
+    self.interpreter['options']['list_all_functions'] = True
+    self.interpreter['options']['default_catalog'] = 'test_catalog'
+    self.interpreter['options']['default_database'] = 'db_a'
+    flink_api = FlinkSqlApi(self.user, interpreter=self.interpreter)
+
+    # and: session is created
+    flink_api.create_session(lang='flink', properties=None)
+
+    # when
+    autocomplete_result = flink_api.autocomplete(snippet='dummy', database=None, table=None, column=None,
+                                                 nested=None, operation='functions')
+
+    # then
+    self._assert_autocomplete_functions(autocomplete_result, ['lower', 'upper', 'test_catalog.db_a.test_fun_a',
+                                                              'test_catalog.db_b.test_fun_b'])
 
   @patch('notebook.connectors.flink_sql.FlinkSqlClient')
   def test_autocomplete_operation_function_flink_1_x(self, client_mock):
@@ -164,7 +200,8 @@ class TestFlinkApi(TestCase):
           {'kind': 'INSERT', 'fields': ['signature', 'default_catalog.default_db.test_function(values <ANY>...)']},
         ]
       },
-      'nextResultUri': f'/v3/sessions/{self.TEST_SESSION_HANDLE}/operations/{self.TEST_OPERATION_HANDLE}/result/1?rowFormat=JSON'
+      'nextResultUri':
+        f'/v3/sessions/{self.TEST_SESSION_HANDLE}/operations/{self.TEST_OPERATION_HANDLE}/result/1?rowFormat=JSON'
     }
 
     # and: FlinkSqlApi instance with configuration
@@ -185,3 +222,24 @@ class TestFlinkApi(TestCase):
     assert autocomplete_result == {
       'function': {'name': 'test_function', 'signature': 'default_catalog.default_db.test_function(values <ANY>...)'}
     }
+
+  def _list_function_payload(self, expected_functions, session_handle=None, operation_handle=None, token=0):
+    session_handle = session_handle if session_handle else self.TEST_SESSION_HANDLE
+    operation_handle = operation_handle if operation_handle else self.TEST_OPERATION_HANDLE
+
+    return {
+      'resultType': 'PAYLOAD',
+      'resultKind': 'SUCCESS_WITH_CONTENT',
+      'results': {
+        'columns': [
+          {'name': 'function name', 'logicalType': {'type': 'VARCHAR', 'nullable': True, 'length': 1000}}],
+        'rowFormat': 'JSON',
+        'data': [
+          {'kind': 'INSERT', 'fields': [fname]} for fname in expected_functions
+        ]},
+      'nextResultUri': f'/v3/sessions/{session_handle}/operations/{operation_handle}/result/1?rowFormat=JSON'
+    }
+
+  def _assert_autocomplete_functions(self, autocomplete_result, expected_fun_names):
+    actual_fun_names = set([f['name'] for f in autocomplete_result['functions']])
+    assert set(expected_fun_names) == actual_fun_names
