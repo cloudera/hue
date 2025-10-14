@@ -390,6 +390,46 @@ class TestApi(object):
     data = json.loads(response.content)
     assert 1 == data['status']
 
+  def test_session_expired_error_message(self):
+    """Test that SessionExpired exception includes a helpful error message"""
+    from notebook.connectors.base import SessionExpired
+    
+    @api_error_handler
+    def send_session_expired():
+      raise SessionExpired()
+    
+    response = send_session_expired()
+    data = json.loads(response.content)
+    assert -2 == data['status']
+    assert 'session has expired' in data['message'].lower()
+    assert 'refresh' in data['message'].lower()
+
+  def test_operation_timeout_error_message(self):
+    """Test that OperationTimeout exception includes a helpful error message"""
+    from notebook.connectors.base import OperationTimeout
+    
+    @api_error_handler
+    def send_operation_timeout():
+      raise OperationTimeout()
+    
+    response = send_operation_timeout()
+    data = json.loads(response.content)
+    assert -4 == data['status']
+    assert 'timed out' in data['message'].lower()
+    assert 'timeout' in data['message'].lower()
+
+  def test_query_error_without_max_row_size(self):
+    """Test that QueryError handler doesn't crash when max_row_size is not in the error message"""
+    @api_error_handler
+    def send_generic_error():
+      raise QueryError(message="Generic database connection error")
+    
+    response = send_generic_error()
+    data = json.loads(response.content)
+    assert 1 == data['status']
+    assert 'Generic database connection error' in data['message']
+    assert 'help' not in data  # Should not have help section for non-max_row_size errors
+
   def test_notebook_autocomplete(self):
     with patch('notebook.api.get_api') as get_api:
       get_api.return_value = Mock(

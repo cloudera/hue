@@ -119,6 +119,7 @@ def api_error_handler(f):
       return f(*args, **kwargs)
     except SessionExpired as e:
       response['status'] = -2
+      response['message'] = e.message if (e.message and isinstance(e.message, basestring)) else 'Your session has expired. Please refresh the page to continue.'
     except QueryExpired as e:
       if ENABLE_HUE_5.get():
         response['query_status'] = {'status': 'expired'}
@@ -137,6 +138,7 @@ def api_error_handler(f):
       response['message'] = e.message
     except OperationTimeout as e:
       response['status'] = -4
+      response['message'] = e.message if (e.message and isinstance(e.message, basestring)) else 'The operation timed out. Please try again or increase the timeout setting.'
     except FilesystemException as e:
       response['status'] = 2
       response['message'] = e.message or 'Query history not found'
@@ -144,7 +146,7 @@ def api_error_handler(f):
       LOG.exception('Error running %s' % f.__name__)
       response['status'] = 1
       response['message'] = smart_str(e)
-      if response['message'].index("max_row_size"):
+      if "max_row_size" in response['message']:
         size = re.search(r"(\d+.?\d*) (.B)", response['message'])
         if size and size.group(1):
           response['help'] = {
