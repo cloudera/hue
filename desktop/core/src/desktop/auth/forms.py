@@ -213,7 +213,7 @@ class LdapAuthenticationForm(AuthenticationForm):
     server = self.cleaned_data.get('server')
 
     if ('(' in username) or (')' in username) or ('*' in username):
-      raise ValidationError(self.error_messages['invalid_login'])
+      raise ValidationError(_("Username contains invalid characters. The characters '(', ')', and '*' are not allowed in LDAP usernames."))
 
     if username and password:
       try:

@@ -865,3 +865,36 @@ class MockLdapBackend(object):
 
   def get_user(self, user_id):
     return User.objects.get(id=user_id)
+
+
+@pytest.mark.django_db
+class TestLdapAuthenticationForm(TestCase):
+  """Test LDAP authentication form validation"""
+  
+  def test_username_special_characters_validation(self):
+    """Test that special characters in LDAP username are properly validated with helpful error message"""
+    from desktop.auth.forms import LdapAuthenticationForm
+    from django.core.exceptions import ValidationError
+    
+    # Test username with parentheses
+    form = LdapAuthenticationForm(data={'username': 'user(test)', 'password': 'pass', 'server': 'LDAP'})
+    form.request = Mock()
+    form.request.user = Mock()
+    
+    with pytest.raises(ValidationError) as exc_info:
+      form.authenticate()
+    
+    error_message = str(exc_info.value)
+    assert 'invalid characters' in error_message.lower()
+    assert '(' in error_message or 'parenthes' in error_message.lower()
+    
+    # Test username with asterisk
+    form = LdapAuthenticationForm(data={'username': 'user*test', 'password': 'pass', 'server': 'LDAP'})
+    form.request = Mock()
+    
+    with pytest.raises(ValidationError) as exc_info:
+      form.authenticate()
+    
+    error_message = str(exc_info.value)
+    assert 'invalid characters' in error_message.lower()
+    assert '*' in error_message
