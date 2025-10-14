@@ -329,21 +329,39 @@ def view(request, path):
     else:
       return display(request, path)
   except S3FileSystemException as e:
-    msg = _("S3 filesystem exception.")
+    # S3FileSystemException message contains the actual error details
+    error_details = smart_str(e)
+    msg = _("S3 filesystem exception: %(error)s") % {'error': error_details}
     if is_ajax(request):
       exception = {
-        'error': smart_str(e)
+        'error': error_details
       }
       return JsonResponse(exception)
     else:
       raise PopupException(msg, detail=e)
-  except (IOError, WebHdfsException) as e:
+  except WebHdfsException as e:
+    # WebHdfsException already contains parsed JSON error message
+    error_details = str(e)
+    msg = _("Cannot access: %(path)s. %(error)s") % {'path': escape(path), 'error': error_details}
+
+    logger.error(msg)
+
+    if is_ajax(request):
+      exception = {
+        'error': error_details
+      }
+      return JsonResponse(exception)
+    else:
+      raise PopupException(msg, detail=e)
+  except IOError as e:
     msg = _("Cannot access: %(path)s. ") % {'path': escape(path)}
 
     if "Connection refused" in str(e):
       msg += _(" The HDFS REST service is not available. ")
+    else:
+      msg += str(e)
 
-    logger.error(msg + str(e))
+    logger.error(msg)
 
     if is_ajax(request):
       exception = {
@@ -1225,14 +1243,19 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
       args = arg_extractor(request, form, parameter_names)
       try:
         op(*args)
-      except (IOError, WebHdfsException) as e:
-        msg = _("Cannot perform operation.")
+      except WebHdfsException as e:
+        # WebHdfsException already contains parsed JSON error message
+        msg = _("Cannot perform operation: %(error)s") % {'error': str(e)}
         raise PopupException(msg, detail=e)
       except S3FileSystemException as e:
-        msg = _("S3 filesystem exception.")
+        # S3FileSystemException contains actual error details
+        msg = _("S3 filesystem exception: %(error)s") % {'error': smart_str(e)}
+        raise PopupException(msg, detail=e)
+      except IOError as e:
+        msg = _("Cannot perform operation: %(error)s") % {'error': str(e)}
         raise PopupException(msg, detail=e)
       except NotImplementedError as e:
-        msg = _("Cannot perform operation.")
+        msg = _("Cannot perform operation: %(error)s") % {'error': str(e)}
         raise PopupException(msg, detail=e)
 
       if next:

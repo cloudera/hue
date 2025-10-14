@@ -1019,6 +1019,23 @@ class TestFileBrowserWithHadoop(object):
     response = self.c.get('/filebrowser/view=/test-does-not-exist')
     assert 'Cannot access' in response.context[0]['message']
 
+  def test_view_webhdfs_error_details(self):
+    """Test that WebHdfsException error details are included in error message"""
+    from hadoop.fs.exceptions import WebHdfsException
+    from desktop.lib.exceptions_renderable import PopupException
+    
+    with patch('filebrowser.views.request') as mock_request:
+      # Create a mock WebHdfsException with JSON error details
+      error_msg = '500 Server Error: Internal Server Error for url: https://example.com/webhdfs/v1/test.txt {"RemoteException":{"message":"FILE_ALREADY_EXISTS: File /test.txt already exists","exception":"FileAlreadyExistsException"}}'
+      mock_exception = WebHdfsException(error_msg)
+      
+      # Mock the fs.stats to raise WebHdfsException
+      with patch.object(self.cluster.fs, 'stats', side_effect=mock_exception):
+        response = self.c.get('/filebrowser/view=/test-file-error')
+        # Verify that the error message includes the actual exception details
+        assert 'Cannot access' in response.context[0]['message']
+        assert 'FILE_ALREADY_EXISTS' in response.context[0]['message'] or 'already exists' in response.context[0]['message']
+
   def test_index(self):
     HOME_DIR = '/user/test'
     NO_HOME_DIR = '/user/no_home'
