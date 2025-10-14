@@ -804,6 +804,29 @@ class TestUserAdminLdap(BaseUserAdminTests):
       for finish in reset:
         finish()
 
+  def test_ldap_url_missing_error_message(self):
+    """Test that missing LDAP URL provides helpful error message"""
+    from unittest.mock import MagicMock
+    
+    # Create a mock ldap_config with None LDAP_URL
+    mock_config = MagicMock()
+    mock_config.LDAP_URL.get.return_value = None
+    
+    # Test get_connection
+    with pytest.raises(Exception) as exc_info:
+      ldap_access.get_connection(mock_config)
+    
+    assert 'No LDAP URL was specified' in str(exc_info.value)
+    assert 'hue.ini' in str(exc_info.value)
+    assert 'ldap_url' in str(exc_info.value)
+    
+    # Test get_auth
+    with pytest.raises(Exception) as exc_info:
+      ldap_access.get_auth(mock_config)
+    
+    assert 'No LDAP URL was specified' in str(exc_info.value)
+    assert 'hue.ini' in str(exc_info.value)
+
 
 @pytest.mark.django_db
 @pytest.mark.requires_hadoop

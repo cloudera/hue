@@ -73,7 +73,7 @@ def get_connection(ldap_config):
   search_bind_authentication = ldap_config.SEARCH_BIND_AUTHENTICATION.get()
 
   if ldap_url is None:
-    raise Exception('No LDAP URL was specified')
+    raise Exception('No LDAP URL was specified. Please configure ldap_url in the [desktop][[ldap]] section of hue.ini')
 
   if search_bind_authentication:
     return LdapConnection(ldap_config, ldap_url, username, password, ldap_cert)
@@ -84,7 +84,7 @@ def get_connection(ldap_config):
 def get_auth(ldap_config):
   ldap_url = ldap_config.LDAP_URL.get()
   if ldap_url is None:
-    raise Exception('No LDAP URL was specified')
+    raise Exception('No LDAP URL was specified. Please configure ldap_url in the [desktop][[ldap]] section of hue.ini')
   username = ldap_config.BIND_DN.get()
   password = ldap_config.BIND_PASSWORD.get()
   if not password:
