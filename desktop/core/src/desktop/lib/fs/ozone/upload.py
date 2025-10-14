@@ -115,6 +115,10 @@ class OFSFineUploaderChunkedUpload(object):
       fp.seek(0)
       self._fs.create(self.target_path, data=fp.getvalue())
       fp.close()
+    except WebHdfsException as e:
+      # WebHdfsException already contains the parsed JSON error message
+      LOG.exception('OFSFineUploaderChunkedUpload: Failed to upload file to ozone at %s: %s' % (self.target_path, e))
+      raise PopupException(str(e))
     except Exception as e:
       LOG.exception('OFSFineUploaderChunkedUpload: Failed to upload file to ozone at %s: %s' % (self.target_path, e))
       raise PopupException("OFSFineUploaderChunkedUpload: uploading file %s failed with %s" % (self.target_path, e))
@@ -246,8 +250,14 @@ class OFSFileUploadHandler(FileUploadHandler):
         LOG.debug("OFSFileUploadHandler uploading file part with size: %s" % self._part_size)
         self._fs.create(self.target_path, data=raw_data)
         return None
+      except WebHdfsException as e:
+        # WebHdfsException already contains the parsed JSON error message
+        LOG.exception('Failed to upload file to ozone at %s: %s' % (self.target_path, e))
+        self._request.META['upload_failed'] = str(e)
+        raise StopUpload()
       except Exception as e:
         LOG.exception('Failed to upload file to ozone at %s: %s' % (self.target_path, e))
+        self._request.META['upload_failed'] = str(e)
         raise StopUpload()
     else:
       return raw_data
