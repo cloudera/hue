@@ -22,12 +22,12 @@ set -ex
 LATEST_PYTHON=$([ -d "$HUE_HOME_DIR/build/env/bin" ] && find "$HUE_HOME_DIR/build/env/bin" -name "python3*" -exec basename {} \; | sort -V | tail -n 1 || echo "")
 
 # Extract version from the latest python binary (e.g., python3.11 → 3.11)
-LATEST_PYTHON_VERSION=$(echo "$LATEST_PYTHON" | grep -oP '\d+\.\d+' || echo "")
+LATEST_PYTHON_VERSION=$(echo "$LATEST_PYTHON" | grep -oE '[0-9]+\.[0-9]+' || echo "")
 
 # Find all supported python versions from build/venvs and include latest version
 readarray -t SUPPORTED_VERSIONS < <(
   (
-    [ -d "$HUE_HOME_DIR/build/venvs" ] && find "$HUE_HOME_DIR/build/venvs" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | grep -oP '\d+\.\d+'
+    [ -d "$HUE_HOME_DIR/build/venvs" ] && find "$HUE_HOME_DIR/build/venvs" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | grep -oE '[0-9]+\.[0-9]+'
     echo "$LATEST_PYTHON_VERSION"
   ) | sort -Vr | uniq
 )
@@ -72,7 +72,7 @@ _choose_python_version() {
   # returns the latest py version, e.g., 3.11, 3.9 or 3.8
   # if HUE_PYTHON_VERSION is set, use it
   if [ -n "$HUE_PYTHON_VERSION" ]; then
-    echo "$HUE_PYTHON_VERSION" | grep -oP '\d+\.\d+'
+    echo "$HUE_PYTHON_VERSION" | grep -oE '[0-9]+\.[0-9]+'
     return 0
   else
     for PYTHON_VERSION in "${SUPPORTED_PYTHON_VERSIONS[@]}"; do
