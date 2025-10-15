@@ -169,7 +169,7 @@ const FormInput = <T,>({
       case FieldType.FILECHOOSER:
         return (
           <FileChooserInput
-            value={String(value)}
+            value={value as string}
             onChange={newValue => onChange(field.name, newValue as T)}
             placeholder={field.placeholder}
             error={error}
