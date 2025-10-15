@@ -43,7 +43,10 @@ const FileChooserInput: React.FC<FileChooserInputProps> = ({
   const handleFileChoose = async (selectedPath: string) => {
     onChange(selectedPath);
     setSelectedPath(selectedPath);
-    setShowModal(false);
+
+    if (showModal) {
+      setShowModal(false);
+    }
   };
 
   return (
@@ -51,7 +54,7 @@ const FileChooserInput: React.FC<FileChooserInputProps> = ({
       <div className="hue-form-input__file-chooser">
         <Input
           value={selectedPath}
-          onChange={e => onChange(e.target.value)}
+          onChange={e => handleFileChoose(e.target.value)}
           placeholder={placeholder ? t(placeholder) : undefined}
           status={error ? 'error' : undefined}
           name={name}
