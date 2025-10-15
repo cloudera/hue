@@ -16,20 +16,47 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
-import json
 import logging
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import patch
 
 import pytest
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.models import Document2
 from notebook.conf import EXAMPLES
-from notebook.models import Analytics, install_custom_examples
+from notebook.models import Analytics, escape_rows, install_custom_examples
 from useradmin.models import User
 
 LOG = logging.getLogger()
+
+
+class TestEscapeRows:
+
+  def test_escape_rows_precision(self):
+    # Test data containing various types, including float
+    test_data = [
+      [1, 'Alice', 29.0],
+      [2, 'Bob', 30.67],
+      [3, 'Charlie', 25.5],
+      [4, 'David', 40.05],
+      [5, None, 29.10],
+      [6, 'Eve', 100]
+    ]
+
+    # Expected result after escaping
+    expected_result = [
+      [1, 'Alice', '29.0'],
+      [2, 'Bob', '30.67'],
+      [3, 'Charlie', '25.5'],
+      [4, 'David', '40.05'],
+      [5, 'NULL', '29.1'],
+      [6, 'Eve', 100]
+    ]
+
+    result = escape_rows(test_data)
+
+    # Assert that the result matches the expected output
+    assert result == expected_result
 
 
 @pytest.mark.django_db
