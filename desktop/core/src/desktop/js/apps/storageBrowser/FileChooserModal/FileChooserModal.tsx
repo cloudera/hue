@@ -121,32 +121,25 @@ const FileChooserModal = ({
     [setSearchTerm]
   );
 
-  const getColumns = (file: FileChooserTableData) => {
-    const columns: ColumnProps<FileChooserTableData>[] = [];
-    for (const key of Object.keys(file)) {
-      const column: ColumnProps<FileChooserTableData> = {
-        dataIndex: key,
-        key: `${key}`
-      };
-      if (key === 'name') {
-        column.render = (_, record: FileChooserTableData) => (
-          <Tooltip title={record.name} mouseEnterDelay={1.5}>
-            <span className="hue-filechooser-modal__table-cell-icon">
-              {record.type === BrowserViewType.dir ? <FolderIcon /> : <FileIcon />}
-            </span>
-            <span
-              className="hue-filechooser-modal__table-cell-name"
-              data-testid="hue-filechooser-modal__table-cell-name"
-            >
-              {record.name}
-            </span>
-          </Tooltip>
-        );
-      }
-      columns.push(column);
+  const columnsConfig: ColumnProps<FileChooserTableData>[] = [
+    {
+      dataIndex: 'name',
+      key: 'name',
+      render: (_, record: FileChooserTableData) => (
+        <Tooltip title={record.name} mouseEnterDelay={1.5}>
+          <span className="hue-filechooser-modal__table-cell-icon">
+            {record.type === BrowserViewType.dir ? <FolderIcon /> : <FileIcon />}
+          </span>
+          <span
+            className="hue-filechooser-modal__table-cell-name"
+            data-testid="hue-filechooser-modal__table-cell-name"
+          >
+            {record.name}
+          </span>
+        </Tooltip>
+      )
     }
-    return columns.filter(col => col.dataIndex !== 'type' && col.dataIndex !== 'path');
-  };
+  ];
 
   const onRowClicked = (record: FileChooserTableData) => {
     return {
@@ -243,96 +236,90 @@ const FileChooserModal = ({
     }
   ];
 
-  const TableContent = (
-    <LoadingErrorWrapper errors={errorConfig}>
-      <PaginatedTable<FileChooserTableData>
-        loading={loading && !polling}
-        data={tableData}
-        isDynamicHeight
-        rowKey={r => `${r.path}__${r.type}__${r.name}`}
-        locale={locale}
-        columns={getColumns(tableData[0] ?? {})}
-        rowClassName={record =>
-          record.type === BrowserViewType.file && !isFileSelectionAllowed
-            ? classNames('hue-filechooser-modal__table-row', 'disabled-row')
-            : 'hue-filechooser-modal__table-row'
-        }
-        onRowClick={onRowClicked}
-        showHeader={false}
-      />
-    </LoadingErrorWrapper>
-  );
+  if (!showModal) {
+    return <></>;
+  }
 
   return (
-    <>
-      {showModal && (
-        <Modal
-          open={showModal}
-          title={title}
-          className="hue-filechooser-modal cuix antd"
-          onOk={isUploadEnabled ? handleUploadClick : handleOk}
-          okText={isUploadEnabled ? t('Upload file') : submitText}
-          okButtonProps={
-            !isUploadEnabled ? { disabled: sourcePath === destPath, loading: submitLoading } : {}
-          }
-          secondaryButtonText={t('Create folder')}
-          onSecondary={() => setShowCreateFolderModal(true)}
-          cancelText={cancelText}
-          onCancel={onClose}
+    <Modal
+      open={showModal}
+      title={title}
+      className="hue-filechooser-modal cuix antd"
+      onOk={isUploadEnabled ? handleUploadClick : handleOk}
+      okText={isUploadEnabled ? t('Upload file') : submitText}
+      okButtonProps={
+        !isUploadEnabled ? { disabled: sourcePath === destPath, loading: submitLoading } : {}
+      }
+      secondaryButtonText={t('Create folder')}
+      onSecondary={() => setShowCreateFolderModal(true)}
+      cancelText={cancelText}
+      onCancel={onClose}
+    >
+      <div className="hue-filechooser-modal__body">
+        <div className="hue-filechooser-modal__path-browser-panel">
+          <PathBrowser filePath={destPath} onFilepathChange={setDestPath} showIcon={false} />
+        </div>
+        <Input
+          className="hue-filechooser-modal__search"
+          placeholder={t('Search')}
+          allowClear={true}
+          onChange={event => {
+            handleSearch(event.target.value);
+          }}
+        />
+        <DragAndDrop onDrop={onFilesDrop} disabled={isUploadEnabled}>
+          <LoadingErrorWrapper errors={errorConfig}>
+            <PaginatedTable<FileChooserTableData>
+              loading={loading && !polling}
+              data={tableData}
+              isDynamicHeight
+              rowKey={r => `${r.path}__${r.type}__${r.name}`}
+              locale={locale}
+              columns={columnsConfig}
+              rowClassName={record =>
+                record.type === BrowserViewType.file && !isFileSelectionAllowed
+                  ? classNames('hue-filechooser-modal__table-row', 'disabled-row')
+                  : 'hue-filechooser-modal__table-row'
+              }
+              onRowClick={onRowClicked}
+              showHeader={false}
+            />
+          </LoadingErrorWrapper>
+        </DragAndDrop>
+      </div>
+      <input
+        ref={uploadRef}
+        type="file"
+        className="hue-importer__source-selector-option-upload"
+        onChange={handleFileUpload}
+      />
+      {showCreateFolderModal && (
+        <BottomSlidePanel
+          isOpen={showCreateFolderModal}
+          title={t('Create Folder')}
+          cancelText="Cancel"
+          primaryText={t('Create')}
+          onClose={() => {
+            setShowCreateFolderModal(false);
+            setCreateFolderValue('');
+          }}
+          onPrimaryClick={handleCreate}
         >
-          <div className="hue-filechooser-modal__body">
-            <div className="hue-filechooser-modal__path-browser-panel">
-              <PathBrowser filePath={destPath} onFilepathChange={setDestPath} showIcon={false} />
-            </div>
+          {/* TODO: Refactor CreateAndUpload to reuse */}
+          <LoadingErrorWrapper errors={createFolderErrorConfig}>
             <Input
-              className="hue-filechooser-modal__search"
-              placeholder={t('Search')}
-              allowClear={true}
-              onChange={event => {
-                handleSearch(event.target.value);
+              defaultValue={createFolderValue}
+              disabled={createFolderLoading}
+              onPressEnter={() => handleCreate()}
+              ref={createFolderInputRef}
+              onChange={e => {
+                setCreateFolderValue(e.target.value);
               }}
             />
-            {isUploadEnabled ? (
-              <DragAndDrop onDrop={onFilesDrop}>{TableContent}</DragAndDrop>
-            ) : (
-              TableContent
-            )}
-          </div>
-          <input
-            ref={uploadRef}
-            type="file"
-            className="hue-importer__source-selector-option-upload"
-            onChange={handleFileUpload}
-          />
-          {showCreateFolderModal && (
-            <BottomSlidePanel
-              isOpen={showCreateFolderModal}
-              title={t('Create Folder')}
-              cancelText="Cancel"
-              primaryText={t('Create')}
-              onClose={() => {
-                setShowCreateFolderModal(false);
-                setCreateFolderValue('');
-              }}
-              onPrimaryClick={handleCreate}
-            >
-              {/* TODO: Refactor CreateAndUpload to reuse */}
-              <LoadingErrorWrapper errors={createFolderErrorConfig}>
-                <Input
-                  defaultValue={createFolderValue}
-                  disabled={createFolderLoading}
-                  onPressEnter={() => handleCreate()}
-                  ref={createFolderInputRef}
-                  onChange={e => {
-                    setCreateFolderValue(e.target.value);
-                  }}
-                />
-              </LoadingErrorWrapper>
-            </BottomSlidePanel>
-          )}
-        </Modal>
+          </LoadingErrorWrapper>
+        </BottomSlidePanel>
       )}
-    </>
+    </Modal>
   );
 };
 

@@ -118,7 +118,7 @@ export const ADVANCED_SETTINGS_CONFIG: Record<string, SettingsFieldConfig[]> = {
     },
     {
       name: 'externalLocation',
-      type: FieldType.INPUT,
+      type: FieldType.FILECHOOSER,
       placeholder: 'External location',
       isHidden: (context: SettingsContext) => !context.useExternalLocation
     }
