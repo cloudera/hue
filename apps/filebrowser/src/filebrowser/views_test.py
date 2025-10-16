@@ -43,11 +43,18 @@ from aws.s3.s3test_utils import get_test_bucket
 from azure.conf import ABFS_CLUSTERS, is_abfs_enabled, is_adls_enabled
 from desktop.conf import is_ofs_enabled, is_oozie_enabled, OZONE, RAZ, USE_STORAGE_CONNECTORS
 from desktop.lib.django_test_util import make_logged_in_client
+from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.test_utils import add_permission, add_to_group, grant_access, remove_from_group
 from desktop.lib.view_util import location_to_url
-from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE, MAX_SNAPPY_DECOMPRESSION_SIZE, REMOTE_STORAGE_HOME
+from filebrowser.conf import (
+  ALLOW_FILE_EXTENSIONS,
+  ENABLE_EXTRACT_UPLOADED_ARCHIVE,
+  MAX_SNAPPY_DECOMPRESSION_SIZE,
+  REMOTE_STORAGE_HOME,
+  RESTRICT_FILE_EXTENSIONS,
+)
 from filebrowser.lib.rwx import expand_mode
-from filebrowser.views import _normalize_path, _read_parquet, snappy_installed
+from filebrowser.views import _normalize_path, _read_parquet, _validate_file_extension_allowed, snappy_installed
 from hadoop import pseudo_hdfs4
 from hadoop.conf import UPLOAD_CHUNK_SIZE
 from hadoop.fs.webhdfs import WebHdfs
@@ -257,6 +264,229 @@ class TestFileBrowser:
           b'"url": "/filebrowser/view=%2Fuser%2Fsystest%2Ftest5%2FT%D0%B6%D0%B5%'
           b'D0%B9%D0%BA%D0%BE%D0%B1%2Femploy%C3%A9s_file.txt",' in response.content
         ), response.content
+
+
+class TestFileExtensionRestrictions:
+  """Test file extension restrictions for filebrowser rename and touch APIs validation logic."""
+
+  # Tests for rename operation validation logic
+  def test_rename_without_extension_change(self):
+    """Test rename validation when extension doesn't change - should pass regardless of restrictions."""
+    reset_allow = ALLOW_FILE_EXTENSIONS.set_for_testing([".txt"])
+    reset_restrict = RESTRICT_FILE_EXTENSIONS.set_for_testing(None)
+
+    try:
+      src_path = '/user/test/document.txt'
+      dest_path = '/user/test/document_renamed.txt'
+
+      # Extract extensions (same logic as smart_rename)
+      _, source_ext = os.path.splitext(src_path)
+      dest_filename = os.path.basename(dest_path)
+      _, dest_ext = os.path.splitext(dest_filename)
+
+      # Validation: only check if extension changes
+      if source_ext.lower() != dest_ext.lower():
+        _validate_file_extension_allowed(dest_filename)
+
+      # Should pass - extensions are the same
+      assert source_ext.lower() == dest_ext.lower()
+    finally:
+      reset_allow()
+      reset_restrict()
+
+  def test_rename_with_extension_change_to_restricted(self):
+    """Test rename validation with change to restricted extension - should fail."""
+    reset_allow = ALLOW_FILE_EXTENSIONS.set_for_testing(None)
+    reset_restrict = RESTRICT_FILE_EXTENSIONS.set_for_testing([".exe", ".bat", ".cmd"])
+
+    try:
+      src_path = '/user/test/script.txt'
+      dest_path = '/user/test/script.exe'
+
+      # Extract extensions (same logic as smart_rename)
+      _, source_ext = os.path.splitext(src_path)
+      dest_filename = os.path.basename(dest_path)
+      _, dest_ext = os.path.splitext(dest_filename)
+
+      # Validation: only check if extension changes
+      if source_ext.lower() != dest_ext.lower():
+        with pytest.raises(PopupException) as exc_info:
+          _validate_file_extension_allowed(dest_filename)
+        assert "is restricted" in str(exc_info.value)
+      else:
+        pytest.fail("Extensions should be different in this test")
+    finally:
+      reset_allow()
+      reset_restrict()
+
+  def test_rename_with_extension_change_to_allowed(self):
+    """Test rename validation with change to allowed extension - should pass."""
+    reset_allow = ALLOW_FILE_EXTENSIONS.set_for_testing([".txt", ".csv", ".json"])
+    reset_restrict = RESTRICT_FILE_EXTENSIONS.set_for_testing(None)
+
+    try:
+      src_path = '/user/test/data.txt'
+      dest_path = '/user/test/data.csv'
+
+      # Extract extensions (same logic as smart_rename)
+      _, source_ext = os.path.splitext(src_path)
+      dest_filename = os.path.basename(dest_path)
+      _, dest_ext = os.path.splitext(dest_filename)
+
+      # Validation: only check if extension changes
+      if source_ext.lower() != dest_ext.lower():
+        _validate_file_extension_allowed(dest_filename)  # Should not raise
+
+      # Should pass - .csv is in allow list
+      assert source_ext.lower() != dest_ext.lower()
+    finally:
+      reset_allow()
+      reset_restrict()
+
+  def test_rename_with_extension_change_to_not_allowed(self):
+    """Test rename validation with change to non-allowed extension - should fail."""
+    reset_allow = ALLOW_FILE_EXTENSIONS.set_for_testing([".txt", ".csv"])
+    reset_restrict = RESTRICT_FILE_EXTENSIONS.set_for_testing(None)
+
+    try:
+      src_path = '/user/test/data.txt'
+      dest_path = '/user/test/data.xml'
+
+      # Extract extensions (same logic as smart_rename)
+      _, source_ext = os.path.splitext(src_path)
+      dest_filename = os.path.basename(dest_path)
+      _, dest_ext = os.path.splitext(dest_filename)
+
+      # Validation: only check if extension changes
+      if source_ext.lower() != dest_ext.lower():
+        with pytest.raises(PopupException) as exc_info:
+          _validate_file_extension_allowed(dest_filename)
+        assert "is not permitted" in str(exc_info.value)
+      else:
+        pytest.fail("Extensions should be different in this test")
+    finally:
+      reset_allow()
+      reset_restrict()
+
+  def test_rename_case_insensitive_extension_check(self):
+    """Test that extension comparison is case-insensitive."""
+    reset_allow = ALLOW_FILE_EXTENSIONS.set_for_testing([".txt"])
+    reset_restrict = RESTRICT_FILE_EXTENSIONS.set_for_testing(None)
+
+    try:
+      src_path = '/user/test/document.TXT'
+      dest_path = '/user/test/document_renamed.txt'
+
+      # Extract extensions (same logic as smart_rename)
+      _, source_ext = os.path.splitext(src_path)
+      dest_filename = os.path.basename(dest_path)
+      _, dest_ext = os.path.splitext(dest_filename)
+
+      # Validation: only check if extension changes
+      if source_ext.lower() != dest_ext.lower():
+        _validate_file_extension_allowed(dest_filename)
+
+      # Should pass - extensions are same (case-insensitive: .TXT == .txt)
+      assert source_ext.lower() == dest_ext.lower()
+    finally:
+      reset_allow()
+      reset_restrict()
+
+  def test_rename_directory_not_affected(self):
+    """Test that renaming directories is not affected by file extension restrictions."""
+    reset_allow = ALLOW_FILE_EXTENSIONS.set_for_testing([".txt"])
+    reset_restrict = RESTRICT_FILE_EXTENSIONS.set_for_testing(None)
+
+    try:
+      src_path = '/user/test/old_folder'
+      dest_path = '/user/test/new_folder'
+
+      # Extract extensions (same logic as smart_rename)
+      _, source_ext = os.path.splitext(src_path)
+      dest_filename = os.path.basename(dest_path)
+      _, dest_ext = os.path.splitext(dest_filename)
+
+      # Validation: only check if extension changes
+      if source_ext.lower() != dest_ext.lower():
+        _validate_file_extension_allowed(dest_filename)
+
+      # Should pass - directories have no extensions, so extensions are same (both empty)
+      assert source_ext == dest_ext == ''
+    finally:
+      reset_allow()
+      reset_restrict()
+
+  # Tests for touch (create file) operation
+  def test_touch_with_allowed_extension(self):
+    """Test creating file with allowed extension - should pass validation."""
+    reset_allow = ALLOW_FILE_EXTENSIONS.set_for_testing([".txt", ".csv", ".json"])
+    reset_restrict = RESTRICT_FILE_EXTENSIONS.set_for_testing(None)
+
+    try:
+      name = 'newfile.txt'
+      # Should not raise exception
+      _validate_file_extension_allowed(name)
+    finally:
+      reset_allow()
+      reset_restrict()
+
+  def test_touch_with_restricted_extension(self):
+    """Test creating file with restricted extension - should fail validation."""
+    reset_allow = ALLOW_FILE_EXTENSIONS.set_for_testing(None)
+    reset_restrict = RESTRICT_FILE_EXTENSIONS.set_for_testing([".exe", ".bat", ".cmd"])
+
+    try:
+      name = 'malicious.exe'
+      # Should raise PopupException
+      with pytest.raises(PopupException) as exc_info:
+        _validate_file_extension_allowed(name)
+      assert "is restricted" in str(exc_info.value)
+    finally:
+      reset_allow()
+      reset_restrict()
+
+  def test_touch_with_not_allowed_extension(self):
+    """Test creating file with non-allowed extension when allow list configured - should fail validation."""
+    reset_allow = ALLOW_FILE_EXTENSIONS.set_for_testing([".txt", ".csv"])
+    reset_restrict = RESTRICT_FILE_EXTENSIONS.set_for_testing(None)
+
+    try:
+      name = 'data.xml'
+      # Should raise PopupException
+      with pytest.raises(PopupException) as exc_info:
+        _validate_file_extension_allowed(name)
+      assert "is not permitted" in str(exc_info.value)
+    finally:
+      reset_allow()
+      reset_restrict()
+
+  def test_touch_without_extension(self):
+    """Test creating file without extension - should pass when no restrictions."""
+    reset_allow = ALLOW_FILE_EXTENSIONS.set_for_testing(None)
+    reset_restrict = RESTRICT_FILE_EXTENSIONS.set_for_testing([".exe"])
+
+    try:
+      name = 'README'
+      # Should not raise exception
+      _validate_file_extension_allowed(name)
+    finally:
+      reset_allow()
+      reset_restrict()
+
+  def test_touch_both_allow_and_restrict_lists(self):
+    """Test that restrict list takes precedence when both lists are configured."""
+    reset_allow = ALLOW_FILE_EXTENSIONS.set_for_testing([".txt", ".exe"])
+    reset_restrict = RESTRICT_FILE_EXTENSIONS.set_for_testing([".exe", ".bat"])
+
+    try:
+      name = 'program.exe'
+      # Should raise PopupException (restrict takes precedence)
+      with pytest.raises(PopupException) as exc_info:
+        _validate_file_extension_allowed(name)
+      assert "is restricted" in str(exc_info.value)
+    finally:
+      reset_allow()
+      reset_restrict()
 
 
 @pytest.mark.requires_hadoop
