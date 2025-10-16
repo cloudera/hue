@@ -1242,7 +1242,11 @@ var FileBrowserModel = function (files, page, breadcrumbs, currentDirPath) {
         self.retrieveData(true);
       },
       error: function (xhr, textStatus, errorThrown) {
-        huePubSub.publish('hue.global.error', {message: xhr.responseText});
+        var errorMessage = xhr.responseText;
+        if (xhr.responseJSON && xhr.responseJSON.detail) {
+          errorMessage = xhr.responseJSON.detail;
+        }
+        huePubSub.publish('hue.global.error', {message: errorMessage});
         resetPrimaryButtonsStatus();
       }
     });
@@ -1273,7 +1277,11 @@ var FileBrowserModel = function (files, page, breadcrumbs, currentDirPath) {
         self.retrieveData(true);
       },
       error: function (xhr, textStatus, errorThrown) {
-        huePubSub.publish('hue.global.error', {message: xhr.responseText});
+        var errorMessage = xhr.responseText;
+        if (xhr.responseJSON && xhr.responseJSON.detail) {
+          errorMessage = xhr.responseJSON.detail;
+        }
+        huePubSub.publish('hue.global.error', {message: errorMessage});
         resetPrimaryButtonsStatus();
       }
     });
