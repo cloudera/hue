@@ -93,6 +93,7 @@ from filebrowser.forms import (
 )
 from filebrowser.lib import xxd
 from filebrowser.lib.rwx import filetype, rwx
+from filebrowser.utils import is_file_upload_allowed
 from hadoop.core_site import get_trash_interval
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.fsutils import do_overwrite_save
@@ -1225,6 +1226,11 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
       args = arg_extractor(request, form, parameter_names)
       try:
         op(*args)
+      except PopupException as e:
+        if is_ajax(request):
+          return JsonResponse({'detail': str(e)}, status=500)
+        else:
+          raise
       except (IOError, WebHdfsException) as e:
         msg = _("Cannot perform operation.")
         raise PopupException(msg, detail=e)
@@ -1269,6 +1275,24 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
   return render(template, request, ret)
 
 
+def _validate_file_extension_allowed(filename):
+  """
+  Validate that a file's extension is allowed based on configured restrictions.
+
+  Args:
+    filename: The filename to validate
+
+  Raises:
+    PopupException: If the file extension is not allowed
+
+  Returns:
+    None if validation passes
+  """
+  is_allowed, error_message = is_file_upload_allowed(filename)
+  if not is_allowed:
+    raise PopupException(error_message)
+
+
 def rename(request):
   def smart_rename(src_path, dest_path):
     """If dest_path doesn't have a directory specified, use same dir."""
@@ -1277,6 +1301,16 @@ def rename(request):
     if "/" not in dest_path:
       src_dir = os.path.dirname(src_path)
       dest_path = request.fs.join(src_dir, dest_path)
+
+    # Extract file extensions from source and destination paths
+    _, source_ext = os.path.splitext(src_path)
+    dest_filename = os.path.basename(dest_path)
+    _, dest_ext = os.path.splitext(dest_filename)
+
+    # Check if extension is changing and validate if allowed
+    if source_ext.lower() != dest_ext.lower():
+      _validate_file_extension_allowed(dest_filename)
+
     if request.fs.exists(dest_path):
       raise PopupException(_('The destination path "%s" already exists.') % dest_path)
     request.fs.rename(src_path, dest_path)
@@ -1310,6 +1344,10 @@ def touch(request):
     # No absolute path specification allowed.
     if posixpath.sep in name:
       raise PopupException(_("Could not name file \"%s\": Slashes are not allowed in filenames." % name))
+
+    # Validate file extension
+    _validate_file_extension_allowed(name)
+
     request.fs.create(
         request.fs.join(
             (path.encode('utf-8') if not isinstance(path, str) else path),
