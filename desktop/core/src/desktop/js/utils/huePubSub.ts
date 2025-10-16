@@ -50,16 +50,17 @@ const subscribe = <T = any>(
     topics[topic] = [];
   }
 
-  const index =
-    topics[topic].push({
-      listener: listener,
-      app: app,
-      state: PubSubState.RUNNING
-    }) - 1;
+  topics[topic].push({
+    listener: listener,
+    app: app,
+    state: PubSubState.RUNNING
+  });
 
   return {
     remove: () => {
-      delete topics[topic][index];
+      if (topics[topic]) {
+        topics[topic] = topics[topic].filter(item => item.listener !== listener);
+      }
     }
   };
 };

@@ -96,7 +96,7 @@ In the meantime, with Axios:
         // Util to check if cached token is still valid before asking to auth for a new one
         axios.post('api/v1/token/verify/', {token: data['access']});
 
-        axios.defaults.headers.common['Authorization'] = 'Bearer ' + data['access'];
+        axios.defaults.headers['Authorization'] = 'Bearer ' + data['access'];
       }).then(function() {
         axios.post('api/v1/query/sqlite', {statement:"SELECT 1000, 1001"}).then(function(data) {
           console.log(data['data']);

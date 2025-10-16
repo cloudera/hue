@@ -57,6 +57,11 @@ RUN pip3 install --upgrade --no-cache-dir setuptools virtualenv pip && \
   rm -rf /var/lib/apt/lists/* && \
   cp -r /hue/tools/docker/hue/conf3/* /usr/share/hue/desktop/conf/ && \
   cp /hue/tools/docker/hue/startup.sh /usr/share/hue/startup.sh && \
+  # Include tools/scripts for multi-python wrapper and helpers
+  mkdir -p /usr/share/hue/tools/scripts && \
+  cp -r /hue/tools/scripts/* /usr/share/hue/tools/scripts/ && \
+  chmod +x /usr/share/hue/tools/scripts/*.sh || true && \
+  chmod +x /usr/share/hue/tools/scripts/python/*.sh || true && \
   mkdir -p /usr/share/hue/tools/slack && \
   cp /hue/tools/slack/manifest.yml /usr/share/hue/tools/slack/manifest.yml && \
   rm -rf /hue && \

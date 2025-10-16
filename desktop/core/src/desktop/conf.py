@@ -331,7 +331,7 @@ def has_tls13_support():
   """Check if TLS 1.3 is supported by the current Python/OpenSSL version."""
   try:
     import ssl
-    return hasattr(ssl, 'HAS_TLSv1_3') and ssl.HAS_TLSv1_3
+    return hasattr(ssl, 'HAS_TLSv1_3') and ssl.HAS_TLSv1_3 and is_https_enabled()
   except ImportError:
     return False
 
@@ -346,7 +346,7 @@ SSL_TLS12_ENABLED = Config(
   key="ssl_tls12_enabled",
   help=_("Enable TLS 1.2 support when available. This is the default behavior."),
   type=coerce_bool,
-  default=True)
+  dynamic_default=is_https_enabled)
 
 
 def has_ssl_no_renegotiation():
@@ -717,6 +717,13 @@ VCS = UnspecifiedConfigSection(
       )
     )
   )
+)
+
+JAVA_PATH = Config(
+  key="java_path",
+  help=_("Java binary path to add to PATH environment variable."),
+  default="",
+  type=str
 )
 
 

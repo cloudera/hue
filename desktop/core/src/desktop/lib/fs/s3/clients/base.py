@@ -87,7 +87,10 @@ class S3ClientInterface(ABC):
     # Initialize transfer config
     self.transfer_config = TRANSFER_CONFIG.copy()
 
-    # Initialize session and clients
+    # Allow subclasses to configure before client creation
+    self._configure_client_settings()
+
+    # Initialize session and clients (after configuration)
     self.session = self._create_session()
     self.s3_client = self._create_client()
     self.s3_resource = self._create_resource()
@@ -126,3 +129,7 @@ class S3ClientInterface(ABC):
   def get_region(self, bucket: str) -> str:
     """Get region for a bucket"""
     pass
+
+  def _configure_client_settings(self) -> None:
+    """Configure client settings before client creation. Override in subclasses."""
+    pass  # Default: no additional configuration

@@ -17,15 +17,8 @@
 import logging
 from urllib.parse import parse_qs, unquote, urlencode
 
-import boto
-from boto.connection import HTTPRequest
-from boto.exception import BotoClientError
-from boto.regioninfo import connect
-from boto.resultset import ResultSet
-from boto.s3 import S3RegionInfo
 from boto.s3.bucket import Bucket, Key
 from boto.s3.connection import NoHostProvided, S3Connection
-from boto.s3.prefix import Prefix
 
 from desktop.conf import RAZ
 from desktop.lib.raz.clients import S3RazClient
@@ -142,7 +135,7 @@ class RazS3Connection(S3Connection):
   def get_signed_url(self, action='GET', url=None, headers=None, data=None):
     raz_client = S3RazClient(username=self.username)
 
-    return raz_client.get_url(action, url, headers, data)
+    return raz_client.get_url(action=action, path=url, headers=headers, data=data)
 
   def _required_auth_capability(self):
     """

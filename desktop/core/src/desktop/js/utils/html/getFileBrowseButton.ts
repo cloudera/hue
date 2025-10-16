@@ -64,7 +64,7 @@ const getFileBrowseButton = (
       if (inputElement.data('fullPath')) {
         initialPath = inputElement.data('fullPath');
       }
-      if (initialPath.indexOf('hdfs://') > -1) {
+      if (initialPath.includes('hdfs://')) {
         initialPath = initialPath.substring(7);
       }
 
@@ -152,7 +152,7 @@ const getFileBrowseButton = (
       ) {
         inputElement.data('fullPath', filePath);
         inputElement.attr('data-original-title', filePath);
-        if (filePath.indexOf(allBindingsAccessor().filechooserOptions.deploymentDir) === 0) {
+        if (filePath.startsWith(allBindingsAccessor().filechooserOptions.deploymentDir)) {
           filePath = filePath.substr(
             allBindingsAccessor().filechooserOptions.deploymentDir.length + 1
           );
