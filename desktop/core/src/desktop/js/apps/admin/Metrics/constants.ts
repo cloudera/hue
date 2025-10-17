@@ -14,40 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@import '../../components/styles/variables';
+export const metricLabels: { [key: string]: string } = {
+  'queries.number': 'Number of Queries',
+  'requests.active': 'Active Requests',
+  'requests.exceptions': 'Request Exceptions',
+  'requests.response-time': 'Request Response Time',
+  'threads.daemon': 'Daemon Threads',
+  'threads.total': 'Total Threads',
+  users: 'Users',
+  'users.active': 'Active Users',
+  'users.active.total': 'Total Active Users'
+};
 
-.antd.cuix {
-  .admin-header {
-    display: flex;
-    align-items: center;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background-color: $fluidx-gray-100;
-    padding: 16px 0;
-    margin-bottom: 16px;
-
-    .admin-header__select-dropdown {
-      border: 1px solid $fluidx-gray-600;
-      border-radius: $border-radius-base;
-      background-color: $fluidx-white;
-      width: 25%;
-      height: 32px;
-    }
-
-    .admin-header__input-filter {
-      margin: $font-size-sm;
-      width: 25%;
-
-      input {
-        box-shadow: none;
-        -webkit-box-shadow: none;
-      }
-    }
-
-    .config__file-location-value {
-      color: $fluidx-blue-600;
-      display: block;
-    }
-  }
-}
+export const labelToKey: { [key: string]: string } = Object.fromEntries(
+  Object.entries(metricLabels).map(([key, label]) => [label, key])
+);

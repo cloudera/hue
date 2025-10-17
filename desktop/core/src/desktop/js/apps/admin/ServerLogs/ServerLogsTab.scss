@@ -20,6 +20,7 @@
   .hue-server-logs-component {
     background-color: $fluidx-gray-100;
     padding: 24px;
+    min-height: 100vh;
 
     .server__display-logs {
       overflow: auto;
