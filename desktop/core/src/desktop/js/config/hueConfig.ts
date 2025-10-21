@@ -126,7 +126,7 @@ export const filterEditorConnectors = (
   connectorTest: ConnectorTest<AppType.editor>
 ): EditorInterpreter[] => filterConnector(AppType.editor, connectorTest);
 
-const rootPathRegex = /.*%3A%2F%2F(.+)$/;
+const rootPathRegex = /.*view=(.+)$/;
 
 /**
  * This takes the initial path from the "browser" config, used in cases where the users can't access '/'
@@ -138,7 +138,19 @@ export const getRootFilePath = (connector: BrowserInterpreter): string => {
   }
   const match = connector.page.match(rootPathRegex);
   if (match) {
-    return match[1] + '/';
+    // Decode the URL-encoded path (e.g., s3a%3A%2F%2F -> s3a://)
+    const decodedPath = decodeURIComponent(match[1]);
+    
+    // For ABFS and OFS, strip the scheme prefix as AssistStorageEntry adds it automatically
+    // S3 doesn't have auto-prefixing logic, so keep the full path
+    if (connector.type === 'abfs' && decodedPath.startsWith('abfs://')) {
+      return decodedPath.substring(7); // Remove 'abfs://'
+    }
+    if (connector.type === 'ofs' && decodedPath.startsWith('ofs://')) {
+      return decodedPath.substring(6); // Remove 'ofs://'
+    }
+    
+    return decodedPath;
   }
 
   return '';
