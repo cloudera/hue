@@ -140,7 +140,7 @@ export const getRootFilePath = (connector: BrowserInterpreter): string => {
   if (match) {
     // Decode the URL-encoded path (e.g., s3a%3A%2F%2F -> s3a://)
     const decodedPath = decodeURIComponent(match[1]);
-    
+
     // For ABFS and OFS, strip the scheme prefix as AssistStorageEntry adds it automatically
     // S3 doesn't have auto-prefixing logic, so keep the full path
     if (connector.type === 'abfs' && decodedPath.startsWith('abfs://')) {
@@ -149,7 +149,7 @@ export const getRootFilePath = (connector: BrowserInterpreter): string => {
     if (connector.type === 'ofs' && decodedPath.startsWith('ofs://')) {
       return decodedPath.substring(6); // Remove 'ofs://'
     }
-    
+
     return decodedPath;
   }
 
