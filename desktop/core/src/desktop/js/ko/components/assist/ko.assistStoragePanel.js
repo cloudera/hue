@@ -50,9 +50,10 @@ const TEMPLATE = `
 
   <script type="text/html" id="assist-storage-header-actions">
     <div class="assist-db-header-actions">
-      <!-- ko if: source.type !== 's3' && source.type !== 'abfs' -->
-      <a class="inactive-action" href="javascript:void(0)" data-bind="click: goHome, attr: { title: I18n('Go to ' + window.USER_HOME_DIR) }"><i class="pointer fa fa-home"></i></a>
-      <!-- ko if: window.SHOW_UPLOAD_BUTTON -->
+      <!-- ko if: source.type === 'hdfs' || source.type === 'adls' || source.type === 'ofs' || source.type === 'gs' || ($parent.rootPath() && (source.type === 's3' || source.type === 'abfs')) -->
+      <a class="inactive-action" href="javascript:void(0)" data-bind="click: goHome, attr: { title: source.type === 'hdfs' ? I18n('Go to ' + window.USER_HOME_DIR) : I18n('Go to home') }"><i class="pointer fa fa-home"></i></a>
+      <!-- /ko -->
+      <!-- ko if: source.type !== 's3' && source.type !== 'abfs' && window.SHOW_UPLOAD_BUTTON -->
       <a class="inactive-action" data-bind="dropzone: {
             url: '/filebrowser/upload/file?dest=' + (source.type === 'adls' ? 'adl:' : '') + path,
             params: { dest: path },
@@ -67,7 +68,6 @@ const TEMPLATE = `
           'Upload file'
         )}"></i></div>
       </a>
-      <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: source.type === 'abfs' && path !== '/' && window.SHOW_UPLOAD_BUTTON -->
       <a class="inactive-action" data-bind="dropzone: {
@@ -201,13 +201,13 @@ class AssistStoragePanel {
     this.activeSource = ko.observable(foundLastSource);
     this.loading = ko.observable();
     this.initialized = false;
-    this.rootPath = getRootFilePath(this.activeSource());
+    this.rootPath = ko.observable(getRootFilePath(this.activeSource()));
 
     this.selectedStorageEntry = ko.observable();
 
     this.activeSource.subscribe(newValue => {
       if (newValue) {
-        this.rootPath = getRootFilePath(this.activeSource());
+        this.rootPath(getRootFilePath(this.activeSource()));
         setInLocalStorage('assist.lastStorageSource', newValue.type);
         this.selectedStorageEntry(undefined);
         this.reload();
@@ -230,7 +230,7 @@ class AssistStoragePanel {
         this.activeSource().type === 'gs' ||
         this.activeSource().type === 'abfs' ||
         this.activeSource().type === 'ofs'
-          ? '/'
+          ? this.rootPath() || '/'
           : window.USER_HOME_DIR;
       this.loadPath(path);
       setInLocalStorage('assist.currentStoragePath_' + this.activeSource().type, path);
@@ -242,17 +242,18 @@ class AssistStoragePanel {
   loadPath(path) {
     this.loading(true);
     let relativePath = path;
-    if (this.rootPath) {
-      relativePath = relativePath.replace(this.rootPath, '/');
+    const rootPath = this.rootPath();
+    if (rootPath) {
+      relativePath = relativePath.replace(rootPath, '/');
     }
     const parts = relativePath.split('/');
     parts.shift();
 
     const currentEntry = new AssistStorageEntry({
       source: this.activeSource(),
-      rootPath: this.rootPath,
+      rootPath,
       definition: {
-        name: this.rootPath,
+        name: rootPath,
         type: 'dir'
       },
       parent: null
@@ -266,10 +267,11 @@ class AssistStoragePanel {
   }
 
   reload() {
+    const defaultPath = this.activeSource().type === 'hdfs' ? window.USER_HOME_DIR : (this.rootPath() || '/');
     this.loadPath(
       getFromLocalStorage(
         'assist.currentStoragePath_' + this.activeSource().type,
-        this.activeSource().type === 'hdfs' ? window.USER_HOME_DIR : '/'
+        defaultPath
       )
     );
   }
