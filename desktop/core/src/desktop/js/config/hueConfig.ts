@@ -143,11 +143,14 @@ export const getRootFilePath = (connector: BrowserInterpreter): string => {
 
     // For ABFS and OFS, strip the scheme prefix as AssistStorageEntry adds it automatically
     // S3 doesn't have auto-prefixing logic, so keep the full path
-    if (connector.type === 'abfs' && decodedPath.startsWith('abfs://')) {
-      return decodedPath.substring(7); // Remove 'abfs://'
+    const abfsPrefix = 'abfs://';
+    if (connector.type === 'abfs' && decodedPath.startsWith(abfsPrefix)) {
+      return decodedPath.substring(abfsPrefix.length);
     }
-    if (connector.type === 'ofs' && decodedPath.startsWith('ofs://')) {
-      return decodedPath.substring(6); // Remove 'ofs://'
+
+    const ofsPrefix = 'ofs://';
+    if (connector.type === 'ofs' && decodedPath.startsWith(ofsPrefix)) {
+      return decodedPath.substring(ofsPrefix.length);
     }
 
     return decodedPath;

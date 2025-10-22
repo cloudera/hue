@@ -251,7 +251,7 @@ class AssistStoragePanel {
 
     const currentEntry = new AssistStorageEntry({
       source: this.activeSource(),
-      rootPath: rootPath,
+      rootPath,
       definition: {
         name: rootPath,
         type: 'dir'
