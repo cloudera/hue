@@ -954,6 +954,63 @@ class TestEditor(OozieMockBase):
     assert set(["b", "foo", "food", "time"]) == reduce(lambda x, y: x | set(y), result, set())
 
 
+  def test_get_initial_params_sorting(self):
+    """Test that ParameterForm.get_initial_params() sorts parameters correctly"""
+    from oozie.forms import ParameterForm
+    
+    # Test data with mixed order parameters
+    conf_dict = {
+        'end_date': '2024-01-01T10:00:00Z',
+        'start_date': '2024-01-01T09:00:00Z',
+        'oozie.use.system.libpath': 'true',  # Should be excluded
+        'custom_param': 'value',
+        'another_param': 'another_value',
+        'nominal_time': '2024-01-01T09:30:00Z'
+    }
+    
+    result = ParameterForm.get_initial_params(conf_dict)
+    
+    # Should be sorted: start_date first, end_date second, then alphabetically
+    assert len(result) == 4, f"Expected 4 parameters, got {len(result)}"
+    assert result[0]['name'] == 'start_date'
+    assert result[0]['value'] == '2024-01-01T09:00:00Z'
+    assert result[1]['name'] == 'end_date'
+    assert result[1]['value'] == '2024-01-01T10:00:00Z'
+    assert result[2]['name'] == 'another_param'
+    assert result[2]['value'] == 'another_value'
+    assert result[3]['name'] == 'custom_param'
+    assert result[3]['value'] == 'value'
+    
+    # Verify oozie.use.system.libpath is excluded
+    param_names = [param['name'] for param in result]
+    assert 'oozie.use.system.libpath' not in param_names
+
+  def test_get_initial_params_edge_cases(self):
+    """Test ParameterForm.get_initial_params() with edge cases"""
+    from oozie.forms import ParameterForm
+    
+    # Test empty dict
+    result = ParameterForm.get_initial_params({})
+    assert result == []
+    
+    # Test with only non-parameters
+    conf_dict = {
+        'oozie.use.system.libpath': 'true',
+        'oozie.some.other.param': 'value'
+    }
+    result = ParameterForm.get_initial_params(conf_dict)
+    assert result == []
+    
+    # Test with only start_date and end_date
+    conf_dict = {
+        'end_date': '2024-01-01T10:00:00Z',
+        'start_date': '2024-01-01T09:00:00Z'
+    }
+    result = ParameterForm.get_initial_params(conf_dict)
+    assert len(result) == 2
+    assert result[0]['name'] == 'start_date'
+    assert result[1]['name'] == 'end_date'
+
   def test_find_all_parameters(self):
     self.wf.data = json.dumps({'sla': [
         {'key': 'enabled', 'value': False},
