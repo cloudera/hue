@@ -971,7 +971,7 @@ class TestEditor(OozieMockBase):
     result = ParameterForm.get_initial_params(conf_dict)
     
     # Should be sorted: start_date first, end_date second, then alphabetically
-    assert len(result) == 4, f"Expected 4 parameters, got {len(result)}"
+    assert len(result) == 4, "Expected 4 parameters, got {}".format(len(result))
     assert result[0]['name'] == 'start_date'
     assert result[0]['value'] == '2024-01-01T09:00:00Z'
     assert result[1]['name'] == 'end_date'

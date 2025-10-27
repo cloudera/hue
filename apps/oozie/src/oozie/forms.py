@@ -86,7 +86,7 @@ class ParameterForm(forms.Form):
   @staticmethod
   def get_initial_params(conf_dict):
     params = [key for key in list(conf_dict.keys()) if key not in ParameterForm.NON_PARAMETERS]
-    
+
     # Sort parameters: start_date first, end_date second, then alphabetically
     def param_sort_key(name):
       if name == 'start_date':
@@ -95,9 +95,9 @@ class ParameterForm(forms.Form):
         return (1, name)
       else:
         return (2, name)
-    
+
     params.sort(key=param_sort_key)
-    
+
     return [{'name': name, 'value': conf_dict[name]} for name in params]
 
   @staticmethod
