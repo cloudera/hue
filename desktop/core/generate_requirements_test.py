@@ -113,9 +113,11 @@ class TestRequirementsGenerator:
       generator = RequirementsGenerator()
       generator.arch = "x86_64"
       generator.python_version_string = "3.9"
-      generator.requirements = ["setuptools==70.0.0", "Django==4.1.13"]
+      generator.requirements = ["Django==4.1.13"]
       generator.local_requirements = []
-      generator.arch_requirements_map = {"x86_64": {"default": ["cryptography==42.0.8"], "3.9": ["Markdown==3.8", "numpy==1.24.4"]}}
+      generator.arch_requirements_map = {
+        "x86_64": {"default": ["cryptography==42.0.8"], "3.9": ["Markdown==3.8", "numpy==1.24.4", "setuptools==80.9.0"]}
+      }
 
       # Mock copy_local_requirements for test isolation
       generator.copy_local_requirements = mock.MagicMock(return_value=[])
@@ -126,7 +128,7 @@ class TestRequirementsGenerator:
       mock_open.assert_called_once_with(f"{self.temp_dir}/requirements-x86_64-3.9.txt", "w")
 
       # Verify correct requirements were written
-      expected_requirements = "\n".join(["setuptools==70.0.0", "Django==4.1.13", "Markdown==3.8", "numpy==1.24.4"])
+      expected_requirements = "\n".join(["Django==4.1.13", "Markdown==3.8", "numpy==1.24.4", "setuptools==80.9.0"])
       mock_open().write.assert_called_once_with(expected_requirements)
 
   @mock.patch("generate_requirements.this_dir")
@@ -176,9 +178,9 @@ class TestRequirementsGenerator:
       generator = RequirementsGenerator()
       generator.arch = "x86_64"
       generator.python_version_string = "3.9"
-      generator.requirements = ["setuptools==70.0.0"]
+      generator.requirements = []
       generator.local_requirements = ["boto-2.49.0", "django-axes-5.13.0"]
-      generator.arch_requirements_map = {"x86_64": {"default": [], "3.9": ["Markdown==3.8"]}}
+      generator.arch_requirements_map = {"x86_64": {"default": [], "3.9": ["Markdown==3.8", "setuptools==80.9.0"]}}
 
       # Mock copy_local_requirements to return file paths
       local_reqs = [f"file://{self.temp_dir}/3.9/boto-2.49.0", f"file://{self.temp_dir}/3.9/django-axes-5.13.0"]
@@ -189,7 +191,7 @@ class TestRequirementsGenerator:
       mock_open.assert_called_once_with(f"{self.temp_dir}/requirements-x86_64-3.9.txt", "w")
 
       expected_requirements = "\n".join(
-        ["setuptools==70.0.0", "Markdown==3.8", f"file://{self.temp_dir}/3.9/boto-2.49.0", f"file://{self.temp_dir}/3.9/django-axes-5.13.0"]
+        ["Markdown==3.8", "setuptools==80.9.0", f"file://{self.temp_dir}/3.9/boto-2.49.0", f"file://{self.temp_dir}/3.9/django-axes-5.13.0"]
       )
 
       mock_open().write.assert_called_once_with(expected_requirements)

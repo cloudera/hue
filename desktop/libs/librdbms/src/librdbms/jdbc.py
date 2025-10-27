@@ -15,12 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import range
-from builtins import object
 import logging
 import os
 import sys
+import threading
+from builtins import object, range
 
+from desktop.conf import JAVA_PATH
 from desktop.lib.i18n import force_unicode, smart_str
 from notebook.conf import DBPROXY_EXTRA_CLASSPATH
 from notebook.connectors.base import AuthenticationRequired
@@ -28,9 +29,54 @@ from notebook.connectors.base import AuthenticationRequired
 LOG = logging.getLogger()
 
 try:
-  from py4j.java_gateway import JavaGateway, JavaObject
-except:
+  from py4j.java_gateway import CallbackServerParameters, GatewayParameters, JavaGateway, JavaObject, launch_gateway
+except Exception:
   LOG.warning('Failed to import py4j')
+
+_GATEWAY_SINGLETON = None
+_GATEWAY_LOCK = threading.Lock()
+
+
+def _build_classpath():
+  classpath = os.environ.get('CLASSPATH', '')
+  extra = DBPROXY_EXTRA_CLASSPATH.get()
+  if extra:
+    classpath = f'{extra}:{classpath}' if classpath else extra
+  return classpath
+
+
+def _get_or_create_gateway():
+  global _GATEWAY_SINGLETON
+  if _GATEWAY_SINGLETON is not None:
+    return _GATEWAY_SINGLETON
+
+  with _GATEWAY_LOCK:
+    if _GATEWAY_SINGLETON is not None:
+      return _GATEWAY_SINGLETON
+
+    classpath = _build_classpath()
+
+    LOG.debug("[GatewaySingleton] starting Java Gateway...")
+    java_port = launch_gateway(
+      classpath=classpath,
+      port=0,
+      die_on_exit=True,
+      redirect_stdout=sys.stdout,
+      redirect_stderr=sys.stderr
+    )
+
+    _GATEWAY_SINGLETON = JavaGateway(
+      gateway_parameters=GatewayParameters(
+        port=java_port,
+        auto_convert=True,
+        eager_load=True
+      ),
+      callback_server_parameters=CallbackServerParameters(
+        port=0
+      )
+    )
+
+    return _GATEWAY_SINGLETON
 
 
 def query_and_fetch(db, statement, n=None):
@@ -58,15 +104,18 @@ def query_and_fetch(db, statement, n=None):
 class Jdbc(object):
 
   def __init__(self, driver_name, url, username, password, impersonation_property=None, impersonation_user=None):
+    java_path = JAVA_PATH.get()
+    if java_path and java_path not in os.environ["PATH"]:
+      os.environ["PATH"] = os.environ["PATH"] + ':' + java_path
+
     if 'py4j' not in sys.modules:
       raise Exception('Required py4j module is not imported.')
 
-    os.environ["PATH"] = os.environ["PATH"] + ':/usr/java/default/bin' # TODO: more generic
-    classpath = os.environ.get('CLASSPATH', '')
-    if DBPROXY_EXTRA_CLASSPATH.get():
-      classpath = '%s:%s' % (DBPROXY_EXTRA_CLASSPATH.get(), classpath)
-
-    self.gateway = JavaGateway.launch_gateway(classpath=classpath)
+    try:
+      self.gateway = _get_or_create_gateway()
+    except Exception as e:
+      LOG.error(f"liibrdbms1-Java Gateway start error: {e}", exc_info=True)
+      raise
 
     self.jdbc_driver = driver_name
     self.db_url = url
@@ -137,7 +186,7 @@ class Cursor(object):
         cell = self.rs.getObject(c + 1)
 
         if isinstance(cell, JavaObject):
-          cell = str(cell) # DATETIME
+          cell = str(cell)  # DATETIME
         row.append(cell)
 
       res.append(row)
