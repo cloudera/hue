@@ -2017,8 +2017,9 @@ class TestEditor(OozieMockBase):
 
     # Check param popup, SLEEP is set by coordinator so not shown in the popup
     response = self.c.get(reverse('oozie:submit_coordinator', args=[coord.id]))
-    assert ([{'name': u'output', 'value': ''},
-                  {'name': u'market', 'value': u'US'}
+    # Parameters are sorted alphabetically after start_date and end_date
+    assert ([{'name': u'market', 'value': u'US'},
+                  {'name': u'output', 'value': ''}
                   ] ==
                   response.context[0]['params_form'].initial)
 
