@@ -21,6 +21,20 @@
     background-color: $fluidx-gray-100;
     padding: 24px;
 
+    .ant-tabs {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background-color: $fluidx-gray-100;
+      padding: 16px 0;
+      margin-bottom: 16px;
+    }
+
+    .ant-tabs-content-holder {
+      overflow: auto;
+      max-height: calc(100vh - 200px);
+    }
+
     .config__spin {
       display: flex;
       justify-content: center;
