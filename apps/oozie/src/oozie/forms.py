@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
 import logging
 from builtins import object
 from datetime import datetime, timedelta
@@ -23,7 +22,6 @@ from functools import partial
 from time import mktime, struct_time
 
 from django import forms
-from django.core.exceptions import ValidationError
 from django.forms.widgets import TextInput
 from django.utils.translation import gettext_lazy as _t
 

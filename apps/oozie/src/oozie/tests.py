@@ -962,7 +962,7 @@ class TestEditor(OozieMockBase):
     conf_dict = {
         'end_date': '2024-01-01T10:00:00Z',
         'start_date': '2024-01-01T09:00:00Z',
-        'oozie.use.system.libpath': 'true',  # Should be excluded
+        'oozie.use.system.libpath': 'true',
         'custom_param': 'value',
         'another_param': 'another_value',
         'nominal_time': '2024-01-01T09:30:00Z'
@@ -971,7 +971,7 @@ class TestEditor(OozieMockBase):
     result = ParameterForm.get_initial_params(conf_dict)
     
     # Should be sorted: start_date first, end_date second, then alphabetically
-    assert len(result) == 4, "Expected 4 parameters, got {}".format(len(result))
+    assert len(result) == 6, "Expected 6 parameters, got {}".format(len(result))
     assert result[0]['name'] == 'start_date'
     assert result[0]['value'] == '2024-01-01T09:00:00Z'
     assert result[1]['name'] == 'end_date'
@@ -980,10 +980,10 @@ class TestEditor(OozieMockBase):
     assert result[2]['value'] == 'another_value'
     assert result[3]['name'] == 'custom_param'
     assert result[3]['value'] == 'value'
-    
-    # Verify oozie.use.system.libpath is excluded
-    param_names = [param['name'] for param in result]
-    assert 'oozie.use.system.libpath' not in param_names
+    assert result[4]['name'] == 'nominal_time'
+    assert result[4]['value'] == '2024-01-01T09:30:00Z'
+    assert result[5]['name'] == 'oozie.use.system.libpath'
+    assert result[5]['value'] == 'true'
 
   def test_get_initial_params_edge_cases(self):
     """Test ParameterForm.get_initial_params() with edge cases"""
@@ -993,13 +993,18 @@ class TestEditor(OozieMockBase):
     result = ParameterForm.get_initial_params({})
     assert result == []
     
-    # Test with only non-parameters
+    # Test with oozie parameters (they are included, not filtered out)
     conf_dict = {
         'oozie.use.system.libpath': 'true',
         'oozie.some.other.param': 'value'
     }
     result = ParameterForm.get_initial_params(conf_dict)
-    assert result == []
+    assert len(result) == 2
+    # Should be sorted alphabetically
+    assert result[0]['name'] == 'oozie.some.other.param'
+    assert result[0]['value'] == 'value'
+    assert result[1]['name'] == 'oozie.use.system.libpath'
+    assert result[1]['value'] == 'true'
     
     # Test with only start_date and end_date
     conf_dict = {
