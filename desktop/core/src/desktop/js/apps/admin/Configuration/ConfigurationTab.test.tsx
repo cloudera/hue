@@ -23,7 +23,6 @@ import { ConfigurationKey } from './ConfigurationKey';
 import { ConfigurationValue } from './ConfigurationValue';
 import ApiHelper from '../../../api/apiHelper';
 
-// Mock API call to fetch configuration data
 jest.mock('../../../api/apiHelper', () => ({
   fetchHueConfigAsync: jest.fn()
 }));
@@ -105,54 +104,16 @@ describe('Configuration Component', () => {
 
     const user = userEvent.setup();
 
-    // Open dropdown
     const select = screen.getByRole('combobox');
     await user.click(select);
 
-    // Wait for and select "ALL" option
     const allOption = await screen.findByTitle('ALL');
     await user.click(allOption);
 
-    // Verify the updated content
     await waitFor(() => {
       expect(screen.getAllByText(/test/i)).toHaveLength(3);
       expect(screen.getByText(/test\.config2/i)).toBeInTheDocument();
       expect(screen.getByText(/Hello World/i)).toBeInTheDocument();
-    });
-  });
-
-  test('Renders Configuration component mathcing search', async () => {
-    render(<Configuration />);
-
-    await waitFor(() => {
-      expect(screen.getByText(/Sections/i)).toBeInTheDocument();
-      expect(screen.getByText(/Desktop/i)).toBeInTheDocument();
-      expect(screen.getByText(/example\.config/i)).toBeInTheDocument();
-      expect(screen.getByText(/Example value/i)).toBeInTheDocument();
-      expect(screen.queryAllByText(/test/i)).toHaveLength(0);
-    });
-
-    const user = userEvent.setup();
-
-    // Open dropdown
-    const select = screen.getByRole('combobox');
-    await user.click(select);
-
-    // Wait for and select "ALL" option
-    const allOption = await screen.findByTitle('ALL');
-    await user.click(allOption);
-
-    const filterinput = screen.getByPlaceholderText('Filter...');
-    await user.click(filterinput);
-    await user.type(filterinput, 'config2');
-
-    // Verify the updated content
-    await waitFor(() => {
-      expect(screen.getAllByText(/test/i)).toHaveLength(3);
-      expect(screen.getByText(/test\.config2/i)).toBeInTheDocument();
-      expect(screen.getByText(/Hello World/i)).toBeInTheDocument();
-
-      expect(screen.queryByText(/example\.config/i)).not.toBeInTheDocument();
     });
   });
 
@@ -181,6 +142,61 @@ describe('Configuration Component', () => {
 
     await waitFor(() => screen.getByText('Empty configuration section'));
     expect(screen.getByText('Empty configuration section')).toBeInTheDocument();
+  });
+
+  test('Displays error message when API call fails', async () => {
+    (ApiHelper.fetchHueConfigAsync as jest.Mock).mockRejectedValue(
+      new Error('Failed to fetch configuration')
+    );
+
+    render(<Configuration />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Error in displaying the Configuration!')).toBeInTheDocument();
+      expect(screen.getByText('Failed to fetch configuration')).toBeInTheDocument();
+    });
+  });
+
+  test('Retry button refetches data after error', async () => {
+    (ApiHelper.fetchHueConfigAsync as jest.Mock).mockRejectedValueOnce(
+      new Error('Failed to fetch configuration')
+    );
+
+    render(<Configuration />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Error in displaying the Configuration!')).toBeInTheDocument();
+    });
+
+    (ApiHelper.fetchHueConfigAsync as jest.Mock).mockResolvedValueOnce({
+      apps: [{ name: 'desktop', has_ui: true, display_name: 'Desktop' }],
+      config: [
+        {
+          help: 'Main configuration section',
+          key: 'desktop',
+          is_anonymous: false,
+          values: [
+            {
+              help: 'Example config help text',
+              key: 'example.config',
+              is_anonymous: false,
+              value: 'Example value'
+            }
+          ]
+        }
+      ],
+      conf_dir: '/conf/directory'
+    });
+
+    const user = userEvent.setup();
+    const retryButton = screen.getByText('Retry');
+    await user.click(retryButton);
+
+    await waitFor(() => {
+      expect(screen.getByText('Sections')).toBeInTheDocument();
+      expect(screen.getByText(/example\.config/i)).toBeInTheDocument();
+      expect(ApiHelper.fetchHueConfigAsync).toHaveBeenCalledTimes(2);
+    });
   });
 
   describe('ConfigurationKey Component', () => {

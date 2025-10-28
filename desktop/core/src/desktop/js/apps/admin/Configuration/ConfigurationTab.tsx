@@ -15,13 +15,12 @@
 // limitations under the License.
 
 import React, { useState, useEffect, useMemo } from 'react';
-import Loading from 'cuix/dist/components/Loading';
-import Alert from 'cuix/dist/components/Alert';
 import { i18nReact } from '../../../utils/i18nReact';
 import AdminHeader from '../AdminHeader';
 import { ConfigurationValue } from './ConfigurationValue';
 import { ConfigurationKey } from './ConfigurationKey';
 import ApiHelper from '../../../api/apiHelper';
+import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 import './Configuration.scss';
 
 interface App {
@@ -67,7 +66,9 @@ const Configuration: React.FC = (): JSX.Element => {
 
   const ALL_SECTIONS_OPTION = t('ALL');
 
-  useEffect(() => {
+  const fetchData = () => {
+    setLoading(true);
+    setError(undefined);
     ApiHelper.fetchHueConfigAsync()
       .then(data => {
         setHueConfig(data);
@@ -81,6 +82,10 @@ const Configuration: React.FC = (): JSX.Element => {
       .finally(() => {
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    fetchData();
   }, []);
 
   const filterConfig = (
@@ -149,41 +154,39 @@ const Configuration: React.FC = (): JSX.Element => {
     ...(hueConfig?.apps.map(app => app.name) || [])
   ];
 
+  const errors = [
+    {
+      enabled: !!error,
+      message: t('Error in displaying the Configuration!'),
+      description: error,
+      actionText: t('Retry'),
+      onClick: fetchData
+    }
+  ];
+
   return (
     <div className="config-component">
-      <Loading spinning={loading}>
-        {error && (
-          <Alert
-            message={`Error: ${error}`}
-            description={t('Error in displaying the Configuration!')}
-            type="error"
-          />
-        )}
-
-        {!error && (
-          <>
-            <div className="config__section-dropdown-label">{t('Sections')}</div>
-            <AdminHeader
-              options={optionsIncludingAll}
-              selectedValue={selectedSection}
-              onSelectChange={setSelectedSection}
-              filterValue={filter}
-              onFilterChange={setFilter}
-              placeholder={
-                selectedSection === ALL_SECTIONS_OPTION
-                  ? t('Filter...')
-                  : `${t('Filter in')} ${selectedSection}...`
-              }
-              configAddress={hueConfig?.conf_dir}
-            />
-            {selectedSection &&
-              visualSections?.length &&
-              visualSections.map(visualSection => (
-                <div key={visualSection.header}>{renderVisualSection(visualSection)}</div>
-              ))}
-          </>
-        )}
-      </Loading>
+      <LoadingErrorWrapper loading={loading} errors={errors}>
+        <div className="config__section-dropdown-label">{t('Sections')}</div>
+        <AdminHeader
+          options={optionsIncludingAll}
+          selectedValue={selectedSection}
+          onSelectChange={setSelectedSection}
+          filterValue={filter}
+          onFilterChange={setFilter}
+          placeholder={
+            selectedSection === ALL_SECTIONS_OPTION
+              ? t('Filter...')
+              : `${t('Filter in')} ${selectedSection}...`
+          }
+          configAddress={hueConfig?.conf_dir}
+        />
+        {selectedSection &&
+          visualSections?.length &&
+          visualSections.map(visualSection => (
+            <div key={visualSection.header}>{renderVisualSection(visualSection)}</div>
+          ))}
+      </LoadingErrorWrapper>
     </div>
   );
 };
