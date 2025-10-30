@@ -28,6 +28,11 @@
       display: flex;
       flex-direction: column;
       gap: vars.$cdl-spacing-m;
+      max-width: 1024px;
+
+      @media (width <= 1024px) {
+        width: 100%;
+      }
     }
 
     &__section {
@@ -47,6 +52,10 @@
         flex: 1;
         width: 100%;
         gap: vars.$cdl-spacing-m;
+
+        @media (width <= 640px) {
+          flex-direction: column;
+        }
       }
 
       &__fields {
