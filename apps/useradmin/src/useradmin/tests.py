@@ -1041,7 +1041,8 @@ class TestUserAdmin(BaseUserAdminTests):
       )
       # Now make sure FUNNY_NAME can't log back in
       response = c_reg.get('/useradmin/users/edit/%s' % (FUNNY_NAME_QUOTED,))
-      assert response.status_code == 302 and "login" in response["location"], "Inactivated user gets redirected to login page"
+      # New behavior: Returns 200 with JavaScript redirect instead of HTTP 302
+      assert response.status_code == 200 and b"Redirecting to login" in response.content, "Inactivated user gets redirected to login page"
 
       # Create a new user with unicode characters
       response = c.post('/useradmin/users/new', dict(

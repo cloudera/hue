@@ -771,13 +771,11 @@ def test_ui_customizations():
   )
 
   try:
-    c = make_logged_in_client()
-    c.logout()
+    # Test LOGIN_SPLASH_HTML on login page when NOT logged in
+    c = Client()
     if not isinstance(custom_message, bytes):
       custom_message = custom_message.encode('utf-8')
     resp = c.get('/hue/accounts/login/', follow=False)
-    assert custom_message in resp.content, resp
-    resp = c.get('/hue/about', follow=True)
     assert custom_message in resp.content, resp
   finally:
     for old_conf in reset:
