@@ -16,11 +16,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
+import logging
 import re
 import sys
-import json
 import time
-import logging
 import urllib.parse
 from builtins import object
 from datetime import datetime
@@ -39,7 +39,7 @@ import libsaml.conf
 import useradmin.conf
 import useradmin.ldap_access
 from desktop import appmanager
-from desktop.auth.backend import create_user, is_admin
+from desktop.auth.backend import create_user
 from desktop.conf import APP_BLACKLIST, ENABLE_ORGANIZATIONS, ENABLE_PROMETHEUS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.i18n import smart_str
@@ -51,7 +51,7 @@ from useradmin.forms import UserChangeForm
 from useradmin.hue_password_policy import reset_password_policy
 from useradmin.metrics import active_users, active_users_per_instance
 from useradmin.middleware import ConcurrentUserSessionMiddleware
-from useradmin.models import Group, GroupPermission, HuePermission, User, UserProfile, get_default_user_group, get_profile
+from useradmin.models import get_default_user_group, get_profile, Group, GroupPermission, HuePermission, User, UserProfile
 
 LOG = logging.getLogger()
 
@@ -345,7 +345,7 @@ class TestUserProfile(BaseUserAdminTests):
 
     assert 0 == UserProfile.objects.filter(user=user).count()
 
-    p = get_profile(user)
+    get_profile(user)
 
     assert 1 == UserProfile.objects.filter(user=user).count()
 

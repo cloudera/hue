@@ -37,7 +37,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, BACKEND_SESSION_KEY, load_backend, login, REDIRECT_FIELD_NAME
 from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.core import exceptions
-from django.http import HttpResponse, HttpResponseNotAllowed, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseNotAllowed
 from django.urls import resolve
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.http import url_has_allowed_host_and_scheme

@@ -18,10 +18,8 @@
 # Test for RequireLoginEverywhereMiddleware in middleware.py
 
 
-import sys
 from unittest.mock import Mock
 
-import django
 import pytest
 from django.test.client import Client
 
