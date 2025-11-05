@@ -20,8 +20,8 @@ import Loading from 'cuix/dist/components/Loading';
 import Alert from 'cuix/dist/components/Alert';
 import { get } from '../../../api/utils';
 import { i18nReact } from '../../../utils/i18nReact';
-import AdminHeader from '../AdminHeader';
-import { metricLabels, labelToKey } from './constants';
+import AdminHeader, { SelectOption } from '../AdminHeader';
+import { metricLabels } from './constants';
 
 import './Metrics.scss';
 
@@ -84,9 +84,8 @@ const Metrics: React.FC = (): JSX.Element => {
     }));
   };
   const handleMetricChange = (value: string) => {
-    const key = value === 'All' ? 'All' : labelToKey[value] || value;
-    setSelectedMetric(key);
-    setShowAllTables(key === 'All');
+    setSelectedMetric(value);
+    setShowAllTables(value === 'All');
   };
 
   const handleFilterInputChange = (filterValue: string) => {
@@ -95,15 +94,21 @@ const Metrics: React.FC = (): JSX.Element => {
 
   const { t } = i18nReact.useTranslation();
 
+  const metricOptions: SelectOption[] = [
+    { value: 'All', label: 'All' },
+    ...filteredKeys.map(key => ({
+      value: key,
+      label: metricLabels[key] || key
+    }))
+  ];
+
   return (
     <div className="cuix antd metrics-component">
       <Loading spinning={loading}>
         {!error && (
           <AdminHeader
-            options={['All', ...filteredKeys.map(key => metricLabels[key] || key)]}
-            selectedValue={
-              selectedMetric === 'All' ? 'All' : metricLabels[selectedMetric] || selectedMetric
-            }
+            options={metricOptions}
+            selectedValue={selectedMetric}
             onSelectChange={handleMetricChange}
             filterValue={searchQuery}
             onFilterChange={handleFilterInputChange}

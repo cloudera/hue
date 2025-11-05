@@ -25,7 +25,3 @@ export const metricLabels: { [key: string]: string } = {
   'users.active': 'Active Users',
   'users.active.total': 'Total Active Users'
 };
-
-export const labelToKey: { [key: string]: string } = Object.fromEntries(
-  Object.entries(metricLabels).map(([key, label]) => [label, key])
-);
