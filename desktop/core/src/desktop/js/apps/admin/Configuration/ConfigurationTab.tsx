@@ -14,13 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { i18nReact } from '../../../utils/i18nReact';
 import AdminHeader from '../AdminHeader';
 import { ConfigurationValue } from './ConfigurationValue';
 import { ConfigurationKey } from './ConfigurationKey';
-import ApiHelper from '../../../api/apiHelper';
+import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
+import { GET_HUE_CONFIG_API } from '../../../api/urls';
 import './Configuration.scss';
 
 interface App {
@@ -58,35 +59,24 @@ interface VisualSection {
 
 const Configuration: React.FC = (): JSX.Element => {
   const { t } = i18nReact.useTranslation();
-  const [hueConfig, setHueConfig] = useState<HueConfig>();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string>();
   const [selectedSection, setSelectedSection] = useState<string>('desktop');
   const [filter, setFilter] = useState<string>('');
 
   const ALL_SECTIONS_OPTION = t('ALL');
 
-  const fetchData = () => {
-    setLoading(true);
-    setError(undefined);
-    ApiHelper.fetchHueConfigAsync()
-      .then(data => {
-        setHueConfig(data);
-        if (data.apps.find(app => app.name === 'desktop')) {
-          setSelectedSection('desktop');
-        }
-      })
-      .catch(error => {
-        setError(error.message);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const {
+    data: hueConfig,
+    loading,
+    error,
+    reloadData
+  } = useLoadData<HueConfig>(GET_HUE_CONFIG_API, {
+    transformKeys: 'none',
+    onSuccess: data => {
+      if (data.apps.find(app => app.name === 'desktop')) {
+        setSelectedSection('desktop');
+      }
+    }
+  });
 
   const filterConfig = (
     config: AdminConfigValue,
@@ -157,10 +147,10 @@ const Configuration: React.FC = (): JSX.Element => {
   const errors = [
     {
       enabled: !!error,
-      message: t('Error in displaying the Configuration!'),
+      message: t('Failed loading configuration'),
       description: error,
       actionText: t('Retry'),
-      onClick: fetchData
+      onClick: reloadData
     }
   ];
 
