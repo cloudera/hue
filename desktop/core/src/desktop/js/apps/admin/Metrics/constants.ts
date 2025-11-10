@@ -14,14 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const metricLabels: { [key: string]: string } = {
-  'queries.number': 'Number of Queries',
-  'requests.active': 'Active Requests',
-  'requests.exceptions': 'Request Exceptions',
-  'requests.response-time': 'Request Response Time',
-  'threads.daemon': 'Daemon Threads',
-  'threads.total': 'Total Threads',
-  users: 'Users',
-  'users.active': 'Active Users',
-  'users.active.total': 'Total Active Users'
+export const metricLabelKeys: { [key: string]: string } = {
+  'queries.number': 'Metrics: Number of Queries',
+  'requests.active': 'Metrics: Active Requests',
+  'requests.exceptions': 'Metrics: Request Exceptions',
+  'requests.response-time': 'Metrics: Request Response Time',
+  'threads.daemon': 'Metrics: Daemon Threads',
+  'threads.total': 'Metrics: Total Threads',
+  users: 'Metrics: Users',
+  'users.active': 'Metrics: Active Users',
+  'users.active.total': 'Metrics: Total Active Users'
 };

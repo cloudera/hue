@@ -61,22 +61,22 @@ describe('Metrics', () => {
     fireEvent.change(filterInput, { target: { value: 'value' } });
 
     await waitFor(() => {
-      expect(screen.getByText('Number of Queries')).toBeInTheDocument();
-      expect(screen.getByText('Daemon Threads')).toBeInTheDocument();
-      expect(screen.getByText('Total Threads')).toBeInTheDocument();
-      expect(screen.getByText('Users')).toBeInTheDocument();
-      expect(screen.getByText('Active Users')).toBeInTheDocument();
-      expect(screen.getByText('Total Active Users')).toBeInTheDocument();
-      expect(screen.queryByText('Active Requests')).not.toBeInTheDocument();
-      expect(screen.queryByText('Request Exceptions')).toBeNull();
-      expect(screen.queryByText('Request Response Time')).toBeNull();
+      expect(screen.getByText('Metrics: Number of Queries')).toBeInTheDocument();
+      expect(screen.getByText('Metrics: Daemon Threads')).toBeInTheDocument();
+      expect(screen.getByText('Metrics: Total Threads')).toBeInTheDocument();
+      expect(screen.getByText('Metrics: Users')).toBeInTheDocument();
+      expect(screen.getByText('Metrics: Active Users')).toBeInTheDocument();
+      expect(screen.getByText('Metrics: Total Active Users')).toBeInTheDocument();
+      expect(screen.queryByText('Metrics: Active Requests')).not.toBeInTheDocument();
+      expect(screen.queryByText('Metrics: Request Exceptions')).toBeNull();
+      expect(screen.queryByText('Metrics: Request Response Time')).toBeNull();
     });
   });
 
   it('should select a specific metric from the dropdown filters the data using click events', async () => {
     render(<Metrics />);
 
-    await waitFor(() => screen.getByText('Number of Queries'));
+    await waitFor(() => screen.getByText('Metrics: Number of Queries'));
 
     const select = screen.getByTestId('admin-header--select').firstElementChild;
     if (select) {
@@ -133,7 +133,7 @@ describe('Metrics', () => {
       expect(screen.queryByText('auth.ldap.auth-time')).not.toBeInTheDocument();
       expect(screen.queryByText('multiprocessing.processes.total')).not.toBeInTheDocument();
       expect(screen.queryByText('python.gc.objects')).not.toBeInTheDocument();
-      expect(screen.queryByText('Users')).toBeInTheDocument();
+      expect(screen.queryByText('Metrics: Users')).toBeInTheDocument();
     });
   });
 });

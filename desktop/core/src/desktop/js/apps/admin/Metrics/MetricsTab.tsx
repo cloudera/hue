@@ -21,7 +21,7 @@ import Alert from 'cuix/dist/components/Alert';
 import { get } from '../../../api/utils';
 import { i18nReact } from '../../../utils/i18nReact';
 import AdminHeader, { SelectOption } from '../AdminHeader';
-import { metricLabels } from './constants';
+import { metricLabelKeys } from './constants';
 
 import './Metrics.scss';
 
@@ -95,10 +95,10 @@ const Metrics: React.FC = (): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
   const metricOptions: SelectOption[] = [
-    { value: 'All', label: 'All' },
+    { value: 'All', label: t('All') },
     ...filteredKeys.map(key => ({
       value: key,
-      label: metricLabels[key] || key
+      label: metricLabelKeys[key] ? t(metricLabelKeys[key]) : key
     }))
   ];
 
