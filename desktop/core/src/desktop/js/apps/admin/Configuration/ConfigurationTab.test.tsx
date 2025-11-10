@@ -21,58 +21,62 @@ import '@testing-library/jest-dom';
 import Configuration from './ConfigurationTab';
 import { ConfigurationKey } from './ConfigurationKey';
 import { ConfigurationValue } from './ConfigurationValue';
-import ApiHelper from '../../../api/apiHelper';
+import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 
-// Mock API call to fetch configuration data
-jest.mock('../../../api/apiHelper', () => ({
-  fetchHueConfigAsync: jest.fn()
-}));
+jest.mock('../../../utils/hooks/useLoadData/useLoadData');
+
+const mockUseLoadData = useLoadData as jest.MockedFunction<typeof useLoadData>;
+
+const mockData = {
+  apps: [
+    { name: 'desktop', has_ui: true, display_name: 'Desktop' },
+    { name: 'test', has_ui: true, display_name: 'test' }
+  ],
+  config: [
+    {
+      help: 'Main configuration section',
+      key: 'desktop',
+      is_anonymous: false,
+      values: [
+        {
+          help: 'Example config help text',
+          key: 'example.config',
+          is_anonymous: false,
+          value: 'Example value'
+        },
+        {
+          help: 'Another config help text',
+          key: 'another.config',
+          is_anonymous: false,
+          value: 'Another value'
+        }
+      ]
+    },
+    {
+      help: '',
+      key: 'test',
+      is_anonymous: false,
+      values: [
+        {
+          help: 'Example config help text2',
+          key: 'test.config2',
+          is_anonymous: false,
+          value: 'Hello World'
+        }
+      ]
+    }
+  ],
+  conf_dir: '/conf/directory'
+};
 
 beforeEach(() => {
   jest.clearAllMocks();
-  ApiHelper.fetchHueConfigAsync = jest.fn(() =>
-    Promise.resolve({
-      apps: [
-        { name: 'desktop', has_ui: true, display_name: 'Desktop' },
-        { name: 'test', has_ui: true, display_name: 'test' }
-      ],
-      config: [
-        {
-          help: 'Main configuration section',
-          key: 'desktop',
-          is_anonymous: false,
-          values: [
-            {
-              help: 'Example config help text',
-              key: 'example.config',
-              is_anonymous: false,
-              value: 'Example value'
-            },
-            {
-              help: 'Another config help text',
-              key: 'another.config',
-              is_anonymous: false,
-              value: 'Another value'
-            }
-          ]
-        },
-        {
-          help: '',
-          key: 'test',
-          is_anonymous: false,
-          values: [
-            {
-              help: 'Example config help text2',
-              key: 'test.config2',
-              is_anonymous: false,
-              value: 'Hello World'
-            }
-          ]
-        }
-      ],
-      conf_dir: '/conf/directory'
-    })
-  );
+  mockUseLoadData.mockReturnValue({
+    data: mockData,
+    loading: false,
+    error: undefined,
+    reloadData: jest.fn()
+  });
 });
 
 describe('Configuration Component', () => {
@@ -80,111 +84,199 @@ describe('Configuration Component', () => {
     jest.clearAllMocks();
   });
 
-  test('Renders Configuration component with fetched data for default desktop section', async () => {
-    render(<Configuration />);
+  describe('Loading and Error States', () => {
+    test('Displays loading spinner when data is being fetched', () => {
+      mockUseLoadData.mockReturnValue({
+        data: undefined,
+        loading: true,
+        error: undefined,
+        reloadData: jest.fn()
+      });
 
-    await waitFor(() => {
-      expect(screen.getByText(/Sections/i)).toBeInTheDocument();
-      expect(screen.getByText(/Desktop/i)).toBeInTheDocument();
-      expect(screen.getByText(/example\.config/i)).toBeInTheDocument();
-      expect(screen.getByText(/Example value/i)).toBeInTheDocument();
-      expect(ApiHelper.fetchHueConfigAsync).toHaveBeenCalled();
+      render(<Configuration />);
+
+      const spinners = screen.getAllByTestId('loading-error-wrapper__spinner');
+      expect(spinners.length).toBeGreaterThan(0);
+      expect(spinners[0]).toBeInTheDocument();
+    });
+
+    test('Displays error message when API call fails', async () => {
+      mockUseLoadData.mockReturnValue({
+        data: undefined,
+        loading: false,
+        error: 'Failed to fetch configuration',
+        reloadData: jest.fn()
+      });
+
+      render(<Configuration />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Failed loading configuration')).toBeInTheDocument();
+        expect(screen.getByText('Failed to fetch configuration')).toBeInTheDocument();
+      });
+    });
+
+    test('Retry button refetches data after error', async () => {
+      const mockReloadData = jest.fn();
+      mockUseLoadData.mockReturnValue({
+        data: undefined,
+        loading: false,
+        error: 'Failed to fetch configuration',
+        reloadData: mockReloadData
+      });
+
+      render(<Configuration />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Failed loading configuration')).toBeInTheDocument();
+      });
+
+      const user = userEvent.setup();
+      const retryButton = screen.getByRole('button', { name: /Retry/i });
+      await user.click(retryButton);
+
+      await waitFor(() => {
+        expect(mockReloadData).toHaveBeenCalledTimes(1);
+      });
     });
   });
 
-  test('Renders Configuration component with fetched data for all sections', async () => {
-    render(<Configuration />);
+  describe('Rendering Configuration Data', () => {
+    test('Renders Configuration component with fetched data for default desktop section', async () => {
+      render(<Configuration />);
 
-    await waitFor(() => {
-      expect(screen.getByText(/Sections/i)).toBeInTheDocument();
-      expect(screen.getByText(/Desktop/i)).toBeInTheDocument();
-      expect(screen.getByText(/example\.config/i)).toBeInTheDocument();
-      expect(screen.getByText(/Example value/i)).toBeInTheDocument();
-      expect(screen.queryAllByText(/test/i)).toHaveLength(0);
+      await waitFor(() => {
+        expect(screen.getByText(/Sections/i)).toBeInTheDocument();
+        expect(screen.getByText(/Desktop/i)).toBeInTheDocument();
+        expect(screen.getByText(/example\.config/i)).toBeInTheDocument();
+        expect(screen.getByText(/Example value/i)).toBeInTheDocument();
+      });
     });
 
-    const user = userEvent.setup();
+    test('Displays configuration directory path', async () => {
+      render(<Configuration />);
 
-    // Open dropdown
-    const select = screen.getByRole('combobox');
-    await user.click(select);
-
-    // Wait for and select "ALL" option
-    const allOption = await screen.findByTitle('ALL');
-    await user.click(allOption);
-
-    // Verify the updated content
-    await waitFor(() => {
-      expect(screen.getAllByText(/test/i)).toHaveLength(3);
-      expect(screen.getByText(/test\.config2/i)).toBeInTheDocument();
-      expect(screen.getByText(/Hello World/i)).toBeInTheDocument();
-    });
-  });
-
-  test('Renders Configuration component mathcing search', async () => {
-    render(<Configuration />);
-
-    await waitFor(() => {
-      expect(screen.getByText(/Sections/i)).toBeInTheDocument();
-      expect(screen.getByText(/Desktop/i)).toBeInTheDocument();
-      expect(screen.getByText(/example\.config/i)).toBeInTheDocument();
-      expect(screen.getByText(/Example value/i)).toBeInTheDocument();
-      expect(screen.queryAllByText(/test/i)).toHaveLength(0);
+      await waitFor(() => {
+        expect(screen.getByText('/conf/directory')).toBeInTheDocument();
+      });
     });
 
-    const user = userEvent.setup();
+    test('Displays message for empty configuration section', async () => {
+      mockUseLoadData.mockReturnValue({
+        data: {
+          apps: [{ name: 'desktop', has_ui: true, display_name: 'Desktop' }],
+          config: [{ help: 'No help available.', key: 'desktop', is_anonymous: false, values: [] }],
+          conf_dir: '/conf/directory'
+        },
+        loading: false,
+        error: undefined,
+        reloadData: jest.fn()
+      });
 
-    // Open dropdown
-    const select = screen.getByRole('combobox');
-    await user.click(select);
+      render(<Configuration />);
 
-    // Wait for and select "ALL" option
-    const allOption = await screen.findByTitle('ALL');
-    await user.click(allOption);
-
-    const filterinput = screen.getByPlaceholderText('Filter...');
-    await user.click(filterinput);
-    await user.type(filterinput, 'config2');
-
-    // Verify the updated content
-    await waitFor(() => {
-      expect(screen.getAllByText(/test/i)).toHaveLength(3);
-      expect(screen.getByText(/test\.config2/i)).toBeInTheDocument();
-      expect(screen.getByText(/Hello World/i)).toBeInTheDocument();
-
-      expect(screen.queryByText(/example\.config/i)).not.toBeInTheDocument();
+      await waitFor(() => screen.getByText('Empty configuration section'));
+      expect(screen.getByText('Empty configuration section')).toBeInTheDocument();
     });
   });
 
-  test('Filters configuration based on input text', async () => {
-    render(<Configuration />);
+  describe('Section Selection', () => {
+    test('Shows all sections when ALL option is selected', async () => {
+      render(<Configuration />);
 
-    const filterInput = screen.getByPlaceholderText('Filter in desktop...');
-    fireEvent.change(filterInput, { target: { value: 'another' } });
+      await waitFor(() => {
+        expect(screen.getByText(/Sections/i)).toBeInTheDocument();
+        expect(screen.getByText(/Desktop/i)).toBeInTheDocument();
+        expect(screen.getByText(/example\.config/i)).toBeInTheDocument();
+        expect(screen.getByText(/Example value/i)).toBeInTheDocument();
+        expect(screen.queryAllByText(/test/i)).toHaveLength(0);
+      });
 
-    await waitFor(() => {
-      expect(screen.queryByText('example.config')).not.toBeInTheDocument();
-      expect(screen.getByText('another.config')).toBeInTheDocument();
+      const user = userEvent.setup();
+
+      const select = screen.getByRole('combobox');
+      await user.click(select);
+
+      const allOption = await screen.findByTitle('ALL');
+      await user.click(allOption);
+
+      await waitFor(() => {
+        expect(screen.getAllByText(/test/i)).toHaveLength(3);
+        expect(screen.getByText(/test\.config2/i)).toBeInTheDocument();
+        expect(screen.getByText(/Hello World/i)).toBeInTheDocument();
+      });
+    });
+
+    test('Switches to specific section when selected from dropdown', async () => {
+      render(<Configuration />);
+
+      await waitFor(() => {
+        expect(screen.getByText(/example\.config/i)).toBeInTheDocument();
+        expect(screen.queryByText(/test\.config2/i)).not.toBeInTheDocument();
+      });
+
+      const user = userEvent.setup();
+      const select = screen.getByRole('combobox');
+      await user.click(select);
+
+      const testOption = await screen.findByTitle('test');
+      await user.click(testOption);
+
+      await waitFor(() => {
+        expect(screen.queryByText(/example\.config/i)).not.toBeInTheDocument();
+        expect(screen.getByText(/test\.config2/i)).toBeInTheDocument();
+        expect(screen.getByText(/Hello World/i)).toBeInTheDocument();
+      });
     });
   });
 
-  test('Displays message for empty configuration section', async () => {
-    (ApiHelper.fetchHueConfigAsync as jest.Mock).mockImplementation(() =>
-      Promise.resolve({
-        apps: [{ name: 'desktop', has_ui: true, display_name: 'Desktop' }],
-        config: [{ help: 'No help available.', key: 'desktop', is_anonymous: false, values: [] }],
-        conf_dir: '/conf/directory'
-      })
-    );
+  describe('Filtering Configuration', () => {
+    test('Filters configuration based on key name', async () => {
+      render(<Configuration />);
 
-    render(<Configuration />);
+      const filterInput = screen.getByPlaceholderText('Filter in desktop...');
+      fireEvent.change(filterInput, { target: { value: 'another' } });
 
-    await waitFor(() => screen.getByText('Empty configuration section'));
-    expect(screen.getByText('Empty configuration section')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.queryByText('example.config')).not.toBeInTheDocument();
+        expect(screen.getByText('another.config')).toBeInTheDocument();
+      });
+    });
+
+    test('Filters configuration based on help text', async () => {
+      render(<Configuration />);
+
+      const filterInput = screen.getByPlaceholderText('Filter in desktop...');
+      fireEvent.change(filterInput, { target: { value: 'Example config help' } });
+
+      await waitFor(() => {
+        expect(screen.getByText('example.config')).toBeInTheDocument();
+        expect(screen.queryByText('another.config')).not.toBeInTheDocument();
+      });
+    });
+
+    test('Shows placeholder text based on selected section', async () => {
+      render(<Configuration />);
+
+      await waitFor(() => {
+        expect(screen.getByPlaceholderText('Filter in desktop...')).toBeInTheDocument();
+      });
+
+      const user = userEvent.setup();
+      const select = screen.getByRole('combobox');
+      await user.click(select);
+
+      const allOption = await screen.findByTitle('ALL');
+      await user.click(allOption);
+
+      await waitFor(() => {
+        expect(screen.getByPlaceholderText('Filter...')).toBeInTheDocument();
+      });
+    });
   });
 
   describe('ConfigurationKey Component', () => {
-    test('If the record has further values in it, should display record key, helpText as tooltip', () => {
+    test('Displays record key and help text as tooltip for parent records with nested values', () => {
       const mockRecord = {
         help: 'This is help text',
         key: 'config.key',
@@ -211,39 +303,39 @@ describe('Configuration Component', () => {
       const tooltip = container.querySelector('.config__help-tooltip');
       expect(tooltip).toBeInTheDocument();
     });
-  });
 
-  test('If the record has no further values in it, verifies the entire config key state', () => {
-    const record = {
-      is_anonymous: false,
-      key: 'Last Config Key',
-      value: 'Some Value',
-      help: 'Help info',
-      default: 'Default Value'
-    };
-    const { getByText, container } = render(<ConfigurationKey record={record} />);
+    test('Displays complete config details for leaf records without nested values', () => {
+      const record = {
+        is_anonymous: false,
+        key: 'Last Config Key',
+        value: 'Some Value',
+        help: 'Help info',
+        default: 'Default Value'
+      };
+      const { getByText, container } = render(<ConfigurationKey record={record} />);
 
-    expect(getByText('Last Config Key')).toBeInTheDocument();
-    expect(getByText('Some Value')).toBeInTheDocument();
-    expect(getByText(/Help info/i)).toBeInTheDocument();
-    expect(getByText(/Default: Default Value/i)).toBeInTheDocument();
+      expect(getByText('Last Config Key')).toBeInTheDocument();
+      expect(getByText('Some Value')).toBeInTheDocument();
+      expect(getByText(/Help info/i)).toBeInTheDocument();
+      expect(getByText(/Default: Default Value/i)).toBeInTheDocument();
 
-    const tooltip = container.querySelector('.config__help-tooltip');
-    expect(tooltip).not.toBeInTheDocument();
-  });
+      const tooltip = container.querySelector('.config__help-tooltip');
+      expect(tooltip).not.toBeInTheDocument();
+    });
 
-  test('renders "Default section" and help text as tooltip for anonymous records', () => {
-    const record = { is_anonymous: true, help: 'Help info', key: 'config.key' };
-    const { getByText, container } = render(<ConfigurationKey record={record} />);
+    test('Renders "Default section" with help tooltip for anonymous records', () => {
+      const record = { is_anonymous: true, help: 'Help info', key: 'config.key' };
+      const { getByText, container } = render(<ConfigurationKey record={record} />);
 
-    expect(getByText(/Default section/i)).toBeInTheDocument();
+      expect(getByText(/Default section/i)).toBeInTheDocument();
 
-    const tooltip = container.querySelector('.config__help-tooltip');
-    expect(tooltip).toBeInTheDocument();
+      const tooltip = container.querySelector('.config__help-tooltip');
+      expect(tooltip).toBeInTheDocument();
+    });
   });
 
   describe('ConfigurationValue Component', () => {
-    test('If the record has further values in it, renders nested configuration key and values correctly', () => {
+    test('Renders nested configuration keys and values for parent records', () => {
       const mockRecord = {
         help: '',
         key: 'parent.config',
@@ -264,13 +356,13 @@ describe('Configuration Component', () => {
       expect(screen.getByText('child value')).toBeInTheDocument();
       expect(screen.queryByText('parent.config')).not.toBeInTheDocument();
     });
-  });
 
-  test('If the record has no further values in it, renders nothing', () => {
-    const mockRecord = { help: '', key: 'empty.config', is_anonymous: false };
+    test('Renders nothing for leaf records without nested values', () => {
+      const mockRecord = { help: '', key: 'empty.config', is_anonymous: false };
 
-    const { container } = render(<ConfigurationValue record={mockRecord} />);
+      const { container } = render(<ConfigurationValue record={mockRecord} />);
 
-    expect(container).toBeEmptyDOMElement();
+      expect(container).toBeEmptyDOMElement();
+    });
   });
 });
