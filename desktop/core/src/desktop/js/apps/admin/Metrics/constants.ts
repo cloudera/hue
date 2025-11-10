@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const metricLabelKeys: { [key: string]: string } = {
+export const metricLabels: { [key: string]: string } = {
   'queries.number': 'Number of Queries',
   'requests.active': 'Active Requests',
   'requests.exceptions': 'Request Exceptions',
