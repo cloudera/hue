@@ -20,7 +20,6 @@ import PaginatedTable, {
 } from '../../../reactComponents/PaginatedTable/PaginatedTable';
 import './Metrics.scss';
 import { i18nReact } from '../../../utils/i18nReact';
-import { metricLabels } from './constants';
 
 interface MetricsValue {
   value: number;
@@ -103,7 +102,7 @@ const MetricsTable: React.FC<MetricsTableProps> = ({ caption, dataSource }) => {
     () =>
       dataSource.map(item => ({
         ...item,
-        name: metricLabels[item.name] ? t(metricLabels[item.name]) : item.name
+        name: t(item.name)
       })),
     [dataSource, t]
   );
@@ -113,11 +112,7 @@ const MetricsTable: React.FC<MetricsTableProps> = ({ caption, dataSource }) => {
       data={transformedDataSource}
       rowKey="name"
       columns={metricsColumns}
-      title={() => (
-        <span className="metrics-heading">
-          {metricLabels[caption] ? t(metricLabels[caption]) : caption}
-        </span>
-      )}
+      title={() => <span className="metrics-heading">{t(caption)}</span>}
     />
   );
 };
