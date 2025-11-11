@@ -23,8 +23,13 @@ import './AdminHeader.scss';
 
 const { Option } = Select;
 
+export interface SelectOption {
+  value: string;
+  label: string;
+}
+
 interface AdminHeaderProps {
-  options: string[];
+  options: (string | SelectOption)[];
   selectedValue: string;
   onSelectChange: (value: string) => void;
   filterValue: string;
@@ -52,11 +57,15 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
         getPopupContainer={triggerNode => triggerNode.parentElement}
         data-testid="admin-header--select"
       >
-        {options.map(option => (
-          <Option key={option} value={option}>
-            {option}
-          </Option>
-        ))}
+        {options.map(option => {
+          const optionValue = typeof option === 'string' ? option : option.value;
+          const optionLabel = typeof option === 'string' ? option : option.label;
+          return (
+            <Option key={optionValue} value={optionValue}>
+              {optionLabel}
+            </Option>
+          );
+        })}
       </Select>
 
       <Input
