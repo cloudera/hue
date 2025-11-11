@@ -20,7 +20,7 @@ import Loading from 'cuix/dist/components/Loading';
 import Alert from 'cuix/dist/components/Alert';
 import { get } from '../../../api/utils';
 import { i18nReact } from '../../../utils/i18nReact';
-import AdminHeader from '../AdminHeader';
+import AdminHeader, { SelectOption } from '../AdminHeader';
 
 import './Metrics.scss';
 
@@ -93,12 +93,20 @@ const Metrics: React.FC = (): JSX.Element => {
 
   const { t } = i18nReact.useTranslation();
 
+  const metricOptions: SelectOption[] = [
+    { value: 'All', label: t('All') },
+    ...filteredKeys.map(key => ({
+      value: key,
+      label: t(key)
+    }))
+  ];
+
   return (
     <div className="cuix antd metrics-component">
       <Loading spinning={loading}>
         {!error && (
           <AdminHeader
-            options={['All', ...filteredKeys]}
+            options={metricOptions}
             selectedValue={selectedMetric}
             onSelectChange={handleMetricChange}
             filterValue={searchQuery}
@@ -117,13 +125,13 @@ const Metrics: React.FC = (): JSX.Element => {
 
         <div className="metrics-component__table-group">
           {!error &&
-            filteredMetricsData.map((tableData, index) => (
-              <div key={index}>
-                {(showAllTables || selectedMetric === tableData.caption) && (
+            filteredMetricsData
+              .filter(tableData => showAllTables || selectedMetric === tableData.caption)
+              .map(tableData => (
+                <div key={tableData.caption}>
                   <MetricsTable caption={tableData.caption} dataSource={tableData.dataSource} />
-                )}
-              </div>
-            ))}
+                </div>
+              ))}
         </div>
       </Loading>
     </div>
