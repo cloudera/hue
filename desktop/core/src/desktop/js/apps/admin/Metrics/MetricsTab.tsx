@@ -127,8 +127,8 @@ const Metrics: React.FC = (): JSX.Element => {
           {!error &&
             filteredMetricsData
               .filter(tableData => showAllTables || selectedMetric === tableData.caption)
-              .map((tableData, index) => (
-                <div key={index}>
+              .map(tableData => (
+                <div key={tableData.caption}>
                   <MetricsTable caption={tableData.caption} dataSource={tableData.dataSource} />
                 </div>
               ))}
