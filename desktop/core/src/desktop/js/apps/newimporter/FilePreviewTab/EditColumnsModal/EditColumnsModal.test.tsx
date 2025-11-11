@@ -213,7 +213,7 @@ describe('EditColumnsModal', () => {
       });
     });
 
-    it('should ensure only one column can be primary key at a time', async () => {
+    it('should allow multiple columns to be selected as composite primary key', async () => {
       const { setColumns, closeModal } = renderModal();
       const user = userEvent.setup();
 
@@ -225,6 +225,43 @@ describe('EditColumnsModal', () => {
 
       await user.click(primaryKeyCheckboxes[0]);
       await user.click(primaryKeyCheckboxes[1]);
+
+      const doneButton = screen.getByRole('button', { name: 'Done' });
+      await user.click(doneButton);
+
+      await waitFor(() => {
+        expect(setColumns).toHaveBeenCalledWith([
+          {
+            ...DEFAULT_COLUMNS[0],
+            type: 'STRING',
+            comment: 'comment1',
+            isPrimaryKey: true
+          },
+          {
+            ...DEFAULT_COLUMNS[1],
+            type: 'INT',
+            comment: 'comment2',
+            isPrimaryKey: true
+          }
+        ]);
+        expect(closeModal).toHaveBeenCalled();
+      });
+    });
+
+    it('should allow toggling primary key checkboxes on and off', async () => {
+      const { setColumns, closeModal } = renderModal();
+      const user = userEvent.setup();
+
+      await waitFor(() => {
+        expect(screen.getByDisplayValue('col1')).toBeInTheDocument();
+      });
+
+      const primaryKeyCheckboxes = screen.getAllByLabelText('Set as primary key');
+
+      await user.click(primaryKeyCheckboxes[0]);
+      await user.click(primaryKeyCheckboxes[1]);
+
+      await user.click(primaryKeyCheckboxes[0]);
 
       const doneButton = screen.getByRole('button', { name: 'Done' });
       await user.click(doneButton);

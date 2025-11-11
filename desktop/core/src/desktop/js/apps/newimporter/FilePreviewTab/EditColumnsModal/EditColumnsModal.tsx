@@ -198,18 +198,9 @@ const EditColumnsModal = ({
   }, [columns, sample]);
 
   const handleChange = (rowIndex: number, field: keyof EditableRow, value: string | boolean) => {
-    if (field === 'isPrimaryKey' && value === true) {
-      setEditableRows(rows =>
-        rows.map((row, i) => ({
-          ...row,
-          isPrimaryKey: i === rowIndex ? true : false
-        }))
-      );
-    } else {
-      setEditableRows(rows =>
-        rows.map((row, i) => (i === rowIndex ? { ...row, [field]: value } : row))
-      );
-    }
+    setEditableRows(rows =>
+      rows.map((row, i) => (i === rowIndex ? { ...row, [field]: value } : row))
+    );
   };
 
   const handleDone = async () => {
@@ -236,7 +227,7 @@ const EditColumnsModal = ({
       render: (isPrimaryKey: boolean, _: EditableRow, rowIndex: number) => (
         <Checkbox
           checked={isPrimaryKey}
-          onChange={() => handleChange(rowIndex, 'isPrimaryKey', true)}
+          onChange={e => handleChange(rowIndex, 'isPrimaryKey', e.target.checked)}
           aria-label={t('Set as primary key')}
         />
       )
