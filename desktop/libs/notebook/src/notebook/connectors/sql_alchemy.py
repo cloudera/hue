@@ -230,13 +230,35 @@ class SqlAlchemyApi(Api):
     current_statement = self._get_current_statement(notebook, snippet)
     statement = current_statement['statement']
 
-    if self.interpreter['dialect_properties'].get('has_use_statement') and snippet.get('database'):
-      connection.execute(
-        'USE %(sql_identifier_quote)s%(database)s%(sql_identifier_quote)s' % {
-          'sql_identifier_quote': self.interpreter['dialect_properties']['sql_identifier_quote'],
-          'database': snippet['database'],
-        }
-      )
+    #if self.interpreter['dialect_properties'].get('has_use_statement') and snippet.get('database'):
+     # connection.execute(
+     #   'USE %(sql_identifier_quote)s%(database)s%(sql_identifier_quote)s' % {
+     #     'sql_identifier_quote': self.interpreter['dialect_properties']['sql_identifier_quote'],
+     #     'database': snippet['database'],
+     #   }
+     # )
+    if snippet.get('database'):
+      if(snippet['type']=='greenplum' or  snippet['type']=='postgresql'):
+        snippet['database'] = snippet['database'].replace("`", "")
+        statement = statement.replace("`", "")
+        # print('---------')
+        # print(snippet)
+        # print('Database Name:', snippet['database'])
+        # print(statement)
+        # print('---------')
+        keywords = ["create", "insert", "drop", "delete"]
+        statement_lower = statement.lower()
+        if any(keyword in statement_lower for keyword in keywords):
+          result = connection.execute(statement)
+        else:
+          result = connection.execute("set search_path TO " + snippet['database'] + ";" + statement)
+      else:
+        connection.execute(
+          'USE %(database)s' % {
+            'database': snippet['database']
+          }
+        )
+        result = connection.execute(statement)
 
     result = connection.execute(statement)
 
