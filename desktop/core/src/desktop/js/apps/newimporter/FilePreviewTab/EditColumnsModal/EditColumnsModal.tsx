@@ -20,7 +20,7 @@ import Modal from 'cuix/dist/components/Modal';
 import Table from 'cuix/dist/components/Table';
 import Input from 'cuix/dist/components/Input';
 import Select from 'cuix/dist/components/Select';
-import { Alert } from 'antd';
+import { Alert, Checkbox } from 'antd';
 import { SQL_TYPE_MAPPING_API_URL } from '../../../admin/Components/utils';
 import useLoadData from '../../../../utils/hooks/useLoadData/useLoadData';
 import LoadingErrorWrapper from '../../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
@@ -39,6 +39,7 @@ interface EditableRow extends Required<BaseColumnProperties> {
   type: string;
   sample: string;
   comment: string;
+  isPrimaryKey: boolean;
 }
 
 interface EditColumnsModalProps {
@@ -190,12 +191,13 @@ const EditColumnsModal = ({
         title: col.title,
         type: (col.type || 'string').toUpperCase(),
         sample: sample && sample[col.dataIndex] !== undefined ? String(sample[col.dataIndex]) : '',
-        comment: col.comment || ''
+        comment: col.comment || '',
+        isPrimaryKey: col.isPrimaryKey || false
       }))
     );
   }, [columns, sample]);
 
-  const handleChange = (rowIndex: number, field: keyof EditableRow, value: string) => {
+  const handleChange = (rowIndex: number, field: keyof EditableRow, value: string | boolean) => {
     setEditableRows(rows =>
       rows.map((row, i) => (i === rowIndex ? { ...row, [field]: value } : row))
     );
@@ -210,13 +212,26 @@ const EditColumnsModal = ({
       ...columns[row.key],
       title: row.title.trim(),
       type: row.type,
-      comment: row.comment
+      comment: row.comment,
+      isPrimaryKey: row.isPrimaryKey
     }));
     setColumns(updatedColumns);
     closeModal();
   };
 
   const modalColumns = [
+    {
+      title: t('P Key'),
+      dataIndex: 'isPrimaryKey',
+      className: 'hue-importer-edit-columns-modal__primary-key',
+      render: (isPrimaryKey: boolean, _: EditableRow, rowIndex: number) => (
+        <Checkbox
+          checked={isPrimaryKey}
+          onChange={e => handleChange(rowIndex, 'isPrimaryKey', e.target.checked)}
+          aria-label={t('Set as primary key')}
+        />
+      )
+    },
     {
       title: t('Title'),
       dataIndex: 'title',
