@@ -18,10 +18,8 @@
 # Test for RequireLoginEverywhereMiddleware in middleware.py
 
 
-import sys
 from unittest.mock import Mock
 
-import django
 import pytest
 from django.test.client import Client
 
@@ -29,11 +27,13 @@ from django.test.client import Client
 @pytest.mark.django_db
 def test_require_login():
   c = Client()
-  # We're not logged in, so expect a redirection.
+  # We're not logged in, so expect a redirect (now via JavaScript in HTML)
 
   response = c.get('/profile')
-  assert isinstance(response, django.http.HttpResponseRedirect), "Expected redirect"
-  assert "/hue/accounts/login?next=/profile" == response["Location"]
+  # New behavior: Returns 200 with JavaScript redirect instead of HTTP 302
+  assert 200 == response.status_code
+  assert b'Redirecting to login' in response.content
+  assert b'/hue/accounts/login' in response.content
 
   # AllowAllBackend should let us in.
   c.login(request=Mock(), username="test", password="test")

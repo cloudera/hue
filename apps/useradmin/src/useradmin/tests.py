@@ -16,11 +16,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
+import logging
 import re
 import sys
-import json
 import time
-import logging
 import urllib.parse
 from builtins import object
 from datetime import datetime
@@ -39,7 +39,7 @@ import libsaml.conf
 import useradmin.conf
 import useradmin.ldap_access
 from desktop import appmanager
-from desktop.auth.backend import create_user, is_admin
+from desktop.auth.backend import create_user
 from desktop.conf import APP_BLACKLIST, ENABLE_ORGANIZATIONS, ENABLE_PROMETHEUS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.i18n import smart_str
@@ -51,7 +51,7 @@ from useradmin.forms import UserChangeForm
 from useradmin.hue_password_policy import reset_password_policy
 from useradmin.metrics import active_users, active_users_per_instance
 from useradmin.middleware import ConcurrentUserSessionMiddleware
-from useradmin.models import Group, GroupPermission, HuePermission, User, UserProfile, get_default_user_group, get_profile
+from useradmin.models import get_default_user_group, get_profile, Group, GroupPermission, HuePermission, User, UserProfile
 
 LOG = logging.getLogger()
 
@@ -345,13 +345,13 @@ class TestUserProfile(BaseUserAdminTests):
 
     assert 0 == UserProfile.objects.filter(user=user).count()
 
-    p = get_profile(user)
+    get_profile(user)
 
     assert 1 == UserProfile.objects.filter(user=user).count()
 
   @override_settings(AUTHENTICATION_BACKENDS=['desktop.auth.backend.AllowFirstUserDjangoBackend'])
   def test_get_and_update_profile(self):
-    c = make_logged_in_client(username='test', password='test', is_superuser=False, recreate=True)
+    make_logged_in_client(username='test', password='test', is_superuser=False, recreate=True)
 
     user = User.objects.get(username='test')
     userprofile = get_profile(user)
@@ -378,7 +378,7 @@ class TestSAMLGroupsCheck(BaseUserAdminTests):
     reset = []
     old_settings = settings.AUTHENTICATION_BACKENDS
     try:
-      c = make_logged_in_client(username='test2', password='test2', is_superuser=False, recreate=True)
+      make_logged_in_client(username='test2', password='test2', is_superuser=False, recreate=True)
       settings.AUTHENTICATION_BACKENDS = ["libsaml.backend.SAML2Backend"]
       request = MockRequest()
 
@@ -428,14 +428,14 @@ class TestUserAdminMetrics(BaseUserAdminTests):
     with patch('useradmin.middleware.get_localhost_name') as get_hostname:
       get_hostname.return_value = 'host1'
 
-      c = make_logged_in_client(username='test1', password='test', is_superuser=False, recreate=True)
+      make_logged_in_client(username='test1', password='test', is_superuser=False, recreate=True)
       userprofile1 = get_profile(User.objects.get(username='test1'))
       userprofile1.last_activity = datetime.now()
       userprofile1.first_login = False
       userprofile1.hostname = 'host1'
       userprofile1.save()
 
-      c = make_logged_in_client(username='test2', password='test', is_superuser=False, recreate=True)
+      make_logged_in_client(username='test2', password='test', is_superuser=False, recreate=True)
       userprofile2 = get_profile(User.objects.get(username='test2'))
       userprofile2.last_activity = datetime.now()
       userprofile2.first_login = False
@@ -451,7 +451,7 @@ class TestUserAdminMetrics(BaseUserAdminTests):
     with patch('useradmin.middleware.get_localhost_name') as get_hostname:
       get_hostname.return_value = 'host2'
 
-      c = make_logged_in_client(username='test3', password='test', is_superuser=False, recreate=True)
+      make_logged_in_client(username='test3', password='test', is_superuser=False, recreate=True)
       userprofile3 = get_profile(User.objects.get(username='test3'))
       userprofile3.last_activity = datetime.now()
       userprofile3.first_login = False
@@ -539,7 +539,7 @@ class TestUserAdmin(BaseUserAdminTests):
 
     # Make sure that a user of supergroup can access /useradmin/users
     # Create user to try to edit
-    notused = User.objects.get_or_create(username="notused", is_superuser=False)
+    User.objects.get_or_create(username="notused", is_superuser=False)
     response = cadmin.get('/useradmin/users/edit/notused?is_embeddable=true')
     assert b'User notused' in response.content
 
@@ -1041,7 +1041,8 @@ class TestUserAdmin(BaseUserAdminTests):
       )
       # Now make sure FUNNY_NAME can't log back in
       response = c_reg.get('/useradmin/users/edit/%s' % (FUNNY_NAME_QUOTED,))
-      assert response.status_code == 302 and "login" in response["location"], "Inactivated user gets redirected to login page"
+      # New behavior: Returns 200 with JavaScript redirect instead of HTTP 302
+      assert response.status_code == 200 and b"Redirecting to login" in response.content, "Inactivated user gets redirected to login page"
 
       # Create a new user with unicode characters
       response = c.post('/useradmin/users/new', dict(
@@ -1099,7 +1100,7 @@ class TestUserAdmin(BaseUserAdminTests):
     c = make_logged_in_client('test', is_superuser=True)
 
     regular_username = 'regular_user'
-    regular_user_client = make_logged_in_client(regular_username, is_superuser=True, recreate=True)
+    make_logged_in_client(regular_username, is_superuser=True, recreate=True)
     regular_user = User.objects.get(username=regular_username)
 
     try:
@@ -1121,7 +1122,7 @@ class TestUserAdmin(BaseUserAdminTests):
 
     # Now the autocomplete has access to all the users and groups
     c1 = make_logged_in_client('user_test_list_for_autocomplete', is_superuser=False, groupname='group_test_list_for_autocomplete')
-    c2_same_group = make_logged_in_client(
+    make_logged_in_client(
       'user_test_list_for_autocomplete2', is_superuser=False, groupname='group_test_list_for_autocomplete'
     )
     c3_other_group = make_logged_in_client(
@@ -1177,7 +1178,7 @@ class TestUserAdmin(BaseUserAdminTests):
     assert (
       [u'test', u'user_test_list_for_autocomplete', u'user_test_list_for_autocomplete2', u'user_test_list_for_autocomplete3'] == users)
 
-    c5_autocomplete_filter_by_groupname = make_logged_in_client(
+    make_logged_in_client(
       'user_doesnt_match_autocomplete_filter', is_superuser=False, groupname='group_test_list_for_autocomplete'
     )
 
@@ -1194,7 +1195,7 @@ class TestUserAdmin(BaseUserAdminTests):
   def test_language_preference(self):
     # Test that language selection appears in Edit Profile for current user
     client = make_logged_in_client('test', is_superuser=False, groupname='test')
-    user = User.objects.get(username='test')
+    User.objects.get(username='test')
     grant_access('test', 'test', 'useradmin')
 
     response = client.get('/useradmin/users/edit/test')
@@ -1202,7 +1203,7 @@ class TestUserAdmin(BaseUserAdminTests):
 
     # Does not appear for superuser editing other profiles
     other_client = make_logged_in_client('test_super', is_superuser=True, groupname='test')
-    superuser = User.objects.get(username='test_super')
+    User.objects.get(username='test_super')
 
     response = other_client.get('/useradmin/users/edit/test')
     assert b"Language Preference" not in response.content, response.content
@@ -1287,7 +1288,7 @@ class TestUserAdminWithHadoop(BaseUserAdminTests):
       if cluster.fs.exists('/user/test1'):
         cluster.fs.do_as_superuser(cluster.fs.rmtree, '/user/test1')
       assert not cluster.fs.exists('/user/test1')
-      response = c.post('/useradmin/users/new', dict(username="test1", password1='test', password2='test', ensure_home_directory=True))
+      c.post('/useradmin/users/new', dict(username="test1", password1='test', password2='test', ensure_home_directory=True))
       assert cluster.fs.exists('/user/test1')
       dir_stat = cluster.fs.stats('/user/test1')
       assert 'test1' == dir_stat.user
@@ -1298,9 +1299,9 @@ class TestUserAdminWithHadoop(BaseUserAdminTests):
       if cluster.fs.exists('/user/test2'):
         cluster.fs.do_as_superuser(cluster.fs.rmtree, '/user/test2')
       assert not cluster.fs.exists('/user/test2')
-      response = c.post('/useradmin/users/new', dict(username="test2", password1='test', password2='test'))
+      c.post('/useradmin/users/new', dict(username="test2", password1='test', password2='test'))
       assert not cluster.fs.exists('/user/test2')
-      response = c.post(
+      c.post(
         '/useradmin/users/edit/%s' % "test2",
         dict(username="test2", password1='test', password2='test', password_old="test", ensure_home_directory=True)
       )
@@ -1314,7 +1315,7 @@ class TestUserAdminWithHadoop(BaseUserAdminTests):
       path_with_special_char = '/user/ctestë01'.decode("utf-8")
       if cluster.fs.exists(path_with_special_char):
         cluster.fs.do_as_superuser(cluster.fs.rmtree, path_with_special_char)
-      response = c.post('/useradmin/users/new', dict(username='ctestë01', password1='test', password2='test', ensure_home_directory=True))
+      c.post('/useradmin/users/new', dict(username='ctestë01', password1='test', password2='test', ensure_home_directory=True))
       assert cluster.fs.exists(path_with_special_char)
       dir_stat = cluster.fs.stats(path_with_special_char)
       assert u'ctestë01' == dir_stat.user
@@ -1331,7 +1332,7 @@ class TestUserAdminWithHadoop(BaseUserAdminTests):
       if cluster.fs.exists('/user/test3'):
         cluster.fs.do_as_superuser(cluster.fs.rmtree, '/user/test3')
       assert not cluster.fs.exists('/user/test3')
-      response = c.post(
+      c.post(
         '/useradmin/users/new', dict(username="test3@ad.sec.cloudera.com", password1='test', password2='test', ensure_home_directory=True)
       )
       assert not cluster.fs.exists('/user/test3@ad.sec.cloudera.com')
@@ -1391,7 +1392,7 @@ def test_get_connection_bind_password_script():
   # Unfortunately our tests leak a cached test ldap connection across functions, so we need to clear it out.
   useradmin.ldap_access.CACHED_LDAP_CONN = None
 
-  SCRIPT = '%s -c "print(\'\\n password from script \\n\')"' % sys.executable
+  '%s -c "print(\'\\n password from script \\n\')"' % sys.executable
 
   # Monkey patch the LdapConnection class as we don't want to make a real connection.
   OriginalLdapConnection = useradmin.ldap_access.LdapConnection
@@ -1425,7 +1426,7 @@ def test_get_connection_bind_password_script():
 class LastActivityMiddlewareTests(object):
 
   def test_last_activity(self):
-    c = make_logged_in_client(username="test", is_superuser=True)
+    make_logged_in_client(username="test", is_superuser=True)
     profile = UserProfile.objects.get(user__username='test')
     assert profile.last_activity != 0
 
