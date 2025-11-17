@@ -80,18 +80,6 @@ export interface MetricsTableProps {
   dataSource: DataSourceItem[];
 }
 
-const metricLabels: { [key: string]: string } = {
-  'queries.number': 'Number of Queries',
-  'requests.active': 'Active Requests',
-  'requests.exceptions': 'Request Exceptions',
-  'requests.response-time': 'Request Response Time',
-  'threads.daemon': 'Daemon Threads',
-  'threads.total': 'Total Threads',
-  users: 'Users',
-  'users.active': 'Active Users',
-  'users.active.total': 'Total Active Users'
-};
-
 const MetricsTable: React.FC<MetricsTableProps> = ({ caption, dataSource }) => {
   const { t } = i18nReact.useTranslation();
 
@@ -114,9 +102,9 @@ const MetricsTable: React.FC<MetricsTableProps> = ({ caption, dataSource }) => {
     () =>
       dataSource.map(item => ({
         ...item,
-        name: metricLabels[item.name] || item.name
+        name: t(item.name)
       })),
-    [dataSource]
+    [dataSource, t]
   );
 
   return (
@@ -124,7 +112,7 @@ const MetricsTable: React.FC<MetricsTableProps> = ({ caption, dataSource }) => {
       data={transformedDataSource}
       rowKey="name"
       columns={metricsColumns}
-      title={() => <span className="metrics-heading">{metricLabels[caption] ?? caption}</span>}
+      title={() => <span className="metrics-heading">{t(caption)}</span>}
     />
   );
 };

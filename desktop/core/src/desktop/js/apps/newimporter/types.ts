@@ -69,6 +69,7 @@ export interface FileMetaData {
 export interface BaseColumnProperties {
   type?: string;
   comment?: string;
+  isPrimaryKey?: boolean;
 }
 
 export interface FilePreviewTableColumn extends BaseColumnProperties {

@@ -110,7 +110,6 @@ class RequirementsGenerator:
       "requests-kerberos==0.14.0",
       "rsa==4.7.2",
       "ruff==0.11.10",
-      "setuptools==70.0.0",
       "six==1.16.0",
       "slack-sdk==3.31.0",
       "SQLAlchemy==1.3.8",
@@ -130,6 +129,7 @@ class RequirementsGenerator:
         "numpy==1.24.4",
         "pandas==2.0.3",
         "sasl==0.3.1",
+        "setuptools==70.0.0",
       ],
       "3.9": [
         "decorator==5.1.1",
@@ -139,6 +139,7 @@ class RequirementsGenerator:
         "pandas==2.0.3",
         "pyopenssl==22.1.0",
         "sasl==0.3.1",
+        "setuptools==80.9.0",
       ],
       "3.11": [
         "async-timeout==5.0.1",
@@ -148,6 +149,7 @@ class RequirementsGenerator:
         "numpy==1.24.4",
         "pandas==2.0.3",
         "pure-sasl==0.6.2",
+        "setuptools==80.9.0",
       ],
     }
 
@@ -158,6 +160,7 @@ class RequirementsGenerator:
         "Markdown==3.1",
         "numpy==1.24.4",
         "pandas==2.0.3",
+        "setuptools==70.0.0",
       ],
       "3.9": [
         "decorator==5.1.1",
@@ -167,6 +170,7 @@ class RequirementsGenerator:
         "pandas==2.0.3",
         "pyopenssl==22.1.0",
         "sasl==0.3.1",
+        "setuptools==80.9.0",
       ],
       "3.11": [
         "async-timeout==5.0.1",
@@ -176,6 +180,7 @@ class RequirementsGenerator:
         "numpy==1.24.4",
         "pandas==2.0.3",
         "pure-sasl==0.6.2",
+        "setuptools==80.9.0",
       ],
     }
     self.arch_requirements_map = {

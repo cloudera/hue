@@ -71,7 +71,7 @@ from desktop.lib.metrics import global_registry
 from desktop.lib.view_util import is_ajax
 from desktop.log import get_audit_logger
 from desktop.log.access import access_log, access_warn, log_page_hit
-from libsaml.conf import CDP_LOGOUT_URL
+from libsaml.conf import CDP_LOGOUT_URL, LOCAL_LOGOUT
 
 
 def nonce_exists(response):
@@ -480,7 +480,7 @@ class LoginAndPermissionMiddleware(Django4MiddlewareAdapterMixin):
         "desktop.auth.backend.SpnegoDjangoBackend",
         "desktop.auth.backend.KnoxSpnegoDjangoBackend"
     ]
-    if CDP_LOGOUT_URL.get() == "":
+    if CDP_LOGOUT_URL.get() == "" and not LOCAL_LOGOUT.get():
       no_idle_backends.append("libsaml.backend.SAML2Backend")
     if request.ajax and all(no_idle_backend not in AUTH.BACKEND.get() for no_idle_backend in no_idle_backends):
       # Send back a magic header which causes Hue.Request to interpose itself

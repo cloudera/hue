@@ -159,8 +159,14 @@ describe('EditColumnsModal', () => {
 
       await waitFor(() => {
         expect(setColumns).toHaveBeenCalledWith([
-          { ...DEFAULT_COLUMNS[0], title: 'newCol1', type: 'STRING', comment: 'new comment' },
-          { ...DEFAULT_COLUMNS[1], type: 'INT' }
+          {
+            ...DEFAULT_COLUMNS[0],
+            title: 'newCol1',
+            type: 'STRING',
+            comment: 'new comment',
+            isPrimaryKey: false
+          },
+          { ...DEFAULT_COLUMNS[1], type: 'INT', isPrimaryKey: false }
         ]);
         expect(closeModal).toHaveBeenCalled();
       });
@@ -176,6 +182,107 @@ describe('EditColumnsModal', () => {
 
       const typeSelects = getColumnTypeSelects();
       expect(typeSelects).toHaveLength(2);
+    });
+
+    it('should set isPrimaryKey to true when primary key checkbox is clicked', async () => {
+      const { setColumns, closeModal } = renderModal();
+      const user = userEvent.setup();
+
+      await waitFor(() => {
+        expect(screen.getByDisplayValue('col1')).toBeInTheDocument();
+      });
+
+      const primaryKeyCheckboxes = screen.getAllByLabelText('Set as primary key');
+      expect(primaryKeyCheckboxes).toHaveLength(2);
+      await user.click(primaryKeyCheckboxes[0]);
+
+      const doneButton = screen.getByRole('button', { name: 'Done' });
+      await user.click(doneButton);
+
+      await waitFor(() => {
+        expect(setColumns).toHaveBeenCalledWith([
+          {
+            ...DEFAULT_COLUMNS[0],
+            type: 'STRING',
+            comment: 'comment1',
+            isPrimaryKey: true
+          },
+          { ...DEFAULT_COLUMNS[1], type: 'INT', comment: 'comment2', isPrimaryKey: false }
+        ]);
+        expect(closeModal).toHaveBeenCalled();
+      });
+    });
+
+    it('should allow multiple columns to be selected as composite primary key', async () => {
+      const { setColumns, closeModal } = renderModal();
+      const user = userEvent.setup();
+
+      await waitFor(() => {
+        expect(screen.getByDisplayValue('col1')).toBeInTheDocument();
+      });
+
+      const primaryKeyCheckboxes = screen.getAllByLabelText('Set as primary key');
+
+      await user.click(primaryKeyCheckboxes[0]);
+      await user.click(primaryKeyCheckboxes[1]);
+
+      const doneButton = screen.getByRole('button', { name: 'Done' });
+      await user.click(doneButton);
+
+      await waitFor(() => {
+        expect(setColumns).toHaveBeenCalledWith([
+          {
+            ...DEFAULT_COLUMNS[0],
+            type: 'STRING',
+            comment: 'comment1',
+            isPrimaryKey: true
+          },
+          {
+            ...DEFAULT_COLUMNS[1],
+            type: 'INT',
+            comment: 'comment2',
+            isPrimaryKey: true
+          }
+        ]);
+        expect(closeModal).toHaveBeenCalled();
+      });
+    });
+
+    it('should allow toggling primary key checkboxes on and off', async () => {
+      const { setColumns, closeModal } = renderModal();
+      const user = userEvent.setup();
+
+      await waitFor(() => {
+        expect(screen.getByDisplayValue('col1')).toBeInTheDocument();
+      });
+
+      const primaryKeyCheckboxes = screen.getAllByLabelText('Set as primary key');
+
+      await user.click(primaryKeyCheckboxes[0]);
+      await user.click(primaryKeyCheckboxes[1]);
+
+      await user.click(primaryKeyCheckboxes[0]);
+
+      const doneButton = screen.getByRole('button', { name: 'Done' });
+      await user.click(doneButton);
+
+      await waitFor(() => {
+        expect(setColumns).toHaveBeenCalledWith([
+          {
+            ...DEFAULT_COLUMNS[0],
+            type: 'STRING',
+            comment: 'comment1',
+            isPrimaryKey: false
+          },
+          {
+            ...DEFAULT_COLUMNS[1],
+            type: 'INT',
+            comment: 'comment2',
+            isPrimaryKey: true
+          }
+        ]);
+        expect(closeModal).toHaveBeenCalled();
+      });
     });
   });
 
@@ -263,8 +370,8 @@ describe('EditColumnsModal', () => {
 
       await waitFor(() => {
         expect(setColumns).toHaveBeenCalledWith([
-          { ...duplicateColumns[0], title: 'col1', type: 'STRING' },
-          { ...duplicateColumns[1], title: 'col2_fixed', type: 'INT' }
+          { ...duplicateColumns[0], title: 'col1', type: 'STRING', isPrimaryKey: false },
+          { ...duplicateColumns[1], title: 'col2_fixed', type: 'INT', isPrimaryKey: false }
         ]);
       });
     });
@@ -312,8 +419,14 @@ describe('EditColumnsModal', () => {
 
       await waitFor(() => {
         expect(setColumns).toHaveBeenCalledWith([
-          { ...columnsWithEmpty[0], title: 'fixed_name', type: 'STRING' },
-          { ...columnsWithEmpty[1], type: 'INT' }
+          {
+            ...columnsWithEmpty[0],
+            title: 'fixed_name',
+            type: 'STRING',
+            comment: 'comment1',
+            isPrimaryKey: false
+          },
+          { ...columnsWithEmpty[1], type: 'INT', comment: 'comment2', isPrimaryKey: false }
         ]);
       });
     });

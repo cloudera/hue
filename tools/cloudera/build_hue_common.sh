@@ -149,7 +149,7 @@ function install_python311() {
   export VIRTUAL_ENV_VERSION="20.24.4"
   # Pip modules install
   sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c '${pip_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable==0.0.1 mysqlclient==2.1.1'
-  sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
+  sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} PG_CONFIG=${PG_CONFIG} -- sh -c 'export PG_CONFIG="$PG_CONFIG"; ${pip_bin} install psycopg2==2.9.6'
   sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
   popd > /dev/null
 }
@@ -194,7 +194,7 @@ function install_python39() {
   export VIRTUAL_ENV_VERSION="20.19.0"
   # Pip modules install
   sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c '${pip_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable==0.0.1 mysqlclient==2.1.1'
-  sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
+  sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} PG_CONFIG=${PG_CONFIG} -- sh -c 'export PG_CONFIG="$PG_CONFIG"; ${pip_bin} install psycopg2==2.9.6'
   sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
   popd > /dev/null
 }
@@ -233,7 +233,7 @@ function install_python38() {
   export VIRTUAL_ENV_VERSION="20.24.4"
   # Pip modules install
   sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c '${pip_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable==0.0.1 mysqlclient==2.1.1'
-  sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
+  sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} PG_CONFIG=${PG_CONFIG} -- sh -c 'export PG_CONFIG="$PG_CONFIG"; ${pip_bin} install psycopg2==2.9.6'
   sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
   popd > /dev/null
 }
