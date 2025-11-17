@@ -20,6 +20,7 @@ import Select from 'cuix/dist/components/Select';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import { i18nReact } from '../../utils/i18nReact';
 import { Form, Radio, Tooltip, Input as AntdInput } from 'antd';
+import FileChooserInput from './FileChooserInput/FileChooserInput';
 import './FormInput.scss';
 
 export enum FieldType {
@@ -27,7 +28,8 @@ export enum FieldType {
   INPUT = 'input',
   TEXTAREA = 'textarea',
   SELECT = 'select',
-  RADIO = 'radio'
+  RADIO = 'radio',
+  FILECHOOSER = 'fileChooser'
 }
 
 export interface FieldOption {
@@ -162,6 +164,17 @@ const FormInput = <T,>({
               </Radio>
             ))}
           </Radio.Group>
+        );
+
+      case FieldType.FILECHOOSER:
+        return (
+          <FileChooserInput
+            value={value as string}
+            onChange={newValue => onChange(field.name, newValue as T)}
+            placeholder={field.placeholder}
+            error={error}
+            name={field.name}
+          />
         );
 
       default:

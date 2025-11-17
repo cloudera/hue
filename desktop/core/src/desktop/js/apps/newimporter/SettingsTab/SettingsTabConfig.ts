@@ -51,7 +51,7 @@ export const ADVANCED_SETTINGS_CONFIG: Record<string, SettingsFieldConfig[]> = {
   description: [
     {
       name: 'description',
-      type: FieldType.INPUT,
+      type: FieldType.TEXTAREA,
       label: 'Description',
       placeholder: "A table to store customer data imported from the marketing team's CRM.",
       tooltip:
@@ -118,7 +118,7 @@ export const ADVANCED_SETTINGS_CONFIG: Record<string, SettingsFieldConfig[]> = {
     },
     {
       name: 'externalLocation',
-      type: FieldType.INPUT,
+      type: FieldType.FILECHOOSER,
       placeholder: 'External location',
       isHidden: (context: SettingsContext) => !context.useExternalLocation
     }
@@ -139,7 +139,6 @@ export const ADVANCED_SETTINGS_CONFIG: Record<string, SettingsFieldConfig[]> = {
       label: 'Field',
       placeholder: 'Choose an option',
       options: DELIMITER_OPTIONS,
-      tooltip: 'Field delimiter',
       isHidden: (context: SettingsContext) => !context.customCharDelimiters
     },
     {
@@ -148,7 +147,6 @@ export const ADVANCED_SETTINGS_CONFIG: Record<string, SettingsFieldConfig[]> = {
       label: 'Array Map',
       placeholder: 'Choose an option',
       options: DELIMITER_OPTIONS,
-      tooltip: 'Array map delimiter',
       isHidden: (context: SettingsContext) => !context.customCharDelimiters
     },
     {
@@ -157,7 +155,6 @@ export const ADVANCED_SETTINGS_CONFIG: Record<string, SettingsFieldConfig[]> = {
       label: 'Struct',
       placeholder: 'Choose an option',
       options: DELIMITER_OPTIONS,
-      tooltip: 'Struct delimiter',
       isHidden: (context: SettingsContext) => !context.customCharDelimiters
     }
   ]
