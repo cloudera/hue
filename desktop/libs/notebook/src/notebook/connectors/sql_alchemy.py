@@ -50,27 +50,21 @@ Each query statement grabs a connection from the engine and will return it after
 Disposing the engine closes all its connections.
 '''
 
-import re
-import sys
-import json
-import uuid
-import logging
 import datetime
+import json
+import logging
+import re
 import textwrap
+import uuid
 from string import Template
 from urllib.parse import parse_qs as urllib_parse_qs, quote_plus as urllib_quote_plus, urlparse as urllib_urlparse
 
-from django.core.cache import caches
-from django.utils.translation import gettext as _
 from past.builtins import long
-from sqlalchemy import MetaData, Table, create_engine, inspect
+from sqlalchemy import create_engine, inspect, MetaData, Table
 from sqlalchemy.exc import CompileError, NoSuchTableError, OperationalError, ProgrammingError, UnsupportedCompilationError
 
-from beeswax import data_export
-from desktop.lib import export_csvxls
 from desktop.lib.i18n import force_unicode
-from librdbms.server import dbms
-from notebook.connectors.base import Api, AuthenticationRequired, QueryError, QueryExpired, _get_snippet_name
+from notebook.connectors.base import Api, AuthenticationRequired, QueryError, QueryExpired
 from notebook.models import escape_rows
 
 ENGINES = {}
@@ -98,7 +92,7 @@ def query_error_handler(func):
       raise
     except Exception as e:
       message = force_unicode(e)
-      if 'Invalid query handle' in message or 'Invalid OperationHandle' in message:
+      if 'Invalid query handle' in message or 'Invalid OperationHandle' in message or 'Invalid or unknown query handle' in message:
         raise QueryExpired(e)
       else:
         LOG.exception('Query Error')
@@ -179,17 +173,15 @@ class SqlAlchemyApi(Api):
 
     if self.options.get('credentials_json'):
       self.options['credentials_info'] = json.loads(
-        self.options.pop('credentials_json')
+          self.options.pop('credentials_json')
       )
 
     # Enables various SqlAlchemy args to be passed along for both Hive & Presto connectors
     # Refer to SqlAlchemy pyhive for more details
     if self.options.get('connect_args'):
-      # Check if connect_args is already a dict, if not then parse it as JSON
-      if not isinstance(self.options.get('connect_args'), dict):
-        self.options['connect_args'] = json.loads(
+      self.options['connect_args'] = json.loads(
           self.options.pop('connect_args')
-        )
+      )
 
     # phoenixdb does not support impersonation using principal_username parameter
     if self.options.get('has_impersonation') and not driver_name.startswith("phoenix"):
@@ -231,17 +223,6 @@ class SqlAlchemyApi(Api):
 
     session = self._get_session(notebook, snippet)
     if session is not None:
-      # For Kerberos authentication, we should not pass password in session properties
-      # Check if this is a Kerberos-enabled connection
-      if 'principal=' in self.options.get('url', ''):
-        # Filter out password property from session
-        if 'properties' in session:
-          session['properties'] = [prop for prop in session['properties'] if prop['name'] != 'password']
-
-          # If no properties left, remove properties entirely
-          if not session['properties']:
-            session.pop('properties', None)
-
       self.options['session'] = session
 
     engine = self._get_engine()
@@ -456,13 +437,13 @@ class SqlAlchemyApi(Api):
 
       response['columns'] = [col['name'] for col in columns]
       response['extended_columns'] = [{
-        'autoincrement': col.get('autoincrement'),
-        'comment': col.get('comment'),
-        'default': col.get('default'),
-        'name': col.get('name'),
-        'nullable': col.get('nullable'),
-        'type': self._get_column_type_name(col),
-      }
+          'autoincrement': col.get('autoincrement'),
+          'comment': col.get('comment'),
+          'default': col.get('default'),
+          'name': col.get('name'),
+          'nullable': col.get('nullable'),
+          'type': self._get_column_type_name(col),
+        }
         for col in columns
       ]
 
@@ -476,14 +457,14 @@ class SqlAlchemyApi(Api):
     return response
 
   @query_error_handler
-  def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
+  def get_sample_data(self, snippet, database=None, table=None, column=None, nested=None, is_async=False, operation=None):
     engine = self._get_engine()
     inspector = inspect(engine)
 
     assist = Assist(inspector, engine, backticks=self.backticks, api=self)
     response = {'status': -1, 'result': {}}
 
-    metadata, sample_data = assist.get_sample_data(database, table, column=column, operation=operation)
+    metadata, sample_data = assist.get_sample_data(database, table, column=column, nested=nested, operation=operation)
 
     response['status'] = 0
     response['rows'] = escape_rows(sample_data)
@@ -491,10 +472,10 @@ class SqlAlchemyApi(Api):
     if table and operation != 'hello':
       columns = assist.get_columns(database, table)
       response['full_headers'] = [{
-        'name': col.get('name'),
-        'type': self._get_column_type_name(col),
-        'comment': ''
-      } for col in columns
+          'name': col.get('name'),
+          'type': self._get_column_type_name(col),
+          'comment': ''
+        } for col in columns
       ]
     elif metadata:
       response['full_headers'] = [{
@@ -502,7 +483,7 @@ class SqlAlchemyApi(Api):
         'type': 'STRING_TYPE',
         'comment': ''
       } for col in metadata
-      ]
+    ]
 
     return response
 
@@ -513,9 +494,9 @@ class SqlAlchemyApi(Api):
       FROM %(backticks)s%(database)s%(backticks)s.%(backticks)s%(table)s%(backticks)s
       LIMIT 1000
       ''' % {
-      'database': database,
-      'table': table,
-      'backticks': self.backticks
+        'database': database,
+        'table': table,
+        'backticks': self.backticks
     })
 
   def _get_column_type_name(self, col):
@@ -561,7 +542,7 @@ class Assist(object):
     except NoSuchTableError:
       return []
 
-  def get_sample_data(self, database, table, column=None, operation=None):
+  def get_sample_data(self, database, table, column=None, nested=None, operation=None):
     if operation == 'hello':
       statement = "SELECT 'Hello World!'"
     else:
@@ -571,11 +552,11 @@ class Assist(object):
         FROM %(backticks)s%(database)s%(backticks)s.%(backticks)s%(table)s%(backticks)s
         LIMIT %(limit)s
         ''' % {
-        'database': database,
-        'table': table,
-        'column': column,
-        'limit': 100,
-        'backticks': self.backticks
+          'database': database,
+          'table': table,
+          'column': column,
+          'limit': 100,
+          'backticks': self.backticks
       })
 
     connection = self.api._create_connection(self.engine)
@@ -595,9 +576,9 @@ class Assist(object):
 
     return {
       'foreign_keys': [{
-        'name': fk.parent.name,
-        'to': fk.target_fullname
-      }
+          'name': fk.parent.name,
+          'to': fk.target_fullname
+        }
         for fk in metaTable.foreign_keys
       ],
       'primary_keys': [{'name': pk.name} for pk in metaTable.primary_key.columns]

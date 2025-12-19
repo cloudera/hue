@@ -140,19 +140,7 @@ def _execute_notebook(request, notebook, snippet):
 
       interpreter = get_api(request, snippet)
       if snippet.get('interface') == 'sqlalchemy':
-        # For Kerberos authentication, we should not pass password in session properties
-        # Check if this is a Kerberos-enabled connection
-        session_to_use = sessions[0]
-        if 'principal=' in interpreter.options.get('url', ''):
-          # Filter out password property from session
-          if 'properties' in session_to_use:
-            session_to_use['properties'] = [prop for prop in session_to_use['properties'] if prop['name'] != 'password']
-
-            # If no properties left, remove properties entirely
-            if not session_to_use['properties']:
-              session_to_use.pop('properties', None)
-
-        interpreter.options['session'] = session_to_use
+        interpreter.options['session'] = sessions[0]
 
       with opentracing.tracer.start_span('interpreter') as span:
         # interpreter.execute needs the sessions, but we don't want to persist them
@@ -187,7 +175,7 @@ def _execute_notebook(request, notebook, snippet):
           _snippet['result']['statements_count'] = response['handle'].get('statements_count', 1)
           _snippet['result']['statement_id'] = response['handle'].get('statement_id', 0)
           _snippet['result']['handle']['statement'] = response['handle'].get(
-            'statement', snippet['statement']
+              'statement', snippet['statement']
           ).strip()  # For non HS2, as non multi query yet
         else:
           _snippet['status'] = 'failed'
@@ -464,9 +452,9 @@ def get_logs(request):
 
   response['logs'] = logs.strip()
   response['progress'] = min(
-    db.progress(notebook, snippet, logs=full_log),
-    99
-  ) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100
+      db.progress(notebook, snippet, logs=full_log),
+      99
+    ) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100
   response['jobs'] = jobs
   response['isFullLogs'] = db.get_log_is_full_log(notebook, snippet)
   response['status'] = 0
@@ -492,7 +480,7 @@ def _save_notebook(notebook, user):
   else:
     notebook_doc = Document2.objects.create(name=notebook['name'], uuid=notebook['uuid'], type=notebook_type, owner=user)
     Document.objects.link(
-      notebook_doc, owner=notebook_doc.owner, name=notebook_doc.name, description=notebook_doc.description, extra=notebook_type
+        notebook_doc, owner=notebook_doc.owner, name=notebook_doc.name, description=notebook_doc.description, extra=notebook_type
     )
     save_as = True
 
@@ -636,10 +624,10 @@ def get_history(request):
         'uuid': doc.uuid,
         'type': doc.type,
         'data': {
-          'statement': statement[:1001] if statement else '',
-          'lastExecuted': notebook['snippets'][0].get('lastExecuted', -1),
-          'status': notebook['snippets'][0].get('status', ''),
-          'parentSavedQueryUuid': notebook.get('parentSavedQueryUuid', '')
+            'statement': statement[:1001] if statement else '',
+            'lastExecuted': notebook['snippets'][0].get('lastExecuted', -1),
+            'status': notebook['snippets'][0].get('status', ''),
+            'parentSavedQueryUuid': notebook.get('parentSavedQueryUuid', '')
         } if notebook['snippets'] else {},
         'absoluteUrl': doc.get_absolute_url(),
       })
@@ -867,7 +855,7 @@ def export_result(request):
     else:
       notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))
       response['watch_url'] = reverse('notebook:execute_and_watch') + '?action=save_as_table&notebook=' + str(notebook_id) + \
-                              '&snippet=0&destination=' + destination
+          '&snippet=0&destination=' + destination
       response['status'] = 0
     request.audit = {
       'operation': 'EXPORT',
@@ -897,7 +885,7 @@ def export_result(request):
     else:
       notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))
       response['watch_url'] = reverse('notebook:execute_and_watch') + '?action=insert_as_query&notebook=' + str(notebook_id) + \
-                              '&snippet=0&destination=' + destination
+          '&snippet=0&destination=' + destination
       response['status'] = 0
     request.audit = {
       'operation': 'EXPORT',
@@ -912,8 +900,8 @@ def export_result(request):
       if data_format == 'dashboard':
         engine = notebook['type'].replace('query-', '')
         response['watch_url'] = reverse(
-          'dashboard:browse',
-          kwargs={'name': notebook_id}
+            'dashboard:browse',
+            kwargs={'name': notebook_id}
         ) + '?source=query&engine=%(engine)s' % {'engine': engine}
         response['status'] = 0
       else:
@@ -929,12 +917,12 @@ def export_result(request):
         response['target_path'] = destination
         response['sample'] = list(sample['data'])
         response['columns'] = [
-          Field(col['name'], col['type']).to_dict() for col in sample['meta']
+            Field(col['name'], col['type']).to_dict() for col in sample['meta']
         ]
     else:
       notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))
       response['watch_url'] = reverse('notebook:execute_and_watch') + '?action=index_query&notebook=' + str(notebook_id) + \
-                              '&snippet=0&destination=' + destination
+          '&snippet=0&destination=' + destination
       response['status'] = 0
 
     if response.get('status') != 0:
@@ -976,11 +964,11 @@ def statement_compatibility(request):
   api = get_api(request, snippet)
 
   response['query_compatibility'] = api.statement_compatibility(
-    interface,
-    notebook,
-    snippet,
-    source_platform=source_platform,
-    target_platform=target_platform
+      interface,
+      notebook,
+      snippet,
+      source_platform=source_platform,
+      target_platform=target_platform
   )
   response['status'] = 0
 

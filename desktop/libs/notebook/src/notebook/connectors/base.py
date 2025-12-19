@@ -15,11 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import re
 import json
+import logging
+import re
 import time
 import uuid
-import logging
 from builtins import object
 
 from django.utils.encoding import smart_str
@@ -27,10 +27,9 @@ from django.utils.translation import gettext as _
 
 from beeswax.common import find_compute, is_compute
 from desktop.auth.backend import is_admin
-from desktop.conf import TASK_SERVER, has_connectors, is_cdw_compute_enabled
+from desktop.conf import has_connectors, is_cdw_compute_enabled, TASK_SERVER
 from desktop.lib import export_csvxls
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.i18n import smart_str
 from metadata.optimizer.base import get_api as get_optimizer_api
 from notebook.conf import get_ordered_interpreters
 from notebook.sql_utils import get_current_statement
@@ -87,15 +86,15 @@ class Notebook(object):
       self.document = document
     else:
       _data = {
-        'name': 'My Notebook',
-        'uuid': str(uuid.uuid4()),
-        'description': '',
-        'type': 'notebook',
-        'isSaved': False,
-        'isManaged': False,  # Aka isTask
-        'skipHistorify': False,
-        'sessions': [],
-        'snippets': [],
+          'name': 'My Notebook',
+          'uuid': str(uuid.uuid4()),
+          'description': '',
+          'type': 'notebook',
+          'isSaved': False,
+          'isManaged': False,  # Aka isTask
+          'skipHistorify': False,
+          'sessions': [],
+          'snippets': [],
       }
       _data.update(options)
       self.data = json.dumps(_data)
@@ -116,12 +115,12 @@ class Notebook(object):
 
   def get_str(self, from_oozie_action=False):
     return '\n\n\n'.join([
-      'USE %s;\n\n%s' % (
-        snippet['database'],
-        snippet['statement_raw'] if from_oozie_action else Notebook.statement_with_variables(snippet)
-      )
-      for snippet in self.get_data()['snippets']
-    ]
+        'USE %s;\n\n%s' % (
+          snippet['database'],
+          snippet['statement_raw'] if from_oozie_action else Notebook.statement_with_variables(snippet)
+        )
+        for snippet in self.get_data()['snippets']
+      ]
     )
 
   @staticmethod
@@ -146,12 +145,12 @@ class Notebook(object):
         return smart_str(p1) + smart_str(value if value is not None else variable['meta'].get('placeholder', ''))
 
       return re.sub(
-        "([^\\\\])\\$" + (
-          "{(" if hasCurlyBracketParameters else "(") + variablesString + ")(=[^}]*)?" + ("}"
-                                                                                          if hasCurlyBracketParameters else ""
-                                                                                          ),
-        replace,
-        smart_str(statement_raw)
+          "([^\\\\])\\$" + (
+            "{(" if hasCurlyBracketParameters else "(") + variablesString + ")(=[^}]*)?" + ("}"
+            if hasCurlyBracketParameters else ""
+          ),
+          replace,
+          smart_str(statement_raw)
       )
 
     return statement_raw
@@ -160,16 +159,16 @@ class Notebook(object):
     _data = json.loads(self.data)
 
     _data['snippets'].append(self._make_snippet({
-      'status': 'running',
-      'statement_raw': sql,
-      'statement': sql,
-      'type': 'hive',
-      'properties': {
-        'files': [],
-        'functions': [],
-        'settings': [],
-      },
-      'database': database,
+       'status': 'running',
+       'statement_raw': sql,
+       'statement': sql,
+       'type': 'hive',
+       'properties': {
+            'files': [],
+            'functions': [],
+            'settings': [],
+       },
+       'database': database,
     }))
     self._add_session(_data, 'hive')
 
@@ -179,15 +178,15 @@ class Notebook(object):
     _data = json.loads(self.data)
 
     _data['snippets'].append(self._make_snippet({
-      u'type': u'java',
-      u'status': u'running',
-      u'properties': {
-        u'files': files,
-        u'class': clazz,
-        u'app_jar': app_jar,
-        u'arguments': arguments,
-        u'archives': [],
-      }
+        u'type': u'java',
+        u'status': u'running',
+        u'properties': {
+          u'files': files,
+          u'class': clazz,
+          u'app_jar': app_jar,
+          u'arguments': arguments,
+          u'archives': [],
+        }
     }))
     self._add_session(_data, 'java')
 
@@ -197,14 +196,14 @@ class Notebook(object):
     _data = json.loads(self.data)
 
     _data['snippets'].append(self._make_snippet({
-      u'type': u'sqoop1',
-      u'status': u'running',
-      u'properties': {
-        u'files': files,
-        u'arguments': arguments,
-        u'archives': [],
-        u'statement': statement
-      }
+        u'type': u'sqoop1',
+        u'status': u'running',
+        u'properties': {
+          u'files': files,
+          u'arguments': arguments,
+          u'archives': [],
+          u'statement': statement
+        }
     }))
     self._add_session(_data, 'java')
 
@@ -214,23 +213,23 @@ class Notebook(object):
     _data = json.loads(self.data)
 
     _data['snippets'].append(self._make_snippet({
-      u'type': u'spark',
-      u'status': u'running',
-      u'properties': {
-        u'files': files,
-        u'class': clazz,
-        u'app_jar': jars,
-        u'arguments': arguments,
-        u'archives': [],
-        u'spark_opts': ''
-      }
+        u'type': u'spark',
+        u'status': u'running',
+        u'properties': {
+          u'files': files,
+          u'class': clazz,
+          u'app_jar': jars,
+          u'arguments': arguments,
+          u'archives': [],
+          u'spark_opts': ''
+        }
     }))
     self._add_session(_data, 'spark')
 
     self.data = json.dumps(_data)
 
   def add_shell_snippet(self, shell_command, arguments=None, archives=None, files=None, env_var=None, last_executed=None,
-                        capture_output=True):
+        capture_output=True):
     _data = json.loads(self.data)
 
     if arguments is None:
@@ -243,18 +242,18 @@ class Notebook(object):
       env_var = []
 
     _data['snippets'].append(self._make_snippet({
-      u'type': u'shell',
-      u'status': u'running',
-      u'properties': {
-        u'files': files,
-        u'shell_command': shell_command,
-        u'arguments': arguments,
-        u'archives': archives,
-        u'env_var': env_var,
-        u'command_path': shell_command,
-        u'capture_output': capture_output
-      },
-      u'lastExecuted': last_executed
+        u'type': u'shell',
+        u'status': u'running',
+        u'properties': {
+          u'files': files,
+          u'shell_command': shell_command,
+          u'arguments': arguments,
+          u'archives': archives,
+          u'env_var': env_var,
+          u'command_path': shell_command,
+          u'capture_output': capture_output
+        },
+        u'lastExecuted': last_executed
     }))
     self._add_session(_data, 'shell')
 
@@ -262,18 +261,18 @@ class Notebook(object):
 
   def _make_snippet(self, _snippet):
     return {
-      'status': _snippet.get('status', 'ready'),
-      'id': str(uuid.uuid4()),
-      'statement_raw': _snippet.get('statement', ''),
-      'statement': _snippet.get('statement', ''),
-      'type': _snippet.get('type'),
-      'properties': _snippet['properties'],
-      'name': _snippet.get('name', '%(type)s snippet' % _snippet),
-      'database': _snippet.get('database'),
-      'result': {},
-      'variables': [],
-      'lastExecuted': _snippet.get('lastExecuted'),
-      'capture_output': _snippet.get('capture_output', True)
+         'status': _snippet.get('status', 'ready'),
+         'id': str(uuid.uuid4()),
+         'statement_raw': _snippet.get('statement', ''),
+         'statement': _snippet.get('statement', ''),
+         'type': _snippet.get('type'),
+         'properties': _snippet['properties'],
+         'name': _snippet.get('name', '%(type)s snippet' % _snippet),
+         'database': _snippet.get('database'),
+         'result': {},
+         'variables': [],
+         'lastExecuted': _snippet.get('lastExecuted'),
+         'capture_output': _snippet.get('capture_output', True)
     }
 
   def _add_session(self, data, snippet_type):
@@ -281,11 +280,11 @@ class Notebook(object):
 
     if snippet_type not in [_s['type'] for _s in data['sessions']]:
       data['sessions'].append({
-        'type': snippet_type,
-        'properties': HS2Api.get_properties(snippet_type),
-        'id': None
+         'type': snippet_type,
+         'properties': HS2Api.get_properties(snippet_type),
+         'id': None
       }
-      )
+    )
 
   def execute(self, request, batch=False):
     from notebook.api import _execute_notebook  # Cyclic dependency
@@ -451,7 +450,7 @@ def get_api(request, snippet):
     interpreter['type'],
     interface,
     interpreter.get('compute') and interpreter['compute']['name'])
-            )
+  )
 
   if interface == 'hiveserver2' or interface == 'hms':
     from notebook.connectors.hiveserver2 import HS2Api
@@ -525,9 +524,6 @@ def get_api(request, snippet):
   elif interface == 'kafka':
     from notebook.connectors.kafka import KafkaApi
     return KafkaApi(request.user)
-  elif interface == 'kyuubi':
-    from notebook.connectors.kyuubi import KyuubiApi
-    return KyuubiApi(request.user, interpreter=interpreter)
   elif interface == 'pig':
     return OozieApi(user=request.user, request=request)  # Backward compatibility until Hue 4
   else:
@@ -554,9 +550,9 @@ class Api(object):
 
   def create_session(self, lang, properties=None):
     return {
-      'type': lang,
-      'id': None,
-      'properties': properties if not None else []
+        'type': lang,
+        'id': None,
+        'properties': properties if not None else []
     }
 
   def close_session(self, session):
@@ -597,7 +593,7 @@ class Api(object):
   def get_jobs(self, notebook, snippet, logs):
     return []
 
-  def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
+  def get_sample_data(self, snippet, database=None, table=None, column=None, nested=None, is_async=False, operation=None):
     raise NotImplementedError()
 
   def explain(self, notebook, snippet):
@@ -646,17 +642,17 @@ class Api(object):
       response = self.describe_column(notebook, snippet, database=database, table=table, column=column)
     elif table:
       response = {
-        'status': 0,
-        'name': table or '',
-        'partition_keys': [],
-        'cols': [],
-        'path_location': '',
-        'hdfs_link': '',
-        'comment': '',
-        'is_view': False,
-        'properties': [],
-        'details': {'properties': {'table_type': ''}, 'stats': {}},
-        'stats': []
+          'status': 0,
+          'name': table or '',
+          'partition_keys': [],
+          'cols': [],
+          'path_location': '',
+          'hdfs_link': '',
+          'comment': '',
+          'is_view': False,
+          'properties': [],
+          'details': {'properties': {'table_type': ''}, 'stats': {}},
+          'stats': []
       }
       describe_table = self.describe_table(notebook, snippet, database, table)
       response.update(describe_table)
@@ -719,8 +715,8 @@ class ExecutionWrapper(object):
   def fetch(self, handle, start_over=None, rows=None):
     if start_over:
       if not self.snippet['result'].get('handle') \
-              or not self.snippet['result']['handle'].get('guid') \
-              or not self.api.can_start_over(self.notebook, self.snippet):
+          or not self.snippet['result']['handle'].get('guid') \
+          or not self.api.can_start_over(self.notebook, self.snippet):
         start_over = False
         handle = self.api.execute(self.notebook, self.snippet)
         self.snippet['result']['handle'] = handle
