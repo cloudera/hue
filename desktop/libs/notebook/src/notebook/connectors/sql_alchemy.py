@@ -50,22 +50,31 @@ Each query statement grabs a connection from the engine and will return it after
 Disposing the engine closes all its connections.
 '''
 
-import datetime
-import json
-import logging
 import re
-import textwrap
+import sys
+import json
 import uuid
+import logging
+import datetime
+import textwrap
 from string import Template
 from urllib.parse import parse_qs as urllib_parse_qs, quote_plus as urllib_quote_plus, urlparse as urllib_urlparse
 
+from django.core.cache import caches
+from django.utils.translation import gettext as _
 from past.builtins import long
-from sqlalchemy import create_engine, inspect, MetaData, Table
+from sqlalchemy import MetaData, Table, create_engine, inspect
 from sqlalchemy.exc import CompileError, NoSuchTableError, OperationalError, ProgrammingError, UnsupportedCompilationError
 
+from beeswax import data_export
+from desktop.lib import export_csvxls
 from desktop.lib.i18n import force_unicode
-from notebook.connectors.base import Api, AuthenticationRequired, QueryError, QueryExpired
+from librdbms.server import dbms
+from notebook.connectors.base import Api, AuthenticationRequired, QueryError, QueryExpired, _get_snippet_name
 from notebook.models import escape_rows
+
+from kazoo.client import KazooClient
+from libzookeeper import conf as libzookeeper_conf
 
 ENGINES = {}
 CONNECTIONS = {}
@@ -92,12 +101,65 @@ def query_error_handler(func):
       raise
     except Exception as e:
       message = force_unicode(e)
-      if 'Invalid query handle' in message or 'Invalid OperationHandle' in message or 'Invalid or unknown query handle' in message:
+      if 'Invalid query handle' in message or 'Invalid OperationHandle' in message:
         raise QueryExpired(e)
       else:
         LOG.exception('Query Error')
         raise QueryError(message)
   return decorator
+
+
+def get_kyuubi_zk_servers(zk_quorum, zk_namespace):
+  """
+  Get Kyuubi server addresses from ZooKeeper
+
+  Args:
+    zk_quorum: ZooKeeper server address list, e.g., 'host1:2181,host2:2181,host3:2181'
+    zk_namespace: Kyuubi namespace in ZooKeeper
+
+  Returns:
+    Kyuubi server list sorted by sequence number
+  """
+  LOG.info("Connecting to ZooKeeper quorum: %s with namespace: %s", zk_quorum, zk_namespace)
+
+  zk = KazooClient(hosts=zk_quorum, read_only=True)
+  zk.start()
+
+  try:
+    znode_path = f"/{zk_namespace}" if not zk_namespace.startswith("/") else zk_namespace
+    if zk.exists(znode_path):
+      LOG.info("Found Kyuubi znode at path: %s", znode_path)
+
+      # Get all child nodes
+      children = zk.get_children(znode_path)
+      LOG.info("Found Kyuubi server instances: %s", children)
+
+      # Filter and sort nodes
+      server_nodes = [child for child in children if re.search(r'serverUri=.+;version=.+;sequence=\d+', child)]
+
+      if server_nodes:
+        # Sort by sequence number
+        server_nodes.sort(key=lambda x: int(re.findall(r'sequence=(\d+)', x)[0]))
+        LOG.info("Sorted Kyuubi server instances by sequence: %s", server_nodes)
+
+        # Extract server information
+        servers = []
+        for node in server_nodes:
+          match = re.search(r'serverUri=(.+?):(\d+);', node)
+          if match:
+            host, port = match.groups()
+            servers.append({'host': host, 'port': int(port)})
+
+        LOG.info("Extracted Kyuubi servers: %s", servers)
+        return servers
+      else:
+        LOG.warning("No valid Kyuubi server nodes found under %s", znode_path)
+        return []
+    else:
+      LOG.error("ZooKeeper node %s does not exist", znode_path)
+      return []
+  finally:
+    zk.stop()
 
 
 class SqlAlchemyApi(Api):
@@ -148,6 +210,10 @@ class SqlAlchemyApi(Api):
     else:
       url = self.options['url']
 
+    # Resolve real address from ZooKeeper if it's a Hive/Kyuubi URL with ZooKeeper configuration
+    if url.startswith('hive://') and 'zooKeeperEnsemble=' in url:
+      url = self._resolve_kyuubi_zk_url(url)
+
     if url.startswith('awsathena+rest://'):
       url = url.replace(url[17:37], urllib_quote_plus(url[17:37]))
       url = url.replace(url[38:50], urllib_quote_plus(url[38:50]))
@@ -173,14 +239,14 @@ class SqlAlchemyApi(Api):
 
     if self.options.get('credentials_json'):
       self.options['credentials_info'] = json.loads(
-          self.options.pop('credentials_json')
+        self.options.pop('credentials_json')
       )
 
     # Enables various SqlAlchemy args to be passed along for both Hive & Presto connectors
     # Refer to SqlAlchemy pyhive for more details
     if self.options.get('connect_args'):
       self.options['connect_args'] = json.loads(
-          self.options.pop('connect_args')
+        self.options.pop('connect_args')
       )
 
     # phoenixdb does not support impersonation using principal_username parameter
@@ -197,6 +263,68 @@ class SqlAlchemyApi(Api):
     options['pool_pre_ping'] = not url.startswith('phoenix://')  # Should be moved to dialect when connectors always on
 
     return create_engine(url, **options)
+
+  def _resolve_kyuubi_zk_url(self, url):
+    """
+    Resolve the real Kyuubi connection URL from ZooKeeper
+
+    Args:
+      url: Original URL containing ZooKeeper configuration
+
+    Returns:
+      Resolved direct connection URL
+    """
+    LOG.info("Resolving Kyuubi URL with ZooKeeper configuration: %s", url)
+
+    # Parse URL and query parameters
+    parsed = urllib_urlparse(url)
+    query_params = urllib_parse_qs(parsed.query)
+
+    # Get ZooKeeper configuration
+    zk_quorum = query_params.get('zooKeeperEnsemble', [None])[0]
+    zk_namespace = query_params.get('zooKeeperNamespace', ['kyuubi'])[0]
+
+    if not zk_quorum:
+      LOG.warning("No zooKeeperEnsemble parameter found in URL, using direct connection")
+      return url
+
+    # Get server list from ZooKeeper
+    servers = get_kyuubi_zk_servers(zk_quorum, zk_namespace)
+
+    if not servers:
+      LOG.warning("No Kyuubi servers found in ZooKeeper, using direct connection")
+      return url
+
+    # Use the first (highest priority) server
+    selected_server = servers[0]
+    LOG.info("Selected Kyuubi server: %s", selected_server)
+
+    # Build new URL, removing ZooKeeper related parameters
+    # Keep the original username and password part
+    if parsed.username:
+      if parsed.password:
+        new_netloc = f"{parsed.username}:{parsed.password}@{selected_server['host']}:{selected_server['port']}"
+      else:
+        new_netloc = f"{parsed.username}@{selected_server['host']}:{selected_server['port']}"
+    else:
+      new_netloc = f"{selected_server['host']}:{selected_server['port']}"
+
+    # Reconstruct URL, exclude ZooKeeper related parameters
+    new_query_params = {}
+    for key, values in query_params.items():
+      if key not in ['zooKeeperEnsemble', 'zooKeeperNamespace', 'serviceDiscoveryMode']:
+        new_query_params[key] = values[0] if values else ''
+
+    # Construct query string
+    query_string = '&'.join([f"{key}={value}" for key, value in new_query_params.items()])
+
+    # Construct new URL
+    new_url = f"{parsed.scheme}://{new_netloc}{parsed.path}"
+    if query_string:
+      new_url += f"?{query_string}"
+
+    LOG.info("Resolved Kyuubi URL from ZooKeeper: %s -> %s", url, new_url)
+    return new_url
 
   def _get_session(self, notebook, snippet):
     for session in notebook['sessions']:
@@ -240,7 +368,15 @@ class SqlAlchemyApi(Api):
 
     result = connection.execute(statement)
 
-    logs = [message for message in result.cursor.fetch_logs()] if result.cursor and hasattr(result.cursor, 'fetch_logs') else []
+    # Safely get logs, add exception handling
+    logs = []
+    if result.cursor and hasattr(result.cursor, 'fetch_logs'):
+      try:
+        logs = [message for message in result.cursor.fetch_logs()]
+      except Exception as e:
+        LOG.warning("Failed to fetch logs from cursor: %s", e)
+        logs = []
+
     cache = {
       'logs': logs,
       'connection': connection,
@@ -389,7 +525,11 @@ class SqlAlchemyApi(Api):
     guid = snippet['result']['handle']['guid']
     cache = CONNECTIONS.get(guid)
     if cache:
-      return '\n'.join(cache['logs'])
+      try:
+        return '\n'.join(cache['logs'])
+      except Exception as e:
+        LOG.warning("Failed to join logs: %s", e)
+        return ""
 
   @query_error_handler
   def close_statement(self, notebook, snippet):
@@ -437,13 +577,13 @@ class SqlAlchemyApi(Api):
 
       response['columns'] = [col['name'] for col in columns]
       response['extended_columns'] = [{
-          'autoincrement': col.get('autoincrement'),
-          'comment': col.get('comment'),
-          'default': col.get('default'),
-          'name': col.get('name'),
-          'nullable': col.get('nullable'),
-          'type': self._get_column_type_name(col),
-        }
+        'autoincrement': col.get('autoincrement'),
+        'comment': col.get('comment'),
+        'default': col.get('default'),
+        'name': col.get('name'),
+        'nullable': col.get('nullable'),
+        'type': self._get_column_type_name(col),
+      }
         for col in columns
       ]
 
@@ -457,14 +597,14 @@ class SqlAlchemyApi(Api):
     return response
 
   @query_error_handler
-  def get_sample_data(self, snippet, database=None, table=None, column=None, nested=None, is_async=False, operation=None):
+  def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
     engine = self._get_engine()
     inspector = inspect(engine)
 
     assist = Assist(inspector, engine, backticks=self.backticks, api=self)
     response = {'status': -1, 'result': {}}
 
-    metadata, sample_data = assist.get_sample_data(database, table, column=column, nested=nested, operation=operation)
+    metadata, sample_data = assist.get_sample_data(database, table, column=column, operation=operation)
 
     response['status'] = 0
     response['rows'] = escape_rows(sample_data)
@@ -472,10 +612,10 @@ class SqlAlchemyApi(Api):
     if table and operation != 'hello':
       columns = assist.get_columns(database, table)
       response['full_headers'] = [{
-          'name': col.get('name'),
-          'type': self._get_column_type_name(col),
-          'comment': ''
-        } for col in columns
+        'name': col.get('name'),
+        'type': self._get_column_type_name(col),
+        'comment': ''
+      } for col in columns
       ]
     elif metadata:
       response['full_headers'] = [{
@@ -483,7 +623,7 @@ class SqlAlchemyApi(Api):
         'type': 'STRING_TYPE',
         'comment': ''
       } for col in metadata
-    ]
+      ]
 
     return response
 
@@ -494,9 +634,9 @@ class SqlAlchemyApi(Api):
       FROM %(backticks)s%(database)s%(backticks)s.%(backticks)s%(table)s%(backticks)s
       LIMIT 1000
       ''' % {
-        'database': database,
-        'table': table,
-        'backticks': self.backticks
+      'database': database,
+      'table': table,
+      'backticks': self.backticks
     })
 
   def _get_column_type_name(self, col):
@@ -542,7 +682,7 @@ class Assist(object):
     except NoSuchTableError:
       return []
 
-  def get_sample_data(self, database, table, column=None, nested=None, operation=None):
+  def get_sample_data(self, database, table, column=None, operation=None):
     if operation == 'hello':
       statement = "SELECT 'Hello World!'"
     else:
@@ -552,11 +692,11 @@ class Assist(object):
         FROM %(backticks)s%(database)s%(backticks)s.%(backticks)s%(table)s%(backticks)s
         LIMIT %(limit)s
         ''' % {
-          'database': database,
-          'table': table,
-          'column': column,
-          'limit': 100,
-          'backticks': self.backticks
+        'database': database,
+        'table': table,
+        'column': column,
+        'limit': 100,
+        'backticks': self.backticks
       })
 
     connection = self.api._create_connection(self.engine)
@@ -576,9 +716,9 @@ class Assist(object):
 
     return {
       'foreign_keys': [{
-          'name': fk.parent.name,
-          'to': fk.target_fullname
-        }
+        'name': fk.parent.name,
+        'to': fk.target_fullname
+      }
         for fk in metaTable.foreign_keys
       ],
       'primary_keys': [{'name': pk.name} for pk in metaTable.primary_key.columns]
