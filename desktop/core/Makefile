@@ -38,4 +38,5 @@ default::
 env-install: $(EXT_ENV_INSTALL) compile
 	@echo '--- Installing $(APP_NAME) into virtual-env'
 	@echo '--- env-install: EXT_ENV_INSTALL: $(EXT_ENV_INSTALL)'
-	@$(ENV_PYTHON) -m pip install -e .
+	@echo '--- Using build constraints to prevent setuptools 82+ (cx-Oracle compatibility)'
+	@PIP_CONSTRAINT=$(ROOT)/desktop/core/build-constraints.txt $(ENV_PYTHON) -m pip install -e .
