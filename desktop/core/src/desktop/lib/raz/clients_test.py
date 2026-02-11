@@ -14,9 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
-import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 import pytest
 from django.test import TestCase
@@ -67,15 +65,15 @@ class AdlsRazClientTest(TestCase):
     self.username = 'csso_hueuser'
 
   def test_check_rename_operation(self):
-    with patch('desktop.lib.raz.raz_client.requests.post') as requests_post:
-      with patch('desktop.lib.raz.raz_client.uuid.uuid4') as uuid:
+    with patch('desktop.lib.raz.raz_client.requests.post'):
+      with patch('desktop.lib.raz.raz_client.uuid.uuid4'):
         with patch('desktop.lib.raz.raz_client.RazClient.check_access') as check_access:
 
           reset = RAZ.API_URL.set_for_testing('https://raz_url:8000')
           check_access.return_value = {'token': 'some_random_sas_token'}
 
           try:
-            sas_token = AdlsRazClient(
+            sas_token = AdlsRazClient(  # noqa: F841
               username=self.username
             ).get_url(
               action='PUT',

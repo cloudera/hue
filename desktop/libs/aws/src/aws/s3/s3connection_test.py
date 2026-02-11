@@ -14,16 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
 import logging
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 import six
-import requests
 
-from aws.client import _make_client
 from aws.s3.s3connection import RazS3Connection
-from aws.s3.s3test_utils import S3TestBase
 from desktop.conf import RAZ
 
 LOG = logging.getLogger()
@@ -60,7 +56,7 @@ class TestRazS3Connection():
         http_request = _mexe.call_args.args[0]
 
         if isinstance(http_request, six.string_types):
-          raise SkipTest()  # Incorrect in Py3 CircleCi
+          raise SkipTest()  # Incorrect in Py3 CircleCi  # noqa: F821
 
         assert 'GET' == http_request.method
         assert 's3-us-west-1.amazonaws.com:443' == http_request.host

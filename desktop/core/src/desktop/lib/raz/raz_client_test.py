@@ -14,14 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from unittest.mock import Mock, patch
+
 import pytest
-import unittest
 from django.test import TestCase
 
-from desktop.lib.raz.raz_client import RazClient, get_raz_client
 from desktop.lib.exceptions_renderable import PopupException
-
-from unittest.mock import patch, Mock
+from desktop.lib.raz.raz_client import get_raz_client, RazClient
 
 
 class RazClientTest(TestCase):
@@ -33,7 +32,6 @@ class RazClientTest(TestCase):
 
     self.s3_path = 'https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv'
     self.adls_path = 'https://gethuestorage.dfs.core.windows.net/gethue-container/user/csso_hueuser/customer.csv'
-
 
   def test_get_raz_client_adls(self):
     client = get_raz_client(
@@ -51,7 +49,6 @@ class RazClientTest(TestCase):
     assert client.service_name == 'gethue_adls'
     assert client.cluster_name == 'gethueCluster'
 
-
   def test_check_access_adls(self):
     with patch('desktop.lib.sdxaas.knox_jwt.requests_kerberos.HTTPKerberosAuth') as HTTPKerberosAuth:
       with patch('desktop.lib.raz.raz_client.requests.post') as requests_post:
@@ -59,8 +56,7 @@ class RazClientTest(TestCase):
 
           requests_post.return_value = Mock(
             status_code=200,
-            json=Mock(return_value=
-            {
+            json=Mock(return_value={
               'operResult': {
                 'result': 'ALLOWED',
                 'additionalInfo': {
@@ -110,10 +106,9 @@ class RazClientTest(TestCase):
           )
           assert resp['token'] == "nulltenantIdnullnullbnullALLOWEDnullnull1.05nSlN7t/QiPJ1OFlCruTEPLibFbAhEYYj5wbJuaeQqs="
 
-
   def test_handle_raz_req(self):
     with patch('desktop.lib.sdxaas.knox_jwt.requests_kerberos.HTTPKerberosAuth') as HTTPKerberosAuth:
-      with patch('desktop.lib.raz.raz_client.requests.post') as requests_post:
+      with patch('desktop.lib.raz.raz_client.requests.post'):
         with patch('desktop.lib.raz.raz_client.fetch_jwt') as fetch_jwt:
           request_headers = {}
           request_data = Mock()
@@ -138,7 +133,7 @@ class RazClientTest(TestCase):
           client = RazClient(self.raz_url, 'jwt', username=self.username, service="adls", service_name="cm_adls", cluster_name="cl1")
           client._handle_raz_ha = Mock()
 
-          raz_req = client._handle_raz_req(self.raz_url, request_headers, request_data)
+          raz_req = client._handle_raz_req(self.raz_url, request_headers, request_data)  # noqa: F841
 
           client._handle_raz_ha.assert_called_with(
             'https://raz.gethue.com:8080',
@@ -161,7 +156,6 @@ class RazClientTest(TestCase):
           with pytest.raises(PopupException):
             client._handle_raz_req(self.raz_url, request_headers, request_data)
 
-
   def test_handle_adls_action_types_mapping(self):
     client = RazClient(self.raz_url, 'kerberos', username=self.username, service="adls", service_name="cm_adls", cluster_name="cl1")
 
@@ -183,14 +177,14 @@ class RazClientTest(TestCase):
 
     method = 'HEAD'
     relative_path = '/user'
-    url_params = {'resource': 'filesystem'} # Stats call for first-level directories like /user
+    url_params = {'resource': 'filesystem'}  # Stats call for first-level directories like /user
 
     access_type = client.handle_adls_req_mapping(method, url_params)
     assert access_type == 'get-status'
 
     method = 'HEAD'
     relative_path = '/'
-    url_params = {'action': 'getAccessControl'} # Stats call for root directory path
+    url_params = {'action': 'getAccessControl'}  # Stats call for root directory path
 
     access_type = client.handle_adls_req_mapping(method, url_params)
     assert access_type == 'get-acl'
@@ -245,12 +239,11 @@ class RazClientTest(TestCase):
 
     # Chmod
     method = 'PATCH'
-    relative_path = '/user/csso_hueuser/customers.csv'
+    relative_path = '/user/csso_hueuser/customers.csv'  # noqa: F841
     url_params = {'action': 'setAccessControl'}
 
     access_type = client.handle_adls_req_mapping(method, url_params)
     assert access_type == 'set-permission'
-
 
   def test_handle_relative_path(self):
     client = RazClient(self.raz_url, 'kerberos', username=self.username, service="adls", service_name="cm_adls", cluster_name="cl1")
@@ -287,7 +280,6 @@ class RazClientTest(TestCase):
     relative_path = client._handle_relative_path(method, url_params, resource_path, "/")
     assert relative_path == "/user/csso_hueuser"
 
-
   def test_get_raz_client_s3(self):
     client = get_raz_client(
       raz_url=self.raz_url,
@@ -304,7 +296,6 @@ class RazClientTest(TestCase):
     assert client.service_name == 'gethue_s3'
     assert client.cluster_name == 'gethueCluster'
 
-
   def test_check_access_s3(self):
     with patch('desktop.lib.sdxaas.knox_jwt.requests_kerberos.HTTPKerberosAuth') as HTTPKerberosAuth:
       with patch('desktop.lib.raz.raz_client.requests.post') as requests_post:
@@ -314,8 +305,7 @@ class RazClientTest(TestCase):
 
               requests_post.return_value = Mock(
                 status_code=200,
-                json=Mock(return_value=
-                  {
+                json=Mock(return_value={
                     'operResult': {
                       'result': 'ALLOWED',
                       'additionalInfo': {
@@ -349,7 +339,7 @@ class RazClientTest(TestCase):
               requests_post.assert_called_with(
                 'https://raz.gethue.com:8080/api/authz/s3/access?doAs=gethue',
                 auth=HTTPKerberosAuth(),
-                headers={'Content-Type': 'application/json', 'Accept-Encoding': 'gzip,deflate'}, 
+                headers={'Content-Type': 'application/json', 'Accept-Encoding': 'gzip,deflate'},
                 json={
                   'requestId': 'mock_request_id',
                   'serviceType': 's3',
@@ -371,7 +361,6 @@ class RazClientTest(TestCase):
               assert resp
               assert resp['AWSAccessKeyId'] == 'AKIA123REDACTED'
 
-
   def test_handle_raz_ha(self):
     with patch('desktop.lib.sdxaas.knox_jwt.requests_kerberos.HTTPKerberosAuth') as HTTPKerberosAuth:
       with patch('desktop.lib.raz.raz_client.requests.post') as requests_post:
@@ -384,9 +373,9 @@ class RazClientTest(TestCase):
 
         requests_post.assert_called_with(
           'https://raz.gethue.com:8080/api/authz/s3/access?doAs=gethue',
-          auth=HTTPKerberosAuth(), 
-          headers={}, 
-          json=request_data, 
+          auth=HTTPKerberosAuth(),
+          headers={},
+          json=request_data,
           verify=False
         )
         assert raz_response.status_code == 200
@@ -401,9 +390,9 @@ class RazClientTest(TestCase):
 
         requests_post.assert_called_with(
           'https://raz_host_1.gethue.com:8080/api/authz/s3/access?doAs=gethue',
-          auth=HTTPKerberosAuth(), 
-          headers={}, 
-          json=request_data, 
+          auth=HTTPKerberosAuth(),
+          headers={},
+          json=request_data,
           verify=False
         )
         assert raz_response.status_code == 200
@@ -417,8 +406,8 @@ class RazClientTest(TestCase):
         requests_post.assert_called_with(
           'https://raz_host_2.gethue.com:8080/api/authz/s3/access?doAs=gethue',
           auth=HTTPKerberosAuth(),
-          headers={}, 
-          json=request_data, 
+          headers={},
+          json=request_data,
           verify=False
         )
         assert raz_response.status_code == 200
@@ -429,6 +418,5 @@ class RazClientTest(TestCase):
         requests_post.side_effect = [Mock(status_code=404), Mock(status_code=404)]
         raz_response = client._handle_raz_ha(self.raz_urls_ha, auth_handler=HTTPKerberosAuth(), data=request_data, headers={})
 
-        assert raz_response == None
+        assert raz_response is None
         assert requests_post.call_count == 2
-
