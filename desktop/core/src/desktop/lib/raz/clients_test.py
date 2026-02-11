@@ -41,7 +41,7 @@ class S3RazClientLiveTest(TestCase):
     assert 'Expires=' in url
 
   def test_check_acccess_s3_list_file(self):
-    # e.g. 'https://gethue-test.s3.amazonaws.com/data/query-hive-weblogs.csv?AWSAccessKeyId=AKIA23E77ZX2HVY76YGL&'
+    # e.g. 'https://gethue-test.s3.amazonaws.com/data/query-hive-weblogs.csv?AWSAccessKeyId=AKIA123REDACTED&'
     # 'Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304'
 
     url = S3RazClient().get_url(bucket='gethue-test', path='/data/query-hive-weblogs.csv')

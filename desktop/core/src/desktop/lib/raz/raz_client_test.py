@@ -326,13 +326,13 @@ class RazClientTest(TestCase):
                 )
               )
               b64decode.return_value = 'https://gethue-test.s3.amazonaws.com/gethue/data/customer.csv' \
-                  '?AWSAccessKeyId=AKIA23E77ZX2HVY76YGL&Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304'
+                  '?AWSAccessKeyId=AKIA123REDACTED&Signature=3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D&Expires=1617207304'
 
               SignResponseProto.return_value = Mock(
                 FromString=Mock(
                   return_value=Mock(
                     signer_generated_headers=[
-                      Mock(key='AWSAccessKeyId', value='AKIA23E77ZX2HVY76YGL')
+                      Mock(key='AWSAccessKeyId', value='AKIA123REDACTED')
                     ]
                   )
                 )
@@ -369,7 +369,7 @@ class RazClientTest(TestCase):
                 verify=False
               )
               assert resp
-              assert resp['AWSAccessKeyId'] == 'AKIA23E77ZX2HVY76YGL'
+              assert resp['AWSAccessKeyId'] == 'AKIA123REDACTED'
 
 
   def test_handle_raz_ha(self):

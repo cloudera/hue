@@ -45,7 +45,7 @@ class TestRazS3Connection():
       with patch('aws.s3.s3connection.RazS3Connection._mexe') as _mexe:
 
         get_url.return_value = {
-            'AWSAccessKeyId': 'AKIA23E77ZX2HVY76YGL',
+            'AWSAccessKeyId': 'AKIA123REDACTED',
             'Signature': '3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D',
             'Expires': '1617207304'
         }
@@ -67,7 +67,7 @@ class TestRazS3Connection():
         assert '/' == http_request.path
         assert '/' == http_request.auth_path
         assert ({
-            'AWSAccessKeyId': 'AKIA23E77ZX2HVY76YGL',
+            'AWSAccessKeyId': 'AKIA123REDACTED',
             'Signature': '3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D',
             'Expires': '1617207304'
           } ==

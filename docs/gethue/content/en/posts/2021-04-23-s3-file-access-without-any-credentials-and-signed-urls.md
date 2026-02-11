@@ -106,7 +106,7 @@ And then how to call it and unmarshal back the XML to Python objects:
     from boto.resultset import ResultSet
     from boto.s3.bucket import Bucket
 
-    tmp_url = 'https://s3-us-west-1.amazonaws.com/?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA23E77ZX2HVY76YGL%2F20210422%2Fus-west-1%2Fs3%2Faws4_request&X-Amz-Date=20210422T213700Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=2efc90228ec9255636de27dab661e071a931f0aea7b51a09027f4747d0a78f6e'
+    tmp_url = 'https://s3-us-west-1.amazonaws.com/?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA123REDACTED%2F20210422%2Fus-west-1%2Fs3%2Faws4_request&X-Amz-Date=20210422T213700Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=2efc90228ec9255636de27dab661e071a931f0aea7b51a09027f4747d0a78f6e'
 
     response = requests.get(tmp_url)
 
