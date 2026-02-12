@@ -16,7 +16,7 @@
 # limitations under the License.
 from django.urls import reverse
 from django.utils.html import escape
-from djangosaml2.views import AssertionConsumerServiceView, EchoAttributesView, LoginView, LogoutView, MetadataView
+from djangosaml2.views import AssertionConsumerServiceView, EchoAttributesView, LoginView, LogoutView, LogoutInitView, MetadataView
 
 from desktop.lib.django_util import render
 
@@ -24,6 +24,7 @@ LoginView.dispatch.login_notrequired = True
 EchoAttributesView.dispatch.login_notrequired = True
 MetadataView.dispatch.login_notrequired = True
 LogoutView.dispatch.login_notrequired = True
+LogoutInitView.dispatch.login_notrequired = True
 AssertionConsumerServiceView.dispatch.login_notrequired = True
 
 try:

@@ -26,7 +26,7 @@ import logging
 from django.contrib.auth import logout as auth_logout
 from django.http import HttpResponse
 from djangosaml2.backends import Saml2Backend as _Saml2Backend
-from djangosaml2.views import LogoutView
+from djangosaml2.views import LogoutInitView
 
 from desktop.auth.backend import force_username_case, rewrite_user
 from desktop.conf import AUTH
@@ -117,9 +117,7 @@ class SAML2Backend(_Saml2Backend):
 
   def logout(self, request, next_page=None):
     if conf.LOGOUT_ENABLED.get():
-      response = LogoutView.as_view()(request)
-      auth_logout(request)
-      return response
+      return LogoutInitView.as_view()(request)
     elif conf.LOCAL_LOGOUT.get():
       auth_logout(request)
       LOG.debug("SAML local logout is called ...")
