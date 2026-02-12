@@ -473,6 +473,8 @@ if desktop.conf.TASK_SERVER_V2.ENABLED.get():
 
 # Configure sessions
 SESSION_COOKIE_NAME = desktop.conf.SESSION.COOKIE_NAME.get()
+SESSION_COOKIE_DOMAIN = desktop.conf.SESSION.COOKIE_DOMAIN.get()
+SESSION_COOKIE_PATH = desktop.conf.SESSION.COOKIE_PATH.get()
 SESSION_COOKIE_AGE = desktop.conf.SESSION.TTL.get()
 SESSION_COOKIE_SECURE = desktop.conf.SESSION.SECURE.get()
 SECURE_REFERRER_POLICY = None
@@ -595,6 +597,9 @@ if SAML_AUTHENTICATION:
   SESSION_EXPIRE_AT_BROWSER_CLOSE = True
   # Add required middleware for djangosaml2 1.9.3+
   MIDDLEWARE.append('djangosaml2.middleware.SamlSessionMiddleware')
+  # Set SAML session cookie name and SameSite attribute
+  SAML_SESSION_COOKIE_NAME = desktop.conf.SESSION.SAML_COOKIE_NAME.get()
+  SAML_SESSION_COOKIE_SAMESITE = desktop.conf.SESSION.SAML_COOKIE_SAMESITE.get()
 
 # Middleware classes.
 for middleware in desktop.conf.MIDDLEWARE.get():

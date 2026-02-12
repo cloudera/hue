@@ -993,6 +993,30 @@ SESSION = ConfigSection(
       type=str,
       default="sessionid",
     ),
+    COOKIE_DOMAIN=Config(
+      key='cookie_domain',
+      help=_("The domain to use for session cookies. This is useful for cross-subdomain cookies."),
+      type=str,
+      default=None,
+    ),
+    COOKIE_PATH=Config(
+      key='cookie_path',
+      help=_("The path to use for session cookies."),
+      type=str,
+      default='/',
+    ),
+    SAML_COOKIE_NAME=Config(
+      key='session_cookie_name',
+      help=_("The name of the cookie to use for SAML sessions (djangosaml2). See Django session settings."),
+      type=str,
+      default="saml_session",
+    ),
+    SAML_COOKIE_SAMESITE=Config(
+      key='session_cookie_samesite',
+      help=_("The SameSite attribute for SAML session cookies (djangosaml2). See Django session settings."),
+      type=str,
+      default=None,
+    ),
     ENABLE_TEST_COOKIE=Config(
       key='enable_test_cookie',
       help=_("Configuration to determine whether test cookie should be added determine whether the user's browser supports cookies."),
