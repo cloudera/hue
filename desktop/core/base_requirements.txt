@@ -10,7 +10,7 @@ channels-redis==4.2.1
 configobj==5.0.9
 oracledb==2.0.0
 django-auth-ldap==4.3.0
-Django==4.2.23
+Django==4.2.24
 daphne==3.0.2
 django-redis==5.4.0
 django-celery-beat==2.6.0

@@ -56,7 +56,7 @@ class RequirementsGenerator:
       "configobj==5.0.9",
       "oracledb==2.0.0",
       "daphne==3.0.2",
-      "Django==4.2.23",
+      "Django==4.2.24",
       "django-auth-ldap==4.3.0",
       "django-celery-beat==2.6.0",
       "django-celery-results==2.5.1",
