@@ -54,7 +54,7 @@ class RequirementsGenerator:
       "channels==4.2.2",
       "channels-redis==4.2.1",
       "configobj==5.0.9",
-      "oracledb==1.0.3",
+      "oracledb==2.0.0",
       "daphne==3.0.2",
       "Django==4.2.23",
       "django-auth-ldap==4.3.0",
