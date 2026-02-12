@@ -18,10 +18,10 @@
 import logging
 
 try:
-  import cx_Oracle as Database
+  import oracledb as Database
 except ImportError as e:
   from django.core.exceptions import ImproperlyConfigured
-  raise ImproperlyConfigured("Error loading cx_Oracle module: %s" % e)
+  raise ImproperlyConfigured("Error loading oracledb module: %s" % e)
 
 from librdbms.server.rdbms_base_lib import BaseRDBMSDataTable, BaseRDBMSResult, BaseRDMSClient
 

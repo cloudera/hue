@@ -794,22 +794,22 @@ def test_check_config_ajax():
   assert "misconfiguration" in response.content, response.content
 
 
-def test_cx_Oracle():
+def test_oracledb():
   """
-  Tests that cx_Oracle (external dependency) is built correctly.
+  Tests that oracledb (external dependency) is built correctly.
   """
   if 'ORACLE_HOME' not in os.environ and 'ORACLE_INSTANTCLIENT_HOME' not in os.environ:
     pytest.skip("Skipping Test")
 
   try:
-    import cx_Oracle
+    import oracledb
 
     return
   except ImportError as ex:
     if "No module named" in ex.message:
       assert (
         False,
-        "cx_Oracle skipped its build. This happens if "
+        "oracledb skipped its build. This happens if "
         "env var ORACLE_HOME or ORACLE_INSTANTCLIENT_HOME is not defined. "
         "So ignore this test failure if your build does not need to work "
         "with an oracle backend.",

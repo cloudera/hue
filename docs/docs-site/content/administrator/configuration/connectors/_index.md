@@ -204,7 +204,7 @@ Currently, only [basic LDAP authentication](https://github.com/trinodb/trino-pyt
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-    ./build/env/bin/pip install cx_Oracle
+    ./build/env/bin/pip install oracledb
 
 Then give Hue the information about the database source:
 

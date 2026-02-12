@@ -23,7 +23,7 @@ import threading
 from builtins import range
 from datetime import datetime, timedelta
 
-from cx_Oracle import DatabaseError as OracleDatabaseError
+from oracledb import DatabaseError as OracleDatabaseError
 from django.db import connection
 from django.db.utils import DatabaseError, OperationalError
 from future import standard_library
