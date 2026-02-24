@@ -481,7 +481,7 @@ def import_rsa_key_from_file(filename, passphrase=None):
     with open(filename, "rb") as fd:
         data = fd.read()
     passphrase = bytes(passphrase, 'ascii') if passphrase else None
-    key = saml2.cryptography.asymmetric.load_pem_private_key(data)
+    key = saml2.cryptography.asymmetric.load_pem_private_key(data, passphrase)
     return key
 
 
