@@ -60,7 +60,7 @@
     "knockout.mapping": "2.4.3",
     "knockout.validation": "2.0.3",
     "localforage": "1.7.3",
-    "lodash": "4.17.21",
+    "lodash": "4.18.1",
     "luxon": "1.28.1",
     "medium-editor": "5.23.3",
     "mustache": "4.1.0",
