@@ -47,7 +47,7 @@
     "file-saver": "2.0.5",
     "filesize": "4.0.0",
     "i18next": "21.10.0",
-    "i18next-http-backend": "1.4.4",
+    "i18next-http-backend": "3.0.5",
     "jquery": "3.5.1",
     "jquery-contextmenu": "2.9.2",
     "jquery-form": "4.3.0",
