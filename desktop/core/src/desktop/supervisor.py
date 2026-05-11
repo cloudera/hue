@@ -247,7 +247,7 @@ def drop_privileges():
 
   N.B. DO NOT USE THE logging MODULE FROM WITHIN THIS FUNCTION.
   This function is run in forked processes right before it calls
-  exec, but the fork may have occured while a different thread
+  exec, but the fork may have occurred while a different thread
   had locked the log. Since it's a forked process, the log will
   be locked forever in the subprocess and thus a logging.X may
   block forever.
