@@ -16,13 +16,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import csv
+import logging
 import os
 import re
-import csv
-import uuid
 import shutil
-import logging
 import tempfile
+import uuid
 from io import StringIO as string_io
 
 import pytz
@@ -45,6 +45,40 @@ DEFAULT_FIELD = {
   'required': 'false',
   'multiValued': 'false'
 }
+
+
+def validate_local_upload_path(path, username):
+    """
+    Ensure *path* refers to a file that was legitimately created by the
+    importer's upload_local_file endpoint for *username*, blocking arbitrary
+    file reads on the host via the 'localfile' input format.
+
+    The check has three layers:
+      1. The resolved path must be inside the system temp directory
+         (defeats path-traversal / symlink attacks).
+      2. The filename must match the pattern stamped by upload_local_file:
+         {username}_{uuid4}:{safe_name};{random}.csv
+         (defeats an attacker who manages to place a file in /tmp).
+      3. The filename must start with the requesting user's username followed
+         by '_' (prevents one user from accessing another user's uploaded file).
+
+    Raises ValueError with a safe message on any violation.
+    Returns the resolved absolute path string on success.
+    """
+    real_path = os.path.realpath(os.path.abspath(path))
+    tmp_dir = os.path.realpath(tempfile.gettempdir())
+
+    if not real_path.startswith(tmp_dir + os.sep):
+        raise ValueError('File path is not within the expected upload directory.')
+
+    if not os.path.isfile(real_path):
+        raise ValueError('Uploaded file not found.')
+
+    filename = os.path.basename(real_path)
+    if not filename.startswith(username + '_'):
+        raise ValueError('File was not uploaded by the current user.')
+
+    return real_path
 
 
 def get_config_template_path(solr_cloud_mode):

@@ -2148,7 +2148,8 @@ CREATE TABLE IF NOT EXISTS default.test1 (
 
 
 def test_create_table_from_local_mysql():
-  with patch('indexer.indexers.sql.get_interpreter') as get_interpreter:
+  with patch('indexer.indexers.sql.get_interpreter') as get_interpreter, \
+       patch('indexer.indexers.sql.validate_local_upload_path', side_effect=lambda path, username: path):
     get_interpreter.return_value = {'Name': 'MySQL', 'dialect': 'mysql'}
     source = {'path': BASE_DIR + '/apps/beeswax/data/tables/us_population.csv', 'sourceType': 'mysql', 'format': {'hasHeader': False}}
     destination = {
@@ -2179,7 +2180,8 @@ INSERT INTO default.test1 VALUES ('NY', 'New York', '8143197'), ('CA', 'Los Ange
 
 @pytest.mark.django_db
 def test_create_table_from_local_impala():
-  with patch('indexer.indexers.sql.get_interpreter') as get_interpreter:
+  with patch('indexer.indexers.sql.get_interpreter') as get_interpreter, \
+       patch('indexer.indexers.sql.validate_local_upload_path', side_effect=lambda path, username: path):
     get_interpreter.return_value = {'Name': 'Impala', 'dialect': 'impala'}
     source = {'path': BASE_DIR + '/apps/beeswax/data/tables/flights.csv', 'sourceType': 'impala', 'format': {'hasHeader': True}}
     destination = {
@@ -2257,7 +2259,8 @@ DROP TABLE IF EXISTS default.test1_tmp;'''
 
 @pytest.mark.django_db
 def test_create_table_only_header_file_local_impala():
-  with patch('indexer.indexers.sql.get_interpreter') as get_interpreter:
+  with patch('indexer.indexers.sql.get_interpreter') as get_interpreter, \
+       patch('indexer.indexers.sql.validate_local_upload_path', side_effect=lambda path, username: path):
     get_interpreter.return_value = {'Name': 'Impala', 'dialect': 'impala'}
     source = {'path': BASE_DIR + '/apps/beeswax/data/tables/onlyheader.csv', 'sourceType': 'impala', 'format': {'hasHeader': True}}
     destination = {

@@ -91,7 +91,8 @@ def test_col_names():
   request = Mock()
   request.POST = {'fileFormat': file_format}
 
-  response = guess_field_types(request)
+  with unittest.mock.patch('indexer.api3.validate_local_upload_path', side_effect=lambda path, username: path):
+    response = guess_field_types(request)
   response = json.loads(response.content)
 
   columns_name = [col['name'] for col in response['columns']]

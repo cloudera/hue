@@ -47,6 +47,7 @@ from indexer.indexers.rdbms import _get_api, run_sqoop
 from indexer.indexers.sql import _create_database, _create_table, _create_table_from_local
 from indexer.models import _save_pipeline
 from indexer.solr_client import MAX_UPLOAD_SIZE, SolrClient
+from indexer.utils import validate_local_upload_path
 from kafka.kafka_api import get_topic_data, get_topics
 from notebook.connectors.base import get_api, Notebook
 from notebook.decorators import api_error_handler
@@ -249,6 +250,11 @@ def guess_field_types(request):
 
   if file_format['inputFormat'] == 'localfile':
     path = urllib_unquote(file_format['path'])
+
+    try:
+      path = validate_local_upload_path(path, request.user.username)
+    except ValueError as e:
+      raise PopupException(_('Invalid local file path: %s') % e)
 
     with open(path, 'r') as local_file:
 

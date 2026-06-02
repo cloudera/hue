@@ -29,8 +29,8 @@ from django.utils.translation import gettext as _
 from azure.abfs.__init__ import abfspath
 from desktop.lib import django_mako
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.settings import BASE_DIR
 from hadoop.fs.hadoopfs import Hdfs
+from indexer.utils import validate_local_upload_path
 from notebook.connectors.base import get_interpreter
 from notebook.models import make_notebook
 from useradmin.models import User
@@ -355,6 +355,11 @@ class SQLIndexer(object):
     path = urllib_unquote(source['path'])
 
     if path:                                                  # data insertion
+      try:
+        path = validate_local_upload_path(path, self.user.username)
+      except ValueError as e:
+        raise PopupException(_('Invalid local file path: %s') % e)
+
       with open(path, 'r') as local_file:
         reader = csv.reader(local_file)
         _csv_rows = []
