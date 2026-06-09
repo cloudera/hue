@@ -18,6 +18,7 @@
 import json
 import logging
 import os
+import posixpath
 import re
 import stat
 import tempfile
@@ -110,6 +111,61 @@ class TestFileBrowser:
         assert 200 == response.status_code
         dir_listing = response.context[0]['files']
         assert 1 == len(dir_listing)
+
+  def test_copy_same_path_trailing_slash_is_rejected(self):
+    # Copying a directory onto itself where the only difference is a trailing slash must be rejected.
+    # Without normalization the raw string comparison passes and request.fs.copy ends up copying the
+    # directory into itself (e.g. /user/systest/tmp -> /user/systest/tmp/tmp), nesting infinitely.
+    with patch('desktop.middleware.fsmanager.get_filesystem') as get_filesystem:
+      mock_fs = Mock(
+        normpath=Mock(side_effect=lambda p: posixpath.normpath(p)),
+      )
+      get_filesystem.return_value = mock_fs
+
+      response = self.client.post('/filebrowser/copy', dict(src_path=['/user/systest/tmp'], dest_path='/user/systest/tmp/'))
+
+      # The guard should fire and copy should never be attempted.
+      assert mock_fs.copy.call_count == 0
+      assert b'Source path and destination path cannot be same' in response.content
+
+  def test_copy_different_path_is_allowed(self):
+    # Sanity check: a genuinely different destination still performs the copy.
+    with patch('desktop.middleware.fsmanager.get_filesystem') as get_filesystem:
+      mock_fs = Mock(
+        normpath=Mock(side_effect=lambda p: posixpath.normpath(p)),
+      )
+      get_filesystem.return_value = mock_fs
+
+      self.client.post('/filebrowser/copy', dict(src_path=['/user/systest/tmp'], dest_path='/user/systest/dest'))
+
+      assert mock_fs.copy.call_count == 1
+
+  def test_move_same_path_trailing_slash_is_rejected(self):
+    # Moving a path onto itself where the only difference is a trailing slash must be rejected;
+    # the raw string comparison alone would let it through to request.fs.rename.
+    with patch('desktop.middleware.fsmanager.get_filesystem') as get_filesystem:
+      mock_fs = Mock(
+        normpath=Mock(side_effect=lambda p: posixpath.normpath(p)),
+      )
+      get_filesystem.return_value = mock_fs
+
+      response = self.client.post('/filebrowser/move', dict(src_path=['/user/systest/tmp'], dest_path='/user/systest/tmp/'))
+
+      # The guard should fire and rename should never be attempted.
+      assert mock_fs.rename.call_count == 0
+      assert b'Source path and destination path cannot be same' in response.content
+
+  def test_move_different_path_is_allowed(self):
+    # Sanity check: a genuinely different destination still performs the move.
+    with patch('desktop.middleware.fsmanager.get_filesystem') as get_filesystem:
+      mock_fs = Mock(
+        normpath=Mock(side_effect=lambda p: posixpath.normpath(p)),
+      )
+      get_filesystem.return_value = mock_fs
+
+      self.client.post('/filebrowser/move', dict(src_path=['/user/systest/tmp'], dest_path='/user/systest/dest'))
+
+      assert mock_fs.rename.call_count == 1
 
   def test_listdir_paged_with_non_ascii(self):
     parent_dir = Mock(

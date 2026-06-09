@@ -1379,7 +1379,9 @@ def move(request):
 
   def bulk_move(*args, **kwargs):
     for arg in args:
-      if arg['src_path'] == arg['dest_path']:
+      # Normalize before comparing so that semantically identical paths that differ only by a
+      # trailing slash (e.g. /user/test/tmp vs /user/test/tmp/) are still detected as the same.
+      if request.fs.normpath(arg['src_path']) == request.fs.normpath(arg['dest_path']):
         raise PopupException(_('Source path and destination path cannot be same'))
       request.fs.rename(
           arg['src_path'].encode('utf-8') if not isinstance(arg['src_path'], str) else arg['src_path'],
@@ -1399,7 +1401,11 @@ def copy(request):
   def bulk_copy(*args, **kwargs):
     ofs_skip_files = ''
     for arg in args:
-      if arg['src_path'] == arg['dest_path']:
+      # Normalize before comparing so that semantically identical paths that differ only by a
+      # trailing slash (e.g. /user/test/tmp vs /user/test/tmp/) are still detected as the same.
+      # Otherwise the raw string comparison passes and request.fs.copy ends up copying a directory
+      # into itself, creating an infinitely nested copy.
+      if request.fs.normpath(arg['src_path']) == request.fs.normpath(arg['dest_path']):
         raise PopupException(_('Source path and destination path cannot be same'))
 
       # Copy method for OFS returns a string of skipped files if their size is greater than chunk size.
