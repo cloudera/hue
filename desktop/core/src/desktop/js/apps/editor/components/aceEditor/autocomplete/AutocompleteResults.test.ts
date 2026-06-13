@@ -73,10 +73,10 @@ describe('AutocompleteResults.ts', () => {
     });
 
   const createSubject = (): AutocompleteResults => {
-    const mockEditor = () => ({
+    const mockEditor = {
       getTextBeforeCursor: () => 'foo',
       getTextAfterCursor: () => 'bar'
-    });
+    };
 
     const mockExecutor = {
       connector: () => ({ id: 'hive', dialect: 'hive' }),
@@ -92,6 +92,64 @@ describe('AutocompleteResults.ts', () => {
       sqlReferenceProvider: sqlReferenceRepository,
       editor: mockEditor as unknown as Ace.Editor
     });
+  };
+
+  const mockSourceMetadata = (columnsByTable: Record<string, { type: string; name: string }[]>) => {
+    jest.spyOn(hueConfig, 'getLastKnownConfig').mockImplementation(
+      () =>
+        ({
+          app_config: {
+            editor: {
+              source_autocomplete_disabled: false
+            }
+          }
+        }) as HueConfig
+    );
+    sourceMetaSpy.mockImplementation(
+      (options: Parameters<typeof CatalogApi.fetchSourceMetadata>[0]) => {
+        const path = options.entry.path;
+        if (path.length === 0) {
+          return CancellablePromise.resolve({ databases: ['default'] });
+        }
+        if (path.length === 1) {
+          return CancellablePromise.resolve({
+            tables_meta: Object.keys(columnsByTable).map((tableName, index) => ({
+              comment: null,
+              index,
+              type: 'Table',
+              name: tableName
+            }))
+          });
+        }
+        if (path.length === 2) {
+          const tableName = path[1].toLowerCase();
+          const extendedColumns = columnsByTable[tableName] || [];
+          return CancellablePromise.resolve({
+            extended_columns: extendedColumns.map(column => ({
+              type: column.type,
+              name: column.name
+            })),
+            columns: extendedColumns.map(column => column.name),
+            partition_keys: []
+          });
+        }
+        if (path.length === 3) {
+          const tableName = path[1].toLowerCase();
+          const columnName = path[2].toLowerCase();
+          const foundColumn = (columnsByTable[tableName] || []).find(
+            column => column.name.toLowerCase() === columnName
+          );
+          if (foundColumn) {
+            return CancellablePromise.resolve({
+              comment: '',
+              type: foundColumn.type,
+              name: foundColumn.name
+            });
+          }
+        }
+        return CancellablePromise.reject();
+      }
+    );
   };
 
   beforeEach(() => {
@@ -302,5 +360,271 @@ describe('AutocompleteResults.ts', () => {
     );
 
     expect(sourceMetaSpy).not.toHaveBeenCalled();
+  });
+
+  it('should suggest columns for CTEs selecting all columns from a source table', async () => {
+    mockSourceMetadata({
+      foo: [
+        { type: 'int', name: 'id' },
+        { type: 'string', name: 'name' }
+      ]
+    });
+    const subject = createSubject();
+    const suggestions: Suggestion[] = [];
+
+    await subject.update(
+      {
+        lowerCase: false,
+        suggestColumns: {
+          source: 'select',
+          tables: [{ identifierChain: [{ cte: 't1' }] }]
+        },
+        commonTableExpressions: [
+          {
+            alias: 't1',
+            columns: [{ tables: [{ identifierChain: [{ name: 'foo' }] }] }]
+          }
+        ]
+      } as AutocompleteParseResult,
+      suggestions
+    );
+
+    const values = suggestions.map(suggestion => suggestion.value);
+    expect(values).toEqual(expect.arrayContaining(['id', 'name']));
+  });
+
+  it('should resolve CTEs that select all columns from another CTE', async () => {
+    mockSourceMetadata({
+      foo: [
+        { type: 'int', name: 'id' },
+        { type: 'string', name: 'name' }
+      ]
+    });
+    const subject = createSubject();
+    const suggestions: Suggestion[] = [];
+
+    await subject.update(
+      {
+        lowerCase: false,
+        suggestColumns: {
+          source: 'select',
+          tables: [{ identifierChain: [{ cte: 't2' }] }]
+        },
+        commonTableExpressions: [
+          {
+            alias: 't1',
+            columns: [{ tables: [{ identifierChain: [{ name: 'foo' }] }] }]
+          },
+          {
+            alias: 't2',
+            columns: [{ tables: [{ identifierChain: [{ name: 't1' }] }] }]
+          }
+        ]
+      } as AutocompleteParseResult,
+      suggestions
+    );
+
+    const cteColumnSuggestions = suggestions.filter(suggestion =>
+      ['id', 'name'].includes(suggestion.value)
+    );
+    expect(cteColumnSuggestions.map(suggestion => suggestion.value)).toEqual(
+      expect.arrayContaining(['id', 'name'])
+    );
+    cteColumnSuggestions.forEach(suggestion => {
+      expect(suggestion.table?.identifierChain).toEqual([{ cte: 't2' }]);
+    });
+  });
+
+  it('should not resolve later CTEs from earlier CTE definitions', async () => {
+    mockSourceMetadata({
+      foo: [
+        { type: 'int', name: 'id' },
+        { type: 'string', name: 'name' }
+      ],
+      bar: [{ type: 'boolean', name: 'active' }]
+    });
+    const subject = createSubject();
+    const suggestions: Suggestion[] = [];
+
+    await subject.update(
+      {
+        lowerCase: false,
+        suggestColumns: {
+          source: 'select',
+          tables: [{ identifierChain: [{ cte: 't1' }] }]
+        },
+        commonTableExpressions: [
+          {
+            alias: 't1',
+            columns: [{ tables: [{ identifierChain: [{ name: 'foo' }] }] }]
+          },
+          {
+            alias: 'foo',
+            columns: [{ tables: [{ identifierChain: [{ name: 'bar' }] }] }]
+          }
+        ]
+      } as AutocompleteParseResult,
+      suggestions
+    );
+
+    const values = suggestions.map(suggestion => suggestion.value);
+    expect(values).toEqual(expect.arrayContaining(['id', 'name']));
+    expect(values).not.toEqual(expect.arrayContaining(['active']));
+  });
+
+  it('should prefer explicit CTE column aliases over expanded source columns', async () => {
+    mockSourceMetadata({
+      foo: [
+        { type: 'int', name: 'id' },
+        { type: 'string', name: 'name' }
+      ]
+    });
+    const subject = createSubject();
+    const suggestions: Suggestion[] = [];
+
+    await subject.update(
+      {
+        lowerCase: false,
+        suggestColumns: {
+          source: 'select',
+          tables: [{ identifierChain: [{ cte: 'renamed_cte' }] }]
+        },
+        commonTableExpressions: [
+          {
+            alias: 'renamed_cte',
+            columnAliases: ['cte_id', 'cte_name'],
+            columns: [{ tables: [{ identifierChain: [{ name: 'foo' }] }] }]
+          }
+        ]
+      } as AutocompleteParseResult,
+      suggestions
+    );
+
+    const values = suggestions.map(suggestion => suggestion.value);
+    expect(values).toEqual(expect.arrayContaining(['cte_id', 'cte_name']));
+    expect(values).not.toEqual(expect.arrayContaining(['id', 'name']));
+  });
+
+  it('should quote explicit CTE column aliases that require quoting', async () => {
+    mockSourceMetadata({
+      foo: [
+        { type: 'int', name: 'id' },
+        { type: 'string', name: 'name' }
+      ]
+    });
+    const subject = createSubject();
+    const suggestions: Suggestion[] = [];
+
+    await subject.update(
+      {
+        lowerCase: false,
+        suggestColumns: {
+          source: 'select',
+          tables: [{ identifierChain: [{ cte: 'renamed_cte' }] }]
+        },
+        commonTableExpressions: [
+          {
+            alias: 'renamed_cte',
+            columnAliases: ['select', 'order-id'],
+            columns: [{ tables: [{ identifierChain: [{ name: 'foo' }] }] }]
+          }
+        ]
+      } as AutocompleteParseResult,
+      suggestions
+    );
+
+    const values = suggestions.map(suggestion => suggestion.value);
+    expect(values).toEqual(expect.arrayContaining(['`select`', '`order-id`']));
+    expect(values).not.toEqual(expect.arrayContaining(['select', 'order-id', 'id', 'name']));
+  });
+
+  it('should suggest columns for CTEs backed only by explicit column aliases', async () => {
+    const subject = createSubject();
+    const suggestions: Suggestion[] = [];
+
+    await subject.update(
+      {
+        lowerCase: false,
+        suggestColumns: {
+          source: 'select',
+          tables: [{ identifierChain: [{ cte: 'values_cte' }] }]
+        },
+        commonTableExpressions: [
+          {
+            alias: 'values_cte',
+            columnAliases: ['cte_id', 'cte_name']
+          }
+        ]
+      } as AutocompleteParseResult,
+      suggestions
+    );
+
+    const values = suggestions.map(suggestion => suggestion.value);
+    expect(values).toEqual(expect.arrayContaining(['cte_id', 'cte_name']));
+    const sourceTableColumnFetches = sourceMetaSpy.mock.calls.filter(
+      ([options]) => options.entry.path.length > 1
+    );
+    expect(sourceTableColumnFetches).toHaveLength(0);
+  });
+
+  it('should apply type filtering to explicit CTE column aliases backed by source columns', async () => {
+    mockSourceMetadata({
+      foo: [
+        { type: 'int', name: 'id' },
+        { type: 'boolean', name: 'active' }
+      ]
+    });
+    const subject = createSubject();
+    const suggestions: Suggestion[] = [];
+
+    await subject.update(
+      {
+        lowerCase: false,
+        suggestColumns: {
+          source: 'select',
+          types: ['BOOLEAN'],
+          tables: [{ identifierChain: [{ cte: 'renamed_cte' }] }]
+        },
+        commonTableExpressions: [
+          {
+            alias: 'renamed_cte',
+            columnAliases: ['cte_id', 'cte_active'],
+            columns: [{ tables: [{ identifierChain: [{ name: 'foo' }] }] }]
+          }
+        ]
+      } as AutocompleteParseResult,
+      suggestions
+    );
+
+    const values = suggestions.map(suggestion => suggestion.value);
+    expect(values).toEqual(expect.arrayContaining(['cte_active']));
+    expect(values).not.toEqual(expect.arrayContaining(['cte_id', 'id', 'active']));
+  });
+
+  it('should apply type filtering to physical table column suggestions', async () => {
+    mockSourceMetadata({
+      foo: [
+        { type: 'int', name: 'id' },
+        { type: 'boolean', name: 'active' }
+      ]
+    });
+    const subject = createSubject();
+    const suggestions: Suggestion[] = [];
+
+    await subject.update(
+      {
+        lowerCase: false,
+        suggestColumns: {
+          source: 'select',
+          types: ['BOOLEAN'],
+          tables: [{ identifierChain: [{ name: 'foo' }] }]
+        }
+      } as AutocompleteParseResult,
+      suggestions
+    );
+
+    const values = suggestions.map(suggestion => suggestion.value);
+    expect(values).toEqual(expect.arrayContaining(['active']));
+    expect(values).not.toEqual(expect.arrayContaining(['id']));
   });
 });

@@ -24,6 +24,11 @@ import HueColors from 'utils/hueColors';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import sqlUtils from 'sql/sqlUtils';
+import {
+  addCteColumns as addCteColumnsFromCte,
+  asCteTable,
+  findCteForTable
+} from 'sql/cteAutocompleteUtils';
 import { matchesType } from 'sql/reference/typeUtils';
 import { DIALECT } from 'apps/editor/snippet';
 import { cancelActiveRequest } from 'api/apiUtils';
@@ -1015,6 +1020,8 @@ class AutocompleteResults {
           this.snippet.connector(),
           suggestColumns.udfRef
         );
+      } else if (suggestColumns.types) {
+        types = suggestColumns.types;
       }
     } catch (err) {}
 
@@ -1049,52 +1056,37 @@ class AutocompleteResults {
     return columnSuggestions;
   }
 
-  async addCteColumns(table, columnSuggestions) {
-    const cte = this.parseResult.commonTableExpressions.find(cte =>
-      equalIgnoreCase(cte.alias, table.identifierChain[0].cte)
+  async addCteColumns(table, types, columnSuggestions, context = {}) {
+    await addCteColumnsFromCte(
+      {
+        dialect: this.dialect(),
+        commonTableExpressions: this.parseResult.commonTableExpressions || [],
+        fetchFieldForIdentifierChain: identifierChain =>
+          this.fetchFieldForIdentifierChain(identifierChain),
+        addColumns: (table, types, columnSuggestions, context) =>
+          this.addColumns(table, types, columnSuggestions, context),
+        addColumnSuggestion: async (column, table, columnName, type, columnSuggestions) => {
+          columnSuggestions.push({
+            value: await sqlUtils.backTickIfNeeded(
+              this.snippet.connector(),
+              columnName,
+              undefined,
+              this.parseResult.suggestColumns?.appendBacktick
+            ),
+            filterValue: columnName,
+            meta: type,
+            category: CATEGORIES.COLUMN,
+            table: table,
+            popular: ko.observable(false),
+            details: column
+          });
+        }
+      },
+      table,
+      types,
+      columnSuggestions,
+      context
     );
-    if (!cte) {
-      return;
-    }
-    for (const column of cte.columns) {
-      const type =
-        typeof column.type !== 'undefined' && column.type !== 'COLREF' ? column.type : 'T';
-      if (typeof column.alias !== 'undefined') {
-        columnSuggestions.push({
-          value: await sqlUtils.backTickIfNeeded(
-            this.snippet.connector(),
-            column.alias,
-            undefined,
-            this.parseResult.suggestColumns?.appendBacktick
-          ),
-          filterValue: column.alias,
-          meta: type,
-          category: CATEGORIES.COLUMN,
-          table: table,
-          popular: ko.observable(false),
-          details: column
-        });
-      } else if (
-        typeof column.identifierChain !== 'undefined' &&
-        column.identifierChain.length > 0 &&
-        typeof column.identifierChain[column.identifierChain.length - 1].name !== 'undefined'
-      ) {
-        columnSuggestions.push({
-          value: await sqlUtils.backTickIfNeeded(
-            this.snippet.connector(),
-            column.identifierChain[column.identifierChain.length - 1].name,
-            undefined,
-            this.parseResult.suggestColumns?.appendBacktick
-          ),
-          filterValue: column.identifierChain[column.identifierChain.length - 1].name,
-          meta: type,
-          category: CATEGORIES.COLUMN,
-          table: table,
-          popular: ko.observable(false),
-          details: column
-        });
-      }
-    }
   }
 
   async addSubQueryColumns(table, columnSuggestions) {
@@ -1154,17 +1146,15 @@ class AutocompleteResults {
     }
   }
 
-  async addColumns(table, types, columnSuggestions) {
-    if (
-      typeof table.identifierChain !== 'undefined' &&
-      table.identifierChain.length === 1 &&
-      typeof table.identifierChain[0].cte !== 'undefined'
-    ) {
+  async addColumns(table, types, columnSuggestions, context = {}) {
+    const visibleCtes = context.visibleCtes || this.parseResult.commonTableExpressions || [];
+    const cte = findCteForTable(table, visibleCtes);
+    if (cte) {
       if (
         typeof this.parseResult.commonTableExpressions !== 'undefined' &&
         this.parseResult.commonTableExpressions.length > 0
       ) {
-        await this.addCteColumns(table, columnSuggestions);
+        await this.addCteColumns(asCteTable(table, cte), types, columnSuggestions, context);
       }
     } else if (
       typeof table.identifierChain !== 'undefined' &&
@@ -1213,7 +1203,7 @@ class AutocompleteResults {
             columnSuggestions.push({
               value: name,
               meta: childEntry.getType(),
-              table: table,
+              table: context.suggestionTable || table,
               category: CATEGORIES.COLUMN,
               popular: ko.observable(false),
               weightAdjust:
@@ -1252,7 +1242,7 @@ class AutocompleteResults {
             columnSuggestions.push({
               value: field.name,
               meta: fieldType,
-              table: table,
+              table: context.suggestionTable || table,
               category: CATEGORIES.COLUMN,
               popular: ko.observable(false),
               weightAdjust:
@@ -1268,8 +1258,9 @@ class AutocompleteResults {
       };
 
       const suggestcolumns = this.parseResult.suggestColumns;
-      const identifierChain =
-        (suggestcolumns && suggestcolumns.identifierChain) || table.identifierChain;
+      const identifierChain = context.suggestionTable
+        ? table.identifierChain
+        : (suggestcolumns && suggestcolumns.identifierChain) || table.identifierChain;
       try {
         const entry = await this.fetchFieldForIdentifierChain(identifierChain);
         if (entry) {

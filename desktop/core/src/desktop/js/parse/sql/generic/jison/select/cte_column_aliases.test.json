@@ -1,0 +1,63 @@
+[
+  {
+    "namePrefix": "should capture CTE column aliases",
+    "beforeCursor": "WITH t1 (cte_id, cte_name) AS (SELECT id, name FROM foo) SELECT ",
+    "afterCursor": "",
+    "noErrors": true,
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
+    "expectedResult": {
+      "lowerCase": false,
+      "suggestAggregateFunctions": {
+        "tables": []
+      },
+      "suggestAnalyticFunctions": true,
+      "suggestFunctions": {},
+      "suggestTables": {
+        "prependQuestionMark": true,
+        "prependFrom": true
+      },
+      "suggestDatabases": {
+        "prependQuestionMark": true,
+        "prependFrom": true,
+        "appendDot": true
+      },
+      "suggestCommonTableExpressions": [
+        {
+          "name": "t1",
+          "prependFrom": true,
+          "prependQuestionMark": true
+        }
+      ],
+      "commonTableExpressions": [
+        {
+          "alias": "t1",
+          "columnAliases": ["cte_id", "cte_name"],
+          "columns": [
+            {
+              "identifierChain": [
+                {
+                  "name": "foo"
+                },
+                {
+                  "name": "id"
+                }
+              ],
+              "type": "COLREF"
+            },
+            {
+              "identifierChain": [
+                {
+                  "name": "foo"
+                },
+                {
+                  "name": "name"
+                }
+              ],
+              "type": "COLREF"
+            }
+          ]
+        }
+      ]
+    }
+  }
+]

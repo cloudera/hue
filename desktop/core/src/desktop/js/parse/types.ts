@@ -30,6 +30,12 @@ export interface SubQuery {
   subQueries?: SubQuery[];
 }
 
+export interface CommonTableExpression {
+  alias: string;
+  columnAliases?: string[];
+  columns?: ColumnDetails[];
+}
+
 export interface ParsedTable {
   alias?: string;
   identifierChain: IdentifierChainEntry[];
@@ -90,10 +96,11 @@ export interface ColumnAliasDetails {
 }
 
 export interface ColumnDetails {
-  type: string;
-  alias: string;
-  identifierChain: IdentifierChainEntry[];
+  type?: string;
+  alias?: string;
+  identifierChain?: IdentifierChainEntry[];
   subQuery?: string;
+  tables?: ParsedTable[];
 }
 
 export interface CommonPopularSuggestion {
@@ -105,10 +112,7 @@ export interface AutocompleteParseResult {
   colRef?: {
     identifierChain: IdentifierChainEntry[];
   };
-  commonTableExpressions?: {
-    alias: string;
-    columns: ColumnDetails[];
-  }[];
+  commonTableExpressions?: CommonTableExpression[];
   locations: IdentifierLocation[];
   lowerCase: boolean;
   subQueries: SubQuery[];
