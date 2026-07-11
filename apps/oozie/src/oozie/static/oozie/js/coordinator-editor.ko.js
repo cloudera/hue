@@ -220,6 +220,37 @@ var CoordinatorEditorViewModel = (function () {
       self.coordinator.refreshParameters();
     }
 
+    self.cronExpressionExplanation = ko.observable({
+      isValid: false,
+      description: '',
+      error: '',
+      nextRuns: []
+    });
+
+    var cronExplanationTimeout = null;
+    self.updateCronExpressionExplanation = function () {
+      if (cronExplanationTimeout) {
+        window.clearTimeout(cronExplanationTimeout);
+      }
+
+      cronExplanationTimeout = window.setTimeout(function () {
+        if (typeof window.cronExpressionUtils === 'undefined') {
+          return;
+        }
+
+        self.cronExpressionExplanation(
+          window.cronExpressionUtils.explain(
+            self.coordinator.properties.cron_frequency(),
+            self.coordinator.properties.timezone()
+          )
+        );
+      }, 300);
+    };
+
+    self.coordinator.properties.cron_frequency.subscribe(self.updateCronExpressionExplanation);
+    self.coordinator.properties.timezone.subscribe(self.updateCronExpressionExplanation);
+    self.updateCronExpressionExplanation();
+
     self.workflowModalFilter = ko.observable("");
     self.filteredModalWorkflows = ko.computed(function () {
       var _filter = self.workflowModalFilter().toLowerCase();
