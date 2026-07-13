@@ -143,6 +143,10 @@ MIDDLEWARE = [
     'desktop.middleware.MultipleProxyMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    # Must be before any middleware that can call login()/rotate_token() inline (Spnego, RemoteUser),
+    # otherwise this middleware's process_request() would reset the freshly-rotated CSRF secret
+    # back to the stale incoming cookie value, causing a CSRF token mismatch on the same request.
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'desktop.middleware.ProxyMiddleware',
     'desktop.middleware.SpnegoMiddleware',
@@ -159,7 +163,6 @@ MIDDLEWARE = [
     'desktop.middleware.NotificationMiddleware',
     'desktop.middleware.ExceptionMiddleware',
     'desktop.middleware.ClusterMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
     'desktop.middleware.CacheControlMiddleware',
     'django.middleware.http.ConditionalGetMiddleware',
     # 'axes.middleware.FailedLoginMiddleware',
