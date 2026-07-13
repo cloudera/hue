@@ -21,6 +21,7 @@ import textwrap
 import time
 from urllib.parse import urlparse
 
+import certifi
 import requests
 from trino.auth import BasicAuthentication
 from trino.client import ClientSession, TrinoQuery, TrinoRequest
@@ -37,6 +38,23 @@ from notebook.connectors.base import Api, ExecutionWrapper, QueryError, ResultWr
 
 LOG = logging.getLogger()
 SESSION_KEY = '%(username)s-%(interpreter_name)s'
+
+_COMBINED_CA_BUNDLE = None
+
+
+def _get_combined_ca_bundle(extra_cert_path):
+  """Merge the system/certifi CA bundle with a custom (e.g. self-signed) cert
+  so both public CAs and the internal cert validate. Computed once per process."""
+  global _COMBINED_CA_BUNDLE
+  if _COMBINED_CA_BUNDLE is None:
+    combined_path = '/tmp/hue-trino-ca-bundle.pem'
+    with open(combined_path, 'wb') as out:
+      with open(certifi.where(), 'rb') as f:
+        out.write(f.read())
+      with open(extra_cert_path, 'rb') as f:
+        out.write(f.read())
+    _COMBINED_CA_BUNDLE = combined_path
+  return _COMBINED_CA_BUNDLE
 
 
 def query_error_handler(func):
@@ -71,6 +89,9 @@ class TrinoApi(Api):
       self.auth_password = auth_password
       self.auth = BasicAuthentication(self.auth_username, self.auth_password)
 
+    ssl_cert_path = self.options.get('ssl_cert_path')
+    verify = _get_combined_ca_bundle(ssl_cert_path) if ssl_cert_path else True
+
     self.session_info = self.create_session()
     self.trino_session = ClientSession(self.user.username, properties=self.session_info['properties'])
     self.trino_request = TrinoRequest(
@@ -78,7 +99,8 @@ class TrinoApi(Api):
       port=self.server_port,
       client_session=self.trino_session,
       http_scheme=self.http_scheme,
-      auth=self.auth
+      auth=self.auth,
+      verify=verify
     )
 
   def get_auth_password(self):
@@ -205,7 +227,7 @@ class TrinoApi(Api):
       if _status.stats['state'] == 'QUEUED':
         status = 'waiting'
       elif _status.stats['state'] == 'RUNNING':
-        status = 'available'  # need to verify
+        status = 'running'
       else:
         status = 'available'
 
@@ -321,6 +343,10 @@ class TrinoApi(Api):
       })
 
     return statement
+
+  @query_error_handler
+  def cancel(self, notebook, snippet):
+    return self.close_statement(notebook, snippet)
 
   def close_statement(self, notebook, snippet):
     try:
