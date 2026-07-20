@@ -140,6 +140,17 @@ LOG = logging.getLogger()
 
 MIDDLEWARE_HEADER = "X-Hue-Middleware-Response"
 
+
+def _get_request_target(request, prefix=''):
+  target = request.path
+  if prefix and target != prefix and not target.startswith(prefix + '/'):
+    target = prefix + target
+  query_string = request.META.get('QUERY_STRING')
+  if query_string:
+    target += '?' + query_string
+  return target
+
+
 # Views inside Django that don't require login
 # (see LoginAndPermissionMiddleware)
 DJANGO_VIEW_AUTH_WHITELIST = [
@@ -495,11 +506,13 @@ class LoginAndPermissionMiddleware(Django4MiddlewareAdapterMixin):
           'url': "%s?%s=%s" % (
               settings.LOGIN_URL,
               REDIRECT_FIELD_NAME,
-              quote('/hue' + request.get_full_path().replace('is_embeddable=true', '').replace('&&', '&'))
+              quote(_get_request_target(request, '/hue').replace('is_embeddable=true', '').replace('&&', '&'))
           )
         })  # Remove embeddable so redirect from & to login works. Login page is not embeddable
       else:
-        return HttpResponseRedirect("%s?%s=%s" % (settings.LOGIN_URL, REDIRECT_FIELD_NAME, quote(request.get_full_path())))
+        redirect_url = "%s?%s=%s" % (
+            settings.LOGIN_URL, REDIRECT_FIELD_NAME, quote(_get_request_target(request)))
+        return HttpResponseRedirect(redirect_url)
 
   def process_response(self, request, response):
     if hasattr(request, 'ts') and hasattr(request, 'view_func'):
