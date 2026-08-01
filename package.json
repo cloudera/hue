@@ -75,7 +75,7 @@
     "react-syntax-highlighter": "15.5.0",
     "regenerator-runtime": "0.13.7",
     "removeNPMAbsolutePaths": "1.0.6",
-    "sanitize-html": "2.13.0",
+    "sanitize-html": "2.17.5",
     "selectize-plugin-clear": "0.0.3",
     "sprintf-js": "1.1.2",
     "sql-formatter": "12.2.1",
