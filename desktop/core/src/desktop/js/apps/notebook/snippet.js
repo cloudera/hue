@@ -2366,17 +2366,38 @@ class Snippet {
                   self.result.hasResultset(self.result.handle().has_result_set);
                 }
 
+                if (self.type() === 'trino') {
+                  // Every check_status() poll GETs the query's current next_uri, which advances
+                  // Trino's pagination cursor and may consume a page of row data along with the
+                  // status check. This has to be applied regardless of which status branch we're
+                  // in below -- including 'available' -- otherwise the immediately-following
+                  // fetchResult() call serializes a stale, already-consumed next_uri and the rows
+                  // tied to this poll's advance are lost for good.
+                  const existing_handle = self.result.handle();
+                  existing_handle.row_count = 0;
+                  existing_handle.rows_remaining = 0;
+                  existing_handle.next_uri = data.query_status.next_uri;
+                  if (data.query_status.result && data.query_status.result.data) {
+                    // The GET above may have delivered an actual page of rows along with the
+                    // status check (Trino only serves a given next_uri's data once). Since
+                    // next_uri now points past that page, fetchResult() has no way to recover
+                    // those rows itself -- they have to be seeded here into handle.result so the
+                    // row_count === 0 path picks them up.
+                    const existing_result = existing_handle.result || { data: [], meta: [], type: 'table' };
+                    existing_result.data = (existing_result.data || []).concat(data.query_status.result.data);
+                    if (data.query_status.result.meta) {
+                      existing_result.meta = data.query_status.result.meta;
+                    }
+                    existing_result.type = data.query_status.result.type || 'table';
+                    existing_handle.result = existing_result;
+                  }
+                }
+
                 if (
                   self.status() == 'running' ||
                   self.status() == 'starting' ||
                   self.status() == 'waiting'
                 ) {
-                  if (self.type() === 'trino') {
-                    const existing_handle = self.result.handle();
-                    existing_handle.row_count = 0;
-                    existing_handle.rows_remaining = 0;
-                    existing_handle.next_uri = data.query_status.next_uri;
-                  }
                   const delay = self.result.executionTime() > 45000 ? 5000 : 1000; // 5s if more than 45s
                   if (!notebook.unloaded()) {
                     self.checkStatusTimeout = setTimeout(_checkStatus, delay);
