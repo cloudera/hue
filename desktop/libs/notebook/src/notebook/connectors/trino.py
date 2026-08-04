@@ -231,8 +231,27 @@ class TrinoApi(Api):
       else:
         status = 'available'
 
+      # This poll's GET already consumed next_uri, and Trino only serves a given next_uri's
+      # row data once. Any rows piggybacked on this response have to be surfaced in the
+      # response itself (not just remembered locally) since the caller -- notebook/api.py --
+      # persists this into the snippet's handle so fetch_result() can pick it up even if it
+      # runs on a different worker process than this poll did.
+      if _status.rows:
+        response['result'] = {
+          'has_more': _status.next_uri is not None,
+          'data': _status.rows,
+          'meta': [{
+              'name': col['name'],
+              'type': col['type'],
+              'comment': ''
+            }
+            for col in _status.columns
+          ] if _status.columns else [],
+          'type': 'table'
+        }
+
     response['status'] = status
-    response['next_uri'] = _status.next_uri if status != 'available' else next_uri
+    response['next_uri'] = _status.next_uri if next_uri is not None else next_uri
     return response
 
   @query_error_handler
