@@ -107,41 +107,6 @@ urlpatterns += [
 ]
 
 urlpatterns += [
-  re_path(r'^storage/filesystems/?$', api_public.storage_get_filesystems, name='storage_get_filesystems'),
-  re_path(r'^storage/list/?$', api_public.storage_listdir_paged, name='storage_listdir_paged'),
-  re_path(r'^storage/create/file/?$', api_public.storage_touch, name='storage_touch'),
-  re_path(r'^storage/create/directory/?$', api_public.storage_mkdir, name='storage_mkdir'),
-  re_path(r'^storage/save/?$', api_public.storage_save_file, name="storage_save_file"),
-  re_path(r'^storage/rename/?$', filebrowser_api.rename, name='storage_rename'),
-  re_path(r'^storage/move/?$', api_public.storage_move, name='storage_move'),
-  re_path(r'^storage/copy/?$', api_public.storage_copy, name='storage_copy'),
-  re_path(r'^storage/upload/file/?$', filebrowser_api.UploadFileAPI.as_view(), name='storage_upload_file'),
-  re_path(r'^storage/upload/chunks/?$', api_public.storage_upload_chunks, name='storage_upload_chunks'),
-  re_path(r'^storage/upload/complete/?$', api_public.storage_upload_complete, name='storage_upload_complete'),
-  re_path(r'^storage/stat/?$', api_public.storage_stat, name='storage_stat'),
-  re_path(r'^storage/display/?$', api_public.storage_display, name='storage_display'),
-  re_path(r'^storage/download/?$', api_public.storage_download, name='storage_download'),
-  re_path(r'^storage/delete/?$', api_public.storage_rmtree, name='storage_rmtree'),
-  re_path(r'^storage/content_summary/?$', api_public.storage_content_summary, name='storage_content_summary'),
-  re_path(r'^storage/replication/?$', api_public.storage_set_replication, name='storage_set_replication'),
-  re_path(r'^storage/trash/path/?$', api_public.storage_get_trash_path, name='storage_get_trash_path'),
-  re_path(r'^storage/trash/restore/?$', api_public.storage_trash_restore, name='storage_trash_restore'),
-  re_path(r'^storage/trash/purge/?$', api_public.storage_trash_purge, name='storage_trash_purge'),
-  re_path(r'^storage/chown/?$', api_public.storage_chown, name='storage_chown'),
-  re_path(r'^storage/chmod/?$', api_public.storage_chmod, name='storage_chmod'),
-  re_path(
-    r'^storage/extract_archive/?$', api_public.storage_extract_archive_using_batch_job, name='storage_extract_archive_using_batch_job'
-  ),
-  re_path(r'^storage/compress/?$', api_public.storage_compress_files_using_batch_job, name='storage_compress_files_using_batch_job'),
-  re_path(r'^storage/move/bulk/?$', api_public.storage_bulk_move, name='storage_bulk_move'),
-  re_path(r'^storage/copy/bulk/?$', api_public.storage_bulk_copy, name='storage_bulk_copy'),
-  re_path(r'^storage/delete/bulk/?$', api_public.storage_bulk_rmtree, name='storage_bulk_rmtree'),
-  re_path(r'^storage/trash/restore/bulk/?$', api_public.storage_trash_bulk_restore, name='storage_trash_bulk_restore'),
-  re_path(r'^storage/chown/bulk/?$', api_public.storage_bulk_chown, name='storage_bulk_chown'),
-  re_path(r'^storage/chmod/bulk/?$', api_public.storage_bulk_chmod, name='storage_bulk_chmod'),
-]
-
-urlpatterns += [
   re_path(
     r'^(?P<dialect>.+)/analyze/(?P<database>\w+)/(?P<table>\w+)(?:/(?P<columns>\w+))?/?$',
     api_public.analyze_table,
@@ -200,4 +165,33 @@ urlpatterns += [
   re_path(r'^iam/users/autocomplete', api_public.list_for_autocomplete, name='iam_users_list_for_autocomplete'),
   re_path(r'^iam/users/?$', api_public.get_users_by_id, name='iam_get_users_by_id'),
   re_path(r'^iam/get_users/?', api_public.get_users, name='iam_get_users'),
+]
+
+urlpatterns += [
+  # Filesystem Resource
+  re_path(r"^storage/filesystems/?$", filebrowser_api.get_all_filesystems, name="storage_filesystems"),
+  # File Resource
+  re_path(r"^storage/file/?$", filebrowser_api.FileAPI.as_view(), name="storage_file"),
+  # Directory Resource
+  re_path(r"^storage/directory/?$", filebrowser_api.DirectoryAPI.as_view(), name="storage_directory"),
+  # Path Resource
+  re_path(r"^storage/stats/?$", filebrowser_api.PathStatsAPI.as_view(), name="storage_stats"),
+  re_path(r"^storage/rename/?$", filebrowser_api.rename, name="storage_rename"),
+  # Trash Resource
+  re_path(r"^storage/trash/?$", filebrowser_api.TrashAPI.as_view(), name="storage_trash"),
+  # Operation Resources
+  re_path(r"^storage/operation/exists/?$", filebrowser_api.check_exists_operation, name="storage_operation_exists"),
+  re_path(r"^storage/operation/copy/?$", filebrowser_api.copy_operation, name="storage_operation_copy"),
+  re_path(r"^storage/operation/move/?$", filebrowser_api.move_operation, name="storage_operation_move"),
+  re_path(r"^storage/operation/delete/?$", filebrowser_api.delete_operation, name="storage_operation_delete"),
+  re_path(r"^storage/operation/restore/trash/?$", filebrowser_api.trash_restore_operation, name="storage_operation_restore_trash"),
+  re_path(r"^storage/operation/permissions/?$", filebrowser_api.permissions_operation, name="storage_operation_permissions"),
+  re_path(r"^storage/operation/ownership/?$", filebrowser_api.ownership_operation, name="storage_operation_ownership"),
+  re_path(r"^storage/operation/replication/?$", filebrowser_api.replication_operation, name="storage_operation_replication"),
+  re_path(r"^storage/operation/compress/?$", filebrowser_api.compress_operation, name="storage_operation_compress"),
+  re_path(r"^storage/operation/extract/?$", filebrowser_api.extract_operation, name="storage_operation_extract"),
+  # Upload APIs
+  re_path(r"^storage/upload/file/?$", filebrowser_api.UploadFileAPI.as_view(), name="storage_upload_file"),
+  re_path(r"^storage/upload/chunks/?$", filebrowser_api.upload_chunks, name="storage_upload_chunks"),
+  re_path(r"^storage/upload/complete/?$", filebrowser_api.upload_complete, name="storage_upload_complete"),
 ]

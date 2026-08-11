@@ -15,16 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import logging
 import mimetypes
 import os
-import posixpath
+import re
 from urllib.parse import quote
 
 from django.core.files.uploadhandler import StopUpload
-from django.core.paginator import EmptyPage, Paginator
-from django.http import HttpResponse, HttpResponseNotModified, HttpResponseRedirect, JsonResponse, StreamingHttpResponse
+from django.http import FileResponse, HttpResponse, HttpResponseNotModified, HttpResponseRedirect, JsonResponse
 from django.utils.http import http_date
 from django.views.static import was_modified_since
 from rest_framework import status
@@ -34,47 +32,80 @@ from rest_framework.parsers import JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from aws.s3.s3fs import get_s3_home_directory, S3ListAllBucketsException
-from azure.abfs.__init__ import get_abfs_home_directory
-from desktop.auth.backend import is_admin
-from desktop.conf import TASK_SERVER_V2
-from desktop.lib import fsmanager, i18n
-from desktop.lib.conf import coerce_bool
+from desktop.lib import fsmanager
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.export_csvxls import file_reader
-from desktop.lib.fs.gc.gs import get_gs_home_directory, GSListAllBucketsException
-from desktop.lib.fs.ozone.ofs import get_ofs_home_directory
 from desktop.lib.i18n import smart_str
-from desktop.lib.tasks.compress_files.compress_utils import compress_files_in_hdfs
-from desktop.lib.tasks.extract_archive.extract_utils import extract_archive_in_hdfs
-from filebrowser.conf import (
-  ENABLE_EXTRACT_UPLOADED_ARCHIVE,
-  FILE_DOWNLOAD_CACHE_CONTROL,
-  REDIRECT_DOWNLOAD,
-  SHOW_DOWNLOAD_BUTTON,
+from filebrowser.conf import FILE_DOWNLOAD_CACHE_CONTROL, REDIRECT_DOWNLOAD, SHOW_DOWNLOAD_BUTTON
+from filebrowser.operations import (
+  check_path_exists,
+  compress_files,
+  copy_paths,
+  create_directory,
+  create_file,
+  delete_paths,
+  extract_archive,
+  get_all_filesystems as get_all_filesystems_operation,
+  get_available_space_for_upload,
+  get_file_contents,
+  get_path_stats,
+  get_trash_path,
+  list_directory,
+  move_paths,
+  purge_trash,
+  rename_file_or_directory,
+  restore_from_trash,
+  save_file,
+  set_ownership,
+  set_permissions,
+  set_replication,
 )
-from filebrowser.lib.rwx import compress_mode, filetype, rwx
-from filebrowser.operations import rename_file_or_directory
-from filebrowser.schemas import RenameSchema
-from filebrowser.serializers import RenameSerializer, UploadFileSerializer
-from filebrowser.utils import get_user_fs, parse_broker_url
-from filebrowser.views import (
-  _can_inline_display,
-  _is_hdfs_superuser,
-  _normalize_path,
-  DEFAULT_CHUNK_SIZE_BYTES,
-  extract_upload_data,
-  MAX_CHUNK_SIZE_BYTES,
-  perform_upload_task,
-  read_contents,
-  stat_absolute_path,
+from filebrowser.schemas import (
+  CheckExistsSchema,
+  CompressFilesSchema,
+  CopyOperationSchema,
+  CreateDirectorySchema,
+  CreateFileSchema,
+  DeleteOperationSchema,
+  ExtractArchiveSchema,
+  GetFileContentsSchema,
+  GetStatsSchema,
+  GetTrashPathSchema,
+  ListDirectorySchema,
+  MoveOperationSchema,
+  RenameSchema,
+  SaveFileSchema,
+  SetOwnershipSchema,
+  SetPermissionsSchema,
+  SetReplicationSchema,
+  TrashRestoreSchema,
 )
-from hadoop.conf import is_hdfs_trash_enabled
-from hadoop.fs.exceptions import WebHdfsException
-from hadoop.fs.fsutils import do_overwrite_save
-from useradmin.models import Group, User
+from filebrowser.serializers import (
+  CheckExistsSerializer,
+  CompressFilesSerializer,
+  CopyOperationSerializer,
+  CreateDirectorySerializer,
+  CreateFileSerializer,
+  DeleteOperationSerializer,
+  DownloadFileSerializer,
+  ExtractArchiveSerializer,
+  GetFileContentsSerializer,
+  GetStatsSerializer,
+  GetTrashPathSerializer,
+  ListDirectorySerializer,
+  MoveOperationSerializer,
+  RenameSerializer,
+  SaveFileSerializer,
+  SetOwnershipSerializer,
+  SetPermissionsSerializer,
+  SetReplicationSerializer,
+  TrashRestoreSerializer,
+  UploadFileSerializer,
+)
+from filebrowser.utils import get_user_fs
+from filebrowser.views import _can_inline_display, _normalize_path, extract_upload_data, perform_upload_task
 
 LOG = logging.getLogger()
+RANGE_HEADER_RE = re.compile(r"bytes=(?P<start>\d+)-(?P<end>\d+)?")
 
 
 def error_handler(view_fn):
@@ -122,27 +153,7 @@ def api_error_handler(view_fn):
   return decorator
 
 
-def _get_hdfs_home_directory(user):
-  return user.get_home_directory()
-
-
-def _get_config(fs, request):
-  config = {}
-  if fs == "hdfs":
-    is_hdfs_superuser = _is_hdfs_superuser(request)
-    config = {
-      "is_trash_enabled": is_hdfs_trash_enabled(),
-      # TODO: Check if any of the below fields should be part of new Hue user and group management APIs
-      "is_hdfs_superuser": is_hdfs_superuser,
-      "groups": [str(x) for x in Group.objects.values_list("name", flat=True)] if is_hdfs_superuser else [],
-      "users": [str(x) for x in User.objects.values_list("username", flat=True)] if is_hdfs_superuser else [],
-      "superuser": request.fs.superuser,
-      "supergroup": request.fs.supergroup,
-    }
-  return config
-
-
-@api_error_handler
+@api_view(["GET"])
 def get_all_filesystems(request):
   """
   Retrieves all configured filesystems along with user-specific configurations.
@@ -156,291 +167,13 @@ def get_all_filesystems(request):
   Returns:
     JsonResponse: A JSON response containing a list of filesystems with their configurations.
   """
-  fs_home_dir_mapping = {
-    "hdfs": _get_hdfs_home_directory,
-    "s3a": get_s3_home_directory,
-    "gs": get_gs_home_directory,
-    "abfs": get_abfs_home_directory,
-    "ofs": get_ofs_home_directory,
-  }
-
-  filesystems = []
-  for fs in fsmanager.get_filesystems(request.user):
-    user_home_dir = fs_home_dir_mapping[fs](request.user)
-    config = _get_config(fs, request)
-
-    filesystems.append({"name": fs, "user_home_directory": user_home_dir, "config": config})
-
-  return JsonResponse(filesystems, safe=False)
-
-
-@api_error_handler
-def download(request):
-  """
-  Downloads a file.
-
-  This is inspired by django.views.static.serve (?disposition={attachment, inline})
-
-  Args:
-    request: The current request object
-
-  Returns:
-    A response object with the file contents or an error message
-  """
-  path = request.GET.get("path")
-  path = _normalize_path(path)
-
-  if not SHOW_DOWNLOAD_BUTTON.get():
-    return HttpResponse("Download operation is not allowed.", status=403)
-
-  if not request.fs.exists(path):
-    return HttpResponse(f"File does not exist: {path}", status=404)
-
-  if not request.fs.isfile(path):
-    return HttpResponse(f"{path} is not a file.", status=400)
-
-  content_type = mimetypes.guess_type(path)[0] or "application/octet-stream"
-  stats = request.fs.stats(path)
-  if not was_modified_since(request.META.get("HTTP_IF_MODIFIED_SINCE"), stats["mtime"]):
-    return HttpResponseNotModified()
-
-  fh = request.fs.open(path)
-
-  # First, verify read permissions on the file.
   try:
-    request.fs.read(path, offset=0, length=1)
-  except WebHdfsException as e:
-    if e.code == 403:
-      return HttpResponse(f"User {request.user.username} is not authorized to download file at path: {path}", status=403)
-    elif request.fs._get_scheme(path).lower() == "abfs" and e.code == 416:
-      # Safe to skip ABFS exception of code 416 for zero length objects, file will get downloaded anyway.
-      LOG.debug("Skipping exception from ABFS:" + str(e))
-    else:
-      return HttpResponse(f"Failed to download file at path {path}: {str(e)}", status=500)  # TODO: status code?
+    result = get_all_filesystems_operation(username=request.user.username)
+    return Response(result, status=status.HTTP_200_OK)
 
-  if REDIRECT_DOWNLOAD.get() and hasattr(fh, "read_url"):
-    response = HttpResponseRedirect(fh.read_url())
-    setattr(response, "redirect_override", True)
-  else:
-    response = StreamingHttpResponse(file_reader(fh), content_type=content_type)
-
-    content_disposition = (
-      request.GET.get("disposition") if request.GET.get("disposition") == "inline" and _can_inline_display(path) else "attachment"
-    )
-
-    # Extract filename for HDFS and OFS for now because the path stats object has a bug in fetching name field
-    # TODO: Fix this super old bug when refactoring the underlying HDFS filesystem code
-    filename = os.path.basename(path) if request.fs._get_scheme(path).lower() in ("hdfs", "ofs") else stats["name"]
-
-    # Set the filename in the Content-Disposition header with proper encoding for special characters
-    encoded_filename = quote(filename)
-    response["Content-Disposition"] = f"{content_disposition}; filename*=UTF-8''{encoded_filename}"
-
-    response["Last-Modified"] = http_date(stats["mtime"])
-    response["Content-Length"] = stats["size"]
-
-    if FILE_DOWNLOAD_CACHE_CONTROL.get():
-      response["Cache-Control"] = FILE_DOWNLOAD_CACHE_CONTROL.get()
-
-  request.audit = {
-    "operation": "DOWNLOAD",
-    "operationText": 'User %s downloaded file at path "%s"' % (request.user.username, path),
-    "allowed": True,
-  }
-
-  return response
-
-
-def _massage_page(page, paginator):
-  return {"page_number": page.number, "page_size": paginator.per_page, "total_pages": paginator.num_pages, "total_size": paginator.count}
-
-
-@api_error_handler
-def listdir_paged(request):
-  """
-  A paginated version of listdir.
-
-  Query parameters:
-    pagenum (int): The page number to show. Defaults to 1.
-    pagesize (int): How many items to show on a page. Defaults to 30.
-    sortby (str): The attribute to sort by. Valid options: 'type', 'name', 'atime', 'mtime', 'user', 'group', 'size'.
-                  Defaults to 'name'.
-    descending (bool): Sort in descending order when true. Defaults to false.
-    filter (str): Substring to filter filenames. Optional.
-
-  Returns:
-    JsonResponse: Contains 'files' and 'page' info.
-
-  Raises:
-    HttpResponse: With appropriate status codes for errors.
-  """
-  path = request.GET.get("path", "/")  # Set default path for index directory
-  path = _normalize_path(path)
-
-  if not request.fs.isdir(path):
-    return HttpResponse(f"{path} is not a directory.", status=400)
-
-  # Extract pagination parameters
-  pagenum = int(request.GET.get("pagenum", 1))
-  pagesize = int(request.GET.get("pagesize", 30))
-
-  # Determine if operation should be performed as another user
-  do_as = None
-  if is_admin(request.user) or request.user.has_hue_permission(action="impersonate", app="security"):
-    do_as = request.GET.get("doas", request.user.username)
-  if hasattr(request, "doas"):
-    do_as = request.doas
-
-  # Get stats for all files in the directory
-  try:
-    if do_as:
-      all_stats = request.fs.do_as_user(do_as, request.fs.listdir_stats, path)
-    else:
-      all_stats = request.fs.listdir_stats(path)
-  except (S3ListAllBucketsException, GSListAllBucketsException) as e:
-    return HttpResponse(f"Bucket listing is not allowed: {e}", status=403)
-
-  # Apply filter first if specified
-  filter_string = request.GET.get("filter")
-  if filter_string:
-    all_stats = [sb for sb in all_stats if filter_string in sb["name"]]
-
-  # Next, sort with proper handling of None values
-  sortby = request.GET.get("sortby", "name")
-  descending = coerce_bool(request.GET.get("descending", False))
-  valid_sort_fields = {"type", "name", "atime", "mtime", "user", "group", "size"}
-
-  if sortby not in valid_sort_fields:
-    LOG.info(f"Ignoring invalid sort attribute '{sortby}' for list directory operation.")
-  else:
-    numeric_fields = {"size", "atime", "mtime"}
-
-    def sorting_key(item):
-      """Generate a sorting key that handles None values for different field types."""
-      value = getattr(item, sortby)
-      if sortby in numeric_fields:
-        # Treat None as 0 for numeric fields for comparison
-        return 0 if value is None else value
-      else:
-        # Treat None as an empty string for non-numeric fields
-        return "" if value is None else value
-
-    try:
-      all_stats = sorted(all_stats, key=sorting_key, reverse=descending)
-    except Exception as sort_error:
-      LOG.error(f"Error during sorting with attribute '{sortby}': {sort_error}")
-      return HttpResponse("An error occurred while sorting the directory contents.", status=500)
-
-  # Do pagination
-  try:
-    paginator = Paginator(all_stats, pagesize, allow_empty_first_page=True)
-    page = paginator.page(pagenum)
-    shown_stats = page.object_list
-  except EmptyPage:
-    message = "No results found for the requested page."
-    LOG.warning(message)
-    return HttpResponse(message, status=404)
-
-  if page:
-    page.object_list = [_massage_stats(request, stat_absolute_path(path, s)) for s in shown_stats]
-
-  response = {"files": page.object_list if page else [], "page": _massage_page(page, paginator) if page else {}}
-
-  return JsonResponse(response)
-
-
-@api_error_handler
-def display(request):
-  """
-  Implements displaying part of a file.
-
-  GET arguments are length, offset, mode, compression and encoding
-  with reasonable defaults chosen.
-
-  Note that display by length and offset are on bytes, not on characters.
-  """
-  path = request.GET.get("path", "/")  # Set default path for index directory
-  path = _normalize_path(path)
-
-  if not request.fs.isfile(path):
-    return HttpResponse(f"{path} is not a file.", status=400)
-
-  encoding = request.GET.get("encoding") or i18n.get_site_encoding()
-
-  # Need to deal with possibility that length is not present
-  # because the offset came in via the toolbar manual byte entry.
-  end = request.GET.get("end")
-  if end:
-    end = int(end)
-
-  begin = request.GET.get("begin", 1)
-  if begin:
-    # Subtract one to zero index for file read
-    begin = int(begin) - 1
-
-  if end:
-    offset = begin
-    length = end - begin
-    if begin >= end:
-      return HttpResponse("First byte to display must be before last byte to display.", status=400)
-  else:
-    length = int(request.GET.get("length", DEFAULT_CHUNK_SIZE_BYTES))
-    # Display first block by default.
-    offset = int(request.GET.get("offset", 0))
-
-  mode = request.GET.get("mode")
-  compression = request.GET.get("compression")
-
-  if mode and mode != "text":
-    return HttpResponse("Mode value must be 'text'.", status=400)
-  if offset < 0:
-    return HttpResponse("Offset may not be less than zero.", status=400)
-  if length < 0:
-    return HttpResponse("Length may not be less than zero.", status=400)
-  if length > MAX_CHUNK_SIZE_BYTES:
-    return HttpResponse(f"Cannot request chunks greater than {MAX_CHUNK_SIZE_BYTES} bytes.", status=400)
-
-  # Read out based on meta.
-  _, offset, length, contents = read_contents(compression, path, request.fs, offset, length)
-
-  # Get contents as string for text mode, or at least try
-  file_contents = None
-  if isinstance(contents, str):
-    file_contents = contents
-    mode = "text"
-  else:
-    try:
-      file_contents = contents.decode(encoding)
-      mode = "text"
-    except UnicodeDecodeError:
-      LOG.error("Cannot decode file contents with encoding: %s." % encoding)
-      return HttpResponse("Cannot display file content. Please download the file instead.", status=422)
-
-  data = {
-    "contents": file_contents,
-    "offset": offset,
-    "length": length,
-    "end": offset + len(contents),
-    "mode": mode,
-  }
-
-  return JsonResponse(data)
-
-
-@api_error_handler
-def stat(request):
-  """
-  Returns the generic stats of FS object.
-  """
-  path = request.GET.get("path")
-  path = _normalize_path(path)
-
-  if not request.fs.exists(path):
-    return HttpResponse(f"Object does not exist: {path}", status=404)
-
-  stats = request.fs.stats(path)
-
-  return JsonResponse(_massage_stats(request, stat_absolute_path(path, stats)))
+  except Exception as e:
+    LOG.error(f"Error in get_all_filesystems API: {e}")
+    return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_error_handler
@@ -621,90 +354,6 @@ class UploadFileAPI(APIView):
       return Response({"error": "An unexpected error occurred while uploading the file."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@api_error_handler
-def mkdir(request):
-  """
-  Create a new directory at the specified path with the given name.
-
-  Args:
-    request (HttpRequest): The HTTP request object containing the data.
-
-  Returns:
-    A HttpResponse with a status code and message indicating the success or failure of the directory creation.
-  """
-  # TODO: Check if this needs to be a PUT request
-  path = request.POST.get("path")
-  name = request.POST.get("name")
-
-  # Check if path and name are provided
-  if not path or not name:
-    return HttpResponse("Missing required parameters: path and name are required.", status=400)
-
-  # Validate the 'name' parameter for invalid characters
-  if posixpath.sep in name or "#" in name:
-    return HttpResponse("Slashes or hashes are not allowed in directory name. Please choose a different name.", status=400)
-
-  dir_path = request.fs.join(path, name)
-
-  # Check if the directory already exists
-  if request.fs.isdir(dir_path):
-    return HttpResponse(f"Error creating {name} directory: Directory already exists.", status=409)
-
-  request.fs.mkdir(dir_path)
-  return HttpResponse(status=201)
-
-
-@api_error_handler
-def touch(request):
-  path = request.POST.get("path")
-  name = request.POST.get("name")
-
-  # Check if path and name are provided
-  if not path or not name:
-    return HttpResponse("Missing parameters: path and name are required.", status=400)
-
-  # Validate the 'name' parameter for invalid characters
-  if name and (posixpath.sep in name):
-    return HttpResponse("Slashes are not allowed in filename. Please choose a different name.", status=400)
-
-  file_path = request.fs.join(path, name)
-
-  # Check if the file already exists
-  if request.fs.isfile(file_path):
-    return HttpResponse(f"Error creating {name} file: File already exists.", status=409)
-
-  request.fs.create(file_path)
-  return HttpResponse(status=201)
-
-
-@api_error_handler
-def save_file(request):
-  """
-  The POST endpoint to save a file in the file editor.
-
-  Does the save and then redirects back to the edit page.
-  """
-  path = request.POST.get("path")
-  path = _normalize_path(path)
-
-  encoding = request.POST.get("encoding")
-  data = request.POST.get("contents").encode(encoding)
-
-  if not path:
-    return HttpResponse("Path parameter is required for saving the file.", status=400)
-
-  try:
-    if request.fs.exists(path):
-      do_overwrite_save(request.fs, path, data)
-    else:
-      request.fs.create(path, overwrite=False, data=data)
-  except Exception as e:
-    return HttpResponse(f"The file could not be saved: {str(e)}", status=500)  # TODO: Status code?
-
-  # TODO: Any response field required?
-  return HttpResponse(status=200)
-
-
 @api_view(["POST"])
 @parser_classes([JSONParser])
 def rename(request):
@@ -737,319 +386,509 @@ def rename(request):
     return Response({"error": "An unexpected error occurred during rename operation"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-def _is_destination_parent_of_source(request, source_path, destination_path):
-  """Check if the destination path is the parent directory of the source path."""
-  return request.fs.parent_path(source_path) == request.fs.normpath(destination_path)
+class FileAPI(APIView):
+  """Handles all file-based operations like download and content retrieval."""
+
+  def get(self, request):
+    """
+    Dispatches to file download or content retrieval based on 'op' parameter.
+    - op=download: Streams the file for download, supporting range requests.
+    - default (no 'op' specified): Returns a JSON object with a portion of the file's content.
+    """
+    op = request.query_params.get("op")
+
+    if op == "download":
+      serializer = DownloadFileSerializer(data=request.query_params)
+      if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+      try:
+        path = _normalize_path(serializer.validated_data["path"])
+        fs = get_user_fs(request.user.username)
+
+        if not SHOW_DOWNLOAD_BUTTON.get():
+          LOG.warning(f"Download attempt blocked by configuration for user: {request.user.username}")
+          return Response({"error": "Download operation is not allowed by system configuration"}, status=status.HTTP_403_FORBIDDEN)
+
+        if not fs.exists(path) or not fs.isfile(path):
+          LOG.info(f"Download attempt for non-existent or non-file path: {path} by user: {request.user.username}")
+          return Response({"error": f"File does not exist at path: {path}"}, status=status.HTTP_404_NOT_FOUND)
+
+        stats = fs.stats(path)
+
+        if not fs.check_access(path, permission="READ"):
+          LOG.error(f"Read permission denied for user {request.user.username} on path: {path}")
+          return Response({"error": f"Permission denied: cannot access '{path}'"}, status=status.HTTP_403_FORBIDDEN)
+
+        if_modified_since = request.META.get("HTTP_IF_MODIFIED_SINCE")
+        if if_modified_since and not was_modified_since(if_modified_since, stats["mtime"]):
+          return HttpResponseNotModified()
+
+        content_type = mimetypes.guess_type(path)[0] or "application/octet-stream"
+        fh = fs.open(path)
+
+        # Handle cloud storage redirects first (cloud storage optimization by pre-signed URLs)
+        if REDIRECT_DOWNLOAD.get() and hasattr(fh, "read_url"):
+          LOG.info(f"Redirecting download for file: {path} by user: {request.user.username}")
+          response = HttpResponseRedirect(fh.read_url())
+          setattr(response, "redirect_override", True)
+        else:
+          # Prepare common headers for file-based responses
+          disposition = serializer.validated_data["disposition"]
+          if disposition == "inline" and not _can_inline_display(path):
+            disposition = "attachment"
+
+          # TODO: Known issue - stats["name"] is buggy for these filesystems
+          scheme = fs._get_scheme(path).lower()
+          filename = os.path.basename(path) if scheme in ("hdfs", "ofs") else stats["name"]
+
+          # Handle Range Requests for resumable downloads and video seeking
+          range_header = request.META.get("HTTP_RANGE")
+          range_match = RANGE_HEADER_RE.match(range_header) if range_header else None
+
+          if range_match:
+            start_byte = int(range_match.group("start"))
+            end_byte = range_match.group("end")
+            end_byte = int(end_byte) if end_byte else stats["size"] - 1
+
+            if not (0 <= start_byte <= end_byte < stats["size"]):
+              return Response({"error": "Requested range not satisfiable"}, status=status.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE)
+
+            fh.seek(start_byte)
+            response = FileResponse(fh, status=status.HTTP_206_PARTIAL_CONTENT, content_type=content_type)
+            response["Content-Range"] = f"bytes {start_byte}-{end_byte}/{stats['size']}"
+            response["Content-Length"] = end_byte - start_byte + 1
+          else:
+            # Handle full file download using FileResponse for consistency
+            response = FileResponse(fh, content_type=content_type)
+            response["Content-Length"] = stats["size"]
+            response["Accept-Ranges"] = "bytes"  # Advertise support for range requests
+
+          # Apply common headers for both full and partial file responses
+          response["Content-Disposition"] = f"{disposition}; filename*=UTF-8''{quote(filename)}"
+          response["Last-Modified"] = http_date(stats["mtime"])
+          if FILE_DOWNLOAD_CACHE_CONTROL.get():
+            response["Cache-Control"] = FILE_DOWNLOAD_CACHE_CONTROL.get()
+
+        request.audit = {
+          "operation": "DOWNLOAD",
+          "operationText": f'User {request.user.username} downloaded file at path "{path}"',
+          "allowed": True,
+        }
+        LOG.info(f"File download initiated for '{path}' by user '{request.user.username}'")
+        return response
+
+      except ValueError as e:
+        LOG.error(f"Invalid request parameters for download: {str(e)}")
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+      except Exception as e:
+        LOG.exception(f"Unexpected error during file download of '{path}': {str(e)}")
+        return Response({"error": "An unexpected error occurred during file download."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
-def _validate_copy_move_operation(request, source_path, destination_path):
-  """Validate the input parameters for copy and move operations for different scenarios."""
-
-  # Check if source and destination paths are provided
-  if not source_path or not destination_path:
-    return HttpResponse("Missing required parameters: source_path and destination_path are required.", status=400)
-
-  # Check if paths are identical
-  if request.fs.normpath(source_path) == request.fs.normpath(destination_path):
-    return HttpResponse("Source and destination paths must be different.", status=400)
-
-  # Verify source path exists
-  if not request.fs.exists(source_path):
-    return HttpResponse("Source file or folder does not exist.", status=404)
-
-  # Check if the destination path is a directory
-  if not request.fs.isdir(destination_path):
-    return HttpResponse("Destination path must be a directory.", status=400)
-
-  # Check if destination path is parent of source path
-  if _is_destination_parent_of_source(request, source_path, destination_path):
-    return HttpResponse("Destination cannot be the parent directory of source.", status=400)
-
-  # Check if file or folder already exists at destination path
-  if request.fs.exists(request.fs.join(destination_path, os.path.basename(source_path))):
-    return HttpResponse("File or folder already exists at destination path.", status=409)
-
-
-@api_error_handler
-def move(request):
-  """
-  Move a file or folder from source path to destination path.
-
-  Args:
-    request: The request object containing source and destination paths
-
-  Returns:
-    Success or error response with appropriate status codes
-  """
-  source_path = request.POST.get("source_path", "")
-  destination_path = request.POST.get("destination_path", "")
-
-  # Validate the operation and return error response if any scenario fails
-  validation_response = _validate_copy_move_operation(request, source_path, destination_path)
-  if validation_response:
-    return validation_response
-
-  request.fs.rename(source_path, destination_path)
-  return HttpResponse(status=200)
-
-
-@api_error_handler
-def copy(request):
-  """
-  Copy a file or folder from the source path to the destination path.
-
-  Args:
-    request: The request object containing source and destination path
-
-  Returns:
-    Success or error response with appropriate status codes
-  """
-  source_path = request.POST.get("source_path", "")
-  destination_path = request.POST.get("destination_path", "")
-
-  # Validate the operation and return error response if any scenario fails
-  validation_response = _validate_copy_move_operation(request, source_path, destination_path)
-  if validation_response:
-    return validation_response
-
-  # Copy method for Ozone FS returns a string of skipped files if their size is greater than configured chunk size.
-  if source_path.startswith("ofs://"):
-    ofs_skip_files = request.fs.copy(source_path, destination_path, recursive=True, owner=request.user)
-    if ofs_skip_files:
-      return JsonResponse({"skipped_files": ofs_skip_files}, status=500)  # TODO: Status code?
-  else:
-    request.fs.copy(source_path, destination_path, recursive=True, owner=request.user)
-
-  return HttpResponse(status=200)
-
-
-@api_error_handler
-def content_summary(request):
-  path = request.GET.get("path")
-  path = _normalize_path(path)
-
-  if not path:
-    return HttpResponse("Path parameter is required to fetch content summary.", status=400)
-
-  if not request.fs.exists(path):
-    return HttpResponse(f"Path does not exist: {path}", status=404)
-
-  response = {}
-  try:
-    content_summary = request.fs.get_content_summary(path)
-    replication_factor = request.fs.stats(path)["replication"]
-
-    content_summary.summary.update({"replication": replication_factor})
-    response = content_summary.summary
-  except Exception:
-    return HttpResponse(f"Failed to fetch content summary for path: {path}", status=500)
-
-  return JsonResponse(response)
-
-
-@api_error_handler
-def set_replication(request):
-  # TODO: Check if this needs to be a PUT request
-  path = request.POST.get("path")
-  replication_factor = request.POST.get("replication_factor")
-
-  result = request.fs.set_replication(path, replication_factor)
-  if not result:
-    return HttpResponse("Failed to set the replication factor.", status=500)
-
-  return HttpResponse(status=200)
-
-
-@api_error_handler
-def rmtree(request):
-  # TODO: Check if this needs to be a DELETE request
-  path = request.POST.get("path")
-  skip_trash = coerce_bool(request.POST.get("skip_trash", False))
-
-  request.fs.rmtree(path, skip_trash)
-
-  return HttpResponse(status=200)
-
-
-@api_error_handler
-def get_trash_path(request):
-  path = request.GET.get("path")
-  path = _normalize_path(path)
-  response = {}
-
-  trash_path = request.fs.trash_path(path)
-  user_home_trash_path = request.fs.join(request.fs.current_trash_path(trash_path), request.user.get_home_directory().lstrip("/"))
-
-  if request.fs.isdir(user_home_trash_path):
-    response["trash_path"] = user_home_trash_path
-  elif request.fs.isdir(trash_path):
-    response["trash_path"] = trash_path
-  else:
-    response["trash_path"] = None
-
-  return JsonResponse(response)
-
-
-@api_error_handler
-def trash_restore(request):
-  path = request.POST.get("path")
-  request.fs.restore(path)
-
-  return HttpResponse(status=200)
-
-
-@api_error_handler
-def trash_purge(request):
-  request.fs.purge_trash()
-
-  return HttpResponse(status=200)
-
-
-@api_error_handler
-def chown(request):
-  # TODO: Check if this needs to be a PUT request
-  path = request.POST.get("path")
-  user = request.POST.get("user")
-  group = request.POST.get("group")
-  recursive = coerce_bool(request.POST.get("recursive", False))
-
-  # TODO: Check if we need to explicitly handle encoding anywhere
-  request.fs.chown(path, user, group, recursive=recursive)
-
-  return HttpResponse(status=200)
-
-
-@api_error_handler
-def chmod(request):
-  # TODO: Check if this needs to be a PUT request
-  # Order matters for calculating mode below
-  perm_names = (
-    "user_read",
-    "user_write",
-    "user_execute",
-    "group_read",
-    "group_write",
-    "group_execute",
-    "other_read",
-    "other_write",
-    "other_execute",
-    "sticky",
-  )
-  path = request.POST.get("path")
-  permission = json.loads(request.POST.get("permission", "{}"))
-
-  mode = compress_mode([coerce_bool(permission.get(p)) for p in perm_names])
-
-  request.fs.chmod(path, mode, recursive=coerce_bool(permission.get("recursive", False)))
-
-  return HttpResponse(status=200)
-
-
-@api_error_handler
-def extract_archive_using_batch_job(request):
-  # TODO: Check core logic with E2E tests -- dont use it until then
-  if not ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
-    return HttpResponse("Extract archive operation is disabled by configuration.", status=500)  # TODO: status code?
-
-  upload_path = request.fs.netnormpath(request.POST.get("upload_path"))
-  archive_name = request.POST.get("archive_name")
-
-  if upload_path and archive_name:
-    try:
-      # TODO: Check is we really require urllib_unquote here? Maybe need to improve old oozie methods also?
-      # upload_path = urllib_unquote(upload_path)
-      # archive_name = urllib_unquote(archive_name)
-      response = extract_archive_in_hdfs(request, upload_path, archive_name)
-    except Exception as e:
-      return HttpResponse(f"Failed to extract archive: {str(e)}", status=500)  # TODO: status code?
-
-  return JsonResponse(response)
-
-
-@api_error_handler
-def compress_files_using_batch_job(request):
-  # TODO: Check core logic with E2E tests -- dont use it until then
-  if not ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
-    return HttpResponse("Compress files operation is disabled by configuration.", status=500)  # TODO: status code?
-
-  upload_path = request.fs.netnormpath(request.POST.get("upload_path"))
-  archive_name = request.POST.get("archive_name")
-  file_names = request.POST.getlist("file_name")
-
-  if upload_path and file_names and archive_name:
-    try:
-      response = compress_files_in_hdfs(request, file_names, upload_path, archive_name)
-    except Exception as e:
-      return HttpResponse(f"Failed to compress files: {str(e)}", status=500)  # TODO: status code?
-  else:
-    return HttpResponse("Output directory is not set.", status=500)  # TODO: status code?
-
-  return JsonResponse(response)
-
-
-@api_error_handler
-def get_available_space_for_upload(request):
-  redis_client = parse_broker_url(TASK_SERVER_V2.BROKER_URL.get())
-  try:
-    upload_available_space = int(redis_client.get("upload_available_space"))
-    if upload_available_space is None:
-      return HttpResponse("upload_available_space key is not set in Redis.", status=500)  # TODO: status code?
-
-    return JsonResponse({"upload_available_space": upload_available_space})
-  except Exception as e:
-    message = f"Failed to get available space from Redis: {str(e)}"
-    LOG.exception(message)
-    return HttpResponse(message, status=500)  # TODO: status code?
-  finally:
-    redis_client.close()
-
-
-@api_error_handler
-def bulk_op(request, op):
-  # TODO: Also try making a generic request data fetching helper method
-  bulk_dict = request.POST.copy()
-  path_list = request.POST.getlist("source_path") if op in (copy, move) else request.POST.getlist("path")
-
-  error_dict = {}
-  for p in path_list:
-    tmp_dict = bulk_dict
-    if op in (copy, move):
-      tmp_dict["source_path"] = p
     else:
-      tmp_dict["path"] = p
+      # Get file contents
+      serializer = GetFileContentsSerializer(data=request.query_params)
+      if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    request.POST = tmp_dict
-    response = op(request)
+      try:
+        result = get_file_contents(data=GetFileContentsSchema(**serializer.validated_data), username=request.user.username)
+        return Response(result, status=status.HTTP_200_OK)
 
-    if response.status_code != 200:
-      # TODO: Improve the error handling with new error UX
-      # Currently, we are storing the error in the error_dict based on response type for each path
-      res_content = response.content.decode("utf-8")
-      if isinstance(response, JsonResponse):
-        error_dict[p] = json.loads(res_content)  # Simply assign to not have dupicate error fields
-      else:
-        error_dict[p] = {"error": res_content}
+      except FileNotFoundError as e:
+        LOG.info(f"File not found during content retrieval: {str(e)}")
+        return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+      except ValueError as e:
+        LOG.warning(f"Bad request for file contents: {str(e)}")
 
-  if error_dict:
-    return JsonResponse(error_dict, status=500)  # TODO: Check if we need diff status code or diff json structure?
+        # Check for decoding error to return a more specific status code
+        if "Cannot decode file" in str(e):
+          return Response({"error": str(e)}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
-  return HttpResponse(status=200)  # TODO: Check if we need to send some message or diff status code?
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+      except Exception as e:
+        LOG.exception(f"Unexpected error during file content retrieval: {str(e)}")
+        return Response({"error": "An unexpected error occurred while reading the file."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+  def put(self, request):
+    """
+    Create a new file with optional initial content.
+
+    Supports comprehensive validation, parent directory creation,
+    and proper error handling with specific HTTP status codes.
+    """
+    serializer = CreateFileSerializer(data=request.data)
+    if not serializer.is_valid():
+      return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+      result = create_file(data=CreateFileSchema(**serializer.validated_data), username=request.user.username)
+      return Response(result, status=status.HTTP_201_CREATED)
+
+    except FileExistsError as e:
+      LOG.info(f"File creation failed - file exists: {e}")
+      return Response({"error": str(e)}, status=status.HTTP_409_CONFLICT)
+    except FileNotFoundError as e:
+      LOG.info(f"File creation failed - parent directory not found: {e}")
+      return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+    except ValueError as e:
+      LOG.warning(f"File creation failed - validation error: {e}")
+      return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    except RuntimeError as e:
+      LOG.error(f"File creation failed - runtime error: {e}")
+      return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    except Exception as e:
+      LOG.exception(f"Unexpected error creating file: {e}")
+      return Response({"error": "An unexpected error occurred while creating the file."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+  def patch(self, request):
+    """
+    Save/update file contents with comprehensive validation.
+
+    Supports content size validation, encoding checks, parent directory creation,
+    and proper error handling with specific HTTP status codes.
+    """
+    serializer = SaveFileSerializer(data=request.data)
+    if not serializer.is_valid():
+      return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+      result = save_file(data=SaveFileSchema(**serializer.validated_data), username=request.user.username)
+      return Response(result, status=status.HTTP_200_OK)
+
+    except FileNotFoundError as e:
+      LOG.info(f"File save failed - parent directory not found: {e}")
+      return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+    except UnicodeEncodeError as e:
+      LOG.warning(f"File save failed - encoding error: {e}")
+      return Response({"error": f"Content cannot be encoded with the specified encoding: {e}"}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+    except ValueError as e:
+      LOG.warning(f"File save failed - validation error: {e}")
+      return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    except RuntimeError as e:
+      LOG.error(f"File save failed - runtime error: {e}")
+      return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    except Exception as e:
+      LOG.exception(f"Unexpected error saving file: {e}")
+      return Response({"error": "An unexpected error occurred while saving the file."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-def _massage_stats(request, stats):
+class DirectoryAPI(APIView):
   """
-  Massage a stats record as returned by the filesystem implementation
-  into the format that the views would like it in.
+  Directory API handling comprehensive directory operations.
+
+  Provides listing and creation functionality with enhanced error handling,
+  detailed validation, and proper HTTP status code mapping.
   """
-  stats_dict = stats.to_json_dict()
-  normalized_path = request.fs.normpath(stats_dict.get("path"))
 
-  stats_dict.update(
-    {
-      "path": normalized_path,
-      "type": filetype(stats.mode),
-      "rwx": rwx(stats.mode, stats.aclBit),
-    }
-  )
+  def get(self, request):
+    """
+    List directory contents with advanced filtering and pagination.
 
-  return stats_dict
+    Supports comprehensive directory listing with security validation,
+    permission checks, filtering, sorting, and pagination.
+    """
+    serializer = ListDirectorySerializer(data=request.query_params)
+    if not serializer.is_valid():
+      return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+      result = list_directory(data=ListDirectorySchema(**serializer.validated_data), username=request.user.username)
+      return Response(result, status=status.HTTP_200_OK)
+
+    except FileNotFoundError as e:
+      LOG.info(f"Directory listing failed - directory not found: {e}")
+      return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+    except PermissionError as e:
+      LOG.warning(f"Directory listing failed - permission denied: {e}")
+      return Response({"error": str(e)}, status=status.HTTP_403_FORBIDDEN)
+    except ValueError as e:
+      LOG.warning(f"Directory listing failed - validation error: {e}")
+      return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    except RuntimeError as e:
+      LOG.error(f"Directory listing failed - runtime error: {e}")
+      return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    except Exception as e:
+      LOG.exception(f"Unexpected error listing directory: {e}")
+      return Response({"error": "An unexpected error occurred while listing the directory."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+  def put(self, request):
+    """
+    Create a new directory with comprehensive validation.
+
+    Supports directory creation with parent directory creation,
+    permission setting, and proper error handling.
+    """
+    serializer = CreateDirectorySerializer(data=request.data)
+    if not serializer.is_valid():
+      return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+      result = create_directory(data=CreateDirectorySchema(**serializer.validated_data), username=request.user.username)
+      return Response(result, status=status.HTTP_201_CREATED)
+
+    except FileExistsError as e:
+      LOG.info(f"Directory creation failed - already exists: {e}")
+      return Response({"error": str(e)}, status=status.HTTP_409_CONFLICT)
+    except FileNotFoundError as e:
+      LOG.info(f"Directory creation failed - parent directory not found: {e}")
+      return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+    except PermissionError as e:
+      LOG.warning(f"Directory creation failed - permission denied: {e}")
+      return Response({"error": str(e)}, status=status.HTTP_403_FORBIDDEN)
+    except ValueError as e:
+      LOG.warning(f"Directory creation failed - validation error: {e}")
+      return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    except RuntimeError as e:
+      LOG.error(f"Directory creation failed - runtime error: {e}")
+      return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    except Exception as e:
+      LOG.exception(f"Unexpected error creating directory: {e}")
+      return Response({"error": "An unexpected error occurred while creating the directory."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class PathStatsAPI(APIView):
+  """Path statistics API."""
+
+  def get(self, request):
+    """Get path statistics."""
+    serializer = GetStatsSerializer(data=request.query_params)
+    if not serializer.is_valid():
+      return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+      result = get_path_stats(data=GetStatsSchema(**serializer.validated_data), username=request.user.username)
+      return Response(result, status=status.HTTP_200_OK)
+
+    except ValueError as e:
+      return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+      LOG.exception(f"Error getting path stats: {e}")
+      return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class TrashAPI(APIView):
+  """Trash API handling trash operations."""
+
+  def get(self, request):
+    """Get trash path information."""
+    serializer = GetTrashPathSerializer(data=request.query_params)
+
+    if not serializer.is_valid():
+      return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+      result = get_trash_path(data=GetTrashPathSchema(**serializer.validated_data), username=request.user.username)
+      return Response(result, status=status.HTTP_200_OK)
+
+    except ValueError as e:
+      return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+      LOG.exception(f"Error getting trash path: {e}")
+      return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+  def delete(self, request):
+    """Purge trash."""
+    try:
+      result = purge_trash(username=request.user.username)
+      return Response(result, status=status.HTTP_200_OK)
+
+    except ValueError as e:
+      return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+      LOG.exception(f"Error purging trash: {e}")
+      return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(["POST"])
+def check_exists_operation(request):
+  """Check if multiple paths exist."""
+  serializer = CheckExistsSerializer(data=request.data)
+  if not serializer.is_valid():
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+  try:
+    result = check_path_exists(data=CheckExistsSchema(**serializer.validated_data), username=request.user.username)
+    return Response(result, status=status.HTTP_200_OK)
+
+  except ValueError as e:
+    return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+  except Exception as e:
+    LOG.exception(f"Error checking path existence: {e}")
+    return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(["POST"])
+def copy_operation(request):
+  """Copy files or directories."""
+  serializer = CopyOperationSerializer(data=request.data)
+  if not serializer.is_valid():
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+  try:
+    result = copy_paths(data=CopyOperationSchema(**serializer.validated_data), username=request.user.username)
+    return Response(result, status=status.HTTP_200_OK)
+
+  except ValueError as e:
+    return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+  except Exception as e:
+    LOG.exception(f"Error copying paths: {e}")
+    return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(["POST"])
+def move_operation(request):
+  """Move files or directories."""
+  serializer = MoveOperationSerializer(data=request.data)
+  if not serializer.is_valid():
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+  try:
+    result = move_paths(data=MoveOperationSchema(**serializer.validated_data), username=request.user.username)
+    return Response(result, status=status.HTTP_200_OK)
+
+  except ValueError as e:
+    return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+  except Exception as e:
+    LOG.exception(f"Error moving paths: {e}")
+    return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(["DELETE"])
+def delete_operation(request):
+  """Delete files or directories."""
+  serializer = DeleteOperationSerializer(data=request.data)
+  if not serializer.is_valid():
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+  try:
+    result = delete_paths(data=DeleteOperationSchema(**serializer.validated_data), username=request.user.username)
+    return Response(result, status=status.HTTP_200_OK)
+
+  except ValueError as e:
+    return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+  except Exception as e:
+    LOG.exception(f"Error deleting paths: {e}")
+    return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(["POST"])
+def trash_restore_operation(request):
+  """Restore files from trash."""
+  serializer = TrashRestoreSerializer(data=request.data)
+  if not serializer.is_valid():
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+  try:
+    result = restore_from_trash(data=TrashRestoreSchema(**serializer.validated_data), username=request.user.username)
+    return Response(result, status=status.HTTP_200_OK)
+
+  except ValueError as e:
+    return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+  except Exception as e:
+    LOG.exception(f"Error restoring from trash: {e}")
+    return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(["PUT"])
+def permissions_operation(request):
+  """Set file/directory permissions."""
+  serializer = SetPermissionsSerializer(data=request.data)
+  if not serializer.is_valid():
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+  try:
+    result = set_permissions(data=SetPermissionsSchema(**serializer.validated_data), username=request.user.username)
+    return Response(result, status=status.HTTP_200_OK)
+
+  except ValueError as e:
+    return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+  except Exception as e:
+    LOG.exception(f"Error setting permissions: {e}")
+    return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(["PUT"])
+def ownership_operation(request):
+  """Set file/directory ownership."""
+  serializer = SetOwnershipSerializer(data=request.data)
+  if not serializer.is_valid():
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+  try:
+    result = set_ownership(data=SetOwnershipSchema(**serializer.validated_data), username=request.user.username)
+    return Response(result, status=status.HTTP_200_OK)
+
+  except ValueError as e:
+    return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+  except Exception as e:
+    LOG.exception(f"Error setting ownership: {e}")
+    return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(["PUT"])
+def replication_operation(request):
+  """Set replication factor."""
+  serializer = SetReplicationSerializer(data=request.data)
+  if not serializer.is_valid():
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+  try:
+    result = set_replication(data=SetReplicationSchema(**serializer.validated_data), username=request.user.username)
+    return Response(result, status=status.HTTP_200_OK)
+
+  except ValueError as e:
+    return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+  except Exception as e:
+    LOG.exception(f"Error setting replication: {e}")
+    return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(["POST"])
+def compress_operation(request):
+  """Compress files into an archive."""
+  serializer = CompressFilesSerializer(data=request.data)
+  if not serializer.is_valid():
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+  try:
+    result = compress_files(data=CompressFilesSchema(**serializer.validated_data), username=request.user.username)
+    return Response(result, status=status.HTTP_200_OK)
+
+  except ValueError as e:
+    return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+  except Exception as e:
+    LOG.exception(f"Error compressing files: {e}")
+    return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(["POST"])
+def extract_operation(request):
+  """Extract an archive."""
+  serializer = ExtractArchiveSerializer(data=request.data)
+  if not serializer.is_valid():
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+  try:
+    result = extract_archive(data=ExtractArchiveSchema(**serializer.validated_data), username=request.user.username)
+    return Response(result, status=status.HTTP_200_OK)
+
+  except ValueError as e:
+    return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+  except Exception as e:
+    LOG.exception(f"Error extracting archive: {e}")
+    return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(["GET"])
+def system_upload_space(request):
+  """Get available space for file uploads."""
+  try:
+    result = get_available_space_for_upload(username=request.user.username)
+    return Response(result, status=status.HTTP_200_OK)
+
+  except ValueError as e:
+    return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+  except Exception as e:
+    LOG.exception(f"Error getting upload space: {e}")
+    return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
