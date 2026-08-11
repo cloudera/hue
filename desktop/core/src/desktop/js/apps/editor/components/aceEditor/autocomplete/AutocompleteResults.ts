@@ -49,6 +49,12 @@ import apiHelper from 'api/apiHelper';
 import dataCatalog from 'catalog/dataCatalog';
 import { SetDetails, SqlReferenceProvider, UdfDetails } from 'sql/reference/types';
 import { hueWindow } from 'types/types';
+import {
+  AddColumnsContext,
+  addCteColumns as addCteColumnsFromCte,
+  asCteTable,
+  findCteForTable
+} from 'sql/cteAutocompleteUtils';
 import sqlUtils from 'sql/sqlUtils';
 import { matchesType } from 'sql/reference/typeUtils';
 import { cancelActiveRequest } from 'api/apiUtils';
@@ -96,6 +102,7 @@ export interface Suggestion {
     | TopFilterValue
     | FieldSample
     | CommentDetails
+    | ColumnDetails
     | { name: string };
   matchComment?: boolean;
   matchIndex?: number;
@@ -778,6 +785,8 @@ class AutocompleteResults {
           this.executor.connector(),
           suggestColumns.udfRef
         );
+      } else if (suggestColumns.types) {
+        types = suggestColumns.types;
       }
     } catch (err) {}
 
@@ -806,53 +815,42 @@ class AutocompleteResults {
     return columnSuggestions;
   }
 
-  async addCteColumns(table: ParsedTable, columnSuggestions: Suggestion[]): Promise<void> {
-    const commonTableExpressions = this.parseResult.commonTableExpressions;
-    if (!commonTableExpressions) {
-      return;
-    }
-    const cte = commonTableExpressions.find(cte =>
-      equalIgnoreCase(cte.alias, table.identifierChain[0].cte)
+  async addCteColumns(
+    table: ParsedTable,
+    types: string[],
+    columnSuggestions: Suggestion[],
+    context: AddColumnsContext = {}
+  ): Promise<void> {
+    await addCteColumnsFromCte(
+      {
+        dialect: this.dialect(),
+        commonTableExpressions: this.parseResult.commonTableExpressions || [],
+        fetchFieldForIdentifierChain: identifierChain =>
+          this.fetchFieldForIdentifierChain(identifierChain),
+        addColumns: (table, types, columnSuggestions, context) =>
+          this.addColumns(table, types, columnSuggestions, context),
+        addColumnSuggestion: async (column, table, columnName, type, columnSuggestions) => {
+          columnSuggestions.push({
+            value: await sqlUtils.backTickIfNeeded(
+              this.executor.connector(),
+              columnName,
+              this.sqlReferenceProvider,
+              this.parseResult.suggestColumns?.appendBacktick
+            ),
+            filterValue: columnName,
+            meta: type,
+            category: Category.Column,
+            table: table,
+            popular: false,
+            details: column
+          });
+        }
+      },
+      table,
+      types,
+      columnSuggestions,
+      context
     );
-    if (!cte) {
-      return;
-    }
-    for (const column of cte.columns) {
-      const type = column.type && column.type !== 'COLREF' ? column.type : 'T';
-      if (column.alias) {
-        columnSuggestions.push({
-          value: await sqlUtils.backTickIfNeeded(
-            this.executor.connector(),
-            column.alias,
-            this.sqlReferenceProvider
-          ),
-          filterValue: column.alias,
-          meta: type,
-          category: Category.Column,
-          table: table,
-          popular: false,
-          details: column
-        });
-      } else if (
-        typeof column.identifierChain !== 'undefined' &&
-        column.identifierChain.length > 0 &&
-        typeof column.identifierChain[column.identifierChain.length - 1].name !== 'undefined'
-      ) {
-        columnSuggestions.push({
-          value: await sqlUtils.backTickIfNeeded(
-            this.executor.connector(),
-            column.identifierChain[column.identifierChain.length - 1].name,
-            this.sqlReferenceProvider
-          ),
-          filterValue: column.identifierChain[column.identifierChain.length - 1].name,
-          meta: type,
-          category: Category.Column,
-          table: table,
-          popular: false,
-          details: column
-        });
-      }
-    }
   }
 
   async addSubQueryColumns(table: ParsedTable, columnSuggestions: Suggestion[]): Promise<void> {
@@ -916,18 +914,17 @@ class AutocompleteResults {
   async addColumns(
     table: ParsedTable,
     types: string[],
-    columnSuggestions: Suggestion[]
+    columnSuggestions: Suggestion[],
+    context: AddColumnsContext = {}
   ): Promise<void> {
-    if (
-      typeof table.identifierChain !== 'undefined' &&
-      table.identifierChain.length === 1 &&
-      typeof table.identifierChain[0].cte !== 'undefined'
-    ) {
+    const visibleCtes = context.visibleCtes || this.parseResult.commonTableExpressions || [];
+    const cte = findCteForTable(table, visibleCtes);
+    if (cte) {
       if (
         typeof this.parseResult.commonTableExpressions !== 'undefined' &&
         this.parseResult.commonTableExpressions.length > 0
       ) {
-        await this.addCteColumns(table, columnSuggestions);
+        await this.addCteColumns(asCteTable(table, cte), types, columnSuggestions, context);
       }
     } else if (
       typeof table.identifierChain !== 'undefined' &&
@@ -975,7 +972,7 @@ class AutocompleteResults {
             columnSuggestions.push({
               value: name,
               meta: childEntry.getType(),
-              table: table,
+              table: context.suggestionTable || table,
               category: Category.Column,
               popular: false,
               weightAdjust:
@@ -1013,7 +1010,7 @@ class AutocompleteResults {
             columnSuggestions.push({
               value: field.name,
               meta: fieldType,
-              table: table,
+              table: context.suggestionTable || table,
               category: Category.Column,
               popular: false,
               weightAdjust:
@@ -1029,8 +1026,9 @@ class AutocompleteResults {
       };
 
       const suggestcolumns = this.parseResult.suggestColumns;
-      const identifierChain =
-        (suggestcolumns && suggestcolumns.identifierChain) || table.identifierChain;
+      const identifierChain = context.suggestionTable
+        ? table.identifierChain
+        : (suggestcolumns && suggestcolumns.identifierChain) || table.identifierChain;
       try {
         const entry = await this.fetchFieldForIdentifierChain(identifierChain);
         if (entry) {

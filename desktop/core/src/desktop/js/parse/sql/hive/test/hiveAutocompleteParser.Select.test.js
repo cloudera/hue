@@ -6491,6 +6491,171 @@ describe('hiveAutocompleteParser.js SELECT statements', () => {
       });
     });
 
+    it('should keep later CTE names out of scope for earlier CTE bodies "WITH t1 AS (SELECT | FROM foo), foo AS (...)"', () => {
+      assertAutoComplete({
+        beforeCursor: 'WITH t1 AS (SELECT ',
+        afterCursor: ' FROM foo), foo AS (SELECT active FROM bar) SELECT * FROM t1',
+        noErrors: true,
+        containsKeywords: ['*', 'ALL', 'DISTINCT'],
+        expectedResult: {
+          lowerCase: false,
+          suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'foo' }] }] },
+          suggestAnalyticFunctions: true,
+          suggestFunctions: {},
+          suggestColumns: { source: 'select', tables: [{ identifierChain: [{ name: 'foo' }] }] }
+        }
+      });
+    });
+
+    it('should suggest columns for chained CTEs "WITH t1 AS (SELECT * FROM foo), t2 AS (SELECT * FROM t1) SELECT | FROM t2"', () => {
+      assertAutoComplete({
+        beforeCursor: 'WITH t1 AS (SELECT * FROM foo), t2 AS (SELECT * FROM t1) SELECT ',
+        afterCursor: ' FROM t2',
+        noErrors: true,
+        containsKeywords: ['*', 'ALL', 'DISTINCT'],
+        expectedResult: {
+          lowerCase: false,
+          suggestAggregateFunctions: { tables: [] },
+          suggestAnalyticFunctions: true,
+          suggestFunctions: {},
+          suggestColumns: { source: 'select', tables: [{ identifierChain: [{ cte: 't2' }] }] },
+          commonTableExpressions: [
+            { alias: 't1', columns: [{ tables: [{ identifierChain: [{ name: 'foo' }] }] }] },
+            { alias: 't2', columns: [{ tables: [{ identifierChain: [{ name: 't1' }] }] }] }
+          ],
+          subQueries: [
+            { alias: 't1', columns: [{ tables: [{ identifierChain: [{ name: 'foo' }] }] }] },
+            { alias: 't2', columns: [{ tables: [{ identifierChain: [{ name: 't1' }] }] }] }
+          ]
+        }
+      });
+    });
+
+    it('should suggest columns for CTEs with explicit column aliases "WITH t1 (cte_id, cte_name) AS (SELECT id, name FROM foo) SELECT | FROM t1"', () => {
+      assertAutoComplete({
+        beforeCursor: 'WITH t1 (cte_id, cte_name) AS (SELECT id, name FROM foo) SELECT ',
+        afterCursor: ' FROM t1',
+        noErrors: true,
+        containsKeywords: ['*', 'ALL', 'DISTINCT'],
+        expectedResult: {
+          lowerCase: false,
+          suggestAggregateFunctions: { tables: [] },
+          suggestAnalyticFunctions: true,
+          suggestFunctions: {},
+          suggestColumns: { source: 'select', tables: [{ identifierChain: [{ cte: 't1' }] }] },
+          commonTableExpressions: [
+            {
+              alias: 't1',
+              columnAliases: ['cte_id', 'cte_name'],
+              columns: [
+                { identifierChain: [{ name: 'foo' }, { name: 'id' }], type: 'COLREF' },
+                { identifierChain: [{ name: 'foo' }, { name: 'name' }], type: 'COLREF' }
+              ]
+            }
+          ],
+          subQueries: [
+            {
+              alias: 't1',
+              columnAliases: ['cte_id', 'cte_name'],
+              columns: [
+                { identifierChain: [{ name: 'foo' }, { name: 'id' }], type: 'COLREF' },
+                { identifierChain: [{ name: 'foo' }, { name: 'name' }], type: 'COLREF' }
+              ]
+            }
+          ]
+        }
+      });
+    });
+
+    it('should normalize quoted explicit CTE column aliases "WITH t1 (`select`, `order-id`) AS (...) SELECT | FROM t1"', () => {
+      assertAutoComplete({
+        beforeCursor: 'WITH t1 (`select`, `order-id`) AS (SELECT id, name FROM foo) SELECT ',
+        afterCursor: ' FROM t1',
+        noErrors: true,
+        containsKeywords: ['*', 'ALL', 'DISTINCT'],
+        expectedResult: {
+          lowerCase: false,
+          suggestAggregateFunctions: { tables: [] },
+          suggestAnalyticFunctions: true,
+          suggestFunctions: {},
+          suggestColumns: { source: 'select', tables: [{ identifierChain: [{ cte: 't1' }] }] },
+          commonTableExpressions: [
+            {
+              alias: 't1',
+              columnAliases: ['select', 'order-id'],
+              columns: [
+                { identifierChain: [{ name: 'foo' }, { name: 'id' }], type: 'COLREF' },
+                { identifierChain: [{ name: 'foo' }, { name: 'name' }], type: 'COLREF' }
+              ]
+            }
+          ],
+          subQueries: [
+            {
+              alias: 't1',
+              columnAliases: ['select', 'order-id'],
+              columns: [
+                { identifierChain: [{ name: 'foo' }, { name: 'id' }], type: 'COLREF' },
+                { identifierChain: [{ name: 'foo' }, { name: 'name' }], type: 'COLREF' }
+              ]
+            }
+          ]
+        }
+      });
+    });
+
+    it('should suggest columns for Hive VALUES CTEs with explicit column aliases "WITH t1 (cte_id, cte_name) AS (VALUES (...)) SELECT | FROM t1"', () => {
+      assertAutoComplete({
+        beforeCursor: "WITH t1 (cte_id, cte_name) AS (VALUES (1, 'bob')) SELECT ",
+        afterCursor: ' FROM t1',
+        noErrors: true,
+        containsKeywords: ['*', 'ALL', 'DISTINCT'],
+        expectedResult: {
+          lowerCase: false,
+          suggestAggregateFunctions: { tables: [] },
+          suggestAnalyticFunctions: true,
+          suggestFunctions: {},
+          suggestColumns: { source: 'select', tables: [{ identifierChain: [{ cte: 't1' }] }] },
+          commonTableExpressions: [
+            {
+              alias: 't1',
+              columnAliases: ['cte_id', 'cte_name']
+            }
+          ]
+        }
+      });
+    });
+
+    it('should suggest columns for qualified CTE references "WITH t1 AS (SELECT id, name FROM foo) SELECT t1.| FROM t1"', () => {
+      assertAutoComplete({
+        beforeCursor: 'WITH t1 AS (SELECT id, name FROM foo) SELECT t1.',
+        afterCursor: ' FROM t1',
+        noErrors: true,
+        containsKeywords: ['*'],
+        expectedResult: {
+          lowerCase: false,
+          suggestColumns: { source: 'select', tables: [{ identifierChain: [{ cte: 't1' }] }] },
+          commonTableExpressions: [
+            {
+              alias: 't1',
+              columns: [
+                { identifierChain: [{ name: 'foo' }, { name: 'id' }], type: 'COLREF' },
+                { identifierChain: [{ name: 'foo' }, { name: 'name' }], type: 'COLREF' }
+              ]
+            }
+          ],
+          subQueries: [
+            {
+              alias: 't1',
+              columns: [
+                { identifierChain: [{ name: 'foo' }, { name: 'id' }], type: 'COLREF' },
+                { identifierChain: [{ name: 'foo' }, { name: 'name' }], type: 'COLREF' }
+              ]
+            }
+          ]
+        }
+      });
+    });
+
     it('should suggest identifiers for "WITH t1 AS (SELECT * FROM FOO) SELECT * FROM |', () => {
       assertAutoComplete({
         beforeCursor: 'WITH t1 AS (SELECT * FROM FOO) SELECT * FROM ',

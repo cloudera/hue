@@ -1367,10 +1367,22 @@ WithQuery
      $4.alias = $1;
      $$ = $4;
    }
+ | RegularOrBacktickedIdentifier CteColumnAliasList 'AS' '(' TableSubQueryInner ')'
+   {
+     parser.addCteAliasLocation(@1, $1);
+     $5.alias = $1;
+     $5.columnAliases = $2;
+     $$ = $5;
+   }
  | RegularOrBacktickedIdentifier 'AS' '(' ValuesClause ')'
    {
      parser.addCteAliasLocation(@1, $1);
      $$ = { alias: $1 };
+   }
+ | RegularOrBacktickedIdentifier CteColumnAliasList 'AS' '(' ValuesClause ')'
+   {
+     parser.addCteAliasLocation(@1, $1);
+     $$ = { alias: $1, columnAliases: $2 };
    }
  ;
 
@@ -1379,11 +1391,29 @@ WithQuery_EDIT
    {
      parser.suggestKeywords(['AS']);
    }
+ | RegularOrBacktickedIdentifier CteColumnAliasList 'CURSOR'
+   {
+     parser.suggestKeywords(['AS']);
+   }
  | RegularOrBacktickedIdentifier 'AS' '(' AnyCursor RightParenthesisOrError
    {
      parser.suggestKeywords(['SELECT']);
    }
+ | RegularOrBacktickedIdentifier CteColumnAliasList 'AS' '(' AnyCursor RightParenthesisOrError
+   {
+     parser.suggestKeywords(['SELECT']);
+   }
  | RegularOrBacktickedIdentifier 'AS' '(' TableSubQueryInner_EDIT RightParenthesisOrError
+ | RegularOrBacktickedIdentifier CteColumnAliasList 'AS' '(' TableSubQueryInner_EDIT RightParenthesisOrError
+ ;
+
+CteColumnAliasList
+ : '(' CteColumnAliases ')'  -> $2
+ ;
+
+CteColumnAliases
+ : ColumnIdentifier                      -> [$1.identifier.name]
+ | CteColumnAliases ',' ColumnIdentifier -> $1.concat([$3.identifier.name])
  ;
 
 OptionalAllOrDistinct
