@@ -667,6 +667,10 @@ class AutocompleteResults {
 
       const tableSuggestions: Suggestion[] = [];
 
+      if (!database) {
+        return tableSuggestions;
+      }
+
       try {
         const dbEntry = await new Promise<DataCatalogEntry>((resolve, reject) => {
           this.onCancelFunctions.push(reject);
@@ -1838,6 +1842,10 @@ class AutocompleteResults {
       suggestTables.identifierChain[0].name
         ? suggestTables.identifierChain[0].name
         : this.activeDatabase;
+
+    if (!db) {
+      return [];
+    }
 
     try {
       const entry = await new Promise<DataCatalogEntry>((resolve, reject) => {

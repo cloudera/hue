@@ -362,6 +362,37 @@ describe('AutocompleteResults.ts', () => {
     expect(sourceMetaSpy).not.toHaveBeenCalled();
   });
 
+  it('should not fetch tables when there is no active database', async () => {
+    jest.spyOn(hueConfig, 'getLastKnownConfig').mockImplementation(
+      () =>
+        ({
+          app_config: {
+            editor: {
+              source_autocomplete_disabled: false
+            }
+          }
+        }) as HueConfig
+    );
+
+    const subject = createSubject();
+    subject.executor.database = (() => undefined) as unknown as Executor['database'];
+
+    const suggestions: Suggestion[] = [];
+    await subject.update(
+      {
+        lowerCase: false,
+        suggestTables: {}
+      } as AutocompleteParseResult,
+      suggestions
+    );
+
+    const tableFetches = sourceMetaSpy.mock.calls.filter(
+      ([options]) => options.entry.path.length === 1
+    );
+    expect(tableFetches).toHaveLength(0);
+    expect(suggestions).toHaveLength(0);
+  });
+
   it('should suggest columns for CTEs selecting all columns from a source table', async () => {
     mockSourceMetadata({
       foo: [
