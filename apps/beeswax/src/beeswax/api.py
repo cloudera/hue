@@ -118,6 +118,10 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None, query
       response['function'] = _get_function(db, database)
     elif database is None:
       response['databases'] = db.get_databases()
+    elif table is None and not database:
+      # An empty database name would be turned into a wildcard scan of all databases
+      response['code'] = 400
+      response['error'] = _('Database name is missing')
     elif table is None:
       tables_meta = db.get_tables_meta(database=database)
       response['tables_meta'] = tables_meta

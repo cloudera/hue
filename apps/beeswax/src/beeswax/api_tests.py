@@ -46,6 +46,14 @@ class TestApi:
 
     assert resp == {"code": 500, "error": "HTTPSConnectionPool(host='gethue.com', port=10001): Read timed out. (read timeout=120)"}
 
+  def test_autocomplete_empty_database_name(self):
+    db = Mock()
+
+    resp = _autocomplete(db, database="")
+
+    assert resp == {"code": 400, "error": "Database name is missing"}
+    assert not db.get_tables_meta.called
+
   def test_get_functions(self):
     # Mock db.get_functions() to return rows that escape_rows can process
     # Each row should be a list where row[0] is the function name
