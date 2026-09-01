@@ -338,6 +338,51 @@ class TestTrinoApi(TestCase):
     assert len(result['data']) == 89
     assert len(result['meta']) == 2
 
+  def test_fetch_result_uses_seed_meta_when_next_uri_already_none(self):
+    # A fast query's entire result (data, columns, and the "no more pages" signal) can already
+    # have been consumed by a check_status() poll and seeded into the handle before fetch_result()
+    # is ever called. In that case next_uri starts out None, the while loop never runs, and column
+    # metadata has to come from the seed -- otherwise the response has no headers at all.
+    mock_trino_request = MagicMock()
+    self.trino_api.trino_request = mock_trino_request
+
+    seed_meta = [{'comment': '', 'name': 'test_column1', 'type': 'str'}, {'comment': '', 'name': 'test_column2', 'type': 'str'}]
+    seed_data = [['value1', 'value2']]
+
+    result = self.trino_api.fetch_result(
+      notebook={},
+      snippet={'result': {'handle': {'next_uri': None, 'result': {'data': seed_data, 'meta': seed_meta}}}},
+      rows=0,
+      start_over=False
+    )
+
+    mock_trino_request.get.assert_not_called()
+    assert result['data'] == seed_data
+    assert result['meta'] == seed_meta
+    assert result['has_more'] is False
+
+  def test_fetch_result_keeps_earlier_columns_when_a_later_page_omits_them(self):
+    # Trino only re-sends column metadata on some responses, not every page. A later page's
+    # response having no columns must not wipe out what an earlier page in the same loop
+    # already established.
+    mock_trino_request = MagicMock()
+    self.trino_api.trino_request = mock_trino_request
+
+    mock_trino_request.get.return_value = MagicMock()
+    _columns = [{'comment': '', 'name': 'test_column1', 'type': 'str'}]
+
+    mock_trino_request.process.side_effect = [
+      MagicMock(stats={'state': 'RUNNING'}, next_uri='http://url2', id=123, rows=[], columns=_columns),
+      MagicMock(stats={'state': 'FINISHED'}, next_uri=None, id=124, rows=[['value1']], columns=None)
+    ]
+
+    result = self.trino_api.fetch_result(
+      notebook={}, snippet={'result': {'handle': {'next_uri': 'http://url1', 'result': {'data': []}}}}, rows=0, start_over=False
+    )
+
+    assert result['meta'] == [{'name': 'test_column1', 'type': 'str', 'comment': ''}]
+    assert result['data'] == [['value1']]
+
   def test_get_select_query(self):
     # Test with specified database, table, and column
     database = '`test_schema.test_db`'

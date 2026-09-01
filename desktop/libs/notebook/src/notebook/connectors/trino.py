@@ -18,7 +18,6 @@
 import json
 import logging
 import textwrap
-import time
 from urllib.parse import urlparse
 
 import certifi
@@ -257,14 +256,18 @@ class TrinoApi(Api):
   @query_error_handler
   def fetch_result(self, notebook, snippet, rows, start_over):
     data = []
-    columns = []
     next_uri = snippet['result']['handle']['next_uri']
     row_count = snippet['result']['handle'].get('row_count', 0)
     rows_remaining = snippet['result']['handle'].get('rows_remaining', 0)
-    status = False
 
+    # Seed both data and columns from the handle. next_uri may already be None here -- e.g. a
+    # fast query whose entire result (data, columns, and the "no more pages" signal) was already
+    # consumed by a check_status() poll -- in which case the while loop below never runs at all,
+    # and columns has to come from here or the response would have no column metadata whatsoever.
+    seed_result = snippet['result']['handle'].get('result') or {}
     if row_count == 0:
-      data = snippet['result']['handle']['result']['data']
+      data = seed_result.get('data', [])
+    columns = seed_result.get('meta', [])
 
     while next_uri:
       try:
@@ -274,7 +277,11 @@ class TrinoApi(Api):
 
       status = self.trino_request.process(response)
       data += status.rows
-      columns = status.columns
+      if status.columns:
+        # Trino only re-sends column metadata on some responses (typically the first), not
+        # every page -- only overwrite columns when this response actually carries it, so a
+        # later columns-less page can't wipe out what an earlier one established.
+        columns = status.columns
 
       if rows_remaining:
         data = data[-rows_remaining:]  # Trim the data to only include the remaining rows
@@ -296,13 +303,13 @@ class TrinoApi(Api):
       'row_count': len(data) + row_count,
       'rows_remaining': rows_remaining,
       'next_uri': next_uri,
-      'has_more': bool(status.next_uri) if status else False,
+      'has_more': bool(next_uri),
       'data': data or [],
       'meta': [{
         'name': column['name'],
         'type': column['type'],
         'comment': ''
-        } for column in columns] if status else [],
+        } for column in columns] if columns else [],
       'type': 'table'
     }
 
@@ -506,35 +513,9 @@ class TrinoExecutionWrapper(ExecutionWrapper):
 
     return ResultWrapper(result.get('meta'), result.get('data'), result.get('has_more'))
 
-  def _until_available(self):
-    if self.snippet['result']['handle'].get('sync', False):
-      return  # Request is already completed
-
-    count = 0
-    sleep_seconds = 1
-    check_status_count = 0
-    get_log_is_full_log = self.api.get_log_is_full_log(self.notebook, self.snippet)
-
-    while True:
-      response = self.api.check_status(self.notebook, self.snippet)
-      old_uri = self.snippet['result']['handle']['next_uri']
-      self.snippet['result']['handle']['next_uri'] = response['next_uri']
-      if self.callback and hasattr(self.callback, 'on_status'):
-        self.callback.on_status(response['status'])
-      if self.callback and hasattr(self.callback, 'on_log'):
-        log = self.api.get_log(self.notebook, self.snippet, startFrom=count)
-        if get_log_is_full_log:
-          log = log[count:]
-
-        self.callback.on_log(log)
-        count += len(log)
-
-      if response['status'] not in ['waiting', 'running', 'submitted']:
-        self.snippet['result']['handle']['next_uri'] = old_uri
-        break
-      check_status_count += 1
-      if check_status_count > 5:
-        sleep_seconds = 5
-      elif check_status_count > 10:
-        sleep_seconds = 10
-      time.sleep(sleep_seconds)
+  # _until_available() is intentionally not overridden here -- it used to duplicate
+  # ExecutionWrapper._until_available() (base.py) with two bugs: it discarded any row data a
+  # check_status() poll happened to carry, and it explicitly reverted next_uri back to the
+  # stale, already-consumed value right before returning. That guaranteed fetch_result() would
+  # re-GET an already-consumed Trino continuation URI and get back a random subset of the real
+  # rows (see base.py's _until_available() for the fixed, shared implementation).

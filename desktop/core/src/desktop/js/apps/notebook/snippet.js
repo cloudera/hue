@@ -2346,6 +2346,14 @@ class Snippet {
     };
 
     self.checkStatus = function () {
+      // Rows a check_status() poll incidentally delivers along with the status check get
+      // held here (client-side only) rather than written straight into self.result.handle(),
+      // since handle is serialized into every outgoing check_status/fetch_result_data request
+      // body -- writing accumulated rows into it would make each subsequent poll's request
+      // grow by the full result size so far, which is what caused 413s on large results.
+      // Reset per execution so a previous run's leftovers can't leak into this one.
+      self._trinoPendingResult = null;
+
       const _checkStatus = function () {
         self.lastCheckStatusRequest = $.post(
           '/notebook/api/check_status',
@@ -2381,15 +2389,19 @@ class Snippet {
                     // The GET above may have delivered an actual page of rows along with the
                     // status check (Trino only serves a given next_uri's data once). Since
                     // next_uri now points past that page, fetchResult() has no way to recover
-                    // those rows itself -- they have to be seeded here into handle.result so the
-                    // row_count === 0 path picks them up.
-                    const existing_result = existing_handle.result || { data: [], meta: [], type: 'table' };
-                    existing_result.data = (existing_result.data || []).concat(data.query_status.result.data);
-                    if (data.query_status.result.meta) {
-                      existing_result.meta = data.query_status.result.meta;
+                    // those rows itself -- accumulate them client-side only (see the comment on
+                    // self._trinoPendingResult above) until they're handed to fetchResult() below.
+                    const pending = self._trinoPendingResult || { data: [], meta: [], type: 'table' };
+                    pending.data = pending.data.concat(data.query_status.result.data);
+                    if (data.query_status.result.meta && data.query_status.result.meta.length) {
+                      // Trino only re-sends column metadata on some poll responses (typically
+                      // the one that first establishes it), not every one that carries rows --
+                      // only overwrite pending.meta when this response actually has it, so a
+                      // later columns-less poll can't wipe out what an earlier one established.
+                      pending.meta = data.query_status.result.meta;
                     }
-                    existing_result.type = data.query_status.result.type || 'table';
-                    existing_handle.result = existing_result;
+                    pending.type = data.query_status.result.type || 'table';
+                    self._trinoPendingResult = pending;
                   }
                 }
 
@@ -2404,6 +2416,18 @@ class Snippet {
                   }
                 } else if (self.status() === 'available' || self.status() === 'success') {
                   if (self.status() === 'available') {
+                    if (self.type() === 'trino' && self._trinoPendingResult) {
+                      // Hand off whatever rows were accumulated client-side across the polls
+                      // above -- this is the one point they actually need to go back to the
+                      // server, as the seed fetchResult()'s row_count === 0 path reads.
+                      const existing_handle = self.result.handle();
+                      const existing_result = existing_handle.result || { data: [], meta: [], type: 'table' };
+                      existing_result.data = (existing_result.data || []).concat(self._trinoPendingResult.data);
+                      existing_result.meta = self._trinoPendingResult.meta;
+                      existing_result.type = self._trinoPendingResult.type;
+                      existing_handle.result = existing_result;
+                      self._trinoPendingResult = null;
+                    }
                     self.fetchResult(100);
                   }
                   self.progress(100);
