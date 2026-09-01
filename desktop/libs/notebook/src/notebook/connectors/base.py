@@ -745,6 +745,25 @@ class ExecutionWrapper(object):
 
     while True:
       response = self.api.check_status(self.notebook, self.snippet)
+
+      # Some connectors (e.g. Trino) report a next_uri continuation token in the check_status()
+      # response, and may deliver a page of row data alongside the status check. This loop
+      # re-checks status by calling check_status() again with the same self.snippet -- which
+      # re-reads whatever next_uri is currently in the handle -- so the advanced next_uri (and
+      # any row data polled alongside it) has to be written back here. Otherwise every iteration
+      # re-requests the same already-consumed URI, and the eventual fetch_result() call downstream
+      # (e.g. for a CSV/Excel download) can end up with an empty or unpredictable subset of rows.
+      if 'next_uri' in response:
+        handle = self.snippet['result']['handle']
+        handle['next_uri'] = response['next_uri']
+        polled_result = response.get('result')
+        if polled_result and polled_result.get('data'):
+          existing_result = handle.setdefault('result', {'data': [], 'meta': [], 'type': 'table'})
+          existing_result['data'] = existing_result.get('data', []) + polled_result['data']
+          if polled_result.get('meta'):
+            existing_result['meta'] = polled_result['meta']
+          existing_result['type'] = polled_result.get('type', 'table')
+
       if self.callback and hasattr(self.callback, 'on_status'):
         self.callback.on_status(response['status'])
       if self.callback and hasattr(self.callback, 'on_log'):
