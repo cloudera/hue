@@ -255,21 +255,24 @@ class TrinoApi(Api):
 
   @query_error_handler
   def fetch_result(self, notebook, snippet, rows, start_over):
-    data = []
     next_uri = snippet['result']['handle']['next_uri']
     row_count = snippet['result']['handle'].get('row_count', 0)
     rows_remaining = snippet['result']['handle'].get('rows_remaining', 0)
 
     # Seed both data and columns from the handle. next_uri may already be None here -- e.g. a
     # fast query whose entire result (data, columns, and the "no more pages" signal) was already
-    # consumed by a check_status() poll -- in which case the while loop below never runs at all,
-    # and columns has to come from here or the response would have no column metadata whatsoever.
+    # consumed by check_status() polls -- in which case the while loop below may never run at
+    # all, and columns has to come from here or the response would have no column metadata
+    # whatsoever. The seed itself is never mutated or discarded: row_count is used purely as an
+    # offset into it, so a seed bigger than one page (100 rows) is correctly paged across
+    # multiple fetch_result() calls instead of being truncated on the first one and permanently
+    # lost -- there's no next_uri to recover it from once it's already in the seed.
     seed_result = snippet['result']['handle'].get('result') or {}
-    if row_count == 0:
-      data = seed_result.get('data', [])
+    full_seed = seed_result.get('data', [])
+    data = full_seed[row_count:]
     columns = seed_result.get('meta', [])
 
-    while next_uri:
+    while next_uri and len(data) < 100:
       try:
         response = self.trino_request.get(next_uri)
       except requests.exceptions.RequestException as e:
@@ -295,15 +298,16 @@ class TrinoApi(Api):
       next_uri = status.next_uri
 
     data = data[:100]
+    new_row_count = row_count + len(data)
 
     properties = self.trino_session.properties
     self._set_session_info_to_user(properties)
 
     return {
-      'row_count': len(data) + row_count,
+      'row_count': new_row_count,
       'rows_remaining': rows_remaining,
       'next_uri': next_uri,
-      'has_more': bool(next_uri),
+      'has_more': bool(next_uri) or new_row_count < len(full_seed),
       'data': data or [],
       'meta': [{
         'name': column['name'],

@@ -361,6 +361,38 @@ class TestTrinoApi(TestCase):
     assert result['meta'] == seed_meta
     assert result['has_more'] is False
 
+  def test_fetch_result_pages_a_seed_larger_than_one_page_across_multiple_calls(self):
+    # A check_status() poll can accumulate more than 100 rows into the seed before the query
+    # reaches its terminal (next_uri=None) state -- e.g. a medium-sized, fast-finishing query.
+    # That seed must be paged across successive fetch_result() calls (mirroring how
+    # TrinoExecutionWrapper.fetch() writes row_count/rows_remaining/next_uri back into the handle
+    # between calls) instead of being truncated to the first 100 rows and silently losing the rest.
+    mock_trino_request = MagicMock()
+    self.trino_api.trino_request = mock_trino_request
+
+    seed_meta = [{'comment': '', 'name': 'test_column1', 'type': 'str'}]
+    seed_data = [[f'value{i}'] for i in range(150)]
+    handle = {'next_uri': None, 'row_count': 0, 'rows_remaining': 0, 'result': {'data': seed_data, 'meta': seed_meta}}
+
+    first = self.trino_api.fetch_result(notebook={}, snippet={'result': {'handle': handle}}, rows=0, start_over=False)
+
+    mock_trino_request.get.assert_not_called()
+    assert first['data'] == seed_data[:100]
+    assert first['row_count'] == 100
+    assert first['has_more'] is True
+
+    # Mirrors what TrinoExecutionWrapper.fetch() does between calls.
+    handle['row_count'] = first['row_count']
+    handle['rows_remaining'] = first['rows_remaining']
+    handle['next_uri'] = first['next_uri']
+
+    second = self.trino_api.fetch_result(notebook={}, snippet={'result': {'handle': handle}}, rows=0, start_over=False)
+
+    mock_trino_request.get.assert_not_called()
+    assert second['data'] == seed_data[100:]
+    assert second['row_count'] == 150
+    assert second['has_more'] is False
+
   def test_fetch_result_keeps_earlier_columns_when_a_later_page_omits_them(self):
     # Trino only re-sends column metadata on some responses, not every page. A later page's
     # response having no columns must not wipe out what an earlier page in the same loop
