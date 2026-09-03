@@ -24,7 +24,7 @@ from unittest.mock import Mock, patch
 import pytest
 
 from desktop.lib.django_test_util import make_logged_in_client
-from notebook.connectors.base import get_api, Notebook
+from notebook.connectors.base import ExecutionWrapper, get_api, Notebook
 from useradmin.models import User
 
 
@@ -99,6 +99,63 @@ class TestNotebook(object):
     assert (
       "SELECT * FROM table WHERE city='Saint-Étienne'" ==
       Notebook.statement_with_variables(snippet))
+
+
+@pytest.mark.django_db
+class TestExecutionWrapperUntilAvailable(object):
+  """
+  Covers ExecutionWrapper._until_available()'s persistence of a connector's next_uri and any
+  row data piggybacked on a status poll. This loop calls check_status() repeatedly against the
+  same self.snippet -- if the advanced next_uri isn't written back after each poll, every
+  iteration re-requests the same already-consumed Trino continuation URI, which is exactly what
+  caused CSV/Excel downloads (which re-execute and poll to completion server-side, independent
+  of the browser-facing check_status/fetch_result_data flow) to come back with no row data.
+  """
+
+  def _make_wrapper(self, next_uri='http://trino/1'):
+    api = Mock()
+    api.get_log_is_full_log.return_value = False
+    snippet = {'result': {'handle': {'guid': 'test-guid', 'next_uri': next_uri}}}
+    return ExecutionWrapper(api, notebook={}, snippet=snippet), api, snippet
+
+  def test_persists_advancing_next_uri_and_polled_rows(self):
+    wrapper, api, snippet = self._make_wrapper()
+    api.check_status.side_effect = [
+      {'status': 'running', 'next_uri': 'http://trino/2'},
+      {
+        'status': 'available',
+        'next_uri': 'http://trino/3',
+        'result': {'data': [['a'], ['b']], 'meta': [{'name': 'col', 'type': 'string', 'comment': ''}], 'type': 'table'}
+      }
+    ]
+
+    wrapper._until_available()
+
+    handle = snippet['result']['handle']
+    assert handle['next_uri'] == 'http://trino/3'
+    assert handle['result']['data'] == [['a'], ['b']]
+    assert api.check_status.call_count == 2
+
+  def test_accumulates_polled_rows_across_multiple_polls(self):
+    wrapper, api, snippet = self._make_wrapper()
+    api.check_status.side_effect = [
+      {'status': 'running', 'next_uri': 'http://trino/2', 'result': {'data': [['a']], 'meta': [], 'type': 'table'}},
+      {'status': 'available', 'next_uri': 'http://trino/3', 'result': {'data': [['b']], 'meta': [], 'type': 'table'}}
+    ]
+
+    wrapper._until_available()
+
+    assert snippet['result']['handle']['result']['data'] == [['a'], ['b']]
+
+  def test_does_not_touch_next_uri_for_connectors_that_dont_report_it(self):
+    # Non-Trino connectors' check_status() responses have no 'next_uri' key at all -- the
+    # handle's next_uri (if any) must be left untouched in that case.
+    wrapper, api, snippet = self._make_wrapper(next_uri='http://trino/1')
+    api.check_status.return_value = {'status': 'available'}
+
+    wrapper._until_available()
+
+    assert snippet['result']['handle']['next_uri'] == 'http://trino/1'
 
 
 iteration = 0

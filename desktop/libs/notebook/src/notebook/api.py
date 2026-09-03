@@ -277,18 +277,49 @@ def _check_status(request, notebook=None, snippet=None, operation_id=None):
 
     if response.get('query_status'):
       has_result_set = response['query_status'].get('has_result_set')
+      next_uri_present = 'next_uri' in response['query_status']
+      next_uri = response['query_status'].get('next_uri')
+      polled_result = response['query_status'].get('result')
     else:
       has_result_set = None
+      next_uri_present = False
+      next_uri = None
+      polled_result = None
 
     if notebook.get('dialect') or notebook['type'].startswith('query') or notebook.get('isManaged'):
       nb_doc = Document2.objects.get_by_uuid(user=request.user, uuid=operation_id or notebook['uuid'])
       if nb_doc.can_write(request.user):
         nb = Notebook(document=nb_doc).get_data()
-        if status != nb['snippets'][0]['status'] or has_result_set != nb['snippets'][0].get('has_result_set'):
+        handle = nb['snippets'][0].setdefault('result', {}).setdefault('handle', {})
+        # check_status() re-checks a query by GETting its current next_uri, which advances
+        # Trino's pagination cursor and may consume a page of row data along with the status
+        # check. When this request is reached via operation_id, the snippet is reloaded from
+        # this same persisted document, so the advanced next_uri (and any polled row data) has
+        # to be saved back here -- otherwise a later poll or fetch_result() call keeps
+        # re-GETting the same, already-consumed URI. A next_uri of None is itself meaningful
+        # progress (no more pages), so it must be persisted too -- next_uri_present (not just
+        # "is not None") is what tracks whether this connector reports next_uri at all.
+        next_uri_changed = next_uri_present and handle.get('next_uri') != next_uri
+        has_polled_data = bool(polled_result and polled_result.get('data'))
+        will_save = (status != nb['snippets'][0]['status'] or has_result_set != nb['snippets'][0].get('has_result_set') or
+                     next_uri_changed or has_polled_data)
+        if will_save:
           nb['snippets'][0]['status'] = status
           if has_result_set is not None:
             nb['snippets'][0]['has_result_set'] = has_result_set
-            nb['snippets'][0]['result']['handle']['has_result_set'] = has_result_set
+            handle['has_result_set'] = has_result_set
+          if next_uri_changed:
+            handle['next_uri'] = next_uri
+          if has_polled_data:
+            # The GET above may have consumed a page of actual row data along with the status
+            # check. fetch_result() may run on a different worker process than this poll did,
+            # so that data has to be appended to the handle's result seed here -- it's the only
+            # place fetch_result() will ever look for it once next_uri has moved past this page.
+            existing_result = handle.setdefault('result', {'data': [], 'meta': [], 'type': 'table'})
+            existing_result['data'] = existing_result.get('data', []) + polled_result['data']
+            if polled_result.get('meta'):
+              existing_result['meta'] = polled_result['meta']
+            existing_result['type'] = polled_result.get('type', 'table')
           nb_doc.update_data(nb)
           nb_doc.save()
 

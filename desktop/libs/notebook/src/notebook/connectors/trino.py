@@ -18,9 +18,9 @@
 import json
 import logging
 import textwrap
-import time
 from urllib.parse import urlparse
 
+import certifi
 import requests
 from trino.auth import BasicAuthentication
 from trino.client import ClientSession, TrinoQuery, TrinoRequest
@@ -37,6 +37,23 @@ from notebook.connectors.base import Api, ExecutionWrapper, QueryError, ResultWr
 
 LOG = logging.getLogger()
 SESSION_KEY = '%(username)s-%(interpreter_name)s'
+
+_COMBINED_CA_BUNDLE = None
+
+
+def _get_combined_ca_bundle(extra_cert_path):
+  """Merge the system/certifi CA bundle with a custom (e.g. self-signed) cert
+  so both public CAs and the internal cert validate. Computed once per process."""
+  global _COMBINED_CA_BUNDLE
+  if _COMBINED_CA_BUNDLE is None:
+    combined_path = '/tmp/hue-trino-ca-bundle.pem'
+    with open(combined_path, 'wb') as out:
+      with open(certifi.where(), 'rb') as f:
+        out.write(f.read())
+      with open(extra_cert_path, 'rb') as f:
+        out.write(f.read())
+    _COMBINED_CA_BUNDLE = combined_path
+  return _COMBINED_CA_BUNDLE
 
 
 def query_error_handler(func):
@@ -71,6 +88,9 @@ class TrinoApi(Api):
       self.auth_password = auth_password
       self.auth = BasicAuthentication(self.auth_username, self.auth_password)
 
+    ssl_cert_path = self.options.get('ssl_cert_path')
+    verify = _get_combined_ca_bundle(ssl_cert_path) if ssl_cert_path else True
+
     self.session_info = self.create_session()
     self.trino_session = ClientSession(self.user.username, properties=self.session_info['properties'])
     self.trino_request = TrinoRequest(
@@ -78,7 +98,8 @@ class TrinoApi(Api):
       port=self.server_port,
       client_session=self.trino_session,
       http_scheme=self.http_scheme,
-      auth=self.auth
+      auth=self.auth,
+      verify=verify
     )
 
   def get_auth_password(self):
@@ -205,27 +226,53 @@ class TrinoApi(Api):
       if _status.stats['state'] == 'QUEUED':
         status = 'waiting'
       elif _status.stats['state'] == 'RUNNING':
-        status = 'available'  # need to verify
+        status = 'running'
       else:
         status = 'available'
 
+      # This poll's GET already consumed next_uri, and Trino only serves a given next_uri's
+      # row data once. Any rows piggybacked on this response have to be surfaced in the
+      # response itself (not just remembered locally) since the caller -- notebook/api.py --
+      # persists this into the snippet's handle so fetch_result() can pick it up even if it
+      # runs on a different worker process than this poll did.
+      if _status.rows:
+        response['result'] = {
+          'has_more': _status.next_uri is not None,
+          'data': _status.rows,
+          'meta': [{
+              'name': col['name'],
+              'type': col['type'],
+              'comment': ''
+            }
+            for col in _status.columns
+          ] if _status.columns else [],
+          'type': 'table'
+        }
+
     response['status'] = status
-    response['next_uri'] = _status.next_uri if status != 'available' else next_uri
+    response['next_uri'] = _status.next_uri if next_uri is not None else next_uri
     return response
 
   @query_error_handler
   def fetch_result(self, notebook, snippet, rows, start_over):
-    data = []
-    columns = []
     next_uri = snippet['result']['handle']['next_uri']
     row_count = snippet['result']['handle'].get('row_count', 0)
     rows_remaining = snippet['result']['handle'].get('rows_remaining', 0)
-    status = False
 
-    if row_count == 0:
-      data = snippet['result']['handle']['result']['data']
+    # Seed both data and columns from the handle. next_uri may already be None here -- e.g. a
+    # fast query whose entire result (data, columns, and the "no more pages" signal) was already
+    # consumed by check_status() polls -- in which case the while loop below may never run at
+    # all, and columns has to come from here or the response would have no column metadata
+    # whatsoever. The seed itself is never mutated or discarded: row_count is used purely as an
+    # offset into it, so a seed bigger than one page (100 rows) is correctly paged across
+    # multiple fetch_result() calls instead of being truncated on the first one and permanently
+    # lost -- there's no next_uri to recover it from once it's already in the seed.
+    seed_result = snippet['result']['handle'].get('result') or {}
+    full_seed = seed_result.get('data', [])
+    data = full_seed[row_count:]
+    columns = seed_result.get('meta', [])
 
-    while next_uri:
+    while next_uri and len(data) < 100:
       try:
         response = self.trino_request.get(next_uri)
       except requests.exceptions.RequestException as e:
@@ -233,7 +280,11 @@ class TrinoApi(Api):
 
       status = self.trino_request.process(response)
       data += status.rows
-      columns = status.columns
+      if status.columns:
+        # Trino only re-sends column metadata on some responses (typically the first), not
+        # every page -- only overwrite columns when this response actually carries it, so a
+        # later columns-less page can't wipe out what an earlier one established.
+        columns = status.columns
 
       if rows_remaining:
         data = data[-rows_remaining:]  # Trim the data to only include the remaining rows
@@ -247,21 +298,22 @@ class TrinoApi(Api):
       next_uri = status.next_uri
 
     data = data[:100]
+    new_row_count = row_count + len(data)
 
     properties = self.trino_session.properties
     self._set_session_info_to_user(properties)
 
     return {
-      'row_count': len(data) + row_count,
+      'row_count': new_row_count,
       'rows_remaining': rows_remaining,
       'next_uri': next_uri,
-      'has_more': bool(status.next_uri) if status else False,
+      'has_more': bool(next_uri) or new_row_count < len(full_seed),
       'data': data or [],
       'meta': [{
         'name': column['name'],
         'type': column['type'],
         'comment': ''
-        } for column in columns] if status else [],
+        } for column in columns] if columns else [],
       'type': 'table'
     }
 
@@ -321,6 +373,10 @@ class TrinoApi(Api):
       })
 
     return statement
+
+  @query_error_handler
+  def cancel(self, notebook, snippet):
+    return self.close_statement(notebook, snippet)
 
   def close_statement(self, notebook, snippet):
     try:
@@ -461,35 +517,9 @@ class TrinoExecutionWrapper(ExecutionWrapper):
 
     return ResultWrapper(result.get('meta'), result.get('data'), result.get('has_more'))
 
-  def _until_available(self):
-    if self.snippet['result']['handle'].get('sync', False):
-      return  # Request is already completed
-
-    count = 0
-    sleep_seconds = 1
-    check_status_count = 0
-    get_log_is_full_log = self.api.get_log_is_full_log(self.notebook, self.snippet)
-
-    while True:
-      response = self.api.check_status(self.notebook, self.snippet)
-      old_uri = self.snippet['result']['handle']['next_uri']
-      self.snippet['result']['handle']['next_uri'] = response['next_uri']
-      if self.callback and hasattr(self.callback, 'on_status'):
-        self.callback.on_status(response['status'])
-      if self.callback and hasattr(self.callback, 'on_log'):
-        log = self.api.get_log(self.notebook, self.snippet, startFrom=count)
-        if get_log_is_full_log:
-          log = log[count:]
-
-        self.callback.on_log(log)
-        count += len(log)
-
-      if response['status'] not in ['waiting', 'running', 'submitted']:
-        self.snippet['result']['handle']['next_uri'] = old_uri
-        break
-      check_status_count += 1
-      if check_status_count > 5:
-        sleep_seconds = 5
-      elif check_status_count > 10:
-        sleep_seconds = 10
-      time.sleep(sleep_seconds)
+  # _until_available() is intentionally not overridden here -- it used to duplicate
+  # ExecutionWrapper._until_available() (base.py) with two bugs: it discarded any row data a
+  # check_status() poll happened to carry, and it explicitly reverted next_uri back to the
+  # stale, already-consumed value right before returning. That guaranteed fetch_result() would
+  # re-GET an already-consumed Trino continuation URI and get back a random subset of the real
+  # rows (see base.py's _until_available() for the fixed, shared implementation).
