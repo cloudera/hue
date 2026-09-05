@@ -31,12 +31,29 @@ import {
 import { registerHueWorkers } from 'sql/workers/hueWorkerHandler';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+import {
+  inferRowDetailsSourceName,
+  inferRowDetailsSourceNameFromExecutable
+} from 'jquery/plugins/rowDetailsSource';
 import bootstrapRatios from 'utils/html/bootstrapRatios';
 import scrollbarWidth from 'utils/screen/scrollbarWidth';
 import waitForRendered from 'utils/timing/waitForRendered';
 import { SHOW_LEFT_ASSIST_EVENT } from 'ko/components/assist/events';
 
 window.Clipboard = Clipboard;
+
+const rowDetailsSourceNameFromSnippet = snippet => () => {
+  const executable =
+    (snippet.activeExecutable && snippet.activeExecutable()) ||
+    (snippet.executor && snippet.executor.activeExecutable);
+  if (executable) {
+    return inferRowDetailsSourceNameFromExecutable(executable);
+  }
+  return inferRowDetailsSourceName({
+    database: snippet.database && snippet.database(),
+    statement: snippet.statement && snippet.statement()
+  });
+};
 
 const HUE_PUB_SUB_EDITOR_ID =
   window.location.pathname.indexOf('notebook') > -1 ? 'notebook' : 'editor';
@@ -132,7 +149,8 @@ huePubSub.subscribe('app.dom.loaded', app => {
             stickToTopPosition: 48 + bannerTopHeight,
             parentId: 'snippet_' + snippet.id(),
             clonedContainerPosition: 'fixed',
-            app: 'editor'
+            app: 'editor',
+            rowDetailsSourceName: rowDetailsSourceNameFromSnippet(snippet)
           });
           $(el).jHueHorizontalScrollbar();
         } else {
@@ -141,7 +159,8 @@ huePubSub.subscribe('app.dom.loaded', app => {
             fixedFirstColumn: vm.editorMode(),
             parentId: 'snippet_' + snippet.id(),
             clonedContainerPosition: 'absolute',
-            app: 'editor'
+            app: 'editor',
+            rowDetailsSourceName: rowDetailsSourceNameFromSnippet(snippet)
           });
         }
       }, 0);

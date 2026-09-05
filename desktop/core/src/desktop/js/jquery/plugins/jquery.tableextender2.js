@@ -19,6 +19,7 @@ import $ from 'jquery';
 import deXSS from 'utils/html/deXSS';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+import { resolveRowDetailsSourceName } from './rowDetailsSource';
 
 const PLUGIN_NAME = 'jHueTableExtender2';
 
@@ -34,6 +35,7 @@ const DEFAULT_OPTIONS = {
   mainScrollable: window,
   app: null,
   stickToTopPosition: -1,
+  rowDetailsSourceName: undefined,
   labels: {
     GO_TO_COLUMN: 'Go to column:',
     PLACEHOLDER: 'column name...',
@@ -467,7 +469,11 @@ Plugin.prototype.drawFirstColumn = function (repositionHeader) {
         .addClass('fa fa-expand pointer muted')
         .prependTo(cell)
         .on('click', () => {
-          huePubSub.publish('table.row.show.details', { idx: idx, table: self.$element });
+          huePubSub.publish('table.row.show.details', {
+            idx: idx,
+            table: self.$element,
+            sourceName: resolveRowDetailsSourceName(self.options.rowDetailsSourceName)
+          });
         })
         .attr('title', self.options.labels.ROW_DETAILS);
     });
