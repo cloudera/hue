@@ -33,6 +33,7 @@ import {
 } from 'apps/editor/events';
 import { trackResult } from 'apps/editor/components/executableStateHandler';
 import { ExecutionStatus } from 'apps/editor/execution/sqlExecutable';
+import { inferRowDetailsSourceNameFromExecutable } from 'jquery/plugins/rowDetailsSource';
 
 export const SIMPLE_RESULT_GRID_COMPONENT = 'simple-result-grid';
 
@@ -180,7 +181,11 @@ class SimpleResultGrid extends DisposableComponent {
         fixedFirstColumn: true,
         parentId: this.id,
         clonedContainerPosition: 'fixed',
-        app: 'editor'
+        app: 'editor',
+        rowDetailsSourceName: () =>
+          inferRowDetailsSourceNameFromExecutable(
+            this.activeExecutable && this.activeExecutable()
+          )
       };
       this.getWrapperElement().css('overflow-x', 'hidden');
       const bannerTopHeight = window.BANNER_TOP_HTML ? 30 : 2;
