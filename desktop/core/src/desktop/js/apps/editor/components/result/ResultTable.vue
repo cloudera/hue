@@ -208,7 +208,7 @@
           grayedOut.value = true;
           try {
             await executable.value.result.fetchRows({ rows: 100 });
-          } catch (e) {}
+          } catch {}
           defer(() => {
             // Allow executable events to finish before enabling the result scroll again
             grayedOut.value = false;

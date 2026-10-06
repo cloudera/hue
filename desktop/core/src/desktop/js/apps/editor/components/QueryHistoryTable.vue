@@ -206,7 +206,7 @@
               uuid,
               absoluteUrl
             }));
-          } catch (err) {}
+          } catch {}
           runningPromise = undefined;
           loadingHistory.value = false;
         }
@@ -234,7 +234,7 @@
               .map(historyDoc => historyDoc.id)
               .join(',')}]`;
           }
-        } catch (err) {}
+        } catch {}
         exportingHistory.value = false;
       };
 

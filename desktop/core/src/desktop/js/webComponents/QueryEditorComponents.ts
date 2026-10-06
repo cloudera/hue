@@ -37,8 +37,12 @@ export interface HueComponentConfig {
 }
 
 const configure = ({ baseUrl, bearerToken }: HueComponentConfig): void => {
-  baseUrl && setBaseUrl(baseUrl);
-  bearerToken && setBearerToken(bearerToken);
+  if (baseUrl) {
+    setBaseUrl(baseUrl);
+  }
+  if (bearerToken) {
+    setBearerToken(bearerToken);
+  }
 };
 
 const createExecutor = (options: ExecutorOptions): Executor => new Executor(options);

@@ -178,7 +178,7 @@ const FileUploadQueue = (): JSX.Element => {
       const { conflicts, nonConflictingFiles } = await detectFileConflicts(newFiles, uploadQueue);
       setConflictingFiles(conflicts);
       addFiles(nonConflictingFiles);
-    } catch (error) {
+    } catch {
       huePubSub.publish('hue.global.error', {
         message: t('Failed to check for file conflicts. Please try again.')
       });

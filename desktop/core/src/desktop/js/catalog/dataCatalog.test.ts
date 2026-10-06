@@ -128,7 +128,7 @@ describe('dataCatalog.ts', () => {
         });
 
         await childPromise;
-      } catch (err) {
+      } catch {
         caught = true;
       }
 

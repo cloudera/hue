@@ -46,7 +46,7 @@ export interface ChunkedFile extends Omit<RegularFile, 'file'> {
   totalChunks: number;
 }
 
-export interface FileVariables extends Partial<Omit<RegularFile, 'uuid' | 'filePath' | 'file'>> {}
+export type FileVariables = Partial<Omit<RegularFile, 'uuid' | 'filePath' | 'file'>>;
 
 export interface FileChunkMetaData {
   qqtotalparts: string;

@@ -47,7 +47,7 @@ const handleStatement = (
         }
       });
     }
-  } catch (error) {}
+  } catch {}
 };
 
 /**
