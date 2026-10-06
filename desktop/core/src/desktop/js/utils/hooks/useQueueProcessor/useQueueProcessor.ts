@@ -69,7 +69,7 @@ const useQueueProcessor = <T>(
     // if all items are processed then call the onSuccess callback
     if (isLoading && processingQueue.length === 0 && queue.length === 0) {
       setIsLoading(false);
-      options.onSuccess && options.onSuccess();
+      options.onSuccess?.();
     }
   }, [queue, processingQueue, options.concurrentProcess, options.onSuccess, isLoading]);
 

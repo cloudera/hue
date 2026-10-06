@@ -139,8 +139,7 @@ export interface EditorInterpreter extends IdentifiableInterpreter {
   dialect: string;
 }
 
-/* eslint-disable @typescript-eslint/no-empty-interface */
-export interface BrowserInterpreter extends Interpreter {}
+export type BrowserInterpreter = Interpreter;
 
 export interface CatalogInterpreter extends IdentifiableInterpreter {
   is_catalog: boolean;
@@ -152,5 +151,4 @@ export interface DashboardInterpreter extends IdentifiableInterpreter {
   is_sql: string;
 }
 
-/* eslint-disable @typescript-eslint/no-empty-interface */
-export interface SchedulerInterpreter extends Interpreter {}
+export type SchedulerInterpreter = Interpreter;

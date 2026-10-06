@@ -146,7 +146,7 @@ export const fetchDescribe = ({
       onCancel(analyzePromise.cancel.bind(analyzePromise));
       try {
         await analyzePromise;
-      } catch (err) {}
+      } catch {}
     }
 
     const [database, table, ...fields] = entry.path;
@@ -379,7 +379,7 @@ const whenAvailable = (options: {
                 resolve(await whenPromise);
                 return;
               }
-            } catch (err) {}
+            } catch {}
           }
           reject(response.query_status);
         } else {
@@ -414,7 +414,7 @@ export const fetchSample = ({
             },
             { silenceErrors: true }
           );
-        } catch (err) {}
+        } catch {}
       }
     };
 
@@ -430,7 +430,7 @@ export const fetchSample = ({
             },
             { silenceErrors: true }
           );
-        } catch (err) {}
+        } catch {}
       }
     };
 
@@ -442,7 +442,7 @@ export const fetchSample = ({
       cancel: async () => {
         try {
           await cancelQuery();
-        } catch (err) {}
+        } catch {}
       }
     });
 
@@ -550,10 +550,10 @@ export const fetchSample = ({
               },
               silenceErrors
             });
-          } catch (err) {}
+          } catch {}
         }
       }
-    } catch (err) {
+    } catch {
       reject();
       closeQuery();
     }

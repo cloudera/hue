@@ -92,7 +92,7 @@ export default class CombinedSqlAnalyser implements SqlAnalyzer {
         if (apiResponse.query_complexity && apiResponse.query_complexity.hints) {
           hints.push(...apiResponse.query_complexity.hints);
         }
-      } catch (err) {}
+      } catch {}
 
       resolve({
         status: 0,
@@ -111,7 +111,7 @@ export default class CombinedSqlAnalyser implements SqlAnalyzer {
     let parsedStatement;
     try {
       parsedStatement = autocompleter.parseSql(statement + ' ', '');
-    } catch (err) {
+    } catch {
       return false;
     }
 
@@ -131,7 +131,7 @@ export default class CombinedSqlAnalyser implements SqlAnalyzer {
     let parsedStatement;
     try {
       parsedStatement = autocompleter.parseSql(statement + ' ', '');
-    } catch (err) {
+    } catch {
       return false;
     }
 
@@ -188,7 +188,7 @@ export default class CombinedSqlAnalyser implements SqlAnalyzer {
             try {
               const apiResponse = await apiPromise;
               values.push(...apiResponse.values);
-            } catch (err) {}
+            } catch {}
 
             resolve({ values });
           } catch (err) {

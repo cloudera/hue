@@ -348,7 +348,7 @@ export class DataCatalog {
         }
       });
       await Promise.all(deletePromises);
-    } catch (err) {}
+    } catch {}
   }
 
   /**
@@ -440,7 +440,7 @@ export class DataCatalog {
         });
         try {
           await Promise.all(existingPromises);
-        } catch (err) {}
+        } catch {}
 
         if (!pathsToLoad.length) {
           resolve(popularEntries);
@@ -503,7 +503,7 @@ export class DataCatalog {
                   });
                   cancellablePromises.push(applyPromise);
                   popularEntries.push(...(await applyPromise));
-                } catch (err) {}
+                } catch {}
                 resolve();
               })
           );
@@ -511,7 +511,7 @@ export class DataCatalog {
           Promise.all(tablePromises).finally(() => {
             resolve(popularEntries);
           });
-        } catch (err) {
+        } catch {
           resolve(popularEntries);
         }
       }

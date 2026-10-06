@@ -162,7 +162,7 @@ export const fetchUdfs = async (
     if (response?.functions) {
       return adaptApiFunctions(response.functions);
     }
-  } catch (err) {}
+  } catch {}
   return [];
 };
 
@@ -180,5 +180,5 @@ export const fetchDescribe = async (
     if (response?.function) {
       return response.function;
     }
-  } catch (err) {}
+  } catch {}
 };

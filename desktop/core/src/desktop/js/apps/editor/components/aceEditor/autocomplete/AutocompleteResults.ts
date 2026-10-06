@@ -341,7 +341,7 @@ class AutocompleteResults {
             };
           }
         }
-      } catch (err) {}
+      } catch {}
     }
     return { type: 'T' };
   }
@@ -368,7 +368,7 @@ class AutocompleteResults {
         this.cancellablePromises.push(childrenPromise);
         childrenPromise.then(resolve).catch(reject);
       });
-    } catch (err) {
+    } catch {
       return [];
     }
   }
@@ -464,7 +464,7 @@ class AutocompleteResults {
             popular: false,
             details: columnAlias
           });
-        } catch (err) {}
+        } catch {}
       } else {
         columnAliasSuggestions.push({
           value: columnAlias.name,
@@ -518,7 +518,7 @@ class AutocompleteResults {
         weightAdjust: 0,
         details: setOptions[name]
       }));
-    } catch (err) {
+    } catch {
       return [];
     }
   }
@@ -560,7 +560,7 @@ class AutocompleteResults {
           }));
 
           return functionSuggestions;
-        } catch (err) {
+        } catch {
           return [];
         }
       };
@@ -577,7 +577,7 @@ class AutocompleteResults {
             suggestFunctions.udfRef
           );
         }
-      } catch (err) {}
+      } catch {}
       suggestions = await getUdfsForTypes(types);
     } else {
       const types = suggestFunctions.types || ['T'];
@@ -602,7 +602,7 @@ class AutocompleteResults {
           popular: false,
           details: udf
         }));
-      } catch (err) {}
+      } catch {}
     }
 
     return suggestions;
@@ -643,7 +643,7 @@ class AutocompleteResults {
           });
         }
       }
-    } catch (err) {}
+    } catch {}
 
     return databaseSuggestions;
   }
@@ -718,7 +718,7 @@ class AutocompleteResults {
             details: tableEntry
           });
         }
-      } catch (err) {}
+      } catch {}
 
       return tableSuggestions;
     };
@@ -741,7 +741,7 @@ class AutocompleteResults {
             tables: [{ identifierChain: suggestTables.identifierChain }]
           };
         }
-      } catch (err) {}
+      } catch {}
     } else if (
       this.dialect() === IMPALA_DIALECT &&
       suggestTables.identifierChain &&
@@ -763,7 +763,7 @@ class AutocompleteResults {
   ): Promise<Suggestion[]> {
     try {
       await tablesPromise;
-    } catch (err) {}
+    } catch {}
 
     const suggestColumns = this.parseResult.suggestColumns;
     if (!suggestColumns) {
@@ -792,7 +792,7 @@ class AutocompleteResults {
       } else if (suggestColumns.types) {
         types = suggestColumns.types;
       }
-    } catch (err) {}
+    } catch {}
 
     suggestColumns.tables.forEach(table => {
       columnPromises.push(this.addColumns(table, types, columnSuggestions));
@@ -800,7 +800,7 @@ class AutocompleteResults {
 
     try {
       await Promise.all(columnPromises);
-    } catch (err) {}
+    } catch {}
 
     AutocompleteResults.mergeColumns(columnSuggestions);
 
@@ -1038,7 +1038,7 @@ class AutocompleteResults {
         if (entry) {
           await addColumnsFromEntry(entry);
         }
-      } catch (err) {}
+      } catch {}
     }
   }
 
@@ -1388,7 +1388,7 @@ class AutocompleteResults {
           suggestion.weightAdjust = details.relativePopularity + 1;
         });
       }
-    } catch (err) {}
+    } catch {}
 
     return joinSuggestions;
   }
@@ -1476,7 +1476,7 @@ class AutocompleteResults {
           suggestion.weightAdjust = details.relativePopularity + 1;
         });
       }
-    } catch (err) {}
+    } catch {}
 
     return joinConditionSuggestions;
   }
@@ -1607,7 +1607,7 @@ class AutocompleteResults {
             : Math.round((100 * details.totalQueryCount) / totalCount);
         suggestion.weightAdjust = details.relativePopularity + 1;
       });
-    } catch (err) {}
+    } catch {}
 
     return aggregateFunctionsSuggestions;
   }
@@ -1713,7 +1713,7 @@ class AutocompleteResults {
         }
         return suggestions;
       }
-    } catch (err) {}
+    } catch {}
     return [];
   }
 
@@ -1825,7 +1825,7 @@ class AutocompleteResults {
           totalCount === 0 ? details.count : Math.round((100 * details.count) / totalCount);
         suggestion.weightAdjust = details.relativePopularity + 1;
       });
-    } catch (err) {}
+    } catch {}
 
     return filterSuggestions;
   }
@@ -1898,7 +1898,7 @@ class AutocompleteResults {
           }
         });
       }
-    } catch (err) {}
+    } catch {}
 
     return [];
   }
@@ -1919,7 +1919,7 @@ class AutocompleteResults {
     try {
       // The columnsDeferred gets resolved synchronously when the data is cached, if not, assume there are some suggestions.
       columnSuggestions = await columnsPromise;
-    } catch (err) {}
+    } catch {}
     if (!columnSuggestions.length) {
       return [];
     }
@@ -2026,7 +2026,7 @@ class AutocompleteResults {
           matchedSuggestion.weightAdjust = matchedSuggestion.relativePopularity;
         });
       }
-    } catch (err) {}
+    } catch {}
 
     return [];
   }

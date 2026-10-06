@@ -93,7 +93,7 @@ export const useDataCatalog = (): UseDataCatalog => {
       const databaseEntries = await fetchSourceMeta(connector, namespace, compute);
       setDatabases(databaseEntries?.databases ?? []);
       setDatabase(databaseEntries.databases?.[0]);
-    } catch (error) {
+    } catch {
       setDatabases([]);
       setDatabase(undefined);
       setTables([]);
@@ -118,7 +118,7 @@ export const useDataCatalog = (): UseDataCatalog => {
         table => table.type?.toLowerCase() === 'table'
       );
       setTables(tables ?? []);
-    } catch (error) {
+    } catch {
       setTables([]);
     } finally {
       setLoading(prev => ({ ...prev, table: false }));
@@ -145,7 +145,7 @@ export const useDataCatalog = (): UseDataCatalog => {
       } else {
         setNamespace(namespaces[0]);
       }
-    } catch (error) {
+    } catch {
       setNamespace(null);
       setCompute(null);
       setDatabases([]);

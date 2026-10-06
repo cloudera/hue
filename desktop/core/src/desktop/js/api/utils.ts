@@ -136,7 +136,7 @@ export const extractErrorMessage = (
       if (errorJs.message) {
         return errorJs.message;
       }
-    } catch (err) {}
+    } catch {}
     return defaultResponse.responseText;
   }
   if (defaultResponse.message && defaultResponse.content) {

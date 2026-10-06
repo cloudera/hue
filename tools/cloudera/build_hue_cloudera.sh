@@ -37,14 +37,12 @@ BUILDTYPE=$1
 DOCKEROS=$2
 HUE_JAR_VERSION=$3
 
-PYTHON38_OSES=("centos7" "redhat8" "sles12" "ubuntu20" "ubuntu22")
-PYTHON39_OSES=("redhat8" "redhat8-arm64" "redhat9" "redhat9-arm64")
+PYTHON39_OSES=("centos7" "redhat8" "redhat8-arm64" "redhat9" "redhat9-arm64" "sles12" "ubuntu20")
 PYTHON311_OSES=("redhat8" "redhat8-arm64" "redhat9" "sles15" "ubuntu22" "ubuntu24" "redhat9-arm64")
 
 LATEST_PYTHON="python3.11"
-PYTHON_VERSIONS=("python3.11" "python3.9" "python3.8")
+PYTHON_VERSIONS=("python3.11" "python3.9")
 
-export REQ_PYTHON38="3.8.12"
 export REQ_PYTHON39="3.9.16"
 export REQ_PYTHON311="3.11.12"
 
@@ -60,16 +58,6 @@ setup_python_env() {
   local ver="$1" os="$2"
 
   case "$ver" in
-    python3.8)
-      if is_supported_os PYTHON38_OSES "$os"; then
-        export PYTHON38_PATH=${PYTHON38_PATH:=/opt/python/3.8.12}
-        if is_supported_python_version "$PYTHON38_PATH/bin/python3.8" $REQ_PYTHON38; then
-          export PATH="$PYTHON38_PATH/bin:$PATH"
-        else
-          unset PYTHON38_PATH
-        fi
-      fi
-      ;;
     python3.9)
       if is_supported_os PYTHON39_OSES "$os"; then
         export PYTHON39_PATH=${PYTHON39_PATH:=/opt/python/3.9.16}
@@ -128,10 +116,6 @@ should_build_python() {
       is_supported_os PYTHON39_OSES "$os"
       return $?
       ;;
-    python3.8)
-      is_supported_os PYTHON38_OSES "$os"
-      return $?
-      ;;
     *)
       return 1
       ;;
@@ -160,7 +144,7 @@ for PYTHON_VER in "${PYTHON_VERSIONS[@]}"; do
     echo "BLD_DIR_ENV=${BLD_DIR_ENV}"
 
     export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${ORACLE_INSTANTCLIENT19_PATH}
-    export PATH=$PYTHON38_PATH/bin:$PYTHON39_PATH/bin:$PYTHON311_PATH/bin:/opt/sqlite3/bin:/usr/bin:$THISPATH
+    export PATH=$PYTHON39_PATH/bin:$PYTHON311_PATH/bin:/opt/sqlite3/bin:/usr/bin:$THISPATH
 
     big_console_header "Hue Build Start for" "$PYTHON_VER" "$@"
     BLD_DIR_ENV="$BLD_DIR_ENV" PYTHON_VER="$PYTHON_VER" make apps docs
@@ -172,7 +156,7 @@ done
 
 big_console_header "Hue PROD Build Start for" "$@"
 if [[ "$DOCKEROS" =~ (centos7|sles12|ubuntu18) ]]; then
-  PYTHON_VER="python3.8" make release
+  PYTHON_VER="python3.9" make release
 else
   PYTHON_VER="python3.11" make release
 fi

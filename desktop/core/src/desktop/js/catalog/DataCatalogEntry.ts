@@ -375,7 +375,7 @@ export default class DataCatalogEntry {
       } else {
         await this.save();
       }
-    } catch (err) {}
+    } catch {}
 
     huePubSub.publish('data.catalog.entry.refreshed', {
       entry: this,
@@ -499,7 +499,7 @@ export default class DataCatalogEntry {
       if (this.dataCatalog.invalidatePromise) {
         try {
           await this.dataCatalog.invalidatePromise;
-        } catch (err) {}
+        } catch {}
       }
 
       try {
@@ -552,7 +552,7 @@ export default class DataCatalogEntry {
     window.clearTimeout(this.saveTimeout);
     try {
       await this.dataCatalog.persistCatalogEntry(this);
-    } catch (err) {}
+    } catch {}
   }
 
   /**
@@ -606,7 +606,7 @@ export default class DataCatalogEntry {
         });
         try {
           sourceMeta = await this.getSourceMeta(options);
-        } catch (err) {}
+        } catch {}
 
         if (cancelled) {
           reject('Cancelled');
@@ -839,7 +839,7 @@ export default class DataCatalogEntry {
               rejectUnknown();
               resolve(children);
             });
-        } catch (err) {
+        } catch {
           resolve([]);
           return;
         }
@@ -988,7 +988,7 @@ export default class DataCatalogEntry {
             cancellablePromises.push(applyPromise);
             const entries = await applyPromise;
             resolve(entries);
-          } catch (err) {
+          } catch {
             resolve([]);
           }
         }
@@ -1075,7 +1075,7 @@ export default class DataCatalogEntry {
             resolve(navigatorMeta.description || navigatorMeta.originalDescription || '');
             return;
           }
-        } catch (err) {}
+        } catch {}
       }
 
       if (this.sourceMeta) {
@@ -1728,7 +1728,7 @@ export default class DataCatalogEntry {
               return;
             }
           }
-        } catch (err) {}
+        } catch {}
 
         if (cachedOnly(options)) {
           reject();
@@ -1736,7 +1736,7 @@ export default class DataCatalogEntry {
           const reloadPromise = this.reloadSample(options);
           try {
             resolve(await reloadPromise);
-          } catch (err) {
+          } catch {
             reject();
           }
         }

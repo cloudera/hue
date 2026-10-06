@@ -172,7 +172,7 @@ export default class AceLocationHandler implements Disposable {
       children.forEach((dbEntry: DataCatalogEntry) => {
         this.availableDatabases.add(dbEntry.name.toLowerCase());
       });
-    } catch (err) {}
+    } catch {}
   }
 
   private isSqlDialect(): boolean {
@@ -984,7 +984,7 @@ export default class AceLocationHandler implements Disposable {
             token.parseLocation.identifierChain.length - 1
           )
         );
-      } catch (err) {}
+      } catch {}
     }
 
     return [];

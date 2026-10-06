@@ -146,7 +146,7 @@ function install_python311() {
 
   export PYTHON311_PATH="${INSTALL_PREFIX}"
   export pip_bin=${PYTHON311_PATH}/bin/pip3.11
-  export VIRTUAL_ENV_VERSION="20.24.4"
+  export VIRTUAL_ENV_VERSION="21.7.16"
   # Pip modules install
   sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c '${pip_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable==0.0.1 mysqlclient==2.1.1'
   sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} PG_CONFIG=${PG_CONFIG} -- sh -c 'export PG_CONFIG="$PG_CONFIG"; ${pip_bin} install psycopg2==2.9.6'
@@ -191,46 +191,7 @@ function install_python39() {
 
   export PYTHON39_PATH="${INSTALL_PREFIX}"
   export pip_bin=${PYTHON39_PATH}/bin/pip3.9
-  export VIRTUAL_ENV_VERSION="20.19.0"
-  # Pip modules install
-  sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c '${pip_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable==0.0.1 mysqlclient==2.1.1'
-  sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} PG_CONFIG=${PG_CONFIG} -- sh -c 'export PG_CONFIG="$PG_CONFIG"; ${pip_bin} install psycopg2==2.9.6'
-  sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
-  popd > /dev/null
-}
-
-function install_python38() {
-  local PYTHON_VERSION=${1:-"3.8.12"}
-  local INSTALL_PREFIX=$2
-  local LD_LIBRARY_PATH=$3
-  local CPPFLAGS=$4
-  local LDFLAGS=$5
-  pushd . > /dev/null
-
-  cd $HOME
-  local PYTHON_TGZ="Python-${PYTHON_VERSION}.tgz"
-  local PYTHON_SRC_DIR="Python-${PYTHON_VERSION}"
-
-  export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/mit/bin:$PATH
-
-  echo "Installing Python ${PYTHON_VERSION}..."
-  sudo PYTHON_VERSION=${PYTHON_VERSION} INSTALL_PREFIX=${INSTALL_PREFIX} \
-    PYTHON_TGZ=${PYTHON_TGZ} PYTHON_SRC_DIR=${PYTHON_SRC_DIR} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} \
-    CPPFLAGS=${CPPFLAGS} LDFLAGS=${LDFLAGS} PATH=${PATH} \
-    -- sh -c 'cd /tmp && mkdir -p "${INSTALL_PREFIX}" && \
-    curl -o "${PYTHON_TGZ}" "https://www.python.org/ftp/python/${PYTHON_VERSION}/${PYTHON_TGZ}" && \
-    tar zxf "${PYTHON_TGZ}" && \
-    cd "${PYTHON_SRC_DIR}" && \
-    ./configure --prefix="${INSTALL_PREFIX}" --enable-shared --enable-optimizations --with-lto && \
-    make altinstall'
-
-  # echo "Stripping debug symbols to reduce size..."
-  # sudo -- sh -c '/usr/bin/strip "${INSTALL_PREFIX}/bin/python3.8" && \
-  #   /usr/bin/strip "${INSTALL_PREFIX}/lib/libpython3.8.so.1.0"'
-
-  export PYTHON38_PATH="${INSTALL_PREFIX}"
-  export pip_bin=${PYTHON38_PATH}/bin/pip3.8
-  export VIRTUAL_ENV_VERSION="20.24.4"
+  export VIRTUAL_ENV_VERSION="21.7.16"
   # Pip modules install
   sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c '${pip_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable==0.0.1 mysqlclient==2.1.1'
   sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} PG_CONFIG=${PG_CONFIG} -- sh -c 'export PG_CONFIG="$PG_CONFIG"; ${pip_bin} install psycopg2==2.9.6'
@@ -263,15 +224,6 @@ function install_sqlite_python() {
       export CPPFLAGS="-I${SQLITE3_PATH}/include"
       export LDFLAGS="-L${SQLITE3_PATH}/lib"
       install_python39 "$PYTHON_VERSION" "$INSTALL_PREFIX" "$LD_LIBRARY_PATH" "$CPPFLAGS" "$LDFLAGS"
-    fi
-  elif [[ "$PYTHON_VERSION" == "$REQ_PYTHON38" ]]; then
-    if [[ -z ${PYTHON38_PATH+x} ]]; then
-      install_build_dependencies "$DOCKEROS"
-      install_sqlite3 "$SQLITE3_PATH"
-      export LD_LIBRARY_PATH="${INSTALL_PREFIX}/lib:${SQLITE3_PATH}/lib:${LD_LIBRARY_PATH}"
-      export CPPFLAGS="-I${SQLITE3_PATH}/include"
-      export LDFLAGS="-L${SQLITE3_PATH}/lib"
-      install_python38 "$PYTHON_VERSION" "$INSTALL_PREFIX" "$LD_LIBRARY_PATH" "$CPPFLAGS" "$LDFLAGS"
     fi
   fi
 
@@ -314,9 +266,9 @@ function centos7_install() {
     sudo -- sh -c 'cd /tmp && curl -fsSL https://rpm.nodesource.com/setup_16.x | sudo bash - && \
         yum install -y nodejs npm'
 
-    unset PYTHON38_PATH
-    if [[ -z ${PYTHON38_PATH+x} ]]; then
-      install_sqlite_python "$os" "$REQ_PYTHON38"
+    unset PYTHON39_PATH
+    if [[ -z ${PYTHON39_PATH+x} ]]; then
+      install_sqlite_python "$os" "$REQ_PYTHON39"
     fi
   fi
 }
@@ -360,10 +312,6 @@ function redhat8_install() {
       install_sqlite_python "$os" "$REQ_PYTHON39"
     fi
 
-    if [[ -z ${PYTHON38_PATH+x} ]]; then
-      install_sqlite_python "$os" "$REQ_PYTHON38"
-    fi
-
   fi
 }
 
@@ -396,10 +344,6 @@ function redhat8_arm64_install() {
 
     if [[ -z ${PYTHON39_PATH+x} ]]; then
       install_sqlite_python "$os" "$REQ_PYTHON39"
-    fi
-
-    if [[ -z ${PYTHON38_PATH+x} ]]; then
-      install_sqlite_python "$os" "$REQ_PYTHON38"
     fi
   fi
 }
@@ -440,10 +384,6 @@ function redhat9_install() {
 
     if [[ -z ${PYTHON39_PATH+x} ]]; then
       install_sqlite_python "$os" "$REQ_PYTHON39"
-    fi
-
-    if [[ -z ${PYTHON38_PATH+x} ]]; then
-      install_sqlite_python "$os" "$REQ_PYTHON38"
     fi
   fi
 }
@@ -522,9 +462,9 @@ function sles12_install() {
     # Node-v20-LTS is not supported by old OS'es - Redhat7_ppc, Centos7, Ubuntu18, Sles12. So upgrading to node-v16
     sudo -- sh -c 'zypper install -y npm14 nodejs14'
 
-    unset PYTHON38_PATH
-    if [[ -z ${PYTHON38_PATH+x} ]]; then
-      install_sqlite_python "$os" "$REQ_PYTHON38"
+    unset PYTHON39_PATH
+    if [[ -z ${PYTHON39_PATH+x} ]]; then
+      install_sqlite_python "$os" "$REQ_PYTHON39"
     fi
   fi
 }
@@ -567,10 +507,6 @@ function sles15_install() {
     if [[ -z ${PYTHON39_PATH+x} ]]; then
       install_sqlite_python "$os" "$REQ_PYTHON39"
     fi
-
-    if [[ -z ${PYTHON38_PATH+x} ]]; then
-      install_sqlite_python "$os" "$REQ_PYTHON38"
-    fi
   fi
 }
 
@@ -587,9 +523,6 @@ function ubuntu18_install() {
         libkrb5-dev'
     sudo -- sh -c 'apt -y install \
         ldap-utils \
-        libpython3.8-dev \
-        libpython3.8-minimal \
-        libpython3.8-stdlib \
         libxmlsec1 \
         libxmlsec1-openssl \
         netcat \
@@ -602,7 +535,6 @@ function ubuntu18_install() {
         python3-psycopg2 \
         python3-setuptools \
         python3-wheel \
-        python3.8-venv \
         python3-dev \
         libpq-dev \
         zlibc'
@@ -628,10 +560,6 @@ function ubuntu18_install() {
     if [[ -z ${PYTHON39_PATH+x} ]]; then
       install_sqlite_python "$os" "$REQ_PYTHON39"
     fi
-
-    if [[ -z ${PYTHON38_PATH+x} ]]; then
-      install_sqlite_python "$os" "$REQ_PYTHON38"
-    fi
   fi
 }
 
@@ -647,9 +575,6 @@ function ubuntu20_install() {
         libkrb5-dev'
     sudo -- sh -c 'apt -y install \
         ldap-utils \
-        libpython3.8-dev \
-        libpython3.8-minimal \
-        libpython3.8-stdlib \
         libxmlsec1 \
         libxmlsec1-openssl \
         libpq-dev \
@@ -662,7 +587,6 @@ function ubuntu20_install() {
         python3-psycopg2 \
         python3-setuptools \
         python3-wheel \
-        python3.8-venv \
         zlibc \
         openssl \
         sudo \
@@ -682,9 +606,9 @@ function ubuntu20_install() {
       cd /tmp && curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && \
       apt-get install -y nodejs'
 
-    unset PYTHON38_PATH
-    if [[ -z ${PYTHON38_PATH+x} ]]; then
-      install_sqlite_python "$os" "$REQ_PYTHON38"
+    unset PYTHON39_PATH
+    if [[ -z ${PYTHON39_PATH+x} ]]; then
+      install_sqlite_python "$os" "$REQ_PYTHON39"
     fi
   fi
 }
@@ -693,9 +617,6 @@ function ubuntu22_install() {
   local os=${1:-"ubuntu22"}
 
   if [[ $FORCEINSTALL -eq 1 ]]; then
-    sudo -- sh -c 'apt update'
-    # Add deadsnakes PPA for Python 3.8
-    sudo -- sh -c 'add-apt-repository ppa:deadsnakes/ppa -y'
     sudo -- sh -c 'apt update'
     # pre-req install
     sudo -- sh -c 'DEBIAN_FRONTEND=noninteractive apt -qq -y install  \
@@ -735,11 +656,6 @@ function ubuntu22_install() {
 
     if [[ -z ${PYTHON39_PATH+x} ]]; then
       install_sqlite_python "$os" "$REQ_PYTHON39"
-    fi
-
-    unset PYTHON38_PATH
-    if [[ -z ${PYTHON38_PATH+x} ]]; then
-      install_sqlite_python "$os" "$REQ_PYTHON38"
     fi
   fi
 }
