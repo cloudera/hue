@@ -50,13 +50,15 @@ class RequirementsGenerator:
       "Babel==2.9.1",
       "boto3==1.37.38",
       "celery[redis]==5.4.0",
-      "cffi==1.15.0",
+      # cryptography 46.x requires cffi >= 2.0.0. Held at 2.0.0 because 2.1.0 needs Python >= 3.10.
+      "cffi==2.0.0",
       "channels==4.2.2",
       "channels-redis==4.2.1",
       "configobj==5.0.9",
+      "cryptography==46.0.7",
       "cx-Oracle==8.3.0",
-      "daphne==3.0.2",
-      "Django==4.2.23",
+      "daphne==4.2.2",
+      "Django==4.2.30",
       "django-auth-ldap==4.3.0",
       "django-celery-beat==2.6.0",
       "django-celery-results==2.5.1",
@@ -80,7 +82,6 @@ class RequirementsGenerator:
       "gunicorn==23.0.0",
       "ipython==8.12.2",  # Python >= 3.8
       "jaeger-client==4.3.0",
-      "jdcal==1.0.1",
       "kazoo==2.8.0",
       "kerberos==1.3.0",
       "krb5==0.5.1",  # pinned for Sles12, dep of requests-kerberos 0.14.0
@@ -95,7 +96,9 @@ class RequirementsGenerator:
       "pyarrow==17.0.0",
       "pydantic==2.10.6",
       "pyformance==0.3.2",
-      "PyJWT==2.4.0",
+      "PyJWT==2.14.0",
+      # Held at 26.0.0: 26.4.0 drops X509Req, which pysaml2 still needs. Caps cryptography at <47.
+      "pyOpenSSL==26.0.0",
       "python-daemon==2.2.4",
       "python-dateutil==2.8.2",
       "python-ldap==3.4.3",
@@ -113,7 +116,7 @@ class RequirementsGenerator:
       "six==1.16.0",
       "slack-sdk==3.31.0",
       "SQLAlchemy==1.3.8",
-      "sqlparse==0.5.0",
+      # sqlparse is pinned per Python version below: 0.6.0 fixes three DoS CVEs but needs Python >= 3.10.
       "tablib==0.13.0",
       "tabulate==0.8.9",
       "thrift-sasl==0.4.3",
@@ -123,64 +126,64 @@ class RequirementsGenerator:
 
     self.x86_64_requirements = {
       "default": [
-        "cryptography==42.0.8",
         "lxml==4.9.1",
-        "Markdown==3.1",
+        "Markdown==3.8.1",
         "numpy==1.24.4",
         "pandas==2.0.3",
         "sasl==0.3.1",
         "setuptools==70.0.0",
+        "sqlparse==0.6.0",
       ],
       "3.9": [
         "decorator==5.1.1",
         "lxml==4.9.1",
-        "Markdown==3.8",
+        "Markdown==3.8.1",
         "numpy==1.24.4",
         "pandas==2.0.3",
-        "pyopenssl==22.1.0",
         "sasl==0.3.1",
         "setuptools==80.9.0",
+        "sqlparse==0.5.3",  # 0.6.0 requires Python >= 3.10
       ],
       "3.11": [
         "async-timeout==5.0.1",
-        "cryptography==42.0.8",
         "lxml==4.9.1",
-        "Markdown==3.8",
+        "Markdown==3.8.1",
         "numpy==1.24.4",
         "pandas==2.0.3",
         "pure-sasl==0.6.2",
         "setuptools==80.9.0",
+        "sqlparse==0.6.0",
       ],
     }
 
     self.aarch64_requirements = {
       "default": [
-        "cryptography==42.0.8",
         "lxml==4.9.1",
-        "Markdown==3.1",
+        "Markdown==3.8.1",
         "numpy==1.24.4",
         "pandas==2.0.3",
         "setuptools==70.0.0",
+        "sqlparse==0.6.0",
       ],
       "3.9": [
         "decorator==5.1.1",
         "lxml==4.9.1",
-        "Markdown==3.8",
+        "Markdown==3.8.1",
         "numpy==1.24.4",
         "pandas==2.0.3",
-        "pyopenssl==22.1.0",
         "sasl==0.3.1",
         "setuptools==80.9.0",
+        "sqlparse==0.5.3",  # 0.6.0 requires Python >= 3.10
       ],
       "3.11": [
         "async-timeout==5.0.1",
-        "cryptography==42.0.8",
         "lxml==4.9.1",
-        "Markdown==3.8",
+        "Markdown==3.8.1",
         "numpy==1.24.4",
         "pandas==2.0.3",
         "pure-sasl==0.6.2",
         "setuptools==80.9.0",
+        "sqlparse==0.6.0",
       ],
     }
     self.arch_requirements_map = {

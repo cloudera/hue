@@ -115,7 +115,7 @@ class JwtAuthentication(authentication.BaseAuthentication):
 
     if key_server_url:
       LOG.debug('Fetching JWKS from URL: %s' % key_server_url)
-      response = requests.get(key_server_url, verify=False)
+      response = requests.get(key_server_url, verify=AUTH.JWT.SSL_CERT_CA_VERIFY.get())
       jwk = json.loads(response.content)
 
       if jwk.get('keys'):
@@ -139,7 +139,7 @@ class JwtAuthentication(authentication.BaseAuthentication):
 
       for jku in key_server_urls_list:
         try:
-          res = requests.get(jku.rstrip('/'), verify=False)
+          res = requests.get(jku.rstrip('/'), verify=AUTH.JWT.SSL_CERT_CA_VERIFY.get())
         except Exception as e:
           if 'Failed to establish a new connection' in str(e):
             LOG.warning('JKU %s is not available.' % jku)
