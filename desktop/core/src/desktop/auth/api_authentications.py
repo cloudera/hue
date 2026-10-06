@@ -15,19 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
-import requests
-import jwt
 import json
-import sys
+import logging
 
+import jwt
+import requests
 from cryptography.hazmat.primitives import serialization
 from rest_framework import authentication, exceptions
 
-from desktop.auth.backend import find_or_create_user, ensure_has_a_group, rewrite_user
-from desktop.conf import ENABLE_ORGANIZATIONS, AUTH
-
-from useradmin.models import User
+from desktop.auth.backend import ensure_has_a_group, find_or_create_user, rewrite_user
+from desktop.conf import AUTH, ENABLE_ORGANIZATIONS
 
 LOG = logging.getLogger()
 
@@ -88,8 +85,7 @@ class JwtAuthentication(authentication.BaseAuthentication):
       LOG.error('JwtAuthentication: %s' % str(e))
       raise exceptions.AuthenticationFailed(e)
 
-
-    if payload.get(AUTH.JWT.USERNAME_HEADER.get()) is None: 
+    if payload.get(AUTH.JWT.USERNAME_HEADER.get()) is None:
       LOG.debug('JwtAuthentication: no username in token')
       return None
 
@@ -150,6 +146,7 @@ class JwtAuthentication(authentication.BaseAuthentication):
     else:
       # For non-HA, it's normal url string.
       return key_server_urls
+
 
 class DummyCustomAuthentication(authentication.BaseAuthentication):
   """
