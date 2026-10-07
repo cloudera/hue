@@ -19,6 +19,7 @@ exports[`SearchInput.vue should render 1`] = `
         placeholder="Search..."
         spellcheck="false"
         type="text"
+        value=""
       />
       <input
         autocomplete="do-not-autocomplete"
