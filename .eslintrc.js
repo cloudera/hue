@@ -139,7 +139,7 @@ module.exports = {
       files: ['*.vue'],
       extends: [
         'plugin:prettier/recommended',
-        'plugin:vue/vue3-recommended',
+        'plugin:vue/recommended',
         'plugin:@typescript-eslint/recommended'
       ],
       parser: 'vue-eslint-parser',
