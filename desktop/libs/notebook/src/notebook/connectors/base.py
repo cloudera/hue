@@ -506,6 +506,9 @@ def get_api(request, snippet):
   elif interface == 'sqlalchemy':
     from notebook.connectors.sql_alchemy import SqlAlchemyApi
     return SqlAlchemyApi(request.user, interpreter=interpreter)
+  elif interface == 'starrocks':
+    from notebook.connectors.starrocks import StarrocksApi
+    return StarrocksApi(request.user, interpreter=interpreter)
   elif interface == 'solr':
     from notebook.connectors.solr import SolrApi
     return SolrApi(request.user, interpreter=interpreter)
