@@ -534,6 +534,9 @@ else:
 </script>
 
 <script type="text/html" id="snippetIcon${ suffix }">
+  <!-- ko if: viewSettings().snippetSvg -->
+  <svg class="hi snippet-icon" aria-hidden="true"><use data-bind="attr: { 'href': '#' + viewSettings().snippetSvg }"></use></svg>
+  <!-- /ko -->
   <!-- ko if: viewSettings().snippetImage -->
   <img class="snippet-icon-image" data-bind="attr: { 'src': viewSettings().snippetImage }" alt="${ _('Snippet icon') }">
   <!-- /ko -->
@@ -845,10 +848,10 @@ else:
 <script type="text/html" id="notebook-snippet-header${ suffix }">
   <!-- ko if: $root.isPresentationMode() || $root.isResultFullScreenMode() -->
   <div class="inline">
-    <!-- ko if: name() -->
-      <span data-bind="text: name"></span>
+    <!-- ko if: presentationTitle() -->
+      <span data-bind="text: presentationTitle"></span>
     <!-- /ko -->
-    <!-- ko if: !name() && !$root.isHidingCode() -->
+    <!-- ko if: !presentationTitle() && !$root.isHidingCode() -->
       <span>${ _("Add -- comments on top of the SQL statement to display a title") }</span>
     <!-- /ko -->
   </div>
@@ -2058,7 +2061,7 @@ else:
   <script type="application/json" id="editorOptionsJson">
     ${ options_json | n,unicode,antixss }
   </script>
-  <script ${nonce_attribute(request)} src="${ static('desktop/js/editor-component.js') }"></script>
+  <script ${nonce_attribute(request)} src="${ static('desktop/js/editor-component.js') }?bindableElement=${ bindableElement | u }&amp;suffix=${ suffix | u }"></script>
 </%def>
 
 

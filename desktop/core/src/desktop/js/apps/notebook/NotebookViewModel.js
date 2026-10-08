@@ -23,6 +23,7 @@ import ChartTransformers from 'apps/notebook/chartTransformers';
 
 import Notebook from 'apps/notebook/notebook';
 import Snippet from 'apps/notebook/snippet';
+import { splitStatementTitle } from 'apps/notebook/statementTitle';
 import {
   ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT,
   GET_ACTIVE_SNIPPET_CONNECTOR_EVENT
@@ -117,25 +118,14 @@ export default class NotebookViewModel {
             presentationSnippet = notebook.presentationSnippets()[statementKey]; // Persist result
             presentationSnippet.variables(variables);
           } else {
-            const titleLines = [];
-            const statementLines = [];
-            sql_statement
-              .trim()
-              .split('\n')
-              .forEach(line => {
-                if (line.trim().startsWith('--') && statementLines.length === 0) {
-                  titleLines.push(line.substr(2));
-                } else {
-                  statementLines.push(line);
-                }
-              });
+            const { title, statement } = splitStatementTitle(sql_statement);
             presentationSnippet = new Snippet(self, notebook, {
               type: notebook.initialType,
               database: database,
               compute: compute,
-              statement_raw: statementLines.join('\n'),
+              statement_raw: statement,
               result: {},
-              name: titleLines.join('\n'),
+              name: title,
               variables: komapping.toJS(variables)
             });
             presentationSnippet.variables = sourceSnippet.variables;

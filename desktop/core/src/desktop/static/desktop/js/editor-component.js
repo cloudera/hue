@@ -1,8 +1,18 @@
 (function initializeEditorComponent() {
+    // The page specific settings are passed on the script URL because onePageViewModel only keeps
+    // the src attribute when it re-injects the scripts of an embeddable page.
+    const scriptParams = new URL(document.currentScript.src).searchParams;
+    const bindableElement = '#' + scriptParams.get('bindableElement');
+    const suffix = scriptParams.get('suffix') || '';
+
     // Fetches data as text content from a document inserted by onePageViewModel.
     // This approach supports 'unsafe-inline' by embedding the content in the <head>,
-    // as specified in editor_component.mako.
-    const editorOptionsElement = document.getElementById('editorOptionsJson');
+    // as specified in editor_component.mako. The editor and the notebook pages are kept side by
+    // side in the DOM, so the lookup is scoped to the page that is currently being loaded.
+    const bindableContainer = document.querySelector(bindableElement);
+    const editorOptionsElement =
+        (bindableContainer && bindableContainer.querySelector('#editorOptionsJson')) ||
+        document.getElementById('editorOptionsJson');
     let options;
     try {
         const optionsJson = editorOptionsElement.textContent;
@@ -23,9 +33,9 @@
         QUERY_HISTORY_UPLOAD_LIMIT: window.QUERY_HISTORY_UPLOAD_LIMIT
     };
 
-    window.EDITOR_BINDABLE_ELEMENT = '#editorComponents';
+    window.EDITOR_BINDABLE_ELEMENT = bindableElement;
 
-    window.EDITOR_SUFFIX = 'editor';
+    window.EDITOR_SUFFIX = suffix;
 
     var HUE_PUB_SUB_EDITOR_ID = (window.location.pathname.indexOf('notebook') > -1) ? 'notebook' : 'editor';
 
@@ -49,19 +59,19 @@
             hive: {
                 placeHolder: I18n("Example: SELECT * FROM tablename, or press CTRL + space"),
                 aceMode: 'ace/mode/hive',
-                snippetImage: '${ static("beeswax/art/icon_beeswax_48.png") }',
+                snippetSvg: 'hi-hive',
                 sqlDialect: true
             },
             hplsql: {
                 placeHolder: I18n("Example: CREATE PROCEDURE name AS SELECT * FROM tablename limit 10 GO"),
                 aceMode: 'ace/mode/hplsql',
-                snippetImage: '${ static("beeswax/art/icon_beeswax_48.png") }',
+                snippetSvg: 'hi-hive',
                 sqlDialect: true
             },
             impala: {
                 placeHolder: I18n("Example: SELECT * FROM tablename, or press CTRL + space"),
                 aceMode: 'ace/mode/impala',
-                snippetImage: '${ static("impala/art/icon_impala_48.png") }',
+                snippetSvg: 'hi-impala',
                 sqlDialect: true
             },
             presto: {
@@ -136,7 +146,7 @@
             pig: {
                 placeHolder: I18n("Example: 1 + 1, or press CTRL + space"),
                 aceMode: 'ace/mode/pig',
-                snippetImage: '${ static("pig/art/icon_pig_48.png") }'
+                snippetSvg: 'hi-pig'
             },
             postgresql: {
                 placeHolder: I18n("Example: SELECT * FROM tablename, or press CTRL + space"),
@@ -165,30 +175,30 @@
             pyspark: {
                 placeHolder: I18n("Example: 1 + 1, or press CTRL + space"),
                 aceMode: 'ace/mode/python',
-                snippetImage: '${ static("spark/art/icon_spark_48.png") }'
+                snippetSvg: 'hi-spark'
             },
             r: {
                 placeHolder: I18n("Example: 1 + 1, or press CTRL + space"),
                 aceMode: 'ace/mode/r',
-                snippetImage: '${ static("spark/art/icon_spark_48.png") }'
+                snippetSvg: 'hi-spark'
             },
             scala: {
                 placeHolder: I18n("Example: 1 + 1, or press CTRL + space"),
                 aceMode: 'ace/mode/scala',
-                snippetImage: '${ static("spark/art/icon_spark_48.png") }'
+                snippetSvg: 'hi-spark'
             },
             spark: {
                 placeHolder: I18n("Example: 1 + 1, or press CTRL + space"),
                 aceMode: 'ace/mode/scala',
-                snippetImage: '${ static("spark/art/icon_spark_48.png") }'
+                snippetSvg: 'hi-spark'
             },
             spark2: {
-                snippetImage: '${ static("spark/art/icon_spark_48.png") }'
+                snippetSvg: 'hi-spark'
             },
             sparksql: {
                 placeHolder: I18n("Example: SELECT * FROM tablename, or press CTRL + space"),
                 aceMode: 'ace/mode/sparksql',
-                snippetImage: '${ static("spark/art/icon_spark_48.png") }',
+                snippetSvg: 'hi-spark',
                 sqlDialect: true
             },
             mapreduce: {
@@ -199,7 +209,7 @@
             },
             sqoop1: {
                 placeHolder: I18n("Example: import  --connect jdbc:hsqldb:file:db.hsqldb --table TT --target-dir hdfs://localhost:8020/user/foo -m 1"),
-                snippetImage: '${ static("sqoop/art/icon_sqoop_48.png") }'
+                snippetSvg: 'hi-sqoop'
             },
             distcp: {
                 snippetIcon: 'fa-files-o'

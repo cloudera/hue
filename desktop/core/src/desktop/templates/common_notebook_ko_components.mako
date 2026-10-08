@@ -57,6 +57,9 @@ from desktop.lib.django_util import nonce_attribute
         <ul class="snippet-list-alts" data-bind="foreach: availableSnippets">
           <li data-bind="click: function() { $parent.addNewSnippet($data) }">
             <div style="width: 30px; display:inline-block;">
+            <!-- ko if: $root.getSnippetViewSettings(type()).snippetSvg -->
+            <svg class="hi snippet-icon" aria-hidden="true"><use data-bind="attr: { 'href': '#' + $root.getSnippetViewSettings(type()).snippetSvg }"></use></svg>
+            <!-- /ko -->
             <!-- ko if: $root.getSnippetViewSettings(type()).snippetImage -->
             <img class="snippet-icon" data-bind="attr: { 'src': $root.getSnippetViewSettings(type()).snippetImage }"  alt="${ _('Snippet icon') }">
             <!-- /ko -->
