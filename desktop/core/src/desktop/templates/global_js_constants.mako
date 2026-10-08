@@ -666,6 +666,8 @@
     'Show in Assist...': '${_('Show in Assist...')}',
     'Show more...': '${_('Show more...')}',
     'Show row details': '${_('Show row details')}',
+    'Row details': '${_('Row details')}',
+    'Row details - %s': '${_('Row details - %s')}',
     'Show sample': '${_('Show sample')}',
     'Show view SQL': '${_('Show view SQL')}',
     'Sidebar for navigation': '${_('Sidebar for navigation')}',

@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import i18next, { InitOptions } from 'i18next';
+import i18next, { InitOptions, TFunction } from 'i18next';
 import HttpApi from 'i18next-http-backend';
 import {
   initReactI18next,
@@ -24,8 +24,7 @@ import {
 } from 'react-i18next';
 import { hueWindow } from 'types/types';
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-let i18nextLoad: Promise<Function>;
+let i18nextLoad: Promise<TFunction>;
 
 const determineLoadStrategy = (supportedLanguages: Array<string>, currentLang: string) => {
   const supportedFullLocales = supportedLanguages

@@ -82,7 +82,7 @@
           });
           emit('history-cleared');
           huePubSub.publish(HISTORY_CLEARED_EVENT);
-        } catch (err) {}
+        } catch {}
         clearingHistory.value = false;
         emit('update:model-value', false);
       };

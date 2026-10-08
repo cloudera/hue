@@ -33,6 +33,7 @@ import {
 } from 'apps/editor/events';
 
 import { attachTracker } from 'apps/editor/components/executableStateHandler';
+import { inferRowDetailsSourceNameFromExecutable } from 'jquery/plugins/rowDetailsSource';
 
 export const RESULT_GRID_COMPONENT = 'result-grid';
 
@@ -388,7 +389,11 @@ class ResultGrid extends DisposableComponent {
         fixedFirstColumn: !this.notebookMode(),
         parentId: $resultTable.parents('.snippet').attr('id'),
         clonedContainerPosition: this.notebookMode() ? 'absolute' : 'fixed',
-        app: 'editor'
+        app: 'editor',
+        rowDetailsSourceName: () =>
+          inferRowDetailsSourceNameFromExecutable(
+            this.activeExecutable && this.activeExecutable()
+          )
       };
       if (!this.notebookMode()) {
         $resultTable.parents('.dataTables_wrapper').css('overflow-x', 'hidden');

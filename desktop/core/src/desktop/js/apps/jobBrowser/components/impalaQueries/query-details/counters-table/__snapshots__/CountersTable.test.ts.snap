@@ -10,7 +10,7 @@ exports[`CountersTable.vue should render 1`] = `
     >
       <caption>
         <!-- Because of Web:TableWithoutCaptionCheck -->
-        
+         
       </caption>
       <thead>
         <tr

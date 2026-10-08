@@ -1367,6 +1367,14 @@ AUTH = ConfigSection(
             type=coerce_bool,
             help=_("Verify custom JWT signature.")
         ),
+        SSL_CERT_CA_VERIFY=Config(
+            key="ssl_cert_ca_verify",
+            dynamic_default=default_ssl_validate,
+            type=coerce_bool,
+            help=_("Choose whether Hue should validate the certificate presented by the JWT key server. "
+                   "Disabling this allows an attacker able to intercept the connection to supply their own "
+                   "signing keys, so only turn it off against a trusted endpoint with a self-signed certificate.")
+        ),
       )
     ),
 ))

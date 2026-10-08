@@ -121,7 +121,7 @@
         try {
           uploadStats.value = await upload<UploadStats>('/desktop/api2/doc/import', formData);
           emit('documents-imported');
-        } catch (err) {
+        } catch {
           failed.value = true;
         }
         importingDocuments.value = false;

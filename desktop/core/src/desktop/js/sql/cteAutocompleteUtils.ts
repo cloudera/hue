@@ -140,7 +140,7 @@ const getCteColumnType = async <Suggestion extends CteSuggestionLike>(
       if (entry) {
         return entry.getType();
       }
-    } catch (err) {}
+    } catch {}
   }
   return 'T';
 };

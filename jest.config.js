@@ -1,6 +1,10 @@
 module.exports = {
   moduleFileExtensions: ['js', 'jsx', 'ts', 'tsx', 'json', 'vue'],
-  transformIgnorePatterns: ['node_modules/(?!(cuix|@cloudera/cuix-core)/)'],
+  // sanitize-html depends on htmlparser2 12 and its ESM-only dependency tree, so those
+  // packages have to go through babel-jest instead of being loaded as CommonJS.
+  transformIgnorePatterns: [
+    'node_modules/(?!(cuix|@cloudera/cuix-core|sanitize-html|htmlparser2|dom-serializer|domelementtype|domhandler|domutils|entities)/)'
+  ],
   transform: {
     '^.+\\.(js|ts|jsx|tsx)$': 'babel-jest',
     '^.+\\.vue$': '@vue/vue3-jest'
@@ -8,6 +12,10 @@ module.exports = {
   moduleNameMapper: {
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
     '^\\./desktop/core/src/desktop/js/(.*)$': '<rootDir>/desktop/core/src/desktop/js/$1',
+    // Hue's own js/vue directory is imported as "vue/...". Since Vue 3.5 declares an exports
+    // map, the resolver rejects those subpaths instead of falling through to moduleDirectories.
+    '^vue/(webComponentWrap|components/.*|wrapper(/.*)?)$':
+      '<rootDir>/desktop/core/src/desktop/js/vue/$1',
     '^@vue/test-utils': '<rootDir>/node_modules/@vue/test-utils/dist/vue-test-utils.cjs.js'
   },
   moduleDirectories: ['node_modules', 'desktop/core/src/desktop/js'],

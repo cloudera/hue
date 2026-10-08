@@ -50,7 +50,7 @@ const ReactExampleGlobal = ({
       className={`react-example-global ${className || ''}`}
       disabled={isClicked}
       onClick={e => {
-        onClick && onClick(e);
+        onClick?.(e);
         setIsClicked(true);
         console.info(`ReactExampleGlobal clicked  ${version} ${myObj?.id}`);
         hueAnalytics.log('test-area', 'button click', true);

@@ -18,6 +18,7 @@ import $ from 'jquery';
 
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+import { resolveRowDetailsSourceName } from './rowDetailsSource';
 
 /*
  * jHue table extender plugin
@@ -291,9 +292,14 @@ Plugin.prototype.init = function () {
   });
   $(document).on('dblclick', '.dataTables_wrapper > table tbody tr', function () {
     if (huePubSub) {
+      const $table = $(this).parents('table');
+      const extender =
+        $table.data('plugin_jHueTableExtender2') || $table.data('plugin_jHueTableExtender');
+      const sourceOption = extender && extender.options && extender.options.rowDetailsSourceName;
       huePubSub.publish('table.row.show.details', {
         idx: $(this).index(),
-        table: $(this).parents('table')
+        table: $table,
+        sourceName: resolveRowDetailsSourceName(sourceOption)
       });
     }
   });

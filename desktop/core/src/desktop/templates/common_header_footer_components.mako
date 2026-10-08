@@ -278,6 +278,15 @@ else:
     var multiLineHandlers = [];
 
     huePubSub.subscribe('table.row.show.details', function (data) {
+      var defaultTitle = '${ _("Row details") }';
+      var titled = '${ _("Row details - %s") }';
+      var sourceName = data && data.sourceName ? String(data.sourceName).trim() : '';
+      var $title = $('#rowDetailsModal .modal-title');
+      if (sourceName) {
+        $title.text(titled.replace('%s', sourceName));
+      } else {
+        $title.text(defaultTitle);
+      }
       var $el = $(data.table);
       var $t = $('#rowDetailsModal').find('table');
       $t.html('');
@@ -316,6 +325,7 @@ else:
     });
 
     $('#rowDetailsModal').on('hidden', function () {
+      $('#rowDetailsModal .modal-title').text('${ _("Row details") }');
       multiLineHandlers.forEach(function (multiLineEllipsisHandler) {
         multiLineEllipsisHandler.dispose();
       });

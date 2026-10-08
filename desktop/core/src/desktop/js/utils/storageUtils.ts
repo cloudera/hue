@@ -39,7 +39,7 @@ export const getFromLocalStorage: LocalStorageGet = <T>(key: string, defaultValu
   if (storedValue && storedValue.length) {
     try {
       return JSON.parse(storedValue);
-    } catch (e) {}
+    } catch {}
     return <T>(<unknown>storedValue);
   }
   return defaultOrNull;
@@ -62,10 +62,10 @@ export const setInLocalStorage = (key: string, value: unknown): void => {
     let jsonString: string | undefined = undefined;
     try {
       jsonString = JSON.stringify(value);
-    } catch (e) {}
+    } catch {}
     try {
       window.localStorage.setItem(userKey, jsonString || String(value));
-    } catch (e) {}
+    } catch {}
   }
 };
 

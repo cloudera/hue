@@ -252,7 +252,7 @@ export const executeStatement = async (options: ExecuteApiOptions): Promise<Exec
         if (response.handle) {
           await cancelStatement(options);
         }
-      } catch (err) {}
+      } catch {}
     }
   });
 

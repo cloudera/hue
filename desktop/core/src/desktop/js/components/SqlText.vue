@@ -86,7 +86,7 @@
         let ruleModule;
         try {
           ruleModule = ace.require(`${getAceMode(this.dialect)}_highlight_rules`);
-        } catch (err) {}
+        } catch {}
         const Rules =
           ruleModule && Object.keys(ruleModule).length === 1
             ? ruleModule[Object.keys(ruleModule)[0]]
@@ -114,7 +114,7 @@
           if (value) {
             try {
               screenColumn = txt.$renderToken(stringBuilder, screenColumn, token, value);
-            } catch (e) {
+            } catch {
               console.warn(
                 value,
                 'Failed to get screen column due to some parsing errors, skip rendering.'
@@ -126,7 +126,7 @@
             value = token.value;
             try {
               screenColumn = txt.$renderToken(stringBuilder, screenColumn, token, value);
-            } catch (e) {
+            } catch {
               if (console && console.warn) {
                 console.warn(
                   value,

@@ -522,7 +522,7 @@ export default class SqlExecutable {
     if (!this.isReady()) {
       try {
         await this.close();
-      } catch (err) {}
+      } catch {}
     }
     this.handle = undefined;
     this.setProgress(0);
@@ -586,7 +586,7 @@ export default class SqlExecutable {
 
     try {
       await closeStatement({ executable: this, silenceErrors: true });
-    } catch (err) {
+    } catch {
       console.warn('Failed closing statement');
     }
     this.setStatus(ExecutionStatus.closed);

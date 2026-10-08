@@ -111,7 +111,7 @@ include Makefile.tarball
 # Build docs (unused)
 ###################################
 test_prep:
-	@PIP_CONSTRAINT=$(ROOT)/desktop/core/build-constraints.txt $(ENV_PYTHON) -m pip install -r $(REQUIREMENT_TEST_FILE)
+	@PIP_CONSTRAINT=$(ROOT)/desktop/core/build-constraints.txt PIP_BUILD_CONSTRAINT=$(ROOT)/desktop/core/build-constraints.txt $(ENV_PYTHON) -m pip install -r $(REQUIREMENT_TEST_FILE)
 
 ###################################
 # Build docs (unused)
@@ -162,9 +162,9 @@ $(BLD_DIR_ENV)/bin/python:
 	@$(eval RELOCATABLE := $(shell which virtualenv-make-relocatable))
 	@echo "REQUIREMENT_FILE is $(REQUIREMENT_FILE)"
 	@echo "--- Using build constraints to prevent setuptools 82+ (cx-Oracle compatibility) ---"
-	@PIP_CONSTRAINT=$(ROOT)/desktop/core/build-constraints.txt $(ENV_PIP) install -r $(REQUIREMENT_FILE)
+	@PIP_CONSTRAINT=$(ROOT)/desktop/core/build-constraints.txt PIP_BUILD_CONSTRAINT=$(ROOT)/desktop/core/build-constraints.txt $(ENV_PIP) install -r $(REQUIREMENT_FILE)
 	@echo "--- Virtual environment setup complete for $(PYTHON_VER) ---"
-	@PIP_CONSTRAINT=$(ROOT)/desktop/core/build-constraints.txt $(ENV_PIP) install $(NAVOPTAPI_WHL)
+	@PIP_CONSTRAINT=$(ROOT)/desktop/core/build-constraints.txt PIP_BUILD_CONSTRAINT=$(ROOT)/desktop/core/build-constraints.txt $(ENV_PIP) install $(NAVOPTAPI_WHL)
 	@echo "--- Finished installing $(NAVOPTAPI_WHL) into virtual-env ---"
 ###################################
 # Build desktop

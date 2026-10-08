@@ -324,7 +324,7 @@
                 editor.setValue(formatted, 1);
               }
               triggerChange();
-            } catch (e) {}
+            } catch {}
             editor.setReadOnly(false);
           }
         });
@@ -609,7 +609,7 @@
           defer(() => {
             try {
               editor.resize(true);
-            } catch (e) {
+            } catch {
               // Can happen when the editor hasn't been initialized
             }
           });

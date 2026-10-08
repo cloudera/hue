@@ -116,7 +116,7 @@
           variable.type = 'text';
           variable.step = '';
       }
-    } catch (err) {}
+    } catch {}
   };
 
   export default defineComponent({
