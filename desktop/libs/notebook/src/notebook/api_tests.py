@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import json
+import uuid
 from collections import OrderedDict
 from unittest.mock import Mock, patch
 
@@ -974,6 +975,126 @@ class TestEditor(object):
         assert 200 == response.status_code
     finally:
       doc.delete()
+
+
+@pytest.mark.django_db
+class TestCheckStatusPersistence(object):
+  """
+  Covers _check_status()'s persistence of a connector's next_uri and any row data
+  piggybacked on a status poll -- the mechanism that keeps a later check_status()/
+  fetch_result() call (reached via operationId) from re-fetching an already-consumed
+  Trino next_uri and silently losing rows.
+  """
+
+  def setup_method(self):
+    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
+    self.user = User.objects.get(username="test")
+
+  def _make_doc(self, next_uri='http://trino/1', seed_data=None):
+    notebook_data = {
+      'type': 'query-trino',
+      'uuid': str(uuid.uuid4()),
+      'isManaged': False,
+      'snippets': [{
+        'type': 'trino',
+        'status': 'running',
+        'result': {
+          'handle': {
+            'guid': 'test-guid',
+            'next_uri': next_uri,
+            'has_result_set': True,
+            'result': {'data': seed_data or [], 'meta': [], 'type': 'table'}
+          }
+        }
+      }]
+    }
+    return Document2.objects.create(
+      name='test_check_status_persistence', type='query-trino', owner=self.user, data=json.dumps(notebook_data)
+    )
+
+  def _reload_handle(self, doc):
+    doc.refresh_from_db()
+    return json.loads(doc.data)['snippets'][0]['result']['handle']
+
+  def test_persists_advancing_next_uri_and_polled_rows(self):
+    doc = self._make_doc(next_uri='http://trino/1')
+    request = Mock(user=self.user)
+
+    with patch('notebook.api.get_api') as get_api:
+      get_api.return_value.check_status.return_value = {
+        'status': 'available',
+        'next_uri': 'http://trino/2',
+        'has_result_set': True,
+        'result': {'data': [['a'], ['b']], 'meta': [{'name': 'col', 'type': 'string', 'comment': ''}], 'type': 'table'}
+      }
+      from notebook.api import _check_status
+      _check_status(request, operation_id=doc.uuid)
+
+    handle = self._reload_handle(doc)
+    assert handle['next_uri'] == 'http://trino/2'
+    assert handle['result']['data'] == [['a'], ['b']]
+
+  def test_accumulates_polled_rows_across_multiple_polls(self):
+    # This is the exact shape of the original bug: a query's rows arrive split across two
+    # separate check_status() polls, each advancing next_uri by one step. Both pages of
+    # data must be preserved, not just the last one.
+    doc = self._make_doc(next_uri='http://trino/1')
+    request = Mock(user=self.user)
+    from notebook.api import _check_status
+
+    with patch('notebook.api.get_api') as get_api:
+      get_api.return_value.check_status.return_value = {
+        'status': 'running',
+        'next_uri': 'http://trino/2',
+        'has_result_set': True,
+        'result': {'data': [['a']], 'meta': [], 'type': 'table'}
+      }
+      _check_status(request, operation_id=doc.uuid)
+
+    with patch('notebook.api.get_api') as get_api:
+      get_api.return_value.check_status.return_value = {
+        'status': 'available',
+        'next_uri': 'http://trino/3',
+        'has_result_set': True,
+        'result': {'data': [['b']], 'meta': [], 'type': 'table'}
+      }
+      _check_status(request, operation_id=doc.uuid)
+
+    handle = self._reload_handle(doc)
+    assert handle['next_uri'] == 'http://trino/3'
+    assert handle['result']['data'] == [['a'], ['b']]
+
+  def test_persists_none_next_uri_as_final_progress(self):
+    # A next_uri of None means "no more pages" -- that's real progress and must overwrite
+    # a previous non-None value, not be skipped as if the connector didn't report next_uri.
+    doc = self._make_doc(next_uri='http://trino/2')
+    request = Mock(user=self.user)
+
+    with patch('notebook.api.get_api') as get_api:
+      get_api.return_value.check_status.return_value = {
+        'status': 'available',
+        'next_uri': None,
+        'has_result_set': True
+      }
+      from notebook.api import _check_status
+      _check_status(request, operation_id=doc.uuid)
+
+    handle = self._reload_handle(doc)
+    assert handle['next_uri'] is None
+
+  def test_does_not_touch_next_uri_for_connectors_that_dont_report_it(self):
+    # Non-Trino connectors' check_status() responses have no 'next_uri' key at all --
+    # persistence must leave the handle's next_uri untouched in that case.
+    doc = self._make_doc(next_uri='http://trino/1')
+    request = Mock(user=self.user)
+
+    with patch('notebook.api.get_api') as get_api:
+      get_api.return_value.check_status.return_value = {'status': 'running', 'has_result_set': True}
+      from notebook.api import _check_status
+      _check_status(request, operation_id=doc.uuid)
+
+    handle = self._reload_handle(doc)
+    assert handle['next_uri'] == 'http://trino/1'
 
 
 @pytest.mark.django_db

@@ -17,6 +17,7 @@
 <%!
   import sys
   import json
+  from django.middleware.csrf import get_token
   from desktop import conf
   from desktop.auth.backend import is_admin, is_hue_admin
   from desktop.conf import APP_SWITCHER_ALTUS_BASE_URL, APP_SWITCHER_MOW_BASE_URL, CUSTOM_DASHBOARD_URL, \
@@ -124,11 +125,7 @@
 
   window.DEV = '${ conf.DEV.get() }' === 'True';
 
-  %if request and request.COOKIES and request.COOKIES.get('csrftoken', '') != '':
-    window.CSRF_TOKEN = '${request.COOKIES.get('csrftoken')}';
-  %else:
-    window.CSRF_TOKEN = '';
-  %endif
+  window.CSRF_TOKEN = '${ get_token(request) }';
 
   window.PREVENT_AUTOFILL_INPUT_ATTRS = 'autocorrect="off" autocomplete="do-not-autocomplete" autocapitalize="off" spellcheck="false"';
 
