@@ -88,7 +88,7 @@ else:
                   <div class="controls">
                     <input id="coord-frequency" type="text" data-bind="textInput: coordinator.properties.cron_frequency, enable: $root.isEditing, attachViewModelToElementData, tagsNotAllowed" name="cron_frequency"/>
                     <span class="help-inline">
-                      <a data-bind="visible: coordinator.properties.cron_advanced" href="http://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/tutorial-lesson-06.html" target="_blank">
+                      <a data-bind="visible: coordinator.properties.cron_advanced" href="https://en.wikipedia.org/wiki/Cron" target="_blank">
                       <i class="fa fa-question-circle" title="${ _('Check syntax ?') }"></i></a>
                     </span>
                   </div>
@@ -100,6 +100,37 @@ else:
                       <i class="fa fa-sliders"></i> <span data-bind="visible: ! coordinator.showAdvancedFrequencyUI()">${ _('Options') }</span>
                       <span data-bind="visible: coordinator.showAdvancedFrequencyUI">${ _('Hide') }</span>
                     </a>
+                  </div>
+                </div>
+                <div class="control-group cron-expression-explainer" data-bind="visible: coordinator.properties.cron_frequency().length > 0">
+                  <label class="control-label"></label>
+                  <div class="controls">
+                    <!-- ko if: $root.cronExpressionExplanation().isValid -->
+                    <div class="cron-expression-explainer__status cron-expression-explainer__status--valid">
+                      <i class="fa fa-check-circle"></i>
+                      <span data-bind="text: $root.cronExpressionExplanation().description"></span>
+                    </div>
+                    <!-- /ko -->
+                    <!-- ko if: ! $root.cronExpressionExplanation().isValid && $root.cronExpressionExplanation().error -->
+                    <div class="cron-expression-explainer__status cron-expression-explainer__status--invalid">
+                      <i class="fa fa-exclamation-circle"></i>
+                      <span data-bind="text: $root.cronExpressionExplanation().error"></span>
+                    </div>
+                    <!-- /ko -->
+                    <!-- ko if: $root.cronExpressionExplanation().isValid && $root.cronExpressionExplanation().nextRuns.length > 0 -->
+                    <div class="cron-expression-explainer__next-runs">
+                      <span class="muted">
+                        ${ _('Next run') }
+                        <!-- ko if: coordinator.properties.timezone() -->
+                        (<span data-bind="text: coordinator.properties.timezone"></span>):
+                        <!-- /ko -->
+                        <!-- ko ifnot: coordinator.properties.timezone() -->
+                        :
+                        <!-- /ko -->
+                        <span data-bind="text: $root.cronExpressionExplanation().nextRuns[0]"></span>
+                      </span>
+                    </div>
+                    <!-- /ko -->
                   </div>
                 </div>
              </form>
