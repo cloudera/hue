@@ -51,6 +51,7 @@ const NOTEBOOK_MAPPING = {
     'history',
     'images',
     'inFocus',
+    'presentationTitle',
     'queries',
     'saveResultsModalVisible',
     'selectedStatement',

@@ -28,6 +28,7 @@ import huePubSub from 'utils/huePubSub';
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 import Result from 'apps/notebook/result';
 import Session from 'apps/notebook/session';
+import { splitStatementTitle } from 'apps/notebook/statementTitle';
 import { getStatementsParser } from 'parse/utils';
 import { SHOW_EVENT as SHOW_GIST_MODAL_EVENT } from 'ko/components/ko.shareGistModal';
 import { cancelActiveRequest } from 'api/apiUtils';
@@ -70,6 +71,7 @@ const NOTEBOOK_MAPPING = {
     'history',
     'images',
     'inFocus',
+    'presentationTitle',
     'queries',
     'saveResultsModalVisible',
     'selectedStatement',
@@ -537,6 +539,11 @@ class Snippet {
       typeof snippet.statement_raw != 'undefined' && snippet.statement_raw != null
         ? snippet.statement_raw
         : ''
+    );
+    // Notebook snippets are not split per statement, so presentation mode falls back to the
+    // leading line comments of the statement when the snippet has not been named.
+    self.presentationTitle = ko.pureComputed(
+      () => self.name() || splitStatementTitle(self.statement_raw()).title
     );
     self.selectedStatement = ko.observable('');
     self.positionStatement = ko.observable(null);
