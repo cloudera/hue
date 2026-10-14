@@ -478,3 +478,27 @@ class GSFileSystem(S3FileSystem):
   def get_upload_handler(self, destination_path, overwrite):
     from desktop.lib.fs.gc.upload import GSNewFileUploadHandler
     return GSNewFileUploadHandler(self, destination_path, overwrite)
+
+  def get_content_summary(self, path):
+    raise NotImplementedError("get_content_summary is not implemented for GS")
+
+  def set_replication(self, path, replication_factor):
+    raise NotImplementedError("set_replication is not implemented for GS")
+
+  def restore(self, path):
+    raise NotImplementedError("Moving to trash is not implemented for GS")
+
+  def chown(self, path, *args, **kwargs):
+    raise NotImplementedError("chown is not implemented for GS")
+
+  def chmod(self, path, *args, **kwargs):
+    raise NotImplementedError("chmod is not implemented for GS")
+
+  def trash_path(self, path):
+    raise NotImplementedError("trash_path is not implemented for GS")
+
+  def current_trash_path(self, trash_path):
+    return NotImplementedError("current_trash_path is not implemented for GS")
+
+  def purge_trash(self):
+    raise NotImplementedError("purge_trash is not implemented for GS")

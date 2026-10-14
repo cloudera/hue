@@ -508,7 +508,7 @@ class ABFS(object):
     self._root.delete(new_path, param, headers=self._getheaders())
 
   def restore(self, path):
-    raise NotImplementedError("")
+    raise NotImplementedError("Moving to trash is not implemented for ABFS")
 
   # Edit permissions of Filesystems, directories. or Files
   # --------------------------------
@@ -552,7 +552,7 @@ class ABFS(object):
     raise NotImplementedError("")
 
   def purge_trash(self):
-    raise NotImplementedError("")
+    raise NotImplementedError("purge_trash is not implemented for ABFS")
 
   # Handle file systems interactions
   # --------------------------------
@@ -670,6 +670,18 @@ class ABFS(object):
         src.close()
     else:
       LOG.info(f'Skipping {local_src} (not a file).')
+
+  def get_content_summary(self, path):
+    raise NotImplementedError("get_content_summary is not implemented for ABFS")
+
+  def set_replication(self, path, replication_factor):
+    raise NotImplementedError("set_replication is not implemented for ABFS")
+
+  def trash_path(self, path):
+    raise NotImplementedError("trash_path is not implemented for ABFS")
+
+  def current_trash_path(self, trash_path):
+    return NotImplementedError("current_trash_path is not implemented for ABFS")
 
   def check_access(self, path, permission="READ"):
     """
