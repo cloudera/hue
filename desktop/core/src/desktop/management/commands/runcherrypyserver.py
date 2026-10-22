@@ -25,6 +25,7 @@ from django.core.management.base import BaseCommand
 
 from desktop import conf
 from desktop.lib.daemon_utils import drop_privileges_if_necessary
+import os
 
 
 CPSERVER_HELP = r"""
@@ -75,42 +76,24 @@ def start_server(options):
     """
     Start CherryPy server
     """
-    from desktop.lib.wsgiserver import CherryPyWSGIServer as Server
-    from desktop.lib.wsgiserver import SSLConnection
+    from desktop.lib.wsgiserver import WSGIServer as Server
+
     from django.core.handlers.wsgi import WSGIHandler
     # Translogger wraps a WSGI app with Apache-style combined logging.
-    server = Server(
-        (options['host'], int(options['port'])),
-        WSGIHandler(),
-        int(options['threads']),
-        options['server_name']
-    )
-    if options['ssl_certificate'] and options['ssl_private_key']:
-        server.ssl_certificate = options['ssl_certificate']
-        server.ssl_private_key = options['ssl_private_key']
-        if options['ssl_certificate_chain']:
-            server.ssl_certificate_chain = options['ssl_certificate_chain']
-        server.ssl_cipher_list = options['ssl_cipher_list']
-        server.ssl_no_renegotiation = options['ssl_no_renegotiation']
 
-        ssl_password = conf.get_ssl_password()
-        if ssl_password:
-            server.ssl_password_cb = lambda *unused: ssl_password
-
+    server = Server(WSGIHandler(), host=options['host'], port=int(options['port']), numthreads=int(options['threads']),
+                    certfile=options['ssl_certificate'], keyfile=options['ssl_private_key'],
+                    ca_certs=options['ssl_certificate_chain'], password=conf.get_ssl_password(),
+                    ssl_cipher_list=options['ssl_cipher_list'])
     try:
-        server.bind_server()
+        server.start()
         drop_privileges_if_necessary(options)
-
-        if isinstance(server.socket, SSLConnection):
-          ciphers = server.socket.get_cipher_list()
-          logging.info("List of enabled ciphers: {}".format(':'.join(ciphers)))
-
-        server.listen_and_loop()
     except KeyboardInterrupt:
         server.stop()
 
 
 def runcpserver(argset=[], **kwargs):
+    os.environ['TMPDIR'] = os.environ.get('HUE_TMP_DIR')
     # Get the options
     options = CPSERVER_OPTIONS.copy()
     options.update(kwargs)
