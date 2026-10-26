@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import os
+import secrets
 import tempfile
 import zipfile
 from unittest.mock import MagicMock, patch
@@ -32,6 +33,46 @@ from desktop.lib.importer.schemas import (
   PreviewFileSchema,
   SqlTypeMapperSchema,
 )
+
+# ---------------------------------------------------------------------------
+# Domain-aware generators shared across test classes
+# ---------------------------------------------------------------------------
+
+_TEST_USERNAME = "test_user"
+
+
+def _username() -> str:
+  """An unpredictable but valid Hue username, unique per call.
+
+  Used in security tests where the specific username carries no semantic
+  meaning — avoids accidentally encoding assumptions about a specific string.
+  """
+  return f"user_{secrets.token_hex(5)}"
+
+
+def _tmp_uploaded_file(**kwargs) -> tempfile.NamedTemporaryFile:
+  """Create a NamedTemporaryFile whose name matches the pattern stamped by
+  ``local_file_upload``: ``{username}_{random}_{original_filename}``.
+
+  This ensures that happy-path tests exercise the real path-validation contract
+  rather than relying on a no-op stub.
+  """
+  return tempfile.NamedTemporaryFile(prefix=f"{_TEST_USERNAME}_", **kwargs)
+
+
+@pytest.fixture
+def controlled_upload_tmpdir(tmp_path, monkeypatch):
+  """Upload temp directory aligned with ``tempfile.gettempdir()`` for validation.
+
+  ``validate_local_file_path`` confines paths to ``realpath(gettempdir())``.
+  Pytest's ``tmp_path`` is not always that directory, so tests that expect a
+  layer-2 failure (``Uploaded file not found``) must pin ``gettempdir`` the same
+  way as ``utils_tests.py``.
+  """
+  controlled_tmpdir = tmp_path / "controlled_tmp"
+  controlled_tmpdir.mkdir()
+  monkeypatch.setattr(tempfile, "gettempdir", lambda: str(controlled_tmpdir))
+  return controlled_tmpdir
 
 
 class TestLocalFileUpload:
@@ -170,9 +211,10 @@ class TestGuessFileMetadata:
   @patch("desktop.lib.importer.operations.is_magic_lib_available", True)
   @patch("desktop.lib.importer.operations.magic")
   def test_guess_file_metadata_csv(self, mock_magic, cleanup_temp_files):
-    # Create a temporary CSV file
+    # Create a temporary CSV file with the correct username prefix so it passes
+    # path validation (mirrors what local_file_upload produces).
     test_content = "col1,col2,col3\nval1,val2,val3\nval4,val5,val6"
-    temp_file = tempfile.NamedTemporaryFile(delete=False)
+    temp_file = _tmp_uploaded_file(delete=False)
     temp_file.write(test_content.encode("utf-8"))
     temp_file.close()
 
@@ -184,7 +226,7 @@ class TestGuessFileMetadata:
     # Create schema object
     schema = GuessFileMetadataSchema(file_path=temp_file.name, import_type="local")
 
-    result = operations.guess_file_metadata(data=schema, username="test_user")
+    result = operations.guess_file_metadata(data=schema, username=_TEST_USERNAME)
 
     assert result == {
       "type": "csv",
@@ -196,9 +238,9 @@ class TestGuessFileMetadata:
   @patch("desktop.lib.importer.operations.is_magic_lib_available", True)
   @patch("desktop.lib.importer.operations.magic")
   def test_guess_file_metadata_tsv(self, mock_magic, cleanup_temp_files):
-    # Create a temporary TSV file
+    # Create a temporary TSV file with the correct username prefix.
     test_content = "col1\tcol2\tcol3\nval1\tval2\tval3\nval4\tval5\tval6"
-    temp_file = tempfile.NamedTemporaryFile(delete=False)
+    temp_file = _tmp_uploaded_file(delete=False)
     temp_file.write(test_content.encode("utf-8"))
     temp_file.close()
 
@@ -210,7 +252,7 @@ class TestGuessFileMetadata:
     # Create schema object
     schema = GuessFileMetadataSchema(file_path=temp_file.name, import_type="local")
 
-    result = operations.guess_file_metadata(data=schema, username="test_user")
+    result = operations.guess_file_metadata(data=schema, username=_TEST_USERNAME)
 
     assert result == {
       "type": "tsv",
@@ -223,7 +265,7 @@ class TestGuessFileMetadata:
   @patch("desktop.lib.importer.operations.magic")
   @patch("desktop.lib.importer.operations._get_sheet_names_xlsx")
   def test_guess_file_metadata_excel(self, mock_get_sheet_names, mock_magic, cleanup_temp_files):
-    # Create a simple .xlsx file
+    # Create a simple .xlsx file with the correct username prefix.
     test_content = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
     <workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
       <sheets>
@@ -233,7 +275,7 @@ class TestGuessFileMetadata:
       </sheets>
     </workbook>"""
 
-    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx")
+    temp_file = _tmp_uploaded_file(delete=False, suffix=".xlsx")
     temp_file.write(test_content.encode("utf-8"))
     temp_file.close()
 
@@ -248,7 +290,7 @@ class TestGuessFileMetadata:
     # Create schema object
     schema = GuessFileMetadataSchema(file_path=temp_file.name, import_type="local")
 
-    result = operations.guess_file_metadata(data=schema, username="test_user")
+    result = operations.guess_file_metadata(data=schema, username=_TEST_USERNAME)
 
     assert result == {
       "type": "excel",
@@ -258,7 +300,7 @@ class TestGuessFileMetadata:
   @patch("desktop.lib.importer.operations.is_magic_lib_available", True)
   @patch("desktop.lib.importer.operations.magic")
   def test_guess_file_metadata_unsupported_type(self, mock_magic, cleanup_temp_files):
-    temp_file = tempfile.NamedTemporaryFile(delete=False)
+    temp_file = _tmp_uploaded_file(delete=False)
     temp_file.write(b"Binary content")
     temp_file.close()
 
@@ -271,14 +313,20 @@ class TestGuessFileMetadata:
     schema = GuessFileMetadataSchema(file_path=temp_file.name, import_type="local")
 
     with pytest.raises(ValueError, match="Unable to detect file format."):
-      operations.guess_file_metadata(data=schema, username="test_user")
+      operations.guess_file_metadata(data=schema, username=_TEST_USERNAME)
 
-  def test_guess_file_metadata_nonexistent_file(self):
-    # Create schema object
-    schema = GuessFileMetadataSchema(file_path="/path/to/nonexistent/file.csv", import_type="local")
+  def test_guess_file_metadata_nonexistent_uploaded_file(self, controlled_upload_tmpdir):
+    """A path inside tmpdir with the correct prefix that no longer exists is rejected.
 
-    with pytest.raises(ValueError, match="Local file does not exist."):
-      operations.guess_file_metadata(data=schema, username="test_user")
+    This covers the race condition where a file is deleted between upload and
+    metadata-guessing — the operation must not open a non-existent path."""
+    nonexistent = controlled_upload_tmpdir / f"{_TEST_USERNAME}_missing_file.csv"
+    # Deliberately do not create the file
+
+    schema = GuessFileMetadataSchema(file_path=str(nonexistent), import_type="local")
+
+    with pytest.raises(ValueError, match="Uploaded file not found"):
+      operations.guess_file_metadata(data=schema, username=_TEST_USERNAME)
 
   def test_guess_remote_file_metadata_no_username(self):
     # Create schema object
@@ -288,7 +336,7 @@ class TestGuessFileMetadata:
       operations.guess_file_metadata(data=schema, username="")
 
   def test_guess_file_metadata_empty_file(self, cleanup_temp_files):
-    temp_file = tempfile.NamedTemporaryFile(delete=False)
+    temp_file = _tmp_uploaded_file(delete=False)
     temp_file.close()
 
     cleanup_temp_files.append(temp_file.name)
@@ -297,11 +345,11 @@ class TestGuessFileMetadata:
     schema = GuessFileMetadataSchema(file_path=temp_file.name, import_type="local")
 
     with pytest.raises(ValueError, match="File is empty, cannot detect file format."):
-      operations.guess_file_metadata(data=schema, username="test_user")
+      operations.guess_file_metadata(data=schema, username=_TEST_USERNAME)
 
   @patch("desktop.lib.importer.operations.is_magic_lib_available", False)
   def test_guess_file_metadata_no_magic_lib(self, cleanup_temp_files):
-    temp_file = tempfile.NamedTemporaryFile(delete=False)
+    temp_file = _tmp_uploaded_file(delete=False)
     temp_file.write(b"Content")
     temp_file.close()
 
@@ -311,7 +359,7 @@ class TestGuessFileMetadata:
     schema = GuessFileMetadataSchema(file_path=temp_file.name, import_type="local")
 
     with pytest.raises(RuntimeError, match="Unable to guess file type. python-magic or its dependency libmagic is not installed."):
-      operations.guess_file_metadata(data=schema, username="test_user")
+      operations.guess_file_metadata(data=schema, username=_TEST_USERNAME)
 
 
 @pytest.mark.usefixtures("cleanup_temp_files")
@@ -330,7 +378,7 @@ class TestPreviewFile:
 
   @patch("desktop.lib.importer.operations.pl")
   def test_preview_excel_file(self, mock_pl, cleanup_temp_files):
-    # Minimal Excel file content (not a real Excel binary, just placeholder for test)
+    # Minimal Excel file content with the correct username prefix.
     test_content = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
     <workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
       <sheets>
@@ -338,7 +386,7 @@ class TestPreviewFile:
       </sheets>
     </workbook>"""
 
-    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx")
+    temp_file = _tmp_uploaded_file(delete=False, suffix=".xlsx")
     temp_file.write(test_content.encode("utf-8"))
     temp_file.close()
 
@@ -358,7 +406,7 @@ class TestPreviewFile:
       file_path=temp_file.name, file_type="excel", import_type="local", sql_dialect="hive", has_header=True, sheet_name="Sheet1"
     )
 
-    result = operations.preview_file(data=schema, username="test_user")
+    result = operations.preview_file(data=schema, username=_TEST_USERNAME)
 
     assert result == {
       "type": "excel",
@@ -370,9 +418,9 @@ class TestPreviewFile:
     }
 
   def test_preview_csv_file(self, cleanup_temp_files):
-    # Create a temporary CSV file
+    # Create a temporary CSV file with the correct username prefix.
     test_content = "col1,col2\n1.1,true\n2.2,false"
-    temp_file = tempfile.NamedTemporaryFile(delete=False)
+    temp_file = _tmp_uploaded_file(delete=False)
     temp_file.write(test_content.encode("utf-8"))
     temp_file.close()
 
@@ -390,7 +438,7 @@ class TestPreviewFile:
       record_separator="\n",
     )
 
-    result = operations.preview_file(data=schema, username="test_user")
+    result = operations.preview_file(data=schema, username=_TEST_USERNAME)
 
     assert result == {
       "type": "csv",
@@ -402,9 +450,9 @@ class TestPreviewFile:
     }
 
   def test_preview_csv_file_with_header_false(self, cleanup_temp_files):
-    # Create a temporary CSV file
+    # Create a temporary CSV file with the correct username prefix.
     test_content = "sample1,sample2\n1.1,true\n2.2,false"
-    temp_file = tempfile.NamedTemporaryFile(delete=False)
+    temp_file = _tmp_uploaded_file(delete=False)
     temp_file.write(test_content.encode("utf-8"))
     temp_file.close()
 
@@ -422,7 +470,7 @@ class TestPreviewFile:
       record_separator="\n",
     )
 
-    result = operations.preview_file(data=schema, username="test_user")
+    result = operations.preview_file(data=schema, username=_TEST_USERNAME)
 
     assert result == {
       "type": "csv",
@@ -431,8 +479,8 @@ class TestPreviewFile:
     }
 
   def test_preview_empty_csv_file(self, cleanup_temp_files):
-    # Create a temporary CSV file
-    temp_file = tempfile.NamedTemporaryFile(delete=False)
+    # Create a temporary CSV file with the correct username prefix.
+    temp_file = _tmp_uploaded_file(delete=False)
     temp_file.write(b" ")
     temp_file.close()
 
@@ -450,7 +498,7 @@ class TestPreviewFile:
       record_separator="\n",
     )
 
-    result = operations.preview_file(data=schema, username="test_user")
+    result = operations.preview_file(data=schema, username=_TEST_USERNAME)
 
     assert result == {
       "type": "csv",
@@ -467,21 +515,21 @@ class TestPreviewFile:
     with pytest.raises(ValueError, match="Username is required"):
       operations.preview_file(data=schema, username="")
 
-  @patch("os.path.exists")
-  def test_preview_nonexistent_local_file(self, mock_exists):
-    mock_exists.return_value = False
+  def test_preview_nonexistent_uploaded_file(self, controlled_upload_tmpdir):
+    """A path inside tmpdir with the correct prefix that no longer exists is rejected.
 
-    # Create schema object
-    schema = PreviewFileSchema(
-      file_path="/path/to/nonexistent.csv", file_type="csv", import_type="local", sql_dialect="hive", has_header=True
-    )
+    Covers the race condition where a file is deleted between upload and preview."""
+    nonexistent = controlled_upload_tmpdir / f"{_TEST_USERNAME}_missing_file.csv"
+    # Deliberately do not create the file
 
-    with pytest.raises(ValueError, match="Local file does not exist: /path/to/nonexistent.csv"):
-      operations.preview_file(data=schema, username="test_user")
+    schema = PreviewFileSchema(file_path=str(nonexistent), file_type="csv", import_type="local", sql_dialect="hive", has_header=True)
+
+    with pytest.raises(ValueError, match="Uploaded file not found"):
+      operations.preview_file(data=schema, username=_TEST_USERNAME)
 
   def test_preview_trino_dialect_type_mapping(self, cleanup_temp_files):
     test_content = "string_col\nfoo\nbar"
-    temp_file = tempfile.NamedTemporaryFile(delete=False)
+    temp_file = _tmp_uploaded_file(delete=False)
     temp_file.write(test_content.encode("utf-8"))
     temp_file.close()
 
@@ -497,7 +545,7 @@ class TestPreviewFile:
       field_separator=",",
     )
 
-    result = operations.preview_file(data=schema, username="test_user")
+    result = operations.preview_file(data=schema, username=_TEST_USERNAME)
 
     # Check the result for Trino-specific type mapping
     assert result["columns"][0]["type"] == "VARCHAR"  # Not STRING
@@ -519,7 +567,7 @@ class TestGuessFileHeader:
 
   def test_guess_header_csv(self, cleanup_temp_files):
     test_content = "header1,header2\nvalue1,value2\nvalue3,value4"
-    temp_file = tempfile.NamedTemporaryFile(delete=False)
+    temp_file = _tmp_uploaded_file(delete=False)
     temp_file.write(test_content.encode("utf-8"))
     temp_file.close()
 
@@ -528,7 +576,7 @@ class TestGuessFileHeader:
     # Create schema object
     schema = GuessFileHeaderSchema(file_path=temp_file.name, file_type="csv", import_type="local")
 
-    result = operations.guess_file_header(data=schema, username="test_user")
+    result = operations.guess_file_header(data=schema, username=_TEST_USERNAME)
 
     assert result
 
@@ -542,7 +590,7 @@ class TestGuessFileHeader:
       </sheets>
     </workbook>"""
 
-    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx")
+    temp_file = _tmp_uploaded_file(delete=False, suffix=".xlsx")
     temp_file.write(test_content.encode("utf-8"))
     temp_file.close()
 
@@ -559,16 +607,18 @@ class TestGuessFileHeader:
     # Create schema object
     schema = GuessFileHeaderSchema(file_path=temp_file.name, file_type="excel", import_type="local", sheet_name="Sheet1")
 
-    result = operations.guess_file_header(data=schema, username="test_user")
+    result = operations.guess_file_header(data=schema, username=_TEST_USERNAME)
 
     assert result
 
-  def test_guess_header_nonexistent_local_file(self):
-    # Create schema object
-    schema = GuessFileHeaderSchema(file_path="/path/to/nonexistent/file.csv", file_type="csv", import_type="local")
+  def test_guess_header_nonexistent_uploaded_file(self, controlled_upload_tmpdir):
+    """A path inside tmpdir with the correct prefix that no longer exists is rejected."""
+    nonexistent = controlled_upload_tmpdir / f"{_TEST_USERNAME}_missing_file.csv"
 
-    with pytest.raises(ValueError, match="Local file does not exist"):
-      operations.guess_file_header(data=schema, username="test_user")
+    schema = GuessFileHeaderSchema(file_path=str(nonexistent), file_type="csv", import_type="local")
+
+    with pytest.raises(ValueError, match="Uploaded file not found"):
+      operations.guess_file_header(data=schema, username=_TEST_USERNAME)
 
   def test_guess_header_remote_file_no_username(self):
     # Create schema object
@@ -831,3 +881,200 @@ class TestExcelSheetNames:
         sheet_names = operations._get_sheet_names_xlsx(f)
 
       assert sheet_names == ["Sheet1", "Sheet2", "CustomSheet"]
+
+
+# ===========================================================================
+# SECURITY CONTRACT: Local file path confinement at the operation layer
+#
+# These tests protect the integration between the three read/analyse
+# operations and ``validate_local_file_path``.  They answer the question:
+# "What would break if someone accidentally removed or moved the
+# validate_local_file_path call in operations.py?"
+#
+# The unit-level contracts for the validator itself live in utils_tests.py.
+# ===========================================================================
+
+
+class TestLocalFilePathConfinement:
+  """Operation-level security contracts for import_type=local path validation.
+
+  Design notes:
+    - Each test asserts a distinct contract or invariant — not a permutation.
+    - Domain-aware generators (_username, secrets.token_hex) replace canned
+      strings like "alice" and "/proc/self/environ" where the specific value
+      carries no semantic meaning.
+    - Negative invariants (os.remove not called, file not opened) are kept
+      because they represent security invariants, not implementation details.
+  """
+
+  # -------------------------------------------------------------------------
+  # CONTRACT: Attacker-supplied paths are rejected before the file is opened
+  # -------------------------------------------------------------------------
+
+  @pytest.mark.parametrize(
+    "attacker_path",
+    [
+      "/proc/self/environ",  # Kubernetes SA token, DB passwords, env vars
+      "/proc/self/cmdline",  # process command line
+      "/etc/passwd",
+      "/var/run/secrets/kubernetes.io/serviceaccount/token",
+    ],
+  )
+  def test_guess_file_metadata_never_opens_system_path(self, attacker_path, monkeypatch):
+    """Attacker-supplied system paths must be rejected before the file is opened.
+
+    If ``validate_local_file_path`` were accidentally removed or called after
+    ``open()``, this test would fail — either because ``open()`` succeeds or
+    because it is called with the attacker-controlled path."""
+    opened_paths = []
+    real_open = open
+
+    def tracking_open(path, *args, **kwargs):
+      opened_paths.append(str(path))
+      return real_open(path, *args, **kwargs)
+
+    monkeypatch.setattr("builtins.open", tracking_open)
+
+    schema = GuessFileMetadataSchema(file_path=attacker_path, import_type="local")
+
+    with pytest.raises(ValueError):
+      operations.guess_file_metadata(data=schema, username=_username())
+
+    assert attacker_path not in opened_paths, f"Security contract violated: attacker path was opened before validation: {attacker_path}"
+
+  @pytest.mark.parametrize(
+    "attacker_path",
+    [
+      "/proc/self/environ",
+      "/etc/passwd",
+      "/var/run/secrets/kubernetes.io/serviceaccount/token",
+    ],
+  )
+  def test_preview_file_never_opens_system_path(self, attacker_path, monkeypatch):
+    """Same confinement contract for preview_file."""
+    opened_paths = []
+    real_open = open
+
+    def tracking_open(path, *args, **kwargs):
+      opened_paths.append(str(path))
+      return real_open(path, *args, **kwargs)
+
+    monkeypatch.setattr("builtins.open", tracking_open)
+
+    schema = PreviewFileSchema(
+      file_path=attacker_path,
+      file_type="csv",
+      import_type="local",
+      sql_dialect="hive",
+      has_header=False,
+    )
+
+    with pytest.raises(ValueError):
+      operations.preview_file(data=schema, username=_username())
+
+    assert attacker_path not in opened_paths, f"Security contract violated: attacker path was opened before validation: {attacker_path}"
+
+  @pytest.mark.parametrize(
+    "attacker_path",
+    [
+      "/proc/self/environ",
+      "/etc/passwd",
+      "/var/run/secrets/kubernetes.io/serviceaccount/token",
+    ],
+  )
+  def test_guess_file_header_never_opens_system_path(self, attacker_path, monkeypatch):
+    """Same confinement contract for guess_file_header."""
+    opened_paths = []
+    real_open = open
+
+    def tracking_open(path, *args, **kwargs):
+      opened_paths.append(str(path))
+      return real_open(path, *args, **kwargs)
+
+    monkeypatch.setattr("builtins.open", tracking_open)
+
+    schema = GuessFileHeaderSchema(file_path=attacker_path, file_type="csv", import_type="local")
+
+    with pytest.raises(ValueError):
+      operations.guess_file_header(data=schema, username=_username())
+
+    assert attacker_path not in opened_paths, f"Security contract violated: attacker path was opened before validation: {attacker_path}"
+
+  # -------------------------------------------------------------------------
+  # INVARIANT: os.remove is not called with an unvalidated path
+  #
+  # ``guess_file_metadata`` and ``preview_file`` call ``os.remove`` in their
+  # finally blocks on processing errors.  The invariant is that this code is
+  # unreachable before validation succeeds — i.e. an attacker cannot trigger
+  # deletion of an arbitrary path by supplying an invalid file_path.
+  # -------------------------------------------------------------------------
+
+  def test_os_remove_not_called_when_guess_metadata_path_is_invalid(self, monkeypatch):
+    """Invariant: a rejected local path must not trigger os.remove.
+
+    Without path validation, a processing error on an attacker-supplied path
+    would cause the finally block to delete that path.  Validation must fire
+    before the finally block is reachable.
+
+    We patch ``os.remove`` as seen by the ``operations`` module (where the
+    call site lives), not the global ``os`` module."""
+    removed_paths = []
+    monkeypatch.setattr(operations.os, "remove", lambda p: removed_paths.append(p))
+
+    schema = GuessFileMetadataSchema(file_path="/proc/self/environ", import_type="local")
+
+    with pytest.raises(ValueError):
+      operations.guess_file_metadata(data=schema, username=_username())
+
+    assert not removed_paths, f"Security invariant violated: os.remove was called with paths: {removed_paths}"
+
+  def test_os_remove_not_called_when_preview_path_is_invalid(self, monkeypatch):
+    """Same os.remove invariant for preview_file."""
+    removed_paths = []
+    monkeypatch.setattr(operations.os, "remove", lambda p: removed_paths.append(p))
+
+    schema = PreviewFileSchema(
+      file_path="/proc/self/environ",
+      file_type="csv",
+      import_type="local",
+      sql_dialect="hive",
+      has_header=False,
+    )
+
+    with pytest.raises(ValueError):
+      operations.preview_file(data=schema, username=_username())
+
+    assert not removed_paths, f"Security invariant violated: os.remove was called with paths: {removed_paths}"
+
+  # -------------------------------------------------------------------------
+  # CONTRACT: Remote paths bypass local confinement entirely
+  #
+  # The path-confinement check is local-only.  Remote paths (HDFS, S3, ABFS)
+  # must not be incorrectly blocked by the tmpdir check.
+  # -------------------------------------------------------------------------
+
+  def test_remote_import_type_bypasses_local_path_validation(self, monkeypatch):
+    """import_type=remote must not trigger the local tmpdir confinement check.
+
+    Contract: the guard is local-only.  A path like ``/proc/self/environ``
+    with ``import_type=remote`` should fail at the remote-FS layer, not at
+    path validation — because remote paths are not opened from the local
+    filesystem."""
+    # We verify that validate_local_file_path is NOT called for remote paths
+    validation_calls = []
+    real_validate = operations.validate_local_file_path
+
+    def tracking_validate(path, username):
+      validation_calls.append(path)
+      return real_validate(path, username)
+
+    monkeypatch.setattr(operations, "validate_local_file_path", tracking_validate)
+
+    schema = GuessFileMetadataSchema(file_path="s3a://bucket/data/file.csv", import_type="remote")
+
+    # The call will fail at the remote-FS layer (no real FS available in tests)
+    # — what matters is that validate_local_file_path was not called.
+    with pytest.raises(Exception):
+      operations.guess_file_metadata(data=schema, username=_username())
+
+    assert not validation_calls, "validate_local_file_path must not be called for import_type=remote"
