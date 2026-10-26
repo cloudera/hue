@@ -12,10 +12,9 @@ Be fast and simple:
 
 ### Python
 
-Similar to the [Docker Hue](/tools/docker/hue). Currently doing only Python 3.8 and 3.9, but we should test the Python 3.10+ build and run the tests.
+Similar to the [Docker Hue](/tools/docker/hue). GitHub Actions validates the build and unit tests on Python 3.11.
 
-* Python 3.8
-* Python 3.9
+* Python 3.11
 
 The docker images could be forked for QA and comes with a series of flags.
 

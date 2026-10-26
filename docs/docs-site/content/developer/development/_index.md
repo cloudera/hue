@@ -13,7 +13,7 @@ This section goes into greater detail on how to build and reuse the components o
 ### Dependencies
 
 * The OS specific packages are listed in the [install guide](/administrator/installation/dependencies/)
-* Python 3.8/3.9 and Django 3.2
+* Python 3.11
 * Vue.js 3
 * Node.js ([20.0+](https://deb.nodesource.com/setup_20.x))
 
@@ -21,8 +21,7 @@ This section goes into greater detail on how to build and reuse the components o
 
 Build once:
 
-    # If you are using Python 3.8, set PYTHON_VER before the build, like
-    export PYTHON_VER=python3.8
+    export PYTHON_VER=python3.11
 
     # Mac user might need to set
     export SKIP_PYTHONDEV_CHECK=true
@@ -217,7 +216,7 @@ Once we get ship it from at least two reviewer, we can push the changes to maste
 
 * The push will auto run the tests and push it to master
 * It can be seen on https://github.com/cloudera/hue/actions
-  * Two builds should be green - One for Python 3.8 and another for Python 3.9
+  * Python 3 CI should be green on Python 3.11
   * If successful, the change would be auto merged to master
   * On failure, we will get a mail
   * Runs usually take 10-20 min
@@ -752,7 +751,7 @@ Publish Github NPM package and Docker images at https://github.com/orgs/cloudera
 Building the tarball release:
 
     git checkout -b release-4.11.0 release-4.11.0
-    export PYTHON_VER=python3.8
+    export PYTHON_VER=python3.11
     make prod
 
 You might need to upgrade the [Mysqlclient](https://docs.gethue.com/administrator/installation/dependencies/#mysql--mariadb) if seeing:

@@ -958,7 +958,7 @@ namespace. See ``apps/about/src/about/urls.py`` for an example.
 ### Dependencies
 
 * The OS specific dependencies listed [here](https://docs.gethue.com/admin-manual/manual.html)
-* Python 3.8 or Python 3.9
+* Python 3.11
 * Django (3.2 included with our distribution)
 * Hadoop (Apache Hadoop 2+)
 * Java (Java 1.8)
