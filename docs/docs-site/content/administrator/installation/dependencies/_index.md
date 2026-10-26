@@ -12,8 +12,6 @@ You will need Python, some OS packages, a Database and Node.js.
 Hue employs some Python modules which use native code and requires certain development libraries be installed on your system. To install from the tarball, you'll need these library development packages and tools installed on your system:
 
 Versions supported:
-* Python 3.8
-* Python 3.9
 * Python 3.11
 ```
 # If you are using Python 3.11, set PYTHON_VER before the build, like
@@ -117,7 +115,7 @@ There is more details on this [Apply Temporary Workaround for Oracle 12 Client](
 
 With Python 3, also:
 
-    sudo apt-get install python3.8-dev python3-distutils
+    sudo apt-get install python3.11-dev python3-distutils
 
 
 ### CentOS/RHEL
@@ -186,8 +184,7 @@ This is a verified step-by-step guide on how to get Hue up and running on a fres
 
    - For Apple Silicon (M1, M2, M3), Python 3.11 is recommended as of June 2025. You can install Python 3.11 either via Homebrew or by direct download from python.org—both options will work, but the direct download is preferred and tested.
 
->**Note:** By default, Hue will use the highest available Python version on your system. If you want to use a specific lower Python version (such as Python 3.8 or 3.9), set the `PYTHON_VER` environment variable before building. 
-For Python 3.11, use `./build/env/bin/hue` as the command path. For Python versions lower than 3.11, the command path will be `./build/venvs/python3.x/bin/hue`, where `python3.x` matches your `PYTHON_VER` setting. Adjust all related commands accordingly if you use a lower Python version. Both options will work as long as you use the correct path for your Python version.
+>**Note:** Hue requires Python 3.11. Set `export PYTHON_VER=python3.11` before building and use `./build/env/bin/hue` for Hue commands.
 
 8. Install node and npm (unless already present) using nvm or brew
 

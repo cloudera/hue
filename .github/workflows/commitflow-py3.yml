@@ -11,10 +11,6 @@ jobs:
   hue-build-and-tests:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        python-version: ['3.9', '3.10', '3.11']
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,10 +21,10 @@ jobs:
         run: |
           ./tools/ci/check_for_commit_message.sh
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: '3.11'
 
       - name: Cache pip
         uses: actions/cache@v4
@@ -51,29 +47,20 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential asciidoc libkrb5-dev libldap2-dev libsasl2-dev libxslt-dev libsasl2-modules-gssapi-mit libsnappy-dev libgdbm-dev
 
-          export PYTHON_VER=python${{ matrix.python-version }}
+          export PYTHON_VER=python3.11
           export SKIP_PYTHONDEV_CHECK=true
           export ROOT=$PWD
           make apps test_prep
 
       - name: Run unit tests
         run: |
-          if [[ "${{ matrix.python-version }}" == "3.11" ]]; then
-            ./build/env/bin/pytest
-          else
-            ./build/venvs/python${{ matrix.python-version }}/bin/pytest
-          fi
+          ./build/env/bin/pytest
 
       - name: Run python lint check
         run: |
-          if [[ "${{ matrix.python-version }}" == "3.11" ]]; then
-            PYTHONWARNINGS=always ./build/env/bin/hue runruff check
-          else
-            PYTHONWARNINGS=always ./build/venvs/python${{ matrix.python-version }}/bin/hue runruff check
-          fi
+          PYTHONWARNINGS=always ./build/env/bin/hue runruff check
 
       - name: Upload reports
-        if: matrix.python-version == '3.11'
         uses: actions/upload-artifact@v4
         with:
           name: hue-reports
