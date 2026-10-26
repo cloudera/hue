@@ -56,15 +56,17 @@ def validate_local_upload_path(path, username):
     The check has three layers:
       1. The resolved path must be inside the system temp directory
          (defeats path-traversal / symlink attacks).
-      2. The filename must match the pattern stamped by upload_local_file:
-         {username}_{uuid4}:{safe_name};{random}.csv
-         (defeats an attacker who manages to place a file in /tmp).
-      3. The filename must start with the requesting user's username followed
-         by '_' (prevents one user from accessing another user's uploaded file).
+      2. The resolved path must be a regular file (not a directory or special node).
+      3. The basename must start with ``{username}_``, matching temp files created by
+         ``upload_local_file`` and ``local_file_upload`` (prevents cross-user access
+         and arbitrary reads of other files under the temp directory).
 
     Raises ValueError with a safe message on any violation.
     Returns the resolved absolute path string on success.
     """
+    if not username:
+        raise ValueError('Username is required.')
+
     real_path = os.path.realpath(os.path.abspath(path))
     tmp_dir = os.path.realpath(tempfile.gettempdir())
 

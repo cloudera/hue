@@ -33,6 +33,7 @@ from desktop.lib.importer.schemas import (
   PreviewFileSchema,
   SqlTypeMapperSchema,
 )
+from desktop.lib.importer.utils import validate_local_file_path
 from filebrowser.utils import get_user_fs
 
 LOG = logging.getLogger()
@@ -192,14 +193,22 @@ def guess_file_metadata(data: GuessFileMetadataSchema, username: str) -> Dict[st
 
   fs = get_user_fs(username) if data.import_type == "remote" else None
 
-  # Check if file exists based on import type
-  if data.import_type == "local" and not os.path.exists(data.file_path):
-    raise ValueError(f"Local file does not exist: {data.file_path}")
-  elif data.import_type == "remote" and not fs.exists(data.file_path):
-    raise ValueError(f"Remote file does not exist: {data.file_path}")
+  # For local files, validate the path is a legitimately uploaded temp file
+  # before touching the filesystem.  This prevents arbitrary file reads and,
+  # via the os.remove in the finally block, arbitrary file deletions.
+
+  # resolved_path is the symlink-collapsed real path returned by the validator;
+  # it may differ from data.file_path if the client supplied a path with
+  # symlink components or redundant separators.
+  if data.import_type == "local":
+    resolved_path = validate_local_file_path(data.file_path, username)
+  else:
+    if not fs.exists(data.file_path):
+      raise ValueError(f"Remote file does not exist: {data.file_path}")
+    resolved_path = data.file_path
 
   should_cleanup = False
-  fh = open(data.file_path, "rb") if data.import_type == "local" else fs.open(data.file_path, "r")
+  fh = open(resolved_path, "rb") if data.import_type == "local" else fs.open(resolved_path, "r")
 
   try:
     sample = fh.read(16 * 1024)  # Read 16 KiB sample
@@ -227,9 +236,9 @@ def guess_file_metadata(data: GuessFileMetadataSchema, username: str) -> Dict[st
 
   finally:
     fh.close()
-    if data.import_type == "local" and should_cleanup and os.path.exists(data.file_path):
-      LOG.debug(f"Due to error in guess_file_metadata, cleaning up uploaded local file: {data.file_path}")
-      os.remove(data.file_path)
+    if data.import_type == "local" and should_cleanup and os.path.exists(resolved_path):
+      LOG.debug(f"Due to error in guess_file_metadata, cleaning up uploaded local file: {resolved_path}")
+      os.remove(resolved_path)
 
 
 def preview_file(data: PreviewFileSchema, username: str, preview_rows: int = 50) -> Dict[str, Any]:
@@ -258,14 +267,22 @@ def preview_file(data: PreviewFileSchema, username: str, preview_rows: int = 50)
 
   fs = get_user_fs(username) if data.import_type == "remote" else None
 
-  # Check if file exists based on import type
-  if data.import_type == "local" and not os.path.exists(data.file_path):
-    raise ValueError(f"Local file does not exist: {data.file_path}")
-  elif data.import_type == "remote" and not fs.exists(data.file_path):
-    raise ValueError(f"Remote file does not exist: {data.file_path}")
+  # For local files, validate the path is a legitimately uploaded temp file
+  # before touching the filesystem.  This prevents arbitrary file reads and,
+  # via the os.remove in the finally block, arbitrary file deletions.
+
+  # resolved_path is the symlink-collapsed real path returned by the validator;
+  # it may differ from data.file_path if the client supplied a path with
+  # symlink components or redundant separators.
+  if data.import_type == "local":
+    resolved_path = validate_local_file_path(data.file_path, username)
+  else:
+    if not fs.exists(data.file_path):
+      raise ValueError(f"Remote file does not exist: {data.file_path}")
+    resolved_path = data.file_path
 
   should_cleanup = False
-  fh = open(data.file_path, "rb") if data.import_type == "local" else fs.open(data.file_path, "r")
+  fh = open(resolved_path, "rb") if data.import_type == "local" else fs.open(resolved_path, "r")
 
   try:
     if data.file_type == "excel":
@@ -283,9 +300,9 @@ def preview_file(data: PreviewFileSchema, username: str, preview_rows: int = 50)
 
   finally:
     fh.close()
-    if data.import_type == "local" and should_cleanup and os.path.exists(data.file_path):
-      LOG.debug(f"Due to error in preview_file, cleaning up uploaded local file: {data.file_path}")
-      os.remove(data.file_path)
+    if data.import_type == "local" and should_cleanup and os.path.exists(resolved_path):
+      LOG.debug(f"Due to error in preview_file, cleaning up uploaded local file: {resolved_path}")
+      os.remove(resolved_path)
 
 
 def _detect_file_type(file_sample: bytes) -> str:
@@ -571,13 +588,18 @@ def guess_file_header(data: GuessFileHeaderSchema, username: str) -> bool:
 
   fs = get_user_fs(username) if data.import_type == "remote" else None
 
-  # Check if file exists based on import type
-  if data.import_type == "local" and not os.path.exists(data.file_path):
-    raise ValueError(f"Local file does not exist: {data.file_path}")
-  elif data.import_type == "remote" and not fs.exists(data.file_path):
-    raise ValueError(f"Remote file does not exist: {data.file_path}")
+  # For local files, validate the path is a legitimately uploaded temp file
+  # before touching the filesystem.  This prevents arbitrary file reads.
 
-  fh = open(data.file_path, "rb") if data.import_type == "local" else fs.open(data.file_path, "r")
+  # resolved_path is the symlink-collapsed real path returned by the validator.
+  if data.import_type == "local":
+    resolved_path = validate_local_file_path(data.file_path, username)
+  else:
+    if not fs.exists(data.file_path):
+      raise ValueError(f"Remote file does not exist: {data.file_path}")
+    resolved_path = data.file_path
+
+  fh = open(resolved_path, "rb") if data.import_type == "local" else fs.open(resolved_path, "r")
 
   has_header = False
 

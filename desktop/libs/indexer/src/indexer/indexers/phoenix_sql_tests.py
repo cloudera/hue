@@ -14,17 +14,19 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
-# limitations under the License.from indexer.indexers.phoenix_sql import PhoenixIndexer
+# limitations under the License.
 
-import sys
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import Mock, patch
+
+import pytest
 
 from desktop.settings import BASE_DIR
 from indexer.indexers.phoenix_sql import PhoenixIndexer
 
 
 def test_create_table_phoenix():
-  with patch('indexer.indexers.phoenix_sql.get_ordered_interpreters') as get_ordered_interpreters:
+  with patch('indexer.indexers.phoenix_sql.get_ordered_interpreters') as get_ordered_interpreters, \
+       patch('indexer.indexers.phoenix_sql.validate_local_upload_path', side_effect=lambda path, username: path):
     get_ordered_interpreters.return_value = [{'Name': 'Phoenix', 'dialect': 'phoenix', 'type': 'phoenix'}]
     source = {
       'inputFormat': 'localfile',
@@ -76,3 +78,28 @@ UPSERT INTO test1 VALUES ('TX', 'Dallas', 1213825);
 UPSERT INTO test1 VALUES ('CA', 'San Jose', 912332);'''
 
     assert statement == sql
+
+
+def test_create_table_phoenix_rejects_arbitrary_local_path():
+  """Verify that a client-supplied path outside the upload directory is rejected."""
+  with patch('indexer.indexers.phoenix_sql.get_ordered_interpreters') as get_ordered_interpreters:
+    get_ordered_interpreters.return_value = [{'Name': 'Phoenix', 'dialect': 'phoenix', 'type': 'phoenix'}]
+    source = {
+      'inputFormat': 'localfile',
+      'path': '/etc/passwd',
+      'sourceType': 'phoenix',
+      'format': {'hasHeader': False}
+    }
+    destination = {
+      'name': 'default.lfi_test',
+      'columns': [{'name': 'line', 'type': 'varchar'}],
+      'sourceType': 'phoenix',
+      'indexerPrimaryKey': ['line'],
+      'indexerRunJob': True
+    }
+    request = Mock()
+    user = Mock()
+    user.username = 'testuser'
+
+    with pytest.raises(ValueError, match='Invalid local file path'):
+      PhoenixIndexer(user=user, fs=Mock()).create_table_from_file(request, source, destination)

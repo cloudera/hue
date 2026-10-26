@@ -38,7 +38,9 @@ class LocalFileUploadSchema(BaseModel):
     _, file_type = os.path.splitext(v)
     restricted_extensions = IMPORTER.RESTRICT_LOCAL_FILE_EXTENSIONS.get()
     if restricted_extensions and file_type.lower() in [ext.lower() for ext in restricted_extensions]:
-      raise ValueError(f'Uploading files with type "{file_type}" is not allowed. Hue is configured to restrict this type.')
+      raise ValueError(
+        f'Uploading files with type "{file_type}" is not allowed. Hue is configured to restrict this type.'
+      )
     return v
 
   @field_validator("filesize")
@@ -58,7 +60,8 @@ class GuessFileMetadataSchema(BaseModel):
 
   @field_validator("file_path")
   @classmethod
-  def file_path_not_blank(cls, v: str) -> str:
+  def validate_file_path(cls, v: str) -> str:
+    """Reject blank paths early; full confinement validation happens in the operation layer."""
     if not v or v.strip() == "":
       raise ValueError("File path cannot be empty or whitespace.")
     return v
@@ -77,7 +80,8 @@ class PreviewFileSchema(BaseModel):
 
   @field_validator("file_path")
   @classmethod
-  def file_path_not_blank(cls, v: str) -> str:
+  def validate_file_path(cls, v: str) -> str:
+    """Reject blank paths early; full confinement validation happens in the operation layer."""
     if not v or v.strip() == "":
       raise ValueError("File path cannot be empty or whitespace.")
     return v
@@ -130,7 +134,8 @@ class GuessFileHeaderSchema(BaseModel):
 
   @field_validator("file_path")
   @classmethod
-  def file_path_not_blank(cls, v: str) -> str:
+  def validate_file_path(cls, v: str) -> str:
+    """Reject blank paths early; full confinement validation happens in the operation layer."""
     if not v or v.strip() == "":
       raise ValueError("File path cannot be empty or whitespace.")
     return v
