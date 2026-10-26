@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
 import json
 import logging
 
@@ -39,7 +38,7 @@ from notebook.connectors.spark_shell import SparkConfiguration
 
 try:
   from oozie.models2 import WorkflowConfiguration as OozieWorkflowConfiguration
-except (ImportError, RuntimeError) as e:
+except (ImportError, RuntimeError):
   OozieWorkflowConfiguration = None
 
 
@@ -141,7 +140,7 @@ def delete_default_configuration(request):
     config = DefaultConfiguration.objects.get(id=config_id)
     assert_can_delete_configuration(request, config)
     config.delete()
-  except DefaultConfiguration.DoesNotExist as e:
+  except DefaultConfiguration.DoesNotExist:
     raise PopupException(_('Could not find configuration with ID: %d') % config_id)
 
   return JsonResponse({
@@ -222,7 +221,7 @@ def _update_default_and_group_configurations(configurations):
               try:
                 groups = Group.objects.filter(id__in=group_ids)
                 _save_configuration(app, properties, is_default=False, groups=groups)
-              except Group.DoesNotExist as e:
+              except Group.DoesNotExist:
                 raise PopupException(_('Could not find one or more groups with IDs: %s') % ', '.join(group_ids))
   except Exception as e:
     raise PopupException(_('Failed to update configurations: %s') % e)

@@ -16,14 +16,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
 import json
+from builtins import object
+
 import pytest
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
 from desktop.models import DefaultConfiguration
-
 from useradmin.models import get_default_user_group, User
 
 
@@ -42,10 +42,8 @@ class TestDefaultConfiguration(object):
     grant_access(self.admin.username, self.admin.username, "desktop")
     grant_access(self.user.username, self.user.username, "desktop")
 
-
   def teardown_method(self):
     DefaultConfiguration.objects.all().delete()
-
 
   def test_update_default_and_group_configurations(self):
     configuration = {
@@ -119,7 +117,6 @@ class TestDefaultConfiguration(object):
     config = DefaultConfiguration.objects.get(app='hive', groups__in=[self.group])
     assert config.properties_list == configuration['hive']['groups'][0]['properties'], config.properties_list
 
-
   def test_get_default_configurations(self):
     app = 'hive'
     properties = [
@@ -176,7 +173,7 @@ class TestDefaultConfiguration(object):
       'user_id': self.user.id})
     content = json.loads(response.content)
     assert content['status'] == 0, content
-    assert content['configuration'] == None, content
+    assert content['configuration'] is None, content
 
     # Creating a default configuration returns default
     response = self.client.post("/desktop/api/configurations/", {'configuration': json.dumps(configuration)})
@@ -187,8 +184,8 @@ class TestDefaultConfiguration(object):
     content = json.loads(response.content)
     assert content['status'] == 0, content
     assert content['configuration']['app'] == 'hive', content
-    assert content['configuration']['is_default'] == True, content
-    assert content['configuration']['user'] == None, content
+    assert content['configuration']['is_default'], content
+    assert content['configuration']['user'] is None, content
     assert content['configuration']['group_ids'] == [], content
     assert content['configuration']['properties'] == properties, content
 
@@ -222,8 +219,8 @@ class TestDefaultConfiguration(object):
     content = json.loads(response.content)
     assert content['status'] == 0, content
     assert content['configuration']['app'] == 'hive', content
-    assert content['configuration']['is_default'] == False, content
-    assert content['configuration']['user'] == None, content
+    assert not content['configuration']['is_default'], content
+    assert content['configuration']['user'] is None, content
     assert content['configuration']['group_ids'] == [self.group.id], content
     assert content['configuration']['properties'] == group_properties, content
 
@@ -244,7 +241,7 @@ class TestDefaultConfiguration(object):
     content = json.loads(response.content)
     assert content['status'] == 0, content
     assert content['configuration']['app'] == 'hive', content
-    assert content['configuration']['is_default'] == False, content
+    assert not content['configuration']['is_default'], content
     assert content['configuration']['user'] == self.user.username, content
     assert content['configuration']['group_ids'] == [], content
     assert content['configuration']['properties'] == user_properties, content
