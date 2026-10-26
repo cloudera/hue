@@ -19,12 +19,17 @@ import sys
 import json
 import logging
 
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import Group
 from django.db import transaction
 from django.db.models import Q
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
+from desktop.configuration.authorization import (
+  assert_can_delete_configuration,
+  require_configuration_admin,
+  resolve_target_user,
+)
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
@@ -60,6 +65,8 @@ def api_error_handler(func):
 
 @api_error_handler
 def default_configurations(request):
+  require_configuration_admin(request.user)
+
   if request.method == 'GET':  # get configurable apps
     configurations = _get_default_configurations()
 
@@ -87,13 +94,10 @@ def app_configuration_for_user(request):
     app = request.GET.get('app')
     user_id = request.GET.get('user_id')
 
-    if not app or not user_id:
+    if not app:
       raise PopupException(_('app_configuration_for_user requires app and user_id'))
 
-    user = User.objects.get(id=user_id)
-
-    if not user:
-      raise PopupException(_('Could not find user with User ID: %s') % user_id)
+    user = resolve_target_user(request, user_id)
 
     config = DefaultConfiguration.objects.get_configuration_for_user(app, user)
 
@@ -106,16 +110,13 @@ def app_configuration_for_user(request):
     user_id = request.POST.get('user_id')
     properties = json.loads(request.POST.get('properties'))
 
-    if not app or not user_id or not properties:
+    if not app or not properties:
       raise PopupException(_('app_configuration_for_user requires app, user_id, and properties'))
 
-    try:
-      user = User.objects.get(id=int(user_id))
-    except User.DoesNotExist as e:
-      raise PopupException(_('Could not find user with ID: %s') % user_id)
+    user = resolve_target_user(request, user_id)
 
     config = _save_configuration(app, properties, is_default=False, user=user)
-    LOG.info('Saved user configuration for app: %s and group_id: %s' % (app, user_id))
+    LOG.info('Saved user configuration for app: %s and user_id: %s' % (app, user.id))
 
     response = {
       'status': 0,
@@ -138,6 +139,7 @@ def delete_default_configuration(request):
   try:
     config_id = int(config_id)
     config = DefaultConfiguration.objects.get(id=config_id)
+    assert_can_delete_configuration(request, config)
     config.delete()
   except DefaultConfiguration.DoesNotExist as e:
     raise PopupException(_('Could not find configuration with ID: %d') % config_id)

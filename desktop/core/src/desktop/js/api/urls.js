@@ -30,7 +30,7 @@ export const GIT_API_PREFIX = '/desktop/api/vcs/contents/';
 export const S3_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('s3a://');
 export const GS_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('gs://');
 export const IMPALA_INVALIDATE_API = '/impala/api/invalidate';
-export const CONFIG_SAVE_API = '/desktop/api/configurations/save/';
+export const CONFIG_SAVE_API = '/desktop/api/configurations/user/';
 export const CONFIG_APPS_API = '/desktop/api/configurations';
 export const SOLR_COLLECTIONS_API = '/indexer/api/indexes/list/';
 export const SOLR_FIELDS_API = '/indexer/api/index/list/';
