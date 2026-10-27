@@ -16,9 +16,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
 import json
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import Mock, patch
 
 import pytest
 from django.http import HttpResponse
@@ -26,7 +25,9 @@ from django.urls import reverse
 
 from desktop.api_public import get_django_request
 from desktop.conf import CUSTOM
+from desktop.configuration.authorization import HUE_ADMIN_REQUIRED_API_MESSAGE
 from desktop.lib.django_test_util import Client, make_logged_in_client
+from desktop.lib.test_utils import grant_access
 from useradmin.models import User
 
 
@@ -51,6 +52,36 @@ class TestCoreApi():
         assert json_resp['system'] == system_banner
       finally:
         done()
+
+
+@pytest.mark.django_db
+class TestCheckConfigPublicApi(object):
+  def setup_method(self):
+    self.unauthorized_client = Client()
+    self.admin_client = make_logged_in_client(username='check_config_admin', recreate=True, is_superuser=True)
+    self.user_client = make_logged_in_client(username='check_config_user', recreate=True, is_superuser=False)
+    grant_access('check_config_admin', 'check_config_admin', 'desktop')
+    grant_access('check_config_user', 'check_config_user', 'desktop')
+
+  def test_check_config_requires_authentication(self):
+    response = self.unauthorized_client.get(reverse('api:core_check_config'))
+    assert response.status_code in (401, 403)
+
+  def test_check_config_denied_for_non_admin(self):
+    with patch('desktop.api2._get_config_errors') as mock_get_config_errors:
+      response = self.user_client.get(reverse('api:core_check_config'))
+
+      assert response.status_code == 403
+      assert json.loads(response.content) == {'message': HUE_ADMIN_REQUIRED_API_MESSAGE}
+      mock_get_config_errors.assert_not_called()
+
+  def test_check_config_allowed_for_admin(self):
+    with patch('desktop.api2._get_config_errors', return_value=[]):
+      with patch('desktop.api2.os.path.realpath', return_value='/hue/conf'):
+        response = self.admin_client.get(reverse('api:core_check_config'))
+
+        assert response.status_code == 200
+        assert json.loads(response.content) == {'hue_config_dir': '/hue/conf', 'config_errors': []}
 
 
 @pytest.mark.django_db
@@ -86,7 +117,7 @@ class TestEditorApi():
 
       execute.assert_called()
       if not execute.call_args.args[1]:
-        raise SkipTest()  # Incorrect in Py3 CircleCi
+        pytest.skip('Incorrect in Py3 CircleCi')
       assert execute.call_args.args[1] == 'hive'
       json.loads(execute.call_args.args[0].POST['notebook'])
       json.loads(execute.call_args.args[0].POST['snippet'])

@@ -53,6 +53,7 @@ from desktop.conf import (
   IMPORTER,
   TASK_SERVER_V2,
 )
+from desktop.configuration.authorization import deny_unless_hue_admin
 from desktop.lib.conf import BoundContainer, GLOBAL_CONFIG, is_anonymous
 from desktop.lib.connectors.models import Connector
 from desktop.lib.django_util import JsonResponse, login_notrequired, render
@@ -1463,9 +1464,9 @@ def _paginate(request, queryset):
 @api_error_handler
 def available_app_examples(request):
   """Returns a dictionary of available apps whose examples can be installed by the admin user."""
-
-  if not is_admin(request.user):
-    return JsonResponse({'message': "You must be a Hue admin to access this endpoint."}, status=403)
+  denied = deny_unless_hue_admin(request)
+  if denied:
+    return denied
 
   supported_app_examples = {'hive', 'impala', 'hbase', 'pig', 'oozie', 'notebook', 'search', 'spark', 'jobsub'}
 
@@ -1481,8 +1482,9 @@ def install_app_examples(request):
   if not app_name:
     return JsonResponse({'message': "Missing parameter: app_name is required."}, status=400)
 
-  if not is_admin(request.user):
-    return JsonResponse({'message': "You must be a Hue admin to access this endpoint."}, status=403)
+  denied = deny_unless_hue_admin(request)
+  if denied:
+    return denied
 
   # Define supported apps and their setup functions
   setup_functions = {
@@ -1563,7 +1565,16 @@ def _setup_search_examples(request):
 
 @api_error_handler
 def check_config(request):
-  """Returns the configuration directory and the list of validation errors."""
+  """
+  Return the Hue configuration directory and configuration validation errors.
+
+  Hue admins only; non-admins must not receive server paths or internal service topology
+  (see ``/desktop/debug/check_config``, which uses the same ``is_admin`` gate).
+  """
+  denied = deny_unless_hue_admin(request)
+  if denied:
+    return denied
+
   response = {
     'hue_config_dir': os.path.realpath(os.getenv("HUE_CONF_DIR", get_desktop_root("conf"))),
     'config_errors': _get_config_errors(request, cache=False),

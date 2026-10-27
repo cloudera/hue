@@ -816,7 +816,7 @@ class TestAvailableAppExamplesAPI:
     nice_name: str
 
   def test_available_app_examples_success(self):
-    with patch("desktop.api2.is_admin") as mock_is_admin:
+    with patch("desktop.configuration.authorization.is_admin") as mock_is_admin:
       with patch("desktop.api2.appmanager.get_apps") as mock_get_apps:
         request = Mock(method="GET", user=Mock())
 
@@ -833,7 +833,7 @@ class TestAvailableAppExamplesAPI:
         assert json.loads(response.content) == {"apps": {"hive": "Hive", "impala": "Impala"}}
 
   def test_available_app_examples_non_admin(self):
-    with patch("desktop.api2.is_admin") as mock_is_admin:
+    with patch("desktop.configuration.authorization.is_admin") as mock_is_admin:
       request = Mock(method="GET", user=Mock())
       mock_is_admin.return_value = False
 
@@ -843,7 +843,7 @@ class TestAvailableAppExamplesAPI:
       assert json.loads(response.content) == {"message": "You must be a Hue admin to access this endpoint."}
 
   def test_available_app_examples_no_apps(self):
-    with patch("desktop.api2.is_admin") as mock_is_admin:
+    with patch("desktop.configuration.authorization.is_admin") as mock_is_admin:
       with patch("desktop.api2.appmanager.get_apps") as mock_get_apps:
         mock_is_admin.return_value = True
         mock_get_apps.return_value = []
@@ -856,7 +856,7 @@ class TestAvailableAppExamplesAPI:
         assert json.loads(response.content) == {"apps": {}}
 
   def test_available_app_examples_only_unsupported_apps(self):
-    with patch("desktop.api2.is_admin") as mock_is_admin:
+    with patch("desktop.configuration.authorization.is_admin") as mock_is_admin:
       with patch("desktop.api2.appmanager.get_apps") as mock_get_apps:
         mock_is_admin.return_value = True
 
@@ -889,7 +889,7 @@ class TestInstallAppExampleAPI:
     assert json.loads(response.content.decode("utf-8"))["message"] == "Unsupported app name: test_app"
 
   def test_install_app_examples_non_admin_user(self):
-    with patch("desktop.api2.is_admin") as mock_is_admin:
+    with patch("desktop.configuration.authorization.is_admin") as mock_is_admin:
       mock_is_admin.return_value = False
 
       request = Mock(method="POST", POST={"app_name": "hive"}, user=Mock())
@@ -899,7 +899,7 @@ class TestInstallAppExampleAPI:
       assert json.loads(response.content.decode("utf-8"))["message"] == "You must be a Hue admin to access this endpoint."
 
   def test_install_app_examples_success_hive(self):
-    with patch("desktop.api2.is_admin") as mock_is_admin:
+    with patch("desktop.configuration.authorization.is_admin") as mock_is_admin:
       with patch("desktop.api2._setup_hive_impala_examples") as mock_setup_hive_impala_examples:
         mock_is_admin.return_value = True
         mock_setup_hive_impala_examples.return_value = None
@@ -911,7 +911,7 @@ class TestInstallAppExampleAPI:
         assert json.loads(response.content.decode("utf-8"))["message"] == "Successfully installed examples for hive."
 
   def test_install_app_examples_success_impala(self):
-    with patch("desktop.api2.is_admin") as mock_is_admin:
+    with patch("desktop.configuration.authorization.is_admin") as mock_is_admin:
       with patch("desktop.api2._setup_hive_impala_examples") as mock_setup_hive_impala_examples:
         mock_is_admin.return_value = True
         mock_setup_hive_impala_examples.return_value = None
@@ -1001,25 +1001,40 @@ class TestInstallAppExampleAPI:
 
 class TestCheckConfigAPI:
   def test_check_config_success(self):
-    with patch("desktop.api2.os.path.realpath") as mock_hue_conf_dir:
-      with patch("desktop.api2._get_config_errors") as mock_get_config_errors:
-        request = Mock(method="GET")
-        mock_hue_conf_dir.return_value = "/test/hue/conf"
-        mock_get_config_errors.return_value = [
-          {"name": "Hive", "message": "The application won't work without a running HiveServer2."},
-          {"name": "Impala", "message": "No available Impalad to send queries to."},
-          {"name": "Spark", "message": "The app won't work without a running Livy Spark Server"},
-        ]
-
-        response = check_config(request)
-        response_data = json.loads(response.content)
-
-        assert response.status_code == 200
-        assert response_data == {
-          "hue_config_dir": "/test/hue/conf",
-          "config_errors": [
+    with patch("desktop.configuration.authorization.is_admin") as mock_is_admin:
+      with patch("desktop.api2.os.path.realpath") as mock_hue_conf_dir:
+        with patch("desktop.api2._get_config_errors") as mock_get_config_errors:
+          mock_is_admin.return_value = True
+          request = Mock(method="GET", user=Mock())
+          mock_hue_conf_dir.return_value = "/test/hue/conf"
+          mock_get_config_errors.return_value = [
             {"name": "Hive", "message": "The application won't work without a running HiveServer2."},
             {"name": "Impala", "message": "No available Impalad to send queries to."},
             {"name": "Spark", "message": "The app won't work without a running Livy Spark Server"},
-          ],
-        }
+          ]
+
+          response = check_config(request)
+          response_data = json.loads(response.content)
+
+          assert response.status_code == 200
+          assert response_data == {
+            "hue_config_dir": "/test/hue/conf",
+            "config_errors": [
+              {"name": "Hive", "message": "The application won't work without a running HiveServer2."},
+              {"name": "Impala", "message": "No available Impalad to send queries to."},
+              {"name": "Spark", "message": "The app won't work without a running Livy Spark Server"},
+            ],
+          }
+          mock_get_config_errors.assert_called_once()
+
+  def test_check_config_non_admin(self):
+    with patch("desktop.configuration.authorization.is_admin") as mock_is_admin:
+      with patch("desktop.api2._get_config_errors") as mock_get_config_errors:
+        mock_is_admin.return_value = False
+        request = Mock(method="GET", user=Mock())
+
+        response = check_config(request)
+
+        assert response.status_code == 403
+        assert json.loads(response.content) == {"message": "You must be a Hue admin to access this endpoint."}
+        mock_get_config_errors.assert_not_called()
