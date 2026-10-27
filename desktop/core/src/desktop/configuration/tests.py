@@ -18,9 +18,11 @@
 
 import json
 from builtins import object
+from unittest.mock import Mock, patch
 
 import pytest
 
+from desktop.configuration.authorization import deny_unless_hue_admin, HUE_ADMIN_REQUIRED_API_MESSAGE
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
 from desktop.models import DefaultConfiguration
@@ -250,8 +252,10 @@ class TestDefaultConfiguration(object):
 @pytest.mark.django_db
 class TestConfigurationAuthorization(object):
   """
-  Regression tests for ISEC-V2026-03: DefaultConfiguration API must not allow IDOR on user_id or
-  unprivileged access to global default/group configuration.
+  Regression tests for configuration authorization (ISEC-V2026-03, ISEC-V2026-04).
+
+  DefaultConfiguration API must not allow IDOR on user_id or unprivileged access to global
+  default/group configuration. ``deny_unless_hue_admin`` must gate admin-only diagnostics APIs.
   """
 
   def setup_method(self):
@@ -384,3 +388,13 @@ class TestConfigurationAuthorization(object):
     content = json.loads(response.content)
     assert content['status'] == 0, content
     assert not DefaultConfiguration.objects.filter(id=user_config.id).exists()
+
+  def test_deny_unless_hue_admin_allows_admin(self):
+    with patch('desktop.configuration.authorization.is_admin', return_value=True):
+      assert deny_unless_hue_admin(Mock(user=Mock())) is None
+
+  def test_deny_unless_hue_admin_blocks_non_admin(self):
+    with patch('desktop.configuration.authorization.is_admin', return_value=False):
+      response = deny_unless_hue_admin(Mock(user=Mock()))
+      assert response.status_code == 403
+      assert json.loads(response.content)['message'] == HUE_ADMIN_REQUIRED_API_MESSAGE

@@ -16,17 +16,37 @@
 # limitations under the License.
 
 """
-Authorization for DefaultConfiguration REST endpoints.
+Authorization for configuration-related REST and diagnostics APIs.
 
-Non-admin users may only read and write their own user-specific configuration rows.
-Default and group-wide configuration management requires a Hue admin (``is_admin``).
+DefaultConfiguration endpoints: non-admins may only access their own user-specific rows;
+default and group-wide configuration requires a Hue admin (``is_admin``).
+
+Admin-only diagnostics (e.g. ``check_config``) use :func:`deny_unless_hue_admin` for HTTP 403
+responses consistent with other public API v1 admin endpoints.
 """
 
 from django.contrib.auth.models import User
 from django.utils.translation import gettext as _
 
 from desktop.auth.backend import is_admin
+from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
+
+# Shared with ``available_app_examples``, ``install_app_examples``, and ``check_config``.
+HUE_ADMIN_REQUIRED_API_MESSAGE = "You must be a Hue admin to access this endpoint."
+
+
+def deny_unless_hue_admin(request):
+  """
+  Guard for JSON handlers exposed on the public API (DRF) that must match legacy admin views.
+
+  Uses the same ``is_admin`` check as ``@admin_required`` on ``/desktop/debug/check_config``.
+
+  :return: ``JsonResponse`` with HTTP 403 when the caller is not a Hue admin, otherwise ``None``.
+  """
+  if not is_admin(request.user):
+    return JsonResponse({"message": HUE_ADMIN_REQUIRED_API_MESSAGE}, status=403)
+  return None
 
 
 def require_configuration_admin(user):
@@ -48,23 +68,23 @@ def resolve_target_user(request, user_id):
   :return: ``User`` instance.
   :raises PopupException: Invalid id, unknown user, or cross-user access without admin rights.
   """
-  if user_id is None or str(user_id).strip() == '':
-    raise PopupException(_('app_configuration_for_user requires app and user_id'))
+  if user_id is None or str(user_id).strip() == "":
+    raise PopupException(_("app_configuration_for_user requires app and user_id"))
 
   try:
     requested_id = int(user_id)
   except (TypeError, ValueError):
-    raise PopupException(_('Invalid user_id.'))
+    raise PopupException(_("Invalid user_id."))
 
   if is_admin(request.user):
     try:
       return User.objects.get(id=requested_id)
     except User.DoesNotExist:
-      raise PopupException(_('Could not find user with User ID: %s') % requested_id)
+      raise PopupException(_("Could not find user with User ID: %s") % requested_id)
 
   if requested_id != request.user.id:
     raise PopupException(
-      _('You do not have permission to access configuration for this user.'),
+      _("You do not have permission to access configuration for this user."),
       error_code=403,
     )
 
@@ -87,7 +107,7 @@ def assert_can_delete_configuration(request, config):
   if config.user_id is not None:
     if config.user_id != request.user.id and not is_admin(request.user):
       raise PopupException(
-        _('You do not have permission to delete this configuration.'),
+        _("You do not have permission to delete this configuration."),
         error_code=403,
       )
     return
