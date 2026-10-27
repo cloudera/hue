@@ -116,7 +116,7 @@ class TestRequirementsGenerator:
       generator.requirements = ["Django==4.1.13"]
       generator.local_requirements = []
       generator.arch_requirements_map = {
-        "x86_64": {"default": ["cryptography==42.0.8"], "3.11": ["Markdown==3.8", "numpy==1.24.4", "setuptools==80.9.0"]}
+        "x86_64": {"3.11": ["Markdown==3.8", "numpy==1.24.4", "setuptools==80.9.0"]}
       }
 
       # Mock copy_local_requirements for test isolation
@@ -143,7 +143,7 @@ class TestRequirementsGenerator:
       generator.arch = "unsupported_arch"
       generator.python_version_string = "3.11"
       generator.requirements = []
-      generator.arch_requirements_map = {"x86_64": {"default": []}, "aarch64": {"default": []}}
+      generator.arch_requirements_map = {"x86_64": {"3.11": []}, "aarch64": {"3.11": []}}
 
       with pytest.raises(ValueError) as exc_info:
         generator.generate_requirements()
@@ -180,7 +180,7 @@ class TestRequirementsGenerator:
       generator.python_version_string = "3.11"
       generator.requirements = []
       generator.local_requirements = ["boto-2.49.0", "django-axes-5.13.0"]
-      generator.arch_requirements_map = {"x86_64": {"default": [], "3.11": ["Markdown==3.8", "setuptools==80.9.0"]}}
+      generator.arch_requirements_map = {"x86_64": {"3.11": ["Markdown==3.8", "setuptools==80.9.0"]}}
 
       # Mock copy_local_requirements to return file paths
       local_reqs = [f"file://{self.temp_dir}/3.11/boto-2.49.0", f"file://{self.temp_dir}/3.11/django-axes-5.13.0"]

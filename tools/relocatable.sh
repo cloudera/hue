@@ -24,7 +24,7 @@ usage() {
   Usage:
     ./tools/relocatable.sh [python_version]
   Example:
-    ./tools/relocatable.sh python3.9
+    ./tools/relocatable.sh python3.11
   "
   exit 1
 }
@@ -95,8 +95,8 @@ export PATH=$(dirname $ENV_PYTHON):$PATH
 PYVER=$($ENV_PYTHON -V 2>&1 | awk '{print $2}' | cut -d '.' -f 1,2)
 BIN_DIR=$(dirname $SYS_PYTHON)
 # Step 1. Fix virtualenv
-if [[ "$PYVER" == "3."[8-9]* || "$PYVER" == "3.11" ]]; then
-  echo "Python version is 3.8 or greater"
+if [[ "$PYVER" == "3.11" ]]; then
+  echo "Python version is 3.11"
   pushd .
   cd $HUE_ROOT
   $SYS_PYTHON $BIN_DIR/virtualenv-make-relocatable "$BLD_DIR_ENV"

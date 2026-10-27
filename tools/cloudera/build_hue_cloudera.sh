@@ -37,13 +37,12 @@ BUILDTYPE=$1
 DOCKEROS=$2
 HUE_JAR_VERSION=$3
 
-PYTHON39_OSES=("centos7" "redhat8" "redhat8-arm64" "redhat9" "redhat9-arm64" "sles12" "ubuntu20")
-PYTHON311_OSES=("redhat8" "redhat8-arm64" "redhat9" "sles15" "ubuntu22" "ubuntu24" "redhat9-arm64")
+# All Cloudera packaging targets build Hue with Python 3.11 (see Makefile.vars).
+PYTHON311_OSES=(
+  "centos7" "redhat8" "redhat8-arm64" "redhat9" "redhat9-arm64"
+  "sles12" "sles15" "ubuntu18" "ubuntu20" "ubuntu22" "ubuntu24"
+)
 
-LATEST_PYTHON="python3.11"
-PYTHON_VERSIONS=("python3.11" "python3.9")
-
-export REQ_PYTHON39="3.9.16"
 export REQ_PYTHON311="3.11.12"
 
 export DESKTOP_VERSION=$DOCKEROS
@@ -55,31 +54,16 @@ export LD_RUN_PATH="/usr/local/lib:$ORACLE_INSTANTCLIENT19_PATH:$LD_RUN_PATH"
 export ORIGINAL_PATH=$PATH
 
 setup_python_env() {
-  local ver="$1" os="$2"
+  local os="$1"
 
-  case "$ver" in
-    python3.9)
-      if is_supported_os PYTHON39_OSES "$os"; then
-        export PYTHON39_PATH=${PYTHON39_PATH:=/opt/python/3.9.16}
-        if is_supported_python_version "$PYTHON39_PATH/bin/python3.9" $REQ_PYTHON39; then
-          export PATH="$PYTHON39_PATH/bin:$PATH"
-        else
-          unset PYTHON39_PATH
-        fi
-      fi
-      ;;
-    python3.11)
-      if is_supported_os PYTHON311_OSES "$os"; then
-        export PYTHON311_PATH=${PYTHON311_PATH:=/opt/python/3.11.12}
-        if is_supported_python_version "$PYTHON311_PATH/bin/python3.11" $REQ_PYTHON311; then
-          export PATH="$PYTHON311_PATH/bin:$PATH"
-        else
-          unset PYTHON311_PATH
-        fi
-      fi
-      ;;
-    *) echo "Unsupported python version: $ver"; exit 1 ;;
-  esac
+  if is_supported_os PYTHON311_OSES "$os"; then
+    export PYTHON311_PATH=${PYTHON311_PATH:=/opt/python/3.11.12}
+    if is_supported_python_version "$PYTHON311_PATH/bin/python3.11" $REQ_PYTHON311; then
+      export PATH="$PYTHON311_PATH/bin:$PATH"
+    else
+      unset PYTHON311_PATH
+    fi
+  fi
 }
 
 install_prerequisite() {
@@ -104,60 +88,34 @@ install_prerequisite() {
 }
 
 should_build_python() {
-  local ver="$1"
-  local os="$2"
-
-  case "$ver" in
-    python3.11)
-      is_supported_os PYTHON311_OSES "$os"
-      return $?
-      ;;
-    python3.9)
-      is_supported_os PYTHON39_OSES "$os"
-      return $?
-      ;;
-    *)
-      return 1
-      ;;
-  esac
-
-  return 1
+  local os="$1"
+  is_supported_os PYTHON311_OSES "$os"
 }
 
-for PYTHON_VER in "${PYTHON_VERSIONS[@]}"; do
-  setup_python_env "$PYTHON_VER" "$DOCKEROS"
-done
+setup_python_env "$DOCKEROS"
 
 big_console_header "Hue PreRequisite Start for $DOCKEROS"
 install_prerequisite "$DOCKEROS"
 big_console_header "Hue PreRequisite End for $DOCKEROS"
 
-THISPATH=$PATH
-for PYTHON_VER in "${PYTHON_VERSIONS[@]}"; do
+if should_build_python "$DOCKEROS"; then
   HUE_SRC=$(realpath "$WORK_DIR/../..")
   cd "$HUE_SRC" || exit 1
 
-  if should_build_python "$PYTHON_VER" "$DOCKEROS"; then
-    BLD_DIR="${BLD_DIR:-$HUE_SRC/build}"
-    BLD_DIR_ENV="$BLD_DIR/venvs/${PYTHON_VER}"
-    [[ "$PYTHON_VER" == "python3.11" || "$DOCKEROS" =~ (sles12|centos7|ubuntu20) ]] && BLD_DIR_ENV="$BLD_DIR/env"
-    echo "BLD_DIR_ENV=${BLD_DIR_ENV}"
+  BLD_DIR="${BLD_DIR:-$HUE_SRC/build}"
+  BLD_DIR_ENV="$BLD_DIR/env"
+  echo "BLD_DIR_ENV=${BLD_DIR_ENV}"
 
-    export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${ORACLE_INSTANTCLIENT19_PATH}
-    export PATH=$PYTHON39_PATH/bin:$PYTHON311_PATH/bin:/opt/sqlite3/bin:/usr/bin:$THISPATH
+  export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${ORACLE_INSTANTCLIENT19_PATH}
+  export PATH="${PYTHON311_PATH:+$PYTHON311_PATH/bin:}/opt/sqlite3/bin:/usr/bin:$ORIGINAL_PATH"
 
-    big_console_header "Hue Build Start for" "$PYTHON_VER" "$@"
-    BLD_DIR_ENV="$BLD_DIR_ENV" PYTHON_VER="$PYTHON_VER" make apps docs
-    BLD_DIR_ENV="$BLD_DIR_ENV" PYTHON_VER="$PYTHON_VER" make relocatable-env
-    BLD_DIR_ENV="$BLD_DIR_ENV" PYTHON_VER="$PYTHON_VER" make huecheck
-    big_console_header "Hue Build End for" "$PYTHON_VER" "$@"
-  fi
-done
+  big_console_header "Hue Build Start for python3.11" "$@"
+  BLD_DIR_ENV="$BLD_DIR_ENV" PYTHON_VER="python3.11" make apps docs
+  BLD_DIR_ENV="$BLD_DIR_ENV" PYTHON_VER="python3.11" make relocatable-env
+  BLD_DIR_ENV="$BLD_DIR_ENV" PYTHON_VER="python3.11" make huecheck
+  big_console_header "Hue Build End for python3.11" "$@"
+fi
 
 big_console_header "Hue PROD Build Start for" "$@"
-if [[ "$DOCKEROS" =~ (centos7|sles12|ubuntu18) ]]; then
-  PYTHON_VER="python3.9" make release
-else
-  PYTHON_VER="python3.11" make release
-fi
+PYTHON_VER="python3.11" make release
 big_console_header "Hue PROD Build End for" "$@"
