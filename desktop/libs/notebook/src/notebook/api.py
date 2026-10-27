@@ -19,8 +19,8 @@ import json
 import logging
 from urllib.parse import unquote as urllib_unquote
 
-import sqlparse
 import opentracing.tracer
+import sqlparse
 from django.db.models import Q
 from django.urls import reverse
 from django.utils.translation import gettext as _
@@ -31,14 +31,15 @@ from desktop.conf import ENABLE_CONNECTORS
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
-from desktop.models import Document, Document2, FilesystemException, __paginate, _get_gist_document
+from desktop.models import __paginate, _get_gist_document, Document, Document2, FilesystemException
 from indexer.fields import Field
 from indexer.file_format import HiveFormat
 from metadata.conf import OPTIMIZER
 from notebook.conf import EXAMPLES
-from notebook.connectors.base import Notebook, QueryError, QueryExpired, SessionExpired, _get_snippet_name, patch_snippet_for_connector
+from notebook.connectors.base import _get_snippet_name, Notebook, patch_snippet_for_connector, QueryError, QueryExpired, SessionExpired
 from notebook.decorators import api_error_handler, check_document_access_permission, check_document_modify_permission
 from notebook.models import _get_dialect_example, escape_rows, get_api, make_notebook, upgrade_session_properties
+from notebook.saved_document_auth import get_writable_document_for_update
 
 LOG = logging.getLogger()
 
@@ -142,7 +143,7 @@ def _execute_notebook(request, notebook, snippet):
       if snippet.get('interface') == 'sqlalchemy':
         interpreter.options['session'] = sessions[0]
 
-      with opentracing.tracer.start_span('interpreter') as span:
+      with opentracing.tracer.start_span('interpreter'):
         # interpreter.execute needs the sessions, but we don't want to persist them
         pre_execute_sessions = notebook['sessions']
         notebook['sessions'] = sessions
@@ -473,11 +474,8 @@ def _save_notebook(notebook, user):
 
   save_as = False
 
-  if notebook.get('parentSavedQueryUuid'):  # We save into the original saved query, not into the query history
-    notebook_doc = Document2.objects.get_by_uuid(user=user, uuid=notebook['parentSavedQueryUuid'])
-  elif notebook.get('id'):
-    notebook_doc = Document2.objects.get(id=notebook['id'])
-  else:
+  notebook_doc = get_writable_document_for_update(notebook, user)
+  if notebook_doc is None:
     notebook_doc = Document2.objects.create(name=notebook['name'], uuid=notebook['uuid'], type=notebook_type, owner=user)
     Document.objects.link(
         notebook_doc, owner=notebook_doc.owner, name=notebook_doc.name, description=notebook_doc.description, extra=notebook_type
@@ -646,7 +644,7 @@ def get_history(request):
 def clear_history(request):
   response = {'status': -1}
 
-  notebook = json.loads(request.POST.get('notebook', '{}'))
+  notebook = json.loads(request.POST.get('notebook', '{}'))  # noqa: F841
   doc_type = request.POST.get('doc_type')
   is_notification_manager = request.POST.get('is_notification_manager', 'false') == 'true'
 
@@ -740,7 +738,7 @@ def autocomplete(request, server=None, database=None, table=None, column=None, n
   response = {'status': -1}
 
   # Passed by check_document_access_permission but unused by APIs
-  notebook = json.loads(request.POST.get('notebook', '{}'))
+  notebook = json.loads(request.POST.get('notebook', '{}'))  # noqa: F841
   cluster = json.loads(request.POST.get('cluster', '{}'))
   if cluster and cluster.get('type') in ('hive-compute', 'impala-compute', 'trino-compute'):
     snippet = cluster
@@ -766,7 +764,7 @@ def get_sample_data(request, server=None, database=None, table=None, column=None
   response = {'status': -1}
 
   # Passed by check_document_access_permission but unused by APIs
-  notebook = json.loads(request.POST.get('notebook', '{}'))
+  notebook = json.loads(request.POST.get('notebook', '{}'))  # noqa: F841
   snippet = json.loads(request.POST.get('snippet', '{}'))
   is_async = json.loads(request.POST.get('async', 'false'))
   operation = json.loads(request.POST.get('operation', '"default"'))

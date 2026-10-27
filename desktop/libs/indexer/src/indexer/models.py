@@ -15,20 +15,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from desktop.models import Document2, Document
+from desktop.models import Document, Document2
+from notebook.saved_document_auth import get_writable_document_for_update
 
 
 def _save_pipeline(pipeline, user):
   pipeline_type = pipeline.get('type', 'pipeline')
   save_as = False
 
-  if pipeline.get('parentSavedQueryUuid'): # We save into the original saved query, not into the query history
-    pipeline_doc = Document2.objects.get_by_uuid(user=user, uuid=pipeline['parentSavedQueryUuid'])
-  elif pipeline.get('id'):
-    pipeline_doc = Document2.objects.get(id=pipeline['id'])
-  else:
+  pipeline_doc = get_writable_document_for_update(pipeline, user)
+  if pipeline_doc is None:
     pipeline_doc = Document2.objects.create(name=pipeline['name'], uuid=pipeline['uuid'], type=pipeline_type, owner=user)
-    Document.objects.link(pipeline_doc, owner=pipeline_doc.owner, name=pipeline_doc.name, description=pipeline_doc.description, extra=pipeline_type)
+    Document.objects.link(
+      pipeline_doc,
+      owner=pipeline_doc.owner,
+      name=pipeline_doc.name,
+      description=pipeline_doc.description,
+      extra=pipeline_type,
+    )
     save_as = True
 
     if pipeline.get('directoryUuid'):
@@ -41,7 +45,7 @@ def _save_pipeline(pipeline, user):
   pipeline['id'] = pipeline_doc.id
   pipeline_doc1 = pipeline_doc._get_doc1(doc2_type=pipeline_type)
   pipeline_doc.update_data(pipeline)
-  #pipeline_doc.search = _get_statement(pipeline)
+  # pipeline_doc.search = _get_statement(pipeline)
   pipeline_doc.name = pipeline_doc1.name = pipeline['name']
   pipeline_doc.description = pipeline_doc1.description = pipeline['description']
   pipeline_doc.save()

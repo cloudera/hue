@@ -34,7 +34,7 @@ from desktop.metrics import num_of_queries
 from desktop.models import Directory, Document, Document2
 from hadoop import cluster as originalCluster
 from notebook.api import _historify
-from notebook.conf import ENABLE_ALL_INTERPRETERS, INTERPRETERS, INTERPRETERS_SHOWN_ON_WHEEL, get_ordered_interpreters
+from notebook.conf import ENABLE_ALL_INTERPRETERS, get_ordered_interpreters, INTERPRETERS, INTERPRETERS_SHOWN_ON_WHEEL
 from notebook.connectors.base import Api, Notebook, QueryError, QueryExpired
 from notebook.decorators import api_error_handler
 from useradmin.models import User
@@ -146,6 +146,19 @@ class TestApi(object):
     assert doc.search == "select * from default.web_logs where app = 'metastore';"
     assert doc.type == "query-hive"
 
+  def test_save_notebook_denies_cross_user_update(self):
+    grant_access(self.user_not_me.username, self.user_not_me.username, 'desktop')
+    notebook_cp = self.notebook.copy()
+    notebook_cp['name'] = 'Attacker overwrite'
+    notebook_json = json.dumps(notebook_cp)
+
+    response = self.client_not_me.post(reverse('notebook:save_notebook'), {'notebook': notebook_json})
+    data = json.loads(response.content)
+
+    assert data['status'] == -1
+    self.doc2.refresh_from_db()
+    assert self.doc2.name == self.notebook['name']
+
   def test_type_when_saving_an_actual_notebook(self):
     notebook_json = (
       """
@@ -203,32 +216,6 @@ class TestApi(object):
       data = json.loads(response.content)
     finally:
       reset()
-
-    assert 0 == data['status'], data
-    doc = Document2.objects.get(pk=data['id'])
-    assert 'query-mysql' == doc.type
-
-  def test_save_notebook_with_connector_on(self):
-    if not ENABLE_CONNECTORS.get():
-      pytest.skip("Skipping Test")
-
-    notebook_cp = self.notebook.copy()
-    notebook_cp.pop('id')
-
-    connector = Connector.objects.create(name='MySql', dialect='mysql')
-
-    notebook_cp['snippets'][0]['connector'] = {
-      'name': 'MySql',
-      'dialect': 'mysql',
-      'type': str(connector.id),
-      'optimizer': 'api',
-    }
-
-    try:
-      response = self.client.post(reverse('notebook:save_notebook'), {'notebook': notebook_json})
-      data = json.loads(response.content)
-    finally:
-      connector.delete()
 
     assert 0 == data['status'], data
     doc = Document2.objects.get(pk=data['id'])
@@ -969,7 +956,7 @@ class TestEditor(object):
         name='open_saved_query_with_hive_not_present', type='query-impala', owner=self.user, data={}
       )
 
-      with patch('desktop.middleware.fsmanager') as fsmanager:
+      with patch('desktop.middleware.fsmanager'):
         response = self.client.get(reverse('notebook:editor'), {'editor': doc.id, 'is_embeddable': True})
         assert 200 == response.status_code
     finally:

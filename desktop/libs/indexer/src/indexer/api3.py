@@ -50,7 +50,7 @@ from indexer.solr_client import MAX_UPLOAD_SIZE, SolrClient
 from indexer.utils import validate_local_upload_path
 from kafka.kafka_api import get_topic_data, get_topics
 from notebook.connectors.base import get_api, Notebook
-from notebook.decorators import api_error_handler
+from notebook.decorators import api_error_handler, check_document_modify_permission
 from notebook.models import escape_rows, MockedDjangoRequest
 
 LOG = logging.getLogger()
@@ -627,14 +627,10 @@ def _small_indexing(user, fs, client, source, destination, index_name):
       searcher = CollectionManagerController(user)
       columns = [field['name'] for field in fields if field['name'] != 'hue_id']
       # Assumes handle still live
-      fetch_handle = lambda rows, start_over: get_api(
-          request, snippet
-      ).fetch_result(
-          notebook,
-          snippet,
-          rows=rows,
-          start_over=start_over
-      )
+
+      def fetch_handle(rows, start_over):
+        return get_api(request, snippet).fetch_result(notebook, snippet, rows=rows, start_over=start_over)
+
       searcher.update_data_from_hive(
           index_name,
           columns,
@@ -719,8 +715,9 @@ def _large_indexing(request, file_format, collection_name, query=None, start_tim
 
 @api_error_handler
 @require_POST
-# @check_document_modify_permission()
+@check_document_modify_permission()
 def save_pipeline(request):
+  """Persist importer pipeline document state; requires write access to the target document."""
   response = {'status': -1}
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
