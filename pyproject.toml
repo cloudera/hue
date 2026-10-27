@@ -16,7 +16,7 @@ addopts = """
 --cov-report html:reports/code-cov/coverage-html \
 --cov-report xml:reports/code-cov/coverage.xml \
 """
-norecursedirs = "desktop/core/ext-py3 desktop/core/3.11 desktop/core/3.10 desktop/core/3.9 desktop/core/3.8"
+norecursedirs = "desktop/core/ext-py3 desktop/core/3.11"
 python_files = "tests.py test_*.py *_tests.py tests_* *_test.py"
 markers = [
   "integration: live server based tests",
@@ -88,7 +88,7 @@ source = [
 precision = 2
 
 [tool.ruff]
-target-version = "py38"
+target-version = "py311"
 line-length = 140
 indent-width = 2
 force-exclude = true

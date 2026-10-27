@@ -15,11 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
+import argparse
 import logging
 import os.path
-import argparse
 import subprocess
+import sys
 
 from django.core.management.base import BaseCommand
 from django.utils.translation import gettext as _
@@ -107,12 +107,7 @@ class Command(BaseCommand):
       *args: Variable arguments.
       **options: Keyword arguments.
     """
-    PYTHON_VERSION = f"{sys.version_info.major}.{sys.version_info.minor}"
-
-    if PYTHON_VERSION == "3.11":
-        ruff_package = paths.get_build_dir('env', 'bin', 'ruff')
-    else:
-        ruff_package = paths.get_build_dir('venvs', f'python{PYTHON_VERSION}', 'bin', 'ruff')
+    ruff_package = paths.get_build_dir('env', 'bin', 'ruff')
 
     if not os.path.exists(ruff_package):
       msg = _(

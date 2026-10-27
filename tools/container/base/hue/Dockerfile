@@ -26,8 +26,8 @@ RUN set -eux; \
         ncurses-devel \
         nmap-ncat \
         procps-ng \
-        python38 \
-        python38-devel \
+        python3.11 \
+        python3.11-devel \
         rsync \
         openldap-devel \
         openssl \
@@ -53,8 +53,7 @@ RUN set -eux; \
     rm -rf /var/cache/yum
 
 RUN set -eux; \
-      /usr/bin/pip3.8 install supervisor \
-      && curl -s https://files.pythonhosted.org/packages/45/78/4621eb7085162bc4d2252ad92af1cc5ccacbd417a50e2ee74426331aad18/psycopg2_binary-2.9.3-cp38-cp38-musllinux_1_1_x86_64.whl -o /tmp/psycopg2_binary-2.9.3-cp38-cp38-musllinux_1_1_x86_64.whl \
+      python3.11 -m pip install supervisor psycopg2-binary \
       && dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm \
       && yum install -y postgresql15 \
       && curl -sL https://rpm.nodesource.com/setup_14.x | bash - \

@@ -40,8 +40,8 @@ RUN set -eux; \
     python3-dev \
     build-base \
     postgresql-dev && \
-    $HUE_BIN/python3.8 -m pip install --upgrade pip --force && \
-    $HUE_BIN/pip install psycopg2 --no-cache-dir
+    $HUE_BIN/python3.11 -m pip install --upgrade pip --force && \
+    $HUE_BIN/pip install psycopg2-binary --no-cache-dir
 
 # Setup directory structure
 RUN mkdir -p ${HUE_LOG_DIR} && chown -R ${HUEUSER}:${HUEUSER} ${HUE_LOG_DIR}
@@ -67,7 +67,7 @@ ADD supervisor-files/hue_redis.conf /etc/supervisor.d/
 RUN chown -R ${HUEUSER}:${HUEUSER} /etc/supervisord.conf && chown -R ${HUEUSER}:${HUEUSER} /etc/supervisor.d
 
 # Remove chardet package
-RUN rm -rf ${HUE_HOME}/build/env/lib/python3.8/site-packages/pip/_vendor/chardet
+RUN rm -rf ${HUE_HOME}/build/env/lib/python3.11/site-packages/pip/_vendor/chardet
 
 EXPOSE 8888 9111 6379
 

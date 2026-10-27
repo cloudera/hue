@@ -4,7 +4,7 @@ LABEL description="Hue Project https://github.com/cloudera/hue"
 
 # Set the environment variable
 ENV NAME="basehue"
-ENV PYTHON_VER=python3.8
+ENV PYTHON_VER=python3.11
 
 # Required for building Hue
 RUN set -eux; \
@@ -34,8 +34,8 @@ RUN set -eux; \
       openldap-devel \
       openssl \
       openssl-devel \
-      python38 \
-      python38-devel \
+      python3.11 \
+      python3.11-devel \
       rsync \
       sqlite-devel \
       sudo \

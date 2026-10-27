@@ -15,8 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# wrapper script to identify the latest python and pass the execution
-# to the corresponding hue script in the `build` directory.
+# Wrapper script that runs Hue using the Python 3.11 virtualenv at build/env/bin.
 
 set -ex
 

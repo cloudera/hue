@@ -63,7 +63,7 @@ docker_hue_build() {
   cp -a $BUILD_DIR/${HUEUSER} $HUE_DIR
   rm -f $HUE_DIR/${HUEUSER}/desktop/conf/*
 
-  # Include tools/scripts for multi-python wrapper and helpers
+  # Include tools/scripts for Hue CLI wrappers and helpers
   mkdir -p $HUE_DIR/${HUEUSER}/tools/scripts
   cp -a $HUE_SRC/tools/scripts/* $HUE_DIR/${HUEUSER}/tools/scripts/
   chmod +x $HUE_DIR/${HUEUSER}/tools/scripts/*.sh 2>/dev/null || true

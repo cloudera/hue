@@ -15,10 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Dynamic requirements generator for the Hue multi-Python build system.
+Dynamic requirements generator for the Hue build system (Python 3.11).
 
-Generate architecture- and Python-version-specific requirement files at
-build time, replacing a static requirements.txt. This tool supports:
+Generate architecture-specific requirement files at build time, replacing
+a static requirements.txt. This tool supports:
 
 - Local editable paths for Hue extensions.
 - Binary wheels for specific platforms (e.g., ppc64le).
@@ -116,7 +116,7 @@ class RequirementsGenerator:
       "six==1.16.0",
       "slack-sdk==3.31.0",
       "SQLAlchemy==1.3.8",
-      # sqlparse is pinned per Python version below: 0.6.0 fixes three DoS CVEs but needs Python >= 3.10.
+      # sqlparse is pinned in the architecture-specific requirements below: 0.6.0 fixes three DoS CVEs.
       "tablib==0.13.0",
       "tabulate==0.8.9",
       "thrift-sasl==0.4.3",
@@ -124,47 +124,23 @@ class RequirementsGenerator:
       "git+https://github.com/gethue/thrift.git",
     ]
 
+    python_311_arch_extras = [
+      "async-timeout==5.0.1",
+      "lxml==4.9.1",
+      "Markdown==3.8.1",
+      "numpy==1.24.4",
+      "pandas==2.0.3",
+      "pure-sasl==0.6.2",
+      "setuptools==80.9.0",
+      "sqlparse==0.6.0",
+    ]
+
     self.x86_64_requirements = {
-      "default": [
-        "lxml==4.9.1",
-        "Markdown==3.8.1",
-        "numpy==1.24.4",
-        "pandas==2.0.3",
-        "sasl==0.3.1",
-        "setuptools==70.0.0",
-        "sqlparse==0.6.0",
-      ],
-      "3.11": [
-        "async-timeout==5.0.1",
-        "lxml==4.9.1",
-        "Markdown==3.8.1",
-        "numpy==1.24.4",
-        "pandas==2.0.3",
-        "pure-sasl==0.6.2",
-        "setuptools==80.9.0",
-        "sqlparse==0.6.0",
-      ],
+      "3.11": python_311_arch_extras,
     }
 
     self.aarch64_requirements = {
-      "default": [
-        "lxml==4.9.1",
-        "Markdown==3.8.1",
-        "numpy==1.24.4",
-        "pandas==2.0.3",
-        "setuptools==70.0.0",
-        "sqlparse==0.6.0",
-      ],
-      "3.11": [
-        "async-timeout==5.0.1",
-        "lxml==4.9.1",
-        "Markdown==3.8.1",
-        "numpy==1.24.4",
-        "pandas==2.0.3",
-        "pure-sasl==0.6.2",
-        "setuptools==80.9.0",
-        "sqlparse==0.6.0",
-      ],
+      "3.11": python_311_arch_extras,
     }
     self.arch_requirements_map = {
       "x86_64": self.x86_64_requirements,
@@ -185,7 +161,12 @@ class RequirementsGenerator:
     if self.arch not in self.arch_requirements_map:
       raise ValueError(f"Unsupported architecture: {self.arch}")
     arch_reqs = self.arch_requirements_map[self.arch]
-    self.requirements.extend(arch_reqs.get(self.python_version_string, arch_reqs["default"]))
+    if self.python_version_string not in arch_reqs:
+      raise ValueError(
+        f"Unsupported Python version {self.python_version_string} for architecture {self.arch}. "
+        f"Supported: {', '.join(sorted(arch_reqs.keys()))}"
+      )
+    self.requirements.extend(arch_reqs[self.python_version_string])
     self.requirements.extend(self.copy_local_requirements(self.python_version_string))
     with open(f"{this_dir}/requirements-{self.arch}-{self.python_version_string}.txt", "w") as f:
       f.write("\n".join(self.requirements))
