@@ -40,8 +40,9 @@ RUN set -eux; \
     python3-dev \
     build-base \
     postgresql-dev && \
-    # pip >= 26.2.2: older releases keep trusting the compromised eMudhra CAs through their vendored certifi.
-    $HUE_BIN/python3.11 -m pip install --upgrade "pip>=26.2.2" && \
+    # pip 26.2.2: older releases keep trusting the compromised eMudhra CAs through their vendored certifi.
+    # Keep in sync with desktop/core/pip-bootstrap-requirements.txt.
+    $HUE_BIN/python3.11 -m pip install --upgrade pip==26.2.2 && \
     $HUE_BIN/pip install psycopg2-binary --no-cache-dir
 
 # Setup directory structure
