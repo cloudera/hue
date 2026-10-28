@@ -43,7 +43,8 @@ PYTHON311_OSES=(
   "sles12" "sles15" "ubuntu18" "ubuntu20" "ubuntu22" "ubuntu24"
 )
 
-export REQ_PYTHON311="3.11.12"
+# 3.11.18 is the first 3.11 release that rejects the compromised eMudhra intermediate CAs.
+export REQ_PYTHON311="3.11.18"
 
 export DESKTOP_VERSION=$DOCKEROS
 export HUE_WEBPACK_CONFIG='webpack.config.internal.js'
@@ -57,7 +58,7 @@ setup_python_env() {
   local os="$1"
 
   if is_supported_os PYTHON311_OSES "$os"; then
-    export PYTHON311_PATH=${PYTHON311_PATH:=/opt/python/3.11.12}
+    export PYTHON311_PATH=${PYTHON311_PATH:=/opt/python/3.11.18}
     if is_supported_python_version "$PYTHON311_PATH/bin/python3.11" $REQ_PYTHON311; then
       export PATH="$PYTHON311_PATH/bin:$PATH"
     else

@@ -80,6 +80,17 @@ class TestRequirementsGenerator:
 
     assert "aarch64" in generator.arch_requirements_map
 
+  def test_certifi_is_pinned_at_or_above_emudhra_fix(self):
+    """certifi must be pinned to a release without the compromised eMudhra CA (>= 2026.10.19)."""
+    generator = RequirementsGenerator()
+
+    certifi_pins = [req for req in generator.requirements if req.lower().startswith("certifi")]
+
+    assert len(certifi_pins) == 1, certifi_pins
+    assert certifi_pins[0].startswith("certifi=="), certifi_pins
+    pinned_version = tuple(int(part) for part in certifi_pins[0].split("==")[1].split("."))
+    assert pinned_version >= (2026, 10, 19), certifi_pins
+
   @mock.patch("generate_requirements.this_dir", create=True)
   @mock.patch("generate_requirements.shutil.copytree")
   def test_copy_local_requirements(self, mock_copytree, mock_this_dir):

@@ -1,0 +1,10 @@
+# pip used to bootstrap the build host and the Hue virtual env (see the virtual-env target in the Makefile).
+#
+# pip always trusts its own vendored certifi in addition to the system trust store, so any pip older than
+# 26.2.2 keeps trusting the compromised eMudhra (emSign) CAs. The hashes make pip verify the downloaded
+# files regardless of which CAs the pip doing the install trusts.
+#
+# To update: take the version and the sha256 digests of both release files from https://pypi.org/project/pip/.
+pip==26.2.2 \
+    --hash=sha256:fd7f4dfa8190e014013b9f08f3e973f4e4c26ffd179a204895533a7254813a70 \
+    --hash=sha256:3a8e5c800492787f33a4114ef54444546c340df428974ebba17e0fd47e11af2f

@@ -25,6 +25,13 @@ is_supported_os() {
   return 1
 }
 
+# Security floors for the eMudhra CA incident. Keep in sync with Makefile.vars and
+# desktop/core/pip-bootstrap-requirements.txt.
+# pip always trusts its own vendored certifi in addition to the system trust store, so any pip older than
+# 26.2.2 keeps trusting the compromised CAs.
+HUE_PIP_VERSION="26.2.2"
+HUE_VIRTUAL_ENV_VERSION="21.14.13"
+
 is_supported_python_version() {
   local PYBIN="$1"
   local version="$2"
@@ -110,7 +117,7 @@ function install_sqlite3() {
 }
 
 function install_python311() {
-  local PYTHON_VERSION=${1:-"3.11.12"}
+  local PYTHON_VERSION=${1:-"3.11.18"}
   local INSTALL_PREFIX=$2
   local LD_LIBRARY_PATH=$3
   local CPPFLAGS=$4
@@ -139,14 +146,14 @@ function install_python311() {
   #   /usr/bin/strip "${INSTALL_PREFIX}/lib/libpython3.11.so.1.0"'
 
   # Install pip
-  sudo PYTHON_VERSION=${PYTHON_VERSION} INSTALL_PREFIX=${INSTALL_PREFIX} \
+  sudo PYTHON_VERSION=${PYTHON_VERSION} INSTALL_PREFIX=${INSTALL_PREFIX} HUE_PIP_VERSION=${HUE_PIP_VERSION} \
     PYTHON_TGZ=${PYTHON_TGZ} PYTHON_SRC_DIR=${PYTHON_SRC_DIR} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} \
     CPPFLAGS=${CPPFLAGS} LDFLAGS=${LDFLAGS} PATH=${PATH} \
-    -- sh -c 'cd /tmp && curl -sS https://bootstrap.pypa.io/get-pip.py | "${INSTALL_PREFIX}/bin/python3.11"'
+    -- sh -c 'cd /tmp && curl -sS https://bootstrap.pypa.io/get-pip.py | "${INSTALL_PREFIX}/bin/python3.11" - "pip==${HUE_PIP_VERSION}"'
 
   export PYTHON311_PATH="${INSTALL_PREFIX}"
   export pip_bin=${PYTHON311_PATH}/bin/pip3.11
-  export VIRTUAL_ENV_VERSION="21.7.16"
+  export VIRTUAL_ENV_VERSION="${HUE_VIRTUAL_ENV_VERSION}"
   # Pip modules install
   sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c '${pip_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable==0.0.1 mysqlclient==2.1.1'
   sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} PG_CONFIG=${PG_CONFIG} -- sh -c 'export PG_CONFIG="$PG_CONFIG"; ${pip_bin} install psycopg2==2.9.6'
@@ -156,7 +163,7 @@ function install_python311() {
 
 function install_sqlite_python() {
   local DOCKEROS="${1:-ubuntu22}"
-  local PYTHON_VERSION="${2:-3.11.12}"
+  local PYTHON_VERSION="${2:-3.11.18}"
   local INSTALL_PREFIX="/opt/python/${PYTHON_VERSION}"
   local SQLITE3_PATH="/opt/sqlite3"
 

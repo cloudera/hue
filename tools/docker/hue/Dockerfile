@@ -31,7 +31,8 @@ RUN apt-get update -y && apt-get install -y \
 
 ADD . /hue
 
-RUN pip3 install --upgrade --no-cache-dir setuptools virtualenv pip && \
+# pip >= 26.2.2 and virtualenv >= 21.14.12: older releases keep trusting the compromised eMudhra CAs.
+RUN pip3 install --upgrade --no-cache-dir setuptools "virtualenv>=21.14.12" "pip>=26.2.2" && \
   apt-get install -y curl && \
   curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \
   apt-get install -y nodejs && \

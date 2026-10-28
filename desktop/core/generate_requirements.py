@@ -50,6 +50,10 @@ class RequirementsGenerator:
       "Babel==2.9.1",
       "boto3==1.37.38",
       "celery[redis]==5.4.0",
+      # Must stay >= 2026.10.19, the first release that drops the compromised eMudhra (emSign) CA. 2026.10.23
+      # also drops the remaining emSign roots. It is a transitive dependency of requests; pin it so the CA
+      # bundle never depends on whatever is newest at build time.
+      "certifi==2026.10.23",
       # cryptography 46.x requires cffi >= 2.0.0. Held at 2.0.0 because 2.1.0 needs Python >= 3.10.
       "cffi==2.0.0",
       "channels==4.2.2",
