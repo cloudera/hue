@@ -53,8 +53,9 @@ RUN set -eux; \
     rm -rf /var/cache/yum
 
 RUN set -eux; \
-      # pip >= 26.2.2: older releases keep trusting the compromised eMudhra CAs through their vendored certifi.
-      python3.11 -m pip install --upgrade "pip>=26.2.2" \
+      # pip 26.2.2: older releases keep trusting the compromised eMudhra CAs through their vendored certifi.
+      # Keep in sync with desktop/core/pip-bootstrap-requirements.txt.
+      python3.11 -m pip install --upgrade pip==26.2.2 \
       && python3.11 -m pip install supervisor psycopg2-binary \
       && dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm \
       && yum install -y postgresql15 \
