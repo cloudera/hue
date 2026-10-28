@@ -12,7 +12,7 @@ You will need Python, some OS packages, a Database and Node.js.
 Hue employs some Python modules which use native code and requires certain development libraries be installed on your system. To install from the tarball, you'll need these library development packages and tools installed on your system:
 
 Versions supported:
-* Python 3.11
+* Python 3.11, **3.11.18 or later** recommended (see the note below)
 ```
 # If you are using Python 3.11, set PYTHON_VER before the build, like
 export PYTHON_VER=python3.11
@@ -20,6 +20,8 @@ export PYTHON_VER=python3.11
 # Export ROOT which should point to your Hue directory
 export ROOT=<path_to_hue_directory>
 ```
+
+>**Security note (eMudhra CA incident):** the compromised eMudhra (emSign) CA was removed from CA bundles such as `certifi`. The Hue build pins `certifi` to `2026.10.23`, installs `pip` 26.2.2 (older `pip` versions keep trusting the compromised CA through their vendored `certifi`) and uses `virtualenv` 21.14.13 on the build host. Python 3.11.18 additionally rejects the compromised intermediate CAs on its own. Rebuild container images without layer caching (`tools/container/build.sh` does this by default) so they pick up the latest system certificates.
 
 ## Database
 
@@ -184,7 +186,7 @@ This is a verified step-by-step guide on how to get Hue up and running on a fres
 
    - For Apple Silicon (M1, M2, M3), Python 3.11 is recommended as of June 2025. You can install Python 3.11 either via Homebrew or by direct download from python.org—both options will work, but the direct download is preferred and tested.
 
->**Note:** Hue requires Python 3.11. Set `export PYTHON_VER=python3.11` before building and use `./build/env/bin/hue` for Hue commands.
+>**Note:** Hue requires Python 3.11. Set `export PYTHON_VER=python3.11` before building and use `./build/env/bin/hue` for Hue commands. python.org only publishes macOS installers for Python 3.11 up to 3.11.9; to get 3.11.18 or later, install Python 3.11 via Homebrew or build it from source. The Hue build upgrades `pip` and pins `certifi` either way.
 
 8. Install node and npm (unless already present) using nvm or brew
 

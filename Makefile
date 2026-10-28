@@ -137,7 +137,7 @@ $(info "SYS_PIP is $(SYS_PIP)")
 $(info "ENV_PIP is $(ENV_PIP)")
 $(info "PYTHON_INCLUDE_DIR is $(PYTHON_INCLUDE_DIR)")
 $(info "PYTHON_H is $(PYTHON_H)")
-$(info "PIP_VERSION is $(PIP_VERSION)")
+$(info "PIP_BOOTSTRAP_REQUIREMENTS_FILE is $(PIP_BOOTSTRAP_REQUIREMENTS_FILE)")
 $(info "VIRTUAL_ENV_VERSION is $(VIRTUAL_ENV_VERSION)")
 $(info "RELOCATABLE is $(RELOCATABLE)")
 $(info "LOCAL_PY_BIN is $(LOCAL_PY_BIN)")
@@ -155,10 +155,15 @@ virtual-env: $(BLD_DIR_ENV)/bin/python
 $(BLD_DIR_ENV)/bin/python:
 	@echo "--- Creating virtual environment for $(PYTHON_VER) ---"
 	@mkdir -p $(BLD_DIR_ENV)
-	@$(SYS_PYTHON) -m pip install --upgrade pip==$(PIP_VERSION)
+	@$(SYS_PYTHON) -m pip install --upgrade --require-hashes -r $(PIP_BOOTSTRAP_REQUIREMENTS_FILE)
 	@$(SYS_PYTHON) -m pip install virtualenv==$(VIRTUAL_ENV_VERSION) virtualenv-make-relocatable==$(VIRTUAL_ENV_RELOCATABLE_VERSION)
-	@$(SYS_PYTHON) -m virtualenv --copies -p $(PYTHON_VER) $(BLD_DIR_ENV)
-	@$(ENV_PYTHON) -m pip install virtualenv==$(VIRTUAL_ENV_VERSION) virtualenv-make-relocatable==$(VIRTUAL_ENV_RELOCATABLE_VERSION)
+	@$(SYS_PYTHON) -m virtualenv $(VIRTUAL_ENV_COPY_OPT) -p $(PYTHON_VER) $(BLD_DIR_ENV)
+	@# virtualenv seeds the pip wheel it embeds, which can be older than the bootstrap pip; upgrade it so the
+	@# shipped env does not keep an old pip (and its vendored, outdated CA bundle).
+	@$(ENV_PYTHON) -m pip install --upgrade --require-hashes -r $(PIP_BOOTSTRAP_REQUIREMENTS_FILE)
+	@# virtualenv is only needed on the build host (above). The shipped env needs just the relocator,
+	@# which does not import virtualenv.
+	@$(ENV_PYTHON) -m pip install virtualenv-make-relocatable==$(VIRTUAL_ENV_RELOCATABLE_VERSION)
 	@$(eval RELOCATABLE := $(shell which virtualenv-make-relocatable))
 	@echo "REQUIREMENT_FILE is $(REQUIREMENT_FILE)"
 	@echo "--- Using build constraints to prevent setuptools 82+ (cx-Oracle compatibility) ---"
