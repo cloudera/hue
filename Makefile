@@ -45,7 +45,7 @@
 # ==========
 # Here we summarize the flow of the build logic. Lines represent dependency.
 #
-#                  virtual-bootstrap.py
+#                      virtualenv
 #                            |
 #                  virtual-env (./env)
 #                            |
