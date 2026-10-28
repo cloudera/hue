@@ -62,7 +62,6 @@ endif
 
 # Various commands
 APP_REG := $(ENV_PYTHON) $(TOOLS_DIR)/app_reg/app_reg.py
-VIRTUAL_BOOTSTRAP := $(TOOLS_DIR)/virtual-bootstrap/virtual-bootstrap.py
 
 
 # <<<< DEV ONLY

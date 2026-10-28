@@ -31,7 +31,6 @@ PROD_INCLUDES := \
 	desktop/conf \
 	desktop/desktop.db \
 	tools/app_reg \
-	tools/virtual-bootstrap \
 	tools/relocatable.py \
 	tools/load-balancer \
 	tools/scripts \

@@ -74,9 +74,6 @@ docker_hue_build() {
   chmod +x $HUE_DIR/${HUEUSER}/tools/scripts/*.sh 2>/dev/null || true
   chmod +x $HUE_DIR/${HUEUSER}/tools/scripts/python/*.sh 2>/dev/null || true
 
-  # Remove chardet package
-  rm -rf $HUE_DIR/${HUEUSER}/tools/virtual-bootstrap/virtualenv_support
-
   # Reduce Hue container size
   rm -rf $HUE_DIR/${HUEUSER}/node_modules
   rm -rf $HUE_DIR/${HUEUSER}/desktop/core/ext-eggs
