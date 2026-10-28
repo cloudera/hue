@@ -58,7 +58,6 @@ from boto import auth_handler
 import boto
 import boto.utils
 import boto.handler
-import boto.cacerts
 
 from boto import config, UserAgent
 from boto.compat import six, http_client, urlparse, quote, encodebytes
@@ -90,7 +89,13 @@ ON_APP_ENGINE = all(key in os.environ for key in (
 PORTS_BY_SECURITY = {True: 443,
                      False: 80}
 
-DEFAULT_CA_CERTS_FILE = os.path.join(os.path.dirname(os.path.abspath(boto.cacerts.__file__)), "cacerts.txt")
+# boto's bundled CA list (boto/cacerts/cacerts.txt) was removed: it was an unmaintained snapshot of a CA list
+# (eMudhra CA remediation). Use certifi's maintained bundle, or the system CA file when certifi is missing.
+try:
+    import certifi
+    DEFAULT_CA_CERTS_FILE = certifi.where()
+except ImportError:
+    DEFAULT_CA_CERTS_FILE = ssl.get_default_verify_paths().cafile if HAVE_HTTPS_CONNECTION else None
 
 
 class HostConnectionPool(object):

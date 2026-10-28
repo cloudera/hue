@@ -1,4 +1,3 @@
-include boto/cacerts/cacerts.txt
 include README.rst
 include boto/file/README
 include .gitignore

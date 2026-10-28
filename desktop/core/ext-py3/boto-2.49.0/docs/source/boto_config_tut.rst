@@ -198,7 +198,7 @@ These settings will default to::
     connection_stale_duration = 180
     is_secure = True
     https_validate_certificates = True
-    ca_certificates_file = cacerts.txt
+    ca_certificates_file = /path/to/ca-bundle.pem
     http_socket_timeout = 60
     send_crlf_after_proxy_auth_headers = False
     endpoints_path = /path/to/my/boto/endpoints.json
