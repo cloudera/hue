@@ -49,7 +49,7 @@ class TestRequirementsGenerator:
     os.makedirs(self.ext_py3_dir)
 
     # Create empty placeholder files that simulate local requirement packages
-    for req in ["boto-2.49.0", "django-axes-5.13.0", "django-babel", "pysaml2-7.3.1", "python-sasl-0.3.1"]:
+    for req in ["boto-2.49.0", "django-axes-5.13.0", "django-babel", "djangomako-1.3.2", "pysaml2-7.3.1", "python-sasl-0.3.1"]:
       with open(os.path.join(self.ext_py3_dir, req), "w") as f:
         f.write("")
 

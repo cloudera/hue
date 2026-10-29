@@ -39,6 +39,8 @@ class RequirementsGenerator:
       "boto-2.49.0",
       "django-axes-5.13.0",
       "django-babel",
+      # Vendored to relax the hard Mako==1.2.3 pin of djangomako 1.3.2 (see its setup.py).
+      "djangomako-1.3.2",
       "pysaml2-7.3.1",
       "python-sasl-0.3.1",
     ]
@@ -75,7 +77,6 @@ class RequirementsGenerator:
       "django-redis==5.4.0",
       "django-utils-six==2.0",
       "django-webpack-loader==1.0.0",
-      "djangomako==1.3.2",
       "djangorestframework==3.15.2",
       "djangorestframework-simplejwt==5.5.1",
       "djangosaml2==1.9.3",
@@ -90,7 +91,7 @@ class RequirementsGenerator:
       "kerberos==1.3.0",
       "krb5==0.5.1",  # pinned for Sles12, dep of requests-kerberos 0.14.0
       "kubernetes==26.1.0",
-      "Mako==1.2.3",
+      "Mako==1.4.2",
       "openpyxl==3.0.9",
       "phoenixdb==1.2.1",
       "polars[calamine]==1.8.2",  # Python >= 3.8
