@@ -23,7 +23,10 @@ from unittest.mock import Mock, patch
 
 import pytest
 
+from desktop.auth.backend import rewrite_user
 from desktop.lib.django_test_util import make_logged_in_client
+from desktop.lib.exceptions_renderable import PopupException
+from notebook.conf import ENABLE_CUSTOM_CONNECTORS
 from notebook.connectors.base import get_api, Notebook
 from useradmin.models import User
 
@@ -43,6 +46,31 @@ class TestNotebook(object):
     }
 
     get_api(request=request, snippet=snippet)
+
+  def test_get_api_custom_connector_is_disabled_by_default(self):
+    request = Mock(user=rewrite_user(self.user))
+    snippet = {'type': 'custom', 'interface': 'trino', 'options': {'url': 'http://localhost:8080'}}
+
+    with pytest.raises(PopupException, match='Custom connectors are not enabled'):
+      get_api(request=request, snippet=snippet)
+
+  def test_get_api_custom_connector_when_enabled(self):
+    request = Mock(user=rewrite_user(self.user))
+    snippet = {'type': 'custom', 'interface': 'trino', 'options': {'url': 'http://localhost:8080'}}
+    reset = ENABLE_CUSTOM_CONNECTORS.set_for_testing(True)
+
+    try:
+      with patch('notebook.connectors.trino.TrinoApi') as TrinoApi:
+        assert get_api(request=request, snippet=snippet) is TrinoApi.return_value
+    finally:
+      reset()
+
+  def test_get_api_custom_connector_built_by_the_server(self):
+    request = Mock(user=rewrite_user(self.user))
+    snippet = {'type': 'custom', 'interface': 'trino', 'options': {'url': 'http://localhost:8080'}}
+
+    with patch('notebook.connectors.trino.TrinoApi') as TrinoApi:
+      assert get_api(request=request, snippet=snippet, allow_custom_connector=True) is TrinoApi.return_value
 
   def test_execute_and_wait(self):
     query = Notebook()
