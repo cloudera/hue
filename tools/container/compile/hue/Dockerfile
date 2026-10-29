@@ -59,7 +59,7 @@ RUN set -eux; \
     rm -rf /var/cache/yum
 
 RUN set -eux; \
-      curl -sL https://rpm.nodesource.com/setup_14.x | bash - \
+      curl -sL https://rpm.nodesource.com/setup_22.x | bash - \
         && yum install -y nodejs \
         && yum clean all -y
 
