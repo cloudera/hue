@@ -17,21 +17,20 @@
 
 from __future__ import absolute_import, unicode_literals
 
-import csv
-import sys
-import json
-import time
 import codecs
-import logging
+import csv
 import datetime
+import json
+import logging
+import sys
+import time
 from builtins import next, object
 from io import StringIO as string_io
 
 from celery import states
 from celery.utils.log import get_task_logger
 from django.core.cache import caches
-from django.db import transaction
-from django.http import FileResponse, HttpRequest
+from django.http import HttpRequest
 from django.utils.module_loading import import_string
 
 from beeswax.data_export import DataAdapter
@@ -42,8 +41,8 @@ from desktop.lib import export_csvxls, fsmanager
 from desktop.models import Document2
 from desktop.settings import CACHES_CELERY_KEY, CACHES_CELERY_QUERY_RESULT_KEY
 from notebook.api import _get_statement
-from notebook.connectors.base import ExecutionWrapper, QueryError, QueryExpired, get_api
-from notebook.models import MockedDjangoRequest, Notebook, make_notebook
+from notebook.connectors.base import ExecutionWrapper, get_api, QueryError, QueryExpired
+from notebook.models import make_notebook, MockedDjangoRequest, Notebook
 from notebook.sql_utils import get_current_statement
 from useradmin.models import User
 
@@ -198,7 +197,6 @@ def run_sync_query(doc_id, user):
 
 def download(*args, **kwargs):
   task_id = args[0]['uuid']
-  notebook = args[0]
   result = download_to_file.AsyncResult(task_id)
   state = result.state
 
@@ -207,7 +205,7 @@ def download(*args, **kwargs):
   elif state in states.EXCEPTION_STATES:
     result.maybe_reraise()
 
-  info = result.wait()  # TODO: Start returning data even if we're not done
+  result.wait()  # TODO: Start returning data even if we're not done
 
   return export_csvxls.file_reader(  # TODO: Convert csv to excel if needed
     storage.open(
@@ -232,7 +230,7 @@ def execute(*args, **kwargs):
   kwargs['max_rows'] = TASK_SERVER.FETCH_RESULT_LIMIT.get()
   _patch_status(notebook)
 
-  task = download_to_file.apply_async(args=args, kwargs=kwargs, task_id=notebook['uuid'])
+  download_to_file.apply_async(args=args, kwargs=kwargs, task_id=notebook['uuid'])
 
   # This redoes some of the work in api.execute. Other option is to pass statement, but then we'd have to modify notebook.api.
   # if should_close: #front end already calls close_statement for multi statement execution no need to do here.
