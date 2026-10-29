@@ -30,9 +30,9 @@ from io import StringIO as string_io
 from celery import states
 from celery.utils.log import get_task_logger
 from django.core.cache import caches
-from django.core.files.storage import get_storage_class
 from django.db import transaction
 from django.http import FileResponse, HttpRequest
+from django.utils.module_loading import import_string
 
 from beeswax.data_export import DataAdapter
 from desktop.auth.backend import rewrite_user
@@ -64,7 +64,7 @@ STATE_MAP = {
   states.IGNORED: 'ignored'
 }
 storage_info = json.loads(TASK_SERVER.RESULT_STORAGE.get())
-storage = get_storage_class(storage_info.get('backend'))(**storage_info.get('properties', {}))
+storage = import_string(storage_info.get('backend'))(**storage_info.get('properties', {}))
 
 
 class ExecutionWrapperCallback(object):

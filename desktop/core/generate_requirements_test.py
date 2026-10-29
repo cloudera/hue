@@ -49,7 +49,7 @@ class TestRequirementsGenerator:
     os.makedirs(self.ext_py3_dir)
 
     # Create empty placeholder files that simulate local requirement packages
-    for req in ["boto-2.49.0", "django-axes-5.13.0", "django-babel", "djangomako-1.3.2", "pysaml2-7.3.1", "python-sasl-0.3.1"]:
+    for req in ["boto-2.49.0", "djangomako-1.3.2", "pysaml2-7.3.1", "python-sasl-0.3.1"]:
       with open(os.path.join(self.ext_py3_dir, req), "w") as f:
         f.write("")
 
@@ -119,7 +119,7 @@ class TestRequirementsGenerator:
 
     with mock.patch.object(RequirementsGenerator, "__init__", return_value=None):
       generator = RequirementsGenerator()
-      generator.local_requirements = ["boto-2.49.0", "django-axes-5.13.0"]
+      generator.local_requirements = ["boto-2.49.0", "pysaml2-7.3.1"]
 
       result = generator.copy_local_requirements(python_version_string)
 
@@ -127,7 +127,7 @@ class TestRequirementsGenerator:
 
       assert len(result) == 2
       assert f"file://{self.temp_dir}/{python_version_string}/boto-2.49.0" in result
-      assert f"file://{self.temp_dir}/{python_version_string}/django-axes-5.13.0" in result
+      assert f"file://{self.temp_dir}/{python_version_string}/pysaml2-7.3.1" in result
 
   @mock.patch("generate_requirements.this_dir")
   @mock.patch("builtins.open", new_callable=mock.mock_open)
@@ -207,11 +207,11 @@ class TestRequirementsGenerator:
       generator.arch = "x86_64"
       generator.python_version_string = "3.11"
       generator.requirements = []
-      generator.local_requirements = ["boto-2.49.0", "django-axes-5.13.0"]
+      generator.local_requirements = ["boto-2.49.0", "pysaml2-7.3.1"]
       generator.arch_requirements_map = {"x86_64": {"3.11": ["Markdown==3.8", "setuptools==80.9.0"]}}
 
       # Mock copy_local_requirements to return file paths
-      local_reqs = [f"file://{self.temp_dir}/3.11/boto-2.49.0", f"file://{self.temp_dir}/3.11/django-axes-5.13.0"]
+      local_reqs = [f"file://{self.temp_dir}/3.11/boto-2.49.0", f"file://{self.temp_dir}/3.11/pysaml2-7.3.1"]
       generator.copy_local_requirements = mock.MagicMock(return_value=local_reqs)
 
       generator.generate_requirements()
@@ -219,7 +219,7 @@ class TestRequirementsGenerator:
       mock_open.assert_called_once_with(f"{self.temp_dir}/requirements-x86_64-3.11.txt", "w")
 
       expected_requirements = "\n".join(
-        ["Markdown==3.8", "setuptools==80.9.0", f"file://{self.temp_dir}/3.11/boto-2.49.0", f"file://{self.temp_dir}/3.11/django-axes-5.13.0"]
+        ["Markdown==3.8", "setuptools==80.9.0", f"file://{self.temp_dir}/3.11/boto-2.49.0", f"file://{self.temp_dir}/3.11/pysaml2-7.3.1"]
       )
 
       mock_open().write.assert_called_once_with(expected_requirements)

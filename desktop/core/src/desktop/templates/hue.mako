@@ -299,7 +299,7 @@ ${ hueIcons.symbols() }
 ${ commonshare() | n,unicode }
 
 % for bundle in get_hue_bundles('hue'):
-  ${ render_bundle(bundle) | n,unicode }
+  ${ render_bundle({'request': request}, bundle) | n,unicode }
 % endfor
 
 <script src="${ static('desktop/js/polyfills.js') }"></script>

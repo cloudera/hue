@@ -11,23 +11,24 @@ cffi==2.0.0
 configobj==5.0.9
 cryptography==46.0.7
 cx-Oracle==8.3.0
-Django==4.2.30
-django-auth-ldap==4.3.0
-django-celery-beat==2.6.0
-django-celery-results==2.5.1
-django-cors-headers==4.4.0
+Django==5.2.18
+django-auth-ldap==5.3.0
+django-axes==8.3.1
+django-celery-beat==2.8.1
+django-celery-results==2.6.0
+django-cors-headers==4.9.0
 django-crequest==2018.5.11
-django-extensions==3.2.3
-django-ipware==3.0.2
+django-extensions==4.1
+django-ipware==7.0.1
 django_opentracing==1.1.0
-django_prometheus==2.3.1
-django-redis==5.4.0
+django_prometheus==2.4.1
+django-redis==6.0.0
 django-utils-six==2.0
-django-webpack-loader==1.0.0
-djangorestframework==3.15.2
+django-webpack-loader==3.2.3
+djangorestframework==3.18.3
 djangorestframework-simplejwt==5.5.1
-djangosaml2==1.9.3
-drf-spectacular[sidecar]==0.27.2
+djangosaml2==1.12.0
+drf-spectacular[sidecar]==0.29.0
 future==0.18.3
 gcs-oauth2-boto-plugin==3.0
 greenlet==3.1.1
@@ -74,7 +75,7 @@ trino==0.329.0
 xlrd==2.0.2
 git+https://github.com/gethue/thrift.git
 async-timeout==5.0.1
-lxml==4.9.1
+lxml==6.1.0
 Markdown==3.8.1
 numpy==1.24.4
 pandas==2.0.3
@@ -82,8 +83,6 @@ pure-sasl==0.6.2
 setuptools==80.9.0
 sqlparse==0.6.0
 -e file://${ROOT}/desktop/core/ext-py3/boto-2.49.0
--e file://${ROOT}/desktop/core/ext-py3/django-axes-5.13.0
--e file://${ROOT}/desktop/core/ext-py3/django-babel
 -e file://${ROOT}/desktop/core/ext-py3/djangomako-1.3.2
 -e file://${ROOT}/desktop/core/ext-py3/pysaml2-7.3.1
 -e file://${ROOT}/desktop/core/ext-py3/python-sasl-0.3.1

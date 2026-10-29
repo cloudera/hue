@@ -25,12 +25,12 @@ import logging
 from datetime import datetime
 from urllib.parse import urlencode as urllib_urlencode
 
-import django.contrib.auth.views
 from axes.decorators import axes_dispatch
-from django.contrib.auth import authenticate, get_backends, login
+from django.contrib.auth import authenticate, get_backends, login, logout as auth_logout, SESSION_KEY
 from django.contrib.sessions.models import Session
 from django.core.exceptions import SuspiciousOperation
 from django.http import HttpResponseRedirect
+from django.shortcuts import resolve_url
 from django.urls import reverse
 from django.utils.encoding import smart_str
 from django.utils.translation import gettext as _
@@ -59,7 +59,7 @@ def get_current_users():
   current_users = {}
   for session in Session.objects.all():
     try:
-      uid = session.get_decoded().get(django.contrib.auth.SESSION_KEY)
+      uid = session.get_decoded().get(SESSION_KEY)
     except SuspiciousOperation:
       # If secret_key changed, this resolution won't work.
       uid = None
@@ -260,7 +260,9 @@ def dt_logout(request, next_page=None):
   if len([backend for backend in backends if hasattr(backend, 'logout')]) == len(backends):
     LOG.warning("Failed to log out from all backends for user: %s" % (username))
 
-  response = django.contrib.auth.views.LogoutView.as_view(next_page=next_page)(request)
+  # Django's LogoutView only accepts POST since Django 5.0, while Hue logs out through a plain link.
+  auth_logout(request)
+  response = HttpResponseRedirect(resolve_url(next_page or '/'))
   response.delete_cookie(LOAD_BALANCER_COOKIE)
   return response
 

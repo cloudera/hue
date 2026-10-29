@@ -67,7 +67,7 @@ ${ commonheader(_("Metastore"), app_name, user, request) | n,unicode }
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 
 % for bundle in get_hue_bundles('tableBrowser'):
-  ${ render_bundle(bundle) | n,unicode }
+  ${ render_bundle({'request': request}, bundle) | n,unicode }
 % endfor
 
 <span class="notebook">

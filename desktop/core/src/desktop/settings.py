@@ -101,10 +101,6 @@ SITE_ID = 1
 # to load the internationalization machinery.
 USE_I18N = True
 
-# If you set this to False, Django will not format dates, numbers and
-# calendars according to the current locale.
-USE_L10N = True
-
 # If you set this to False, Django will not use timezone-aware datetimes.
 USE_TZ = False
 
@@ -127,7 +123,11 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'desktop', 'libs', 'liboauth', 'src', 'liboauth', 'static'),
 )
 
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
+# STATICFILES_STORAGE and DEFAULT_FILE_STORAGE were removed in Django 5.1 and are ignored.
+STORAGES = {
+    'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+    'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'},
+}
 
 # For Django admin interface
 STATIC_URL = '/static/'
@@ -148,7 +148,6 @@ MIDDLEWARE = [
     'desktop.middleware.SpnegoMiddleware',
     'desktop.middleware.HueRemoteUserMiddleware',
     'django.middleware.locale.LocaleMiddleware',
-    'django_babel.middleware.LocaleMiddleware',
     'desktop.middleware.AjaxMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -162,7 +161,6 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'desktop.middleware.CacheControlMiddleware',
     'django.middleware.http.ConditionalGetMiddleware',
-    # 'axes.middleware.FailedLoginMiddleware',
     'desktop.middleware.MimeTypeJSFileFixStreamingMiddleware',
     'crequest.middleware.CrequestMiddleware',
 ]
@@ -190,7 +188,6 @@ INSTALLED_APPS = [
     # 'south', # database migration tool
 
     # i18n support
-    'django_babel',
 
     # Desktop injects all the other installed apps into here magically.
     'desktop',
@@ -564,10 +561,16 @@ AXES_LOCK_OUT_AT_FAILURE = desktop.conf.AUTH.LOGIN_LOCK_OUT_AT_FAILURE.get()
 AXES_COOLOFF_TIME = None
 if desktop.conf.AUTH.LOGIN_COOLOFF_TIME.get() and desktop.conf.AUTH.LOGIN_COOLOFF_TIME.get() != 0:
   AXES_COOLOFF_TIME = desktop.conf.AUTH.LOGIN_COOLOFF_TIME.get()
-AXES_USE_USER_AGENT = desktop.conf.AUTH.LOGIN_LOCK_OUT_USE_USER_AGENT.get()
-AXES_LOCK_OUT_BY_COMBINATION_USER_AND_IP = desktop.conf.AUTH.LOGIN_LOCK_OUT_BY_COMBINATION_USER_AND_IP.get()
-AXES_BEHIND_REVERSE_PROXY = desktop.conf.AUTH.BEHIND_REVERSE_PROXY.get()
-AXES_REVERSE_PROXY_HEADER = desktop.conf.AUTH.REVERSE_PROXY_HEADER.get()
+# A failed login is counted against the IP address alone, or against all of the parameters of a nested list together.
+_axes_lockout_parameters = ['ip_address']
+if desktop.conf.AUTH.LOGIN_LOCK_OUT_BY_COMBINATION_USER_AND_IP.get():
+  _axes_lockout_parameters.insert(0, 'username')
+if desktop.conf.AUTH.LOGIN_LOCK_OUT_USE_USER_AGENT.get():
+  _axes_lockout_parameters.append('user_agent')
+AXES_LOCKOUT_PARAMETERS = [_axes_lockout_parameters]
+# Axes only trusts the connection address unless it is told which request header carries the client IP.
+if desktop.conf.AUTH.BEHIND_REVERSE_PROXY.get():
+  AXES_IPWARE_META_PRECEDENCE_ORDER = (desktop.conf.AUTH.REVERSE_PROXY_HEADER.get(),)
 
 
 LOGIN_URL = '/hue/accounts/login'
