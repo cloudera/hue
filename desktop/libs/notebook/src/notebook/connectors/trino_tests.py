@@ -15,15 +15,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 from django.test import TestCase
 
-from desktop.auth.backend import rewrite_user
 from desktop.lib.django_test_util import make_logged_in_client
-from notebook.connectors.trino import TrinoApi
+from desktop.lib.rest.http_client import RestException
+from notebook.connectors.base import QueryError
+from notebook.connectors.trino import query_error_handler, TrinoApi
 from useradmin.models import User
+
+
+def query_result(rows):
+  """A stand-in for the TrinoResult of the Trino client, which returns all of its rows (all pages) when iterated."""
+  result = MagicMock()
+  result.__iter__.return_value = iter(rows)
+  return result
 
 
 class TestTrinoApi(TestCase):
@@ -127,7 +135,7 @@ class TestTrinoApi(TestCase):
     with patch('notebook.connectors.trino.TrinoQuery') as TrinoQuery:
       # Mock TrinoQuery object and its execute method
       query_instance = TrinoQuery.return_value
-      query_instance.result.rows = [['value1', 'value2'], ['value3', 'value4']]
+      query_instance.execute.return_value = query_result([['value1', 'value2'], ['value3', 'value4']])
       query_instance.columns = [
         {'name': 'test_column1', 'type': 'string', 'comment': ''}, {'name': 'test_column2', 'type': 'string', 'comment': ''}
       ]
@@ -365,7 +373,7 @@ class TestTrinoApi(TestCase):
       'comment := tpch:comment\n           suppkey := tpch:suppkey\n\n']]
       # Mock TrinoQuery object and its execute method
       query_instance = TrinoQuery.return_value
-      query_instance.execute.return_value = MagicMock(next_uri=None, id='123', rows=output, columns=[])
+      query_instance.execute.return_value = query_result(output)
 
       # Call the explain method
       result = self.trino_api.explain(notebook=None, snippet=snippet)
@@ -395,9 +403,11 @@ class TestTrinoApi(TestCase):
   @patch('notebook.connectors.trino.DEFAULT_AUTH_USERNAME.get', return_value='mocked_username')
   @patch('notebook.connectors.trino.DEFAULT_AUTH_PASSWORD.get', return_value='mocked_password')
   def test_auth_username_custom(self, mock_default_username, mock_default_password):
-    self.interpreter['options']['auth_username'] = 'custom_username'
-    self.interpreter['options']['auth_password'] = 'custom_password'
-    trino_api = TrinoApi(self.user, interpreter=self.interpreter)
+    interpreter = {
+      'options': dict(self.interpreter['options'], auth_username='custom_username', auth_password='custom_password'),
+      'name': 'trino'
+    }
+    trino_api = TrinoApi(self.user, interpreter=interpreter)
 
     assert trino_api.auth_username == 'custom_username'
     assert trino_api.auth_password == 'custom_password'
@@ -441,7 +451,7 @@ class TestTrinoApi(TestCase):
           ]
           query_instance = TrinoQuery.return_value
           query_instance.execute.side_effect = [
-            MagicMock(rows=[["schema1"], ["schema2"]]),  # First catalog response
+            query_result([["schema1"], ["schema2"]]),  # First catalog response
             Exception("Some error")  # Second catalog raises an exception
           ]
           result = self.trino_api._show_databases()
@@ -454,3 +464,143 @@ class TestTrinoApi(TestCase):
           Log_error.assert_called_once_with(
             "Failed to fetch schemas from catalog catalog2: Some error"
           )
+
+  def _create_api(self, **options):
+    interpreter = {'options': dict({'url': 'https://example.com:8443'}, **options), 'name': 'trino'}
+    return TrinoApi(self.user, interpreter=interpreter)
+
+  def test_parse_api_url_defaults(self):
+    assert self.trino_api.parse_api_url('http://example.com') == ('example.com', 8080, 'http')
+    assert self.trino_api.parse_api_url('https://example.com') == ('example.com', 443, 'https')
+    assert self.trino_api.parse_api_url('https://example.com:8443') == ('example.com', 8443, 'https')
+
+  @patch('notebook.connectors.trino.DEFAULT_AUTH_USERNAME.get', return_value='global_username')
+  @patch('notebook.connectors.trino.DEFAULT_AUTH_PASSWORD.get', return_value='global_password')
+  def test_empty_interpreter_credentials_fall_back_to_the_global_ones(self, mock_default_password, mock_default_username):
+    trino_api = self._create_api(auth_username='', auth_password='')
+
+    assert trino_api.auth_username == 'global_username'
+    assert trino_api.auth_password == 'global_password'
+
+  @patch('notebook.connectors.trino.DEFAULT_AUTH_USERNAME.get', return_value=None)
+  @patch('notebook.connectors.trino.DEFAULT_AUTH_PASSWORD.get', return_value=None)
+  def test_no_credentials_means_no_authentication(self, mock_default_password, mock_default_username):
+    assert self._create_api().auth is None
+
+  def test_credentials_are_ignored_over_http(self):
+    # The Trino client refuses to send credentials over plain HTTP
+    with patch('notebook.connectors.trino.LOG.warning') as log_warning:
+      trino_api = self._create_api(url='http://example.com:8080', auth_username='username', auth_password='password')
+
+    assert trino_api.auth is None
+    log_warning.assert_called_once()
+
+  def test_credentials_are_used_over_https(self):
+    with patch('notebook.connectors.trino.TrinoRequest') as trino_request:
+      trino_api = self._create_api(auth_username='username', auth_password='password')
+
+    assert trino_api.auth is not None
+    assert trino_request.call_args.kwargs['auth'] is trino_api.auth
+
+  @patch('notebook.connectors.trino.DEFAULT_AUTH_PASSWORD.get', return_value=None)
+  def test_password_script_is_not_run_when_a_password_is_given(self, mock_default_password):
+    with patch('notebook.connectors.trino.coerce_password_from_script') as coerce_password_from_script:
+      trino_api = self._create_api(auth_username='username', auth_password='password', auth_password_script='script')
+
+    coerce_password_from_script.assert_not_called()
+    assert trino_api.auth_password == 'password'
+
+  def test_ssl_verify(self):
+    test_cases = [
+      ({}, True),
+      ({'ssl_verify': True}, True),
+      ({'ssl_verify': False}, False),
+      ({'ssl_verify': 'true'}, True),
+      ({'ssl_verify': ' False '}, False),
+      ({'ssl_verify': '/etc/ssl/ca.pem'}, '/etc/ssl/ca.pem'),
+    ]
+
+    for options, expected_verify in test_cases:
+      with patch('notebook.connectors.trino.TrinoRequest') as trino_request:
+        trino_api = self._create_api(**options)
+
+      assert trino_api.ssl_verify == expected_verify, options
+      assert trino_request.call_args.kwargs['verify'] == expected_verify, options
+
+  def test_trino_user(self):
+    assert self._create_api().trino_session.user == self.user.username
+    assert self._create_api(trino_user='service_user').trino_session.user == 'service_user'
+
+  def test_create_session_properties(self):
+    with patch.object(self.trino_api, '_get_session_info_from_user', return_value=None):
+      assert self.trino_api.create_session()['properties'] == {}
+      assert self.trino_api.create_session(properties={'query_max_run_time': '1h'})['properties'] == {'query_max_run_time': '1h'}
+
+  def test_fetch_result_has_more_when_the_last_page_has_rows_left(self):
+    mock_trino_request = MagicMock()
+    self.trino_api.trino_request = mock_trino_request
+    mock_data = [[f'value{i}'] for i in range(150)]
+    mock_trino_request.process.return_value = MagicMock(
+      stats={'state': 'FINISHED'}, next_uri=None, id=123, rows=mock_data, columns=[{'name': 'col', 'type': 'str'}]
+    )
+
+    result = self.trino_api.fetch_result(
+      notebook={}, snippet={'result': {'handle': {'next_uri': 'http://url', 'result': {'data': []}}}}, rows=0, start_over=False
+    )
+
+    assert len(result['data']) == 100
+    assert result['rows_remaining'] == 50
+    assert result['next_uri'] == 'http://url'
+    assert result['has_more'] is True
+
+  def test_cancel(self):
+    mock_trino_request = MagicMock()
+    self.trino_api.trino_request = mock_trino_request
+
+    assert self.trino_api.cancel(notebook={}, snippet={'result': {'handle': {'next_uri': 'http://url'}}}) == {'status': 0}
+    mock_trino_request.delete.assert_called_once_with('http://url')
+
+    assert self.trino_api.cancel(notebook={}, snippet={'result': {'handle': {'next_uri': None}}}) == {'status': -1}
+
+  def test_use_database(self):
+    with patch('notebook.connectors.trino.TrinoQuery') as TrinoQuery:
+      self.trino_api._use_database(None)
+      TrinoQuery.assert_not_called()
+
+      self.trino_api._use_database('my-catalog.my_schema')
+      TrinoQuery.assert_called_once_with(self.trino_api.trino_request, 'USE "my-catalog"."my_schema"')
+
+  def test_show_databases_quotes_the_catalog(self):
+    with patch('notebook.connectors.trino.TrinoQuery') as TrinoQuery:
+      with patch('notebook.connectors.trino.TrinoApi._show_catalogs', return_value=['my-catalog']):
+        TrinoQuery.return_value.execute.return_value = query_result([['my_schema']])
+
+        assert self.trino_api._show_databases() == ['my-catalog.my_schema']
+
+    TrinoQuery.assert_called_once_with(self.trino_api.trino_request, 'SHOW SCHEMAS FROM "my-catalog"')
+
+  def test_metadata_queries_read_all_the_pages(self):
+    with patch('notebook.connectors.trino.TrinoQuery') as TrinoQuery:
+      # Only the first page is available as the rows of the result, the iteration goes through all of them
+      result = query_result([['table1'], ['table2'], ['table3']])
+      result.rows = [['table1']]
+      TrinoQuery.return_value.execute.return_value = result
+
+      tables = self.trino_api._show_tables('my_catalog.my_schema')
+
+    assert [table['name'] for table in tables] == ['table1', 'table2', 'table3']
+
+  def test_query_error_handler(self):
+    @query_error_handler
+    def fail_with_rest_exception():
+      raise RestException(Exception('the server failed'))
+
+    @query_error_handler
+    def fail_with_json_errors():
+      raise RestException(Exception('{"errors": "bad query"}'))
+
+    with pytest.raises(QueryError, match='the server failed'):
+      fail_with_rest_exception()
+
+    with pytest.raises(QueryError, match='bad query'):
+      fail_with_json_errors()
