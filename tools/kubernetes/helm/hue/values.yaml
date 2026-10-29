@@ -43,9 +43,6 @@ workers:
   replicas: 1
 scheduler:
   enabled: false
-websocket:
-  enabled: false
-  replicas: 1
 monitoring:
   enabled: false
 alerting:

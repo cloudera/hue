@@ -1264,29 +1264,6 @@ There is no bridge to KO for components using this integration. Example using in
     }
   });
 
-  if (window.WEB_SOCKETS_ENABLED) {
-    const prefix = location.protocol === 'https:' ? 'wss://' : 'ws://';
-    var editorWs = new WebSocket(prefix + window.location.host + '/ws/editor/results/' + 'userA' + '/');
-
-    editorWs.onopen = function(e) {
-      console.info('Notification socket open.');
-    };
-
-    editorWs.onmessage = function(e) {
-      var data = JSON.parse(e.data);
-      if (data['type'] === 'channel_name') {
-        window.WS_CHANNEL = data['data'];
-      } else if (data['type'] === 'query_result') {
-        huePubSub.publish('editor.ws.query.fetch_result', data['data']);
-      }
-      console.log(data);
-    };
-
-    editorWs.onclose = function(e) {
-      console.error('Chat socket closed unexpectedly');
-    };
-  }
-
   window.EDITOR_ENABLE_QUERY_SCHEDULING = '${ ENABLE_QUERY_SCHEDULING.get() }' === 'True';
 
   window.SQL_ANALYZER_AUTO_UPLOAD_QUERIES = '${ OPTIMIZER.AUTO_UPLOAD_QUERIES.get() }' === 'True';

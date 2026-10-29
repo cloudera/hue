@@ -65,8 +65,6 @@ export interface hueWindow {
   USER_IS_ADMIN?: boolean;
   USER_IS_HUE_ADMIN?: boolean;
   USER_VIEW_EDIT_USER_ENABLED?: boolean;
-  WEB_SOCKETS_ENABLED?: boolean;
-  WS_CHANNEL?: string;
   hueDebug?: HueDebug;
   hueDebugAnalytics?: boolean;
   gtag?: (type: string, name: string, parameters: { action: string; version: string }) => void;

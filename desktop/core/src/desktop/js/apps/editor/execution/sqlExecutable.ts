@@ -41,7 +41,6 @@ import dataCatalog from 'catalog/dataCatalog';
 import { ParsedSqlStatement } from 'parse/sqlStatementsParser';
 import { HueAlert } from 'reactComponents/GlobalAlert/types';
 import { GLOBAL_ERROR_TOPIC } from 'reactComponents/GlobalAlert/events';
-import { hueWindow } from 'types/types';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
 import UUID from 'utils/string/UUID';
@@ -361,14 +360,10 @@ export default class SqlExecutable {
         if (!queryStatus.result) {
           return;
         }
-        if ((<hueWindow>window).WEB_SOCKETS_ENABLED) {
-          huePubSub.publish('editor.ws.query.fetch_result', queryStatus.result);
-        } else {
-          if (!this.result) {
-            this.result = new ExecutionResult(this, true);
-          }
-          this.result.handleResultResponse(queryStatus.result);
+        if (!this.result) {
+          this.result = new ExecutionResult(this, true);
         }
+        this.result.handleResultResponse(queryStatus.result);
       case ExecutionStatus.running:
       case ExecutionStatus.starting:
       case ExecutionStatus.waiting:
@@ -628,8 +623,7 @@ export default class SqlExecutable {
       uuid: UUID(),
       name: '',
       isSaved: false,
-      sessions: [session],
-      editorWsChannel: (<hueWindow>window).WS_CHANNEL
+      sessions: [session]
     };
 
     return {

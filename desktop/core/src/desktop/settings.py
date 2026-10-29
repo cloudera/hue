@@ -550,18 +550,6 @@ if EMAIL_BACKEND == 'sendgrid_backend.SendgridBackend':
   SENDGRID_SANDBOX_MODE_IN_DEBUG = DEBUG
 
 
-if desktop.conf.has_channels():
-  INSTALLED_APPS.append('channels')
-  ASGI_APPLICATION = 'desktop.routing.application'
-  CHANNEL_LAYERS = {
-    'default': {
-      'BACKEND': 'channels_redis.core.RedisChannelLayer',
-      'CONFIG': {
-        'hosts': [(desktop.conf.WEBSOCKETS.LAYER_HOST.get(), desktop.conf.WEBSOCKETS.LAYER_PORT.get())],
-      },
-    },
-  }
-
 # Used for securely creating sessions. Should be unique and not shared with anybody.
 # Changing auth backends will invalidate all open sessions.
 SECRET_KEY = desktop.conf.get_secret_key()

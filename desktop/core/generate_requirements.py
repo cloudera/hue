@@ -58,12 +58,9 @@ class RequirementsGenerator:
       "certifi==2026.10.23",
       # cryptography 46.x requires cffi >= 2.0.0. Held at 2.0.0 because 2.1.0 needs Python >= 3.10.
       "cffi==2.0.0",
-      "channels==4.2.2",
-      "channels-redis==4.2.1",
       "configobj==5.0.9",
       "cryptography==46.0.7",
       "cx-Oracle==8.3.0",
-      "daphne==4.2.2",
       "Django==4.2.30",
       "django-auth-ldap==4.3.0",
       "django-celery-beat==2.6.0",
