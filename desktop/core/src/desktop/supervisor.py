@@ -32,26 +32,25 @@ This entry point should point to a SuperviseeSpec instance in your module.
 
 from __future__ import print_function
 
-import os
 import grp
-import pwd
-import sys
-import time
-import signal
 import logging
 import optparse
-import threading
+import os
+import pwd
+import signal
 import subprocess
+import sys
+import threading
+import time
 from builtins import object, range
+from importlib.metadata import entry_points
 
 import daemon
-import pkg_resources
-from daemon.daemon import DaemonContext
 from daemon.pidfile import TimeoutPIDLockFile
 
-import desktop.log
-import desktop.lib.paths
 import desktop.lib.daemon_utils
+import desktop.lib.paths
+import desktop.log
 
 PROC_NAME = 'supervisor'
 LOG = logging.getLogger()
@@ -164,7 +163,7 @@ class Supervisor(threading.Thread):
           return
 
         LOG.error("Process %s exited abnormally. Restarting it." % (proc_str,))
-    except BaseException as ex:
+    except BaseException:
       LOG.exception("Uncaught exception. Supervisor exiting.")
       self.state = Supervisor.ERROR
 
@@ -229,7 +228,7 @@ def get_pid_cmdline(pid):
 
 def get_supervisees():
   """Pull the supervisor specifications out of the entry point."""
-  eps = list(pkg_resources.iter_entry_points(ENTRY_POINT_GROUP))
+  eps = list(entry_points(group=ENTRY_POINT_GROUP))
   return dict((ep.name, ep.load()) for ep in eps)
 
 
@@ -366,7 +365,7 @@ def main():
       sups.append(sup)
 
     wait_loop(sups, options)
-  except BaseException as ex:
+  except BaseException:
     LOG.exception("Exception in supervisor main loop")
     shutdown(sups)  # shutdown() exits the process
 

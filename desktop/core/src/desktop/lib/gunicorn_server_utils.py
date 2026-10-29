@@ -29,9 +29,9 @@ import ssl
 import sys
 import tempfile
 import time
+from importlib.metadata import version
 
 import gunicorn.app.base
-import pkg_resources
 import psutil
 import redis
 from django.core.wsgi import get_wsgi_application
@@ -90,7 +90,7 @@ def worker_int(worker):
 
 def enable_logging(args, options):
   """Enable basic logging for the process"""
-  HUE_DESKTOP_VERSION = pkg_resources.get_distribution("desktop").version or "Unknown"
+  HUE_DESKTOP_VERSION = version("desktop") or "Unknown"
   # Start basic logging as soon as possible.
   if "HUE_PROCESS_NAME" not in os.environ:
     _proc = os.path.basename(len(sys.argv) > 1 and sys.argv[1] or sys.argv[0])

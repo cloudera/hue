@@ -4,6 +4,8 @@
 # always builds it from source. Its setup.py imports pkg_resources, which
 # setuptools removed in 82.0.0.
 #
-# This must be passed as PIP_BUILD_CONSTRAINT: PIP_CONSTRAINT does not apply to
-# the isolated environment pip creates for build dependencies, and needs pip >= 25.3.
+# This must be passed as PIP_BUILD_CONSTRAINT, which constrains only the isolated
+# environment pip creates for build dependencies and needs pip >= 25.3. Do not pass
+# it as PIP_CONSTRAINT: that would also constrain the setuptools the virtual env
+# installs, which has to be 84.1.0 or later.
 setuptools<82

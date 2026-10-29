@@ -15,14 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import os
 import re
 import sys
-import logging
 import traceback
 from builtins import object
+from importlib.metadata import entry_points
 
-import pkg_resources
 from django.utils.translation import gettext as _
 
 import desktop
@@ -56,7 +56,7 @@ def _import_module_or_none(module):
   try:
     __import__(module)
     return sys.modules[module]
-  except ImportError as ie:
+  except ImportError:
     # If the exception came from us importing, we want to just
     # return None. We need to inspect the stack, though, so we properly
     # reraise in the case that the module we're importing triggered
@@ -78,7 +78,7 @@ class DesktopModuleInfo(object):
 
   A Desktop app is encapsulated by a module.
   These modules are found using the "desktop.sdk.application"
-  entrypoint (from pkg_resources/setup.py).
+  entrypoint (declared in setup.py).
 
   Each desktop app may have a settings file,
   which lists DJANGO_APPS to be installed as
@@ -184,7 +184,7 @@ class DesktopModuleInfo(object):
     if self.static_dir:
       f = os.path.join(self.static_dir, "bootstrap.js")
       if os.path.exists(f):
-        return file(f)
+        return open(f)
     else:
       return None
 
@@ -236,7 +236,7 @@ def load_libs():
     raise Exception("load_apps already has been called.")
   DESKTOP_LIBS = []
 
-  for lib in pkg_resources.iter_entry_points("desktop.sdk.lib"):
+  for lib in entry_points(group="desktop.sdk.lib"):
     m = lib.load()
     DESKTOP_LIBS.append(DesktopModuleInfo(m))
 
@@ -260,7 +260,7 @@ def load_apps(app_blacklist):
     raise Exception(_("load_apps has already been called."))
   DESKTOP_APPS = []
 
-  for sdk_app in pkg_resources.iter_entry_points("desktop.sdk.application"):
+  for sdk_app in entry_points(group="desktop.sdk.application"):
 
     if desktop.conf.CSP_NONCE.get():
       # This Apps are not supported CSP Nonce is enabled.
