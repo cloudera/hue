@@ -5,6 +5,10 @@ import datetime
 from os import remove
 from os.path import join
 
+from cryptography import x509
+from cryptography.exceptions import InvalidSignature
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.x509.oid import NameOID
 from OpenSSL import crypto
 import dateutil.parser
 import pytz
@@ -22,6 +26,34 @@ class CertificateError(Exception):
 
 class PayloadError(Exception):
     pass
+
+
+def _to_bytes(value):
+    return value if isinstance(value, bytes) else value.encode("utf-8")
+
+
+def _hash_algorithm(name):
+    """
+    Hue change: pyOpenSSL 26 removed X509Req, so certificate requests are built with cryptography, which wants a
+    hash object instead of a name like "sha256".
+    """
+    try:
+        return getattr(hashes, name.upper())()
+    except AttributeError:
+        raise WrongInput(f"Unsupported hash algorithm: {name}")
+
+
+def _subject_name(cert_info):
+    return x509.Name(
+        [
+            x509.NameAttribute(NameOID.COUNTRY_NAME, cert_info["country_code"]),
+            x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, cert_info["state"]),
+            x509.NameAttribute(NameOID.LOCALITY_NAME, cert_info["city"]),
+            x509.NameAttribute(NameOID.ORGANIZATION_NAME, cert_info["organization"]),
+            x509.NameAttribute(NameOID.ORGANIZATIONAL_UNIT_NAME, cert_info["organization_unit"]),
+            x509.NameAttribute(NameOID.COMMON_NAME, cert_info["cn"]),
+        ]
+    )
 
 
 class OpenSSLWrapper:
@@ -134,31 +166,34 @@ class OpenSSLWrapper:
         k = crypto.PKey()
         k.generate_key(crypto.TYPE_RSA, key_length)
 
-        # create a self-signed cert
-        cert = crypto.X509()
-
-        if request:
-            cert = crypto.X509Req()
-
         if len(cert_info["country_code"]) != 2:
             raise WrongInput("Country code must be two letters!")
-        cert.get_subject().C = cert_info["country_code"]
-        cert.get_subject().ST = cert_info["state"]
-        cert.get_subject().L = cert_info["city"]
-        cert.get_subject().O = cert_info["organization"]  # noqa: E741
-        cert.get_subject().OU = cert_info["organization_unit"]
-        cert.get_subject().CN = cn
-        if not request:
+
+        if request:
+            csr = (
+                x509.CertificateSigningRequestBuilder()
+                .subject_name(_subject_name(cert_info))
+                .sign(k.to_cryptography_key(), _hash_algorithm(hash_alg))
+            )
+        else:
+            # create a self-signed cert
+            cert = crypto.X509()
+            cert.get_subject().C = cert_info["country_code"]
+            cert.get_subject().ST = cert_info["state"]
+            cert.get_subject().L = cert_info["city"]
+            cert.get_subject().O = cert_info["organization"]  # noqa: E741
+            cert.get_subject().OU = cert_info["organization_unit"]
+            cert.get_subject().CN = cn
             cert.set_serial_number(sn)
             cert.gmtime_adj_notBefore(valid_from)  # Valid before present time
             cert.gmtime_adj_notAfter(valid_to)  # 3 650 days
             cert.set_issuer(cert.get_subject())
-        cert.set_pubkey(k)
-        cert.sign(k, hash_alg)
+            cert.set_pubkey(k)
+            cert.sign(k, hash_alg)
 
         try:
             if request:
-                tmp_cert = crypto.dump_certificate_request(crypto.FILETYPE_PEM, cert)
+                tmp_cert = csr.public_bytes(serialization.Encoding.PEM)
             else:
                 tmp_cert = crypto.dump_certificate(crypto.FILETYPE_PEM, cert)
             tmp_key = None
@@ -237,27 +272,24 @@ class OpenSSLWrapper:
         :return:                  String representation of the signed
                                   certificate.
         """
-        ca_cert = crypto.load_certificate(crypto.FILETYPE_PEM, sign_cert_str)
-        ca_key = None
-        if passphrase is not None:
-            ca_key = crypto.load_privatekey(crypto.FILETYPE_PEM, sign_key_str, passphrase)
-        else:
-            ca_key = crypto.load_privatekey(crypto.FILETYPE_PEM, sign_key_str)
-        req_cert = crypto.load_certificate_request(crypto.FILETYPE_PEM, request_cert_str)
+        ca_cert = x509.load_pem_x509_certificate(_to_bytes(sign_cert_str))
+        ca_key = serialization.load_pem_private_key(
+            _to_bytes(sign_key_str), password=_to_bytes(passphrase) if passphrase is not None else None
+        )
+        req_cert = x509.load_pem_x509_csr(_to_bytes(request_cert_str))
 
-        cert = crypto.X509()
-        cert.set_subject(req_cert.get_subject())
-        cert.set_serial_number(sn)
-        cert.gmtime_adj_notBefore(valid_from)
-        cert.gmtime_adj_notAfter(valid_to)
-        cert.set_issuer(ca_cert.get_subject())
-        cert.set_pubkey(req_cert.get_pubkey())
-        cert.sign(ca_key, hash_alg)
-
-        cert_dump = crypto.dump_certificate(crypto.FILETYPE_PEM, cert)
-        if isinstance(cert_dump, str):
-            return cert_dump
-        return cert_dump.decode("utf-8")
+        now = datetime.datetime.now(datetime.timezone.utc)
+        cert = (
+            x509.CertificateBuilder()
+            .subject_name(req_cert.subject)
+            .issuer_name(ca_cert.subject)
+            .public_key(req_cert.public_key())
+            .serial_number(sn)
+            .not_valid_before(now + datetime.timedelta(seconds=valid_from))
+            .not_valid_after(now + datetime.timedelta(seconds=valid_to))
+            .sign(ca_key, _hash_algorithm(hash_alg))
+        )
+        return cert.public_bytes(serialization.Encoding.PEM).decode("utf-8")
 
     def verify_chain(self, cert_chain_str_list, cert_str):
         """
@@ -321,16 +353,13 @@ class OpenSSLWrapper:
             if ca_cert.get_subject().CN == cert.get_subject().CN:
                 return False, ("CN may not be equal for CA certificate and the " "signed certificate.")
 
-            cert_algorithm = cert.get_signature_algorithm()
-            cert_algorithm = cert_algorithm.decode("ascii")
-            cert_str = cert_str.encode("ascii")
+            cert_crypto = saml2.cryptography.pki.load_pem_x509_certificate(cert_str.encode("ascii"))
 
-            cert_crypto = saml2.cryptography.pki.load_pem_x509_certificate(cert_str)
-
+            # Hue change: pyOpenSSL 26 removed crypto.verify(), so check the signature with cryptography.
             try:
-                crypto.verify(ca_cert, cert_crypto.signature, cert_crypto.tbs_certificate_bytes, cert_algorithm)
+                cert_crypto.verify_directly_issued_by(ca_cert.to_cryptography())
                 return True, "Signed certificate is valid and correctly signed by CA certificate."
-            except crypto.Error as e:
+            except (InvalidSignature, ValueError, TypeError) as e:
                 return False, f"Certificate is incorrectly signed: {str(e)}"
         except Exception as e:
             return False, f"Certificate is not valid for an unknown reason. {str(e)}"
