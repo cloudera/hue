@@ -59,7 +59,7 @@ class RequirementsGenerator:
       # cryptography requires cffi >= 2.0.0. Held at 2.0.0 because 2.1.0 needs Python >= 3.10.
       "cffi==2.0.0",
       "configobj==5.0.9",
-      "cryptography==46.0.7",
+      "cryptography==50.0.2",
       "cx-Oracle==8.3.0",
       "Django==5.2.18",
       "django-auth-ldap==5.3.0",
@@ -100,8 +100,9 @@ class RequirementsGenerator:
       "pyarrow==23.0.1",
       "pydantic==2.10.6",
       "PyJWT==2.15.1",
-      # Held at 26.0.0: 26.4.0 drops X509Req, which pysaml2 still needs. Caps cryptography at <47.
-      "pyOpenSSL==26.0.0",
+      # 26.3.0 is the first release that accepts cryptography 49 and 50. It no longer has X509Req, so the certificate
+      # request code of the vendored pysaml2 uses cryptography directly.
+      "pyOpenSSL==26.4.0",
       "python-daemon==2.2.4",
       "python-dateutil==2.8.2",
       "python-ldap==3.4.5",
