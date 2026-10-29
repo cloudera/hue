@@ -15,14 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import sys
 import json
+import logging
+import os
+import subprocess
+import sys
+import tempfile
 import time
 import uuid
-import logging
-import tempfile
-import subprocess
 from io import StringIO as string_io
 from unittest.mock import Mock, patch
 
@@ -30,8 +30,7 @@ import pytest
 from configobj import ConfigObj
 from django.core.management import call_command
 from django.core.paginator import Paginator
-from django.db import connection
-from django.db.models import CharField, SmallIntegerField, query
+from django.db.models import CharField, query, SmallIntegerField
 from django.http import HttpResponse
 from django.test.client import Client
 from django.urls import re_path, reverse
@@ -39,10 +38,10 @@ from django.views.static import serve
 
 import desktop
 import desktop.conf
+import desktop.redaction as redaction
 import desktop.urls
 import desktop.views as views
 import notebook.conf
-import desktop.redaction as redaction
 from dashboard.conf import HAS_SQL_ENABLED
 from desktop.appmanager import DESKTOP_APPS
 from desktop.auth.backend import rewrite_user
@@ -54,7 +53,7 @@ from desktop.lib.paths import get_desktop_root
 from desktop.lib.python_util import force_dict_to_strings
 from desktop.lib.test_utils import grant_access
 from desktop.middleware import DJANGO_VIEW_AUTH_WHITELIST
-from desktop.models import HUE_VERSION, ClusterConfig, Directory, Document, Document2, _version_from_properties, get_data_link
+from desktop.models import _version_from_properties, ClusterConfig, Directory, Document, Document2, get_data_link, HUE_VERSION
 from desktop.redaction import logfilter
 from desktop.redaction.engine import RedactionPolicy, RedactionRule
 from desktop.settings import DATABASES
@@ -791,7 +790,7 @@ def test_check_config_ajax():
   c = make_logged_in_client()
   response = c.get(reverse(check_config))
   content = response.content.decode('utf-8')
-  assert "misconfiguration" in response.content, response.content
+  assert "misconfiguration" in content, content
 
 
 def test_cx_Oracle():
@@ -802,17 +801,14 @@ def test_cx_Oracle():
     pytest.skip("Skipping Test")
 
   try:
-    import cx_Oracle
-
-    return
+    import cx_Oracle  # noqa: F401
   except ImportError as ex:
-    if "No module named" in ex.message:
-      assert (
-        False,
+    if "No module named" in str(ex):
+      pytest.fail(
         "cx_Oracle skipped its build. This happens if "
         "env var ORACLE_HOME or ORACLE_INSTANTCLIENT_HOME is not defined. "
         "So ignore this test failure if your build does not need to work "
-        "with an oracle backend.",
+        "with an oracle backend."
       )
 
 
@@ -1435,13 +1431,6 @@ def test_db_migrations_mysql(django_db_blocker):
         raise e
       finally:
         del DATABASES[name]
-
-
-# @raises(ImportError)
-def test_forbidden_libs():
-  if sys.version_info[0] > 2:
-    pytest.skip("Skipping Test")
-  import chardet  # chardet license (LGPL) is not compatible and should not be bundled
 
 
 @pytest.mark.django_db

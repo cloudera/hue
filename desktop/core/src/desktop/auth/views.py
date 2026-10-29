@@ -36,7 +36,6 @@ from django.utils.encoding import smart_str
 from django.utils.translation import gettext as _
 
 from desktop.auth import forms as auth_forms
-from desktop.auth.backend import OIDCBackend
 from desktop.auth.forms import ImpersonationAuthenticationForm, OrganizationAuthenticationForm, OrganizationUserCreationForm
 from desktop.conf import ENABLE_ORGANIZATIONS, OAUTH, SESSION
 from desktop.lib import fsmanager
@@ -47,7 +46,7 @@ from desktop.settings import LOAD_BALANCER_COOKIE
 from desktop.views import saml_login_headers, samlgroup_check
 from hadoop.fs.exceptions import WebHdfsException
 from notebook.connectors.base import get_api
-from useradmin.models import Group, User, UserProfile, get_profile
+from useradmin.models import get_profile, User, UserProfile
 from useradmin.views import ensure_home_directory, require_change_password
 
 LOG = logging.getLogger()
@@ -188,7 +187,7 @@ def dt_login(request, from_modal=False):
         request.fs = fsmanager.get_filesystem(request.fs_ref)
       try:
         ensure_home_directory(request.fs, request.user)
-      except (IOError, WebHdfsException) as e:
+      except (IOError, WebHdfsException):
         LOG.error('Could not create home directory for %s user %s.' % ('OIDC' if 'OIDCBackend' in backend_names else 'SAML', request.user))
     if request.user.is_authenticated and not from_modal:
       return HttpResponseRedirect(redirect_to)
