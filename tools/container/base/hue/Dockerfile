@@ -59,7 +59,7 @@ RUN set -eux; \
       && python3.11 -m pip install supervisor psycopg2-binary \
       && dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm \
       && yum install -y postgresql15 \
-      && curl -sL https://rpm.nodesource.com/setup_14.x | bash - \
+      && curl -sL https://rpm.nodesource.com/setup_22.x | bash - \
         && yum install -y nodejs \
         && yum clean all -y  \
         && rm -rf /var/cache/yum

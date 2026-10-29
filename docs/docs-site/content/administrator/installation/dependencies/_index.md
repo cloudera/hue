@@ -289,14 +289,16 @@ On macOS 10.15.x
 
 ## NodeJs
 
+Node.js 22.13 or later is required.
+
 e.g. how to install on Ubuntu:
 
-    curl -sL https://deb.nodesource.com/setup_20.x | sudo bash -
+    curl -sL https://deb.nodesource.com/setup_22.x | sudo bash -
     sudo apt-get install -y nodejs
 
 For Centos / Red Hat use this source:
 
-    curl -sL https://rpm.nodesource.com/setup_20.x | sudo bash -
+    curl -sL https://rpm.nodesource.com/setup_22.x | sudo bash -
     sudo yum install -y nodejs
 
 Upgrade to npm 10+:
