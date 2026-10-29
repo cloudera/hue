@@ -16,17 +16,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
 import logging
+from builtins import object
+from unittest.mock import patch
+
 import pytest
 
+from desktop.auth.backend import rewrite_user
+from desktop.lib.django_test_util import make_logged_in_client
 from indexer.conf import ENABLE_SQOOP
 from indexer.indexers.rdbms import _get_api
 from librdbms.server import dbms as rdbms
 from useradmin.models import User
-
-from desktop.auth.backend import rewrite_user
-from desktop.lib.django_test_util import make_logged_in_client
 
 LOG = logging.getLogger()
 
@@ -58,5 +59,22 @@ class TestRdbmsIndexer(object):
     assert 0 == data['status'], data
     assert '' != data['rows'], data
 
+
 class Bag(dict):
   pass
+
+
+def test_custom_rdbms_does_not_depend_on_the_custom_connectors_flag():
+  request = Bag()
+  request.POST = {
+    'source': '{"rdbmsMode": "customRdbms", "rdbmsType": "jdbc", "rdbmsJdbcDriver": "org.postgresql.Driver", '
+              '"rdbmsHostname": "jdbc:postgresql://localhost/db", "rdbmsUsername": "user", "rdbmsPassword": "password"}'
+  }
+
+  with patch('indexer.indexers.rdbms.get_api') as get_api:
+    _get_api(request)
+
+  snippet = get_api.call_args.args[1]
+  assert snippet['type'] == 'custom'
+  assert snippet['interface'] == 'jdbc'
+  assert get_api.call_args.kwargs['allow_custom_connector'] is True

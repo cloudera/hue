@@ -25,7 +25,7 @@ from django.utils.translation import gettext as _, gettext_lazy as _t
 
 from desktop import appmanager
 from desktop.conf import ENABLE_UNIFIED_ANALYTICS, get_clusters, has_connectors, is_oozie_enabled
-from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection, coerce_bool, coerce_csv, coerce_json_dict
+from desktop.lib.conf import coerce_bool, coerce_csv, coerce_json_dict, Config, ConfigSection, UnspecifiedConfigSection
 
 LOG = logging.getLogger()
 
@@ -240,6 +240,16 @@ ENABLE_QUERY_SCHEDULING = Config(
 ENABLE_EXTERNAL_STATEMENT = Config(
   key="enable_external_statements",
   help=_t("Flag to enable the selection of queries from files, saved queries into the editor or as snippet."),
+  type=coerce_bool,
+  default=False,
+)
+
+ENABLE_CUSTOM_CONNECTORS = Config(
+  key="enable_custom_connectors",
+  help=_t(
+    "Flag to let the API clients choose the connector interface and its options (URL, credentials...) of a snippet "
+    "with the 'custom' type. Off by default, as it lets any user reach any host the server can reach."
+  ),
   type=coerce_bool,
   default=False,
 )

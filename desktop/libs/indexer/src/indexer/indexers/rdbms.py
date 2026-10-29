@@ -15,23 +15,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
 import json
-import uuid
 import logging
+import uuid
 
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import smart_str
-from librdbms.conf import DATABASES, get_connector_name, get_database_password, get_server_choices
-from librdbms.jdbc import Jdbc
+from librdbms.conf import DATABASES, get_database_password, get_server_choices
 from librdbms.server import dbms as rdbms
 from notebook.conf import get_ordered_interpreters
 from notebook.connectors.base import get_api
 from notebook.models import make_notebook
-from useradmin.models import User
 
 LOG = logging.getLogger()
 
@@ -95,7 +92,13 @@ def _get_api(request):
     name = type
     interface = file_format['inputFormat']
 
-  return get_api(request, {'type': type, 'interface': interface, 'options': options, 'query_server': query_server, 'name': name})
+  # The importer only builds 'custom' snippets for its own jdbc and rdbms interfaces, so it does not depend on
+  # [notebook] enable_custom_connectors, which restricts the 'custom' snippets sent by API clients.
+  return get_api(
+    request,
+    {'type': type, 'interface': interface, 'options': options, 'query_server': query_server, 'name': name},
+    allow_custom_connector=True
+  )
 
 
 def jdbc_db_list(request):
