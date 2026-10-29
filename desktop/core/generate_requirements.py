@@ -95,7 +95,8 @@ class RequirementsGenerator:
       "phoenixdb==1.2.1",
       "polars[calamine]==1.8.2",  # Python >= 3.8
       "prompt-toolkit==3.0.39",
-      "protobuf==3.20.3",
+      # Needs >= 6.33.5 at runtime: desktop/lib/raz/signer_protos_pb2.py is generated with protoc 6.33.5.
+      "protobuf==6.33.5",
       "psutil==5.8.0",
       "pyarrow==23.0.1",
       "pydantic==2.10.6",
