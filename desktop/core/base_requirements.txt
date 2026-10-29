@@ -1,18 +1,21 @@
+# Mirror of the pins in generate_requirements.py, kept so that Dependabot can scan the Python dependencies.
+# The build does not read this file. generate_requirements_test.py fails when it drifts from the generator.
 apache-ranger==0.0.3
-requests-gssapi==1.2.3
 asn1crypto==0.24.0
 avro-python3==1.8.2
 Babel==2.9.1
+boto3==1.37.38
 celery[redis]==5.4.0
+certifi==2026.10.23
 cffi==2.0.0
 channels==4.2.2
 channels-redis==4.2.1
 configobj==5.0.9
+cryptography==46.0.7
 cx-Oracle==8.3.0
-django-auth-ldap==4.3.0
-Django==4.2.30
 daphne==4.2.2
-django-redis==5.4.0
+Django==4.2.30
+django-auth-ldap==4.3.0
 django-celery-beat==2.6.0
 django-celery-results==2.5.1
 django-cors-headers==4.4.0
@@ -21,59 +24,69 @@ django-extensions==3.2.3
 django-ipware==3.0.2
 django_opentracing==1.1.0
 django_prometheus==2.3.1
+django-redis==5.4.0
+django-utils-six==2.0
 django-webpack-loader==1.0.0
 djangomako==1.3.2
-djangorestframework-simplejwt==5.3.1
 djangorestframework==3.15.2
+djangorestframework-simplejwt==5.5.1
 djangosaml2==1.9.3
+drf-spectacular[sidecar]==0.27.2
 future==0.18.3
 gcs-oauth2-boto-plugin==3.0
 greenlet==3.1.1
 gunicorn==23.0.0
-ipython==8.12.2  # Python >= 3.8
+ipython==8.12.2
 jaeger-client==4.3.0
 kazoo==2.8.0
 kerberos==1.3.0
+krb5==0.5.1
 kubernetes==26.1.0
 Mako==1.2.3
-Markdown==3.8.1
 openpyxl==3.0.9
 phoenixdb==1.2.1
-polars[calamine]==1.8.2  # Python >= 3.8
+polars[calamine]==1.8.2
 prompt-toolkit==3.0.39
 protobuf==3.20.3
-pyarrow==17.0.0
+psutil==5.8.0
+pyarrow==23.0.1
 pydantic==2.10.6
 pyformance==0.3.2
-python-dateutil==2.8.2
+PyJWT==2.15.1
+pyOpenSSL==26.0.0
 python-daemon==2.2.4
-python-ldap==3.4.3
+python-dateutil==2.8.2
+python-ldap==3.4.5
 python-magic==0.4.27
 python-oauth2==1.1.0
 python-pam==2.0.2
 pytidylib==0.3.2
 pytz==2021.3
-PyJWT==2.14.0
 PyYAML==6.0.1
-requests==2.32.3
+requests==2.33.0
+requests-gssapi==1.2.3
 requests-kerberos==0.14.0
-krb5==0.5.1  # pinned for Sles12, dep of requests-kerberos 0.14.0
 rsa==4.7.2
 ruff==0.11.10
+six==1.16.0
 slack-sdk==3.31.0
 SQLAlchemy==1.3.8
-sqlparse==0.6.0
-tablib==0.13.0
+tablib==3.10.0
 tabulate==0.8.9
-trino==0.329.0
-git+https://github.com/gethue/thrift.git
 thrift-sasl==0.4.3
-django-utils-six==2.0
-six==1.16.0
-psutil==5.8.0
-drf-spectacular[sidecar]==0.27.2
+trino==0.329.0
+xlrd==2.0.2
+git+https://github.com/gethue/thrift.git
+async-timeout==5.0.1
+lxml==4.9.1
+Markdown==3.8.1
+numpy==1.24.4
+pandas==2.0.3
+pure-sasl==0.6.2
+setuptools==80.9.0
+sqlparse==0.6.0
 -e file://${ROOT}/desktop/core/ext-py3/boto-2.49.0
 -e file://${ROOT}/desktop/core/ext-py3/django-axes-5.13.0
+-e file://${ROOT}/desktop/core/ext-py3/django-babel
 -e file://${ROOT}/desktop/core/ext-py3/pysaml2-7.3.1
 -e file://${ROOT}/desktop/core/ext-py3/python-sasl-0.3.1
--e file://${ROOT}/desktop/core/ext-py3/django-babel
