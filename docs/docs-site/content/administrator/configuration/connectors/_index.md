@@ -188,16 +188,30 @@ Then give Hue the information about the trino cluster:
     interface=trino
     options='{"url": "http://localhost:8080"}'
 
-With credentials:
+With basic (LDAP or password file) authentication. Trino only accepts it over HTTPS, so the credentials are ignored (and a warning is logged) for `http://` URLs:
 
-    options='{"url": "http://localhost:8080",  "auth_username": "", "auth_password":""}'
+    options='{"url": "https://trino.example.com:443", "auth_username": "hue", "auth_password": "secret"}'
 
-With password script:
+With a password script, which avoids storing the password in the configuration. Its output is used as the password:
 
-    options='{"url": "http://localhost:8080",  "auth_username": "", "auth_password_script":""}'
+    options='{"url": "https://trino.example.com:443", "auth_username": "hue", "auth_password_script": "/path/to/script"}'
+
+Other options:
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `ssl_verify` | `true` | Validate the server certificate. Use `false` to disable it, or the path of a CA bundle. |
+| `trino_user` | the Hue user | User sent to Trino (`X-Trino-User`). |
+
+Databases are listed per catalog and named `catalog.schema`, e.g. `hive.default`.
 
 **Note**
-Currently, only [basic LDAP authentication](https://github.com/trinodb/trino-python-client?tab=readme-ov-file#basic-authentication) using username and password or password script is supported. Alternatively, you can establish unsecured Trino connections.
+* Only [basic authentication](https://github.com/trinodb/trino-python-client?tab=readme-ov-file#basic-authentication) or unsecured connections are supported.
+* The section name must be `trino` for the native client (`interface=trino`). The SQLAlchemy `trino://` URL of the `interface=sqlalchemy` connector is a different integration.
+
+#### Custom connectors
+
+API clients can send a snippet of type `custom` that defines its own interface and options, which lets the Hue server connect to any host. This is disabled by default and can be enabled in the `[notebook]` section with `enable_custom_connectors=true` if the users are trusted. Connectors defined in the configuration are not affected.
 
 
 ### Oracle
