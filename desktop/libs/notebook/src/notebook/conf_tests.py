@@ -15,9 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
 import json
-import unittest
 from unittest.mock import Mock, patch
 
 import pytest
@@ -25,10 +23,9 @@ from django.test import TestCase
 
 from desktop.auth.backend import rewrite_user
 from desktop.conf import ENABLE_CONNECTORS
-from desktop.lib.connectors.api import _get_installed_connectors
 from desktop.lib.django_test_util import make_logged_in_client
-from notebook.conf import _excute_test_query, config_validator, get_ordered_interpreters
-from useradmin.models import User, get_default_user_group, update_app_permissions
+from notebook.conf import _excute_test_query, config_validator, get_ordered_interpreters, INTERPRETERS
+from useradmin.models import get_default_user_group, User
 
 
 class TestInterpreterConfig(TestCase):
@@ -72,6 +69,22 @@ class TestInterpreterConfig(TestCase):
       assert interpreters, interpreters
       assert all(['dialect_properties' in interpreter for interpreter in interpreters]), interpreters
       assert any([interpreter.get('dialect_properties').get('sql_identifier_quote') for interpreter in interpreters]), interpreters
+
+  def test_native_trino_interpreter(self):
+    reset = INTERPRETERS.set_for_testing({
+      'trino': {'name': 'Trino', 'interface': 'trino', 'options': {'url': 'http://localhost:8080'}},
+    })
+    try:
+      with patch('notebook.conf.INTERPRETERS_CACHE', None), patch('notebook.conf.has_connectors', return_value=False):
+        interpreters = get_ordered_interpreters(user=self.user)
+    finally:
+      reset()
+
+    trino = next(interpreter for interpreter in interpreters if interpreter['type'] == 'trino')
+    assert trino['interface'] == 'trino'
+    assert trino['dialect'] == 'trino'
+    assert trino['options'] == {'url': 'http://localhost:8080'}
+    assert trino['is_sql']
 
 
 @pytest.mark.django_db
