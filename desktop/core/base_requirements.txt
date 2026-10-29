@@ -27,7 +27,6 @@ django_prometheus==2.3.1
 django-redis==5.4.0
 django-utils-six==2.0
 django-webpack-loader==1.0.0
-djangomako==1.3.2
 djangorestframework==3.15.2
 djangorestframework-simplejwt==5.5.1
 djangosaml2==1.9.3
@@ -42,7 +41,7 @@ kazoo==2.8.0
 kerberos==1.3.0
 krb5==0.5.1
 kubernetes==26.1.0
-Mako==1.2.3
+Mako==1.4.2
 openpyxl==3.0.9
 phoenixdb==1.2.1
 polars[calamine]==1.8.2
@@ -88,5 +87,6 @@ sqlparse==0.6.0
 -e file://${ROOT}/desktop/core/ext-py3/boto-2.49.0
 -e file://${ROOT}/desktop/core/ext-py3/django-axes-5.13.0
 -e file://${ROOT}/desktop/core/ext-py3/django-babel
+-e file://${ROOT}/desktop/core/ext-py3/djangomako-1.3.2
 -e file://${ROOT}/desktop/core/ext-py3/pysaml2-7.3.1
 -e file://${ROOT}/desktop/core/ext-py3/python-sasl-0.3.1
