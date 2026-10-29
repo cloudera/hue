@@ -94,7 +94,7 @@ else:
 % endif
 
 % for bundle in get_hue_bundles('notebook'):
-  ${ render_bundle(bundle) | n,unicode }
+  ${ render_bundle({'request': request}, bundle) | n,unicode }
 % endfor
 
 <!--[if IE 9]>

@@ -1366,74 +1366,75 @@ def test_collect_validation_messages_extras():
 
 
 # Test db migration from 5.7,...,5.15 to latest
-@pytest.mark.django_db
-def test_db_migrations_sqlite():
-  versions = ['5.' + str(i) for i in range(7, 16)]
-  for version in versions:
-    name = 'hue_' + version + '_' + uuid.uuid4().hex
-    file_name = 'hue_' + version + '.db'
-    path = get_desktop_root('./core/src/desktop/test_data/' + file_name)
-    DATABASES[name] = {
-      'ENGINE': 'django.db.backends.sqlite3',
-      'NAME': path,
-      'USER': '',
-      'SCHEMA': 'public',
-      'PASSWORD': '',
-      'HOST': '',
-      'PORT': '',
-      'OPTIONS': {},
-      'ATOMIC_REQUESTS': True,
-      'CONN_MAX_AGE': 0,
-      'AUTOCOMMIT': True,
-      'CONN_HEALTH_CHECKS': False,
-      'TIME_ZONE': None,
-    }
-    try:
-      call_command('migrate', '--fake-initial', '--database=' + name)
-    finally:
-      del DATABASES[name]
+def test_db_migrations_sqlite(django_db_blocker):
+  with django_db_blocker.unblock():
+    versions = ['5.' + str(i) for i in range(7, 16)]
+    for version in versions:
+      name = 'hue_' + version + '_' + uuid.uuid4().hex
+      file_name = 'hue_' + version + '.db'
+      path = get_desktop_root('./core/src/desktop/test_data/' + file_name)
+      DATABASES[name] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': path,
+        'USER': '',
+        'SCHEMA': 'public',
+        'PASSWORD': '',
+        'HOST': '',
+        'PORT': '',
+        'OPTIONS': {},
+        'ATOMIC_REQUESTS': True,
+        'CONN_MAX_AGE': 0,
+        'AUTOCOMMIT': True,
+        'CONN_HEALTH_CHECKS': False,
+        'TIME_ZONE': None,
+      }
+      try:
+        call_command('migrate', '--fake-initial', '--database=' + name)
+      finally:
+        del DATABASES[name]
 
 
-def test_db_migrations_mysql():
-  if desktop.conf.DATABASE.ENGINE.get().find('mysql') < 0:
-    pytest.skip("Skipping Test")
-  versions = ['5_' + str(i) for i in range(7, 16)]
-  os.putenv('PATH', '$PATH:/usr/local/bin')
-  try:
-    subprocess.check_output('type mysql', shell=True)
-  except subprocess.CalledProcessError as e:
-    LOG.warning('mysql not found')
-    pytest.skip("Skipping Test")
-  for version in versions:
-    file_name = 'hue_' + version + '_mysql.sql'
-    name = 'hue_' + version + '_' + uuid.uuid4().hex
-    path = get_desktop_root('./core/src/desktop/test_data/' + file_name)
-    DATABASES[name] = {
-      'ENGINE': desktop.conf.DATABASE.ENGINE.get(),
-      'NAME': name,
-      'USER': desktop.conf.DATABASE.USER.get(),
-      'SCHEMA': name,
-      'PASSWORD': desktop.conf.get_database_password(),
-      'HOST': desktop.conf.DATABASE.HOST.get(),
-      'PORT': str(desktop.conf.DATABASE.PORT.get()),
-      'OPTIONS': force_dict_to_strings(desktop.conf.DATABASE.OPTIONS.get()),
-      'ATOMIC_REQUESTS': True,
-      'PATH': path,
-      'CONN_MAX_AGE': desktop.conf.DATABASE.CONN_MAX_AGE.get(),
-    }
+def test_db_migrations_mysql(django_db_blocker):
+  with django_db_blocker.unblock():
+    if desktop.conf.DATABASE.ENGINE.get().find('mysql') < 0:
+      pytest.skip("Skipping Test")
+    versions = ['5_' + str(i) for i in range(7, 16)]
+    os.putenv('PATH', '$PATH:/usr/local/bin')
     try:
-      subprocess.check_output(
-        'mysql -u%(USER)s -p%(PASSWORD)s -e "CREATE DATABASE %(SCHEMA)s"' % DATABASES[name], stderr=subprocess.STDOUT, shell=True
-      )  # No way to run this command with django
-      subprocess.check_output(
-        'mysql -u%(USER)s -p%(PASSWORD)s %(SCHEMA)s < %(PATH)s' % DATABASES[name], stderr=subprocess.STDOUT, shell=True
-      )
-      call_command('migrate', '--fake-initial', '--database=%(SCHEMA)s' % DATABASES[name])
-    except subprocess.CalledProcessError as e:
-      LOG.warning('stderr: {}'.format(e.output))
-      raise e
-    finally:
-      del DATABASES[name]
+      subprocess.check_output('type mysql', shell=True)
+    except subprocess.CalledProcessError:
+      LOG.warning('mysql not found')
+      pytest.skip("Skipping Test")
+    for version in versions:
+      file_name = 'hue_' + version + '_mysql.sql'
+      name = 'hue_' + version + '_' + uuid.uuid4().hex
+      path = get_desktop_root('./core/src/desktop/test_data/' + file_name)
+      DATABASES[name] = {
+        'ENGINE': desktop.conf.DATABASE.ENGINE.get(),
+        'NAME': name,
+        'USER': desktop.conf.DATABASE.USER.get(),
+        'SCHEMA': name,
+        'PASSWORD': desktop.conf.get_database_password(),
+        'HOST': desktop.conf.DATABASE.HOST.get(),
+        'PORT': str(desktop.conf.DATABASE.PORT.get()),
+        'OPTIONS': force_dict_to_strings(desktop.conf.DATABASE.OPTIONS.get()),
+        'ATOMIC_REQUESTS': True,
+        'PATH': path,
+        'CONN_MAX_AGE': desktop.conf.DATABASE.CONN_MAX_AGE.get(),
+      }
+      try:
+        subprocess.check_output(
+          'mysql -u%(USER)s -p%(PASSWORD)s -e "CREATE DATABASE %(SCHEMA)s"' % DATABASES[name], stderr=subprocess.STDOUT, shell=True
+        )  # No way to run this command with django
+        subprocess.check_output(
+          'mysql -u%(USER)s -p%(PASSWORD)s %(SCHEMA)s < %(PATH)s' % DATABASES[name], stderr=subprocess.STDOUT, shell=True
+        )
+        call_command('migrate', '--fake-initial', '--database=%(SCHEMA)s' % DATABASES[name])
+      except subprocess.CalledProcessError as e:
+        LOG.warning('stderr: {}'.format(e.output))
+        raise e
+      finally:
+        del DATABASES[name]
 
 
 # @raises(ImportError)

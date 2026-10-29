@@ -56,7 +56,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   <link rel="stylesheet" href="${ static('desktop/css/bootstrap-slider.css') }">
 
   % for bundle in get_hue_bundles('jobBrowser'):
-    ${ render_bundle(bundle) | n,unicode }
+    ${ render_bundle({'request': request}, bundle) | n,unicode }
   % endfor
 
   <script src="${ static('desktop/ext/js/bootstrap-datepicker.min.js') }"></script>

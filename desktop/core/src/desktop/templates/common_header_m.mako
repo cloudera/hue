@@ -95,7 +95,7 @@ if USE_NEW_EDITOR.get():
   </script>
 
   % for bundle in get_hue_bundles('hue'):
-    ${ render_bundle(bundle) | n,unicode }
+    ${ render_bundle({'request': request}, bundle) | n,unicode }
   % endfor
 
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.touchSwipe.min.js') }"></script>
