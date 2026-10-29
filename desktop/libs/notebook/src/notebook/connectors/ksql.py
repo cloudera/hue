@@ -21,16 +21,11 @@ from __future__ import absolute_import
 import json
 import logging
 
-from desktop.conf import has_channels
 from desktop.lib.i18n import force_unicode
 from kafka.ksql_client import KSqlApi as KSqlClientApi
 from notebook.connectors.base import Api, QueryError
 
 LOG = logging.getLogger()
-
-
-if has_channels():
-  pass
 
 
 def query_error_handler(func):
@@ -57,18 +52,13 @@ class KSqlApi(Api):
 
   @query_error_handler
   def execute(self, notebook, snippet):
-    channel_name = notebook.get('editorWsChannel')
-
     db = self._get_db()
 
-    data, description = db.query(
-        snippet['statement'],
-        channel_name=channel_name
-    )
+    data, description = db.query(snippet['statement'])
     has_result_set = data is not None
 
     return {
-      'sync': not (has_channels() and channel_name),
+      'sync': True,
       'has_result_set': has_result_set,
       'result': {
           'has_more': False,

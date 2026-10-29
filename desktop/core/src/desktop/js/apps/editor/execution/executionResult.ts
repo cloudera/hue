@@ -73,16 +73,6 @@ const COMPLEX_TYPES: { [key: string]: boolean } = {
   struct: true
 };
 
-// huePubSub.subscribe('editor.ws.query.fetch_result', executionResult => {
-//   if (executionResult.status != 'finalMessage') {
-//     const result = new ExecutionResult(null);
-//     result.fetchedOnce = true;
-//     result.handleResultResponse(executionResult);
-//     // eslint-disable-next-line no-undef
-//     executionResult.data.forEach(element => $('#wsResult').append('<li>' + element + '</li>'));
-//   }
-// });
-
 export interface KoEnrichedMeta extends ResultMeta {
   cssClass: string;
   checked: Observable<boolean>;

@@ -1087,8 +1087,7 @@ export default class Snippet {
       result: {}, // TODO: Moved to executor but backend requires it
       database: this.database(),
       compute: this.compute(),
-      wasBatchExecuted: this.wasBatchExecuted(),
-      editorWsChannel: window.WS_CHANNEL
+      wasBatchExecuted: this.wasBatchExecuted()
     });
   }
 

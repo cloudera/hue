@@ -26,15 +26,6 @@ spec:
   - host: {{ .Values.ingress.domain }}
     http:
       paths:
-      {{- if .Values.websocket.enabled }}
-      - backend:
-          service:
-            name: daphne-websocket
-            port:
-              number: 8001
-        pathType: ImplementationSpecific
-        path: /(ws/.*)
-      {{- end }}
       - backend:
           service:
             name: hue-balancer

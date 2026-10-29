@@ -16,21 +16,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
 import json
 import logging
 from builtins import object
 
-from django.core.cache import cache
 from django.utils.translation import gettext as _
 
-from desktop.conf import has_channels
 from desktop.lib.i18n import smart_str
-from desktop.lib.rest.http_client import RestException
-
-if has_channels():
-  from notebook.consumer import _send_to_channel
-
 
 LOG = logging.getLogger()
 
@@ -66,7 +58,7 @@ class KSqlApi(object):
     self._api_url = url.strip('/')
     self.user = user
 
-    self.client = client = KSQLAPI(self._api_url)
+    self.client = KSQLAPI(self._api_url)
 
   def show_tables(self):
     try:
@@ -101,7 +93,7 @@ class KSqlApi(object):
     LOG.debug('ksqlDB response: %s' % response)
     return response[0] if response else {'@type': 'queries', 'queries': []}  # INSERTs return empty currently
 
-  def query(self, statement, channel_name=None):
+  def query(self, statement):
     data = []
     metadata = []
 
@@ -115,24 +107,11 @@ class KSqlApi(object):
         {'type': 'STRING', 'name': 'Row', 'comment': None}
       ]
 
-      if has_channels() and channel_name:
-        _send_to_channel(
-            channel_name,
-            message_type='task.progress',
-            message_data={'status': 'running', 'query_id': 1}
-        )
-
       try:
         for line in result:
           # columns = line.keys()
           # data.append([line[col] for col in columns])
           if 'finalMessage' in line:
-            if has_channels() and channel_name:  # Send results via WS and empty results
-              _send_to_channel(
-                  channel_name,
-                  message_type='task.result',
-                  message_data={'status': 'finalMessage', 'query_id': 1}
-              )
             break
           elif 'header' in line:
             continue
@@ -142,7 +121,7 @@ class KSqlApi(object):
           if is_select:
             try:
               data_line = json.loads(line)
-            except ValueError as e:
+            except ValueError:
               data_line = json.loads(line[:-1])  # Most probably record is not JSON
             if data_line.get('@type') == 'statement_error':
               raise KSqlApiException(data_line['message'])
@@ -150,14 +129,6 @@ class KSqlApi(object):
               data.append(data_line['row']['columns'])
           else:
             data.append([line])
-
-          if has_channels() and channel_name:  # Send results via WS and empty results
-            _send_to_channel(
-                channel_name,
-                message_type='task.result',
-                message_data={'data': data, 'meta': metadata, 'query_id': 1}
-            )
-            data = []  # TODO: special message when end of stream
       except RuntimeError as e:
         if 'generator raised StopIteration' in str(e):
           return data, metadata
@@ -167,14 +138,6 @@ class KSqlApi(object):
       data, metadata = self._decode_result(
         self.ksql(statement)
       )
-
-      if has_channels() and channel_name:  # Send results via WS and empty results
-        _send_to_channel(
-            channel_name,
-            message_type='task.result',
-            message_data={'data': data, 'meta': metadata, 'query_id': 1}
-        )
-        data = []  # TODO: special message when end of stream
 
     return data, metadata
 
