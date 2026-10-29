@@ -46,8 +46,8 @@ def query_error_handler(func):
     except RestException as e:
       try:
         message = force_unicode(json.loads(e.message)['errors'])
-      except Exception as ex:
-        message = ex.message
+      except Exception:
+        message = e.message
       message = force_unicode(message)
       raise QueryError(message)
     except Exception as e:
@@ -61,25 +61,58 @@ class TrinoApi(Api):
     Api.__init__(self, user, interpreter=interpreter)
     self.options = interpreter['options']
     self.server_host, self.server_port, self.http_scheme = self.parse_api_url(self.options.get('url'))
-    self.auth = None
 
-    auth_username = self.options.get('auth_username', DEFAULT_AUTH_USERNAME.get())
-    auth_password = self.options.get('auth_password', self.get_auth_password())
-
-    if auth_username and auth_password:
-      self.auth_username = auth_username
-      self.auth_password = auth_password
-      self.auth = BasicAuthentication(self.auth_username, self.auth_password)
+    self.auth = self._resolve_auth()
+    self.ssl_verify = self._resolve_ssl_verify()
+    self.trino_user = self.options.get('trino_user') or self.user.username
 
     self.session_info = self.create_session()
-    self.trino_session = ClientSession(self.user.username, properties=self.session_info['properties'])
+    self.trino_session = ClientSession(self.trino_user, properties=self.session_info['properties'])
     self.trino_request = TrinoRequest(
       host=self.server_host,
       port=self.server_port,
       client_session=self.trino_session,
       http_scheme=self.http_scheme,
-      auth=self.auth
+      auth=self.auth,
+      verify=self.ssl_verify
     )
+
+  def _resolve_auth(self):
+    """
+    Returns the HTTP basic authentication to use, or None when no credentials are configured.
+
+    The credentials of the interpreter options win over the global [desktop] auth_username and auth_password,
+    which are shared with the other connectors. The Trino client refuses to send credentials over plain HTTP, so
+    they are ignored (with a warning) unless the URL is https.
+    """
+    username = self.options.get('auth_username') or DEFAULT_AUTH_USERNAME.get()
+    password = self.options.get('auth_password') or self.get_auth_password()
+
+    if not (username and password):
+      return None
+
+    if self.http_scheme != 'https':
+      LOG.warning('Trino: ignoring the basic authentication credentials because %s is not an https URL.' % self.options.get('url'))
+      return None
+
+    self.auth_username = username
+    self.auth_password = password
+    return BasicAuthentication(username, password)
+
+  def _resolve_ssl_verify(self):
+    """
+    Returns what the 'ssl_verify' interpreter option means for the requests library: True to verify the server
+    certificate against the system CAs, False to skip the verification, or the path of a CA bundle to verify against.
+    """
+    ssl_verify = self.options.get('ssl_verify', True)
+
+    if isinstance(ssl_verify, str):
+      value = ssl_verify.strip().lower()
+      if value in ('true', 'false'):
+        return value == 'true'
+      return ssl_verify  # Path of a CA bundle
+
+    return bool(ssl_verify)
 
   def get_auth_password(self):
     auth_password_script = self.options.get('auth_password_script')
@@ -105,10 +138,29 @@ class TrinoApi(Api):
 
     return identifier
 
+  def _use_database(self, database):
+    """Sets the current catalog and schema of the session. Does nothing when no database is selected."""
+    if database:
+      TrinoQuery(self.trino_request, 'USE ' + self._format_identifier(database, is_db=True)).execute()
+
+  def _fetch_all(self, statement):
+    """
+    Runs a statement and reads all of its result pages.
+
+    TrinoQuery.execute() only returns the first page that has rows, so the rows of larger results (many tables, a
+    wide DESCRIBE or a long sample) would be silently cut if they were read from the result right after it.
+    Returns the rows and the columns of the result.
+    """
+    query_client = TrinoQuery(self.trino_request, statement)
+    rows = list(query_client.execute())
+    return rows, query_client.columns
+
   @query_error_handler
   def parse_api_url(self, api_url):
     parsed_url = urlparse(api_url)
-    return parsed_url.hostname, parsed_url.port, parsed_url.scheme
+    scheme = parsed_url.scheme or 'http'
+    port = parsed_url.port or (443 if scheme == 'https' else 8080)
+    return parsed_url.hostname, port, scheme
 
   def _get_session_key(self):
     return SESSION_KEY % {
@@ -148,17 +200,14 @@ class TrinoApi(Api):
     new_session_info = {
         'type': lang,
         'id': None,
-        'properties': properties if not None else []
+        'properties': properties if properties is not None else {}
     }
 
     return new_session_info
 
   @query_error_handler
   def execute(self, notebook, snippet):
-    database = snippet['database']
-    database = self._format_identifier(database, is_db=True)
-    query_client = TrinoQuery(self.trino_request, 'USE ' + database)
-    query_client.execute()
+    self._use_database(snippet['database'])
 
     current_statement = self._get_current_statement(notebook, snippet)
     statement = current_statement['statement']
@@ -255,7 +304,7 @@ class TrinoApi(Api):
       'row_count': len(data) + row_count,
       'rows_remaining': rows_remaining,
       'next_uri': next_uri,
-      'has_more': bool(status.next_uri) if status else False,
+      'has_more': bool(next_uri),  # Also true when the last page fetched still has rows to return
       'data': data or [],
       'meta': [{
         'name': column['name'],
@@ -289,18 +338,13 @@ class TrinoApi(Api):
   @query_error_handler
   def get_sample_data(self, snippet, database=None, table=None, column=None, nested=None, is_async=False, operation=None):
     statement = self._get_select_query(database, table, column, operation)
-    query_client = TrinoQuery(self.trino_request, statement)
-    query_client.execute()
+    rows, columns = self._fetch_all(statement)
 
-    response = {
+    return {
       'status': 0,
-      'rows': [],
-      'full_headers': []
+      'rows': rows,
+      'full_headers': columns
     }
-    response['rows'] = query_client.result.rows
-    response['full_headers'] = query_client.columns
-
-    return response
 
   def _get_select_query(self, database, table, column=None, operation=None, limit=100):
     if operation == 'hello':
@@ -336,6 +380,10 @@ class TrinoApi(Api):
 
     return {'status': 0}
 
+  def cancel(self, notebook, snippet):
+    """Cancels the query, which Trino does when the next URI of the query is deleted."""
+    return self.close_statement(notebook, snippet)
+
   def close_session(self, session):
     self._remove_session_info_from_user()
 
@@ -345,9 +393,8 @@ class TrinoApi(Api):
 
     for catalog in catalogs:
       try:
-        query_client = TrinoQuery(self.trino_request, 'SHOW SCHEMAS FROM ' + catalog)
-        response = query_client.execute()
-        databases += [f'{catalog}.{item}' for sublist in response.rows for item in sublist]
+        rows, _columns = self._fetch_all('SHOW SCHEMAS FROM ' + self._format_identifier(catalog))
+        databases += [f'{catalog}.{item}' for sublist in rows for item in sublist]
       except Exception as e:
         # Log the exception and continue with the next catalog
         LOG.error(f"Failed to fetch schemas from catalog {catalog}: {str(e)}")
@@ -357,21 +404,15 @@ class TrinoApi(Api):
 
   @query_error_handler
   def _show_catalogs(self):
-    query_client = TrinoQuery(self.trino_request, 'SHOW CATALOGS')
-    response = query_client.execute()
-    res = response.rows
-    catalogs = [item for sublist in res for item in sublist]
+    rows, _columns = self._fetch_all('SHOW CATALOGS')
+    catalogs = [item for sublist in rows for item in sublist]
 
     return catalogs
 
   @query_error_handler
   def _show_tables(self, database):
-    database = self._format_identifier(database, is_db=True)
-    query_client = TrinoQuery(self.trino_request, 'USE ' + database)
-    query_client.execute()
-    query_client = TrinoQuery(self.trino_request, 'SHOW TABLES')
-    response = query_client.execute()
-    tables = response.rows
+    self._use_database(database)
+    tables, _columns = self._fetch_all('SHOW TABLES')
     return [{
       'name': table[0],
       'type': 'table',
@@ -382,20 +423,15 @@ class TrinoApi(Api):
 
   @query_error_handler
   def _get_columns(self, database, table):
-    database = self._format_identifier(database, is_db=True)
-    query_client = TrinoQuery(self.trino_request, 'USE ' + database)
-    query_client.execute()
-    table = self._format_identifier(table)
-    query_client = TrinoQuery(self.trino_request, 'DESCRIBE ' + table)
-    response = query_client.execute()
-    columns = response.rows
+    self._use_database(database)
+    rows, _columns = self._fetch_all('DESCRIBE ' + self._format_identifier(table))
 
     return [{
       'name': col[0],
       'type': col[1],
       'comment': '',
     }
-      for col in columns
+      for col in rows
     ]
 
   def get_log(self, notebook, snippet, startFrom=None, size=None):
@@ -410,11 +446,8 @@ class TrinoApi(Api):
 
     if statement:
       try:
-        database = snippet['database']
-        database = self._format_identifier(database, is_db=True)
-        TrinoQuery(self.trino_request, 'USE ' + database).execute()
-        result = TrinoQuery(self.trino_request, 'EXPLAIN ' + statement).execute()
-        explanation = result.rows
+        self._use_database(snippet['database'])
+        explanation, _columns = self._fetch_all('EXPLAIN ' + statement)
       except Exception as e:
         explanation = str(e)
 
