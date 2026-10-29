@@ -91,6 +91,23 @@ class TestRequirementsGenerator:
     pinned_version = tuple(int(part) for part in certifi_pins[0].split("==")[1].split("."))
     assert pinned_version >= (2026, 10, 19), certifi_pins
 
+  def test_base_requirements_file_mirrors_the_generator(self):
+    """
+    base_requirements.txt is only read by Dependabot, so it must list exactly the pins the build installs.
+
+    To update it after changing a pin, rewrite the file from RequirementsGenerator().requirements, the x86_64 3.11
+    extras and one `-e file://${ROOT}/desktop/core/ext-py3/<name>` line per local requirement.
+    """
+    generator = RequirementsGenerator()
+    expected_pins = set(generator.requirements) | set(generator.x86_64_requirements["3.11"])
+    expected_local = {f"-e file://${{ROOT}}/desktop/core/ext-py3/{name}" for name in generator.local_requirements}
+
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "base_requirements.txt")) as f:
+      lines = [line.strip() for line in f if line.strip() and not line.startswith("#")]
+
+    assert {line for line in lines if not line.startswith("-e ")} == expected_pins
+    assert {line for line in lines if line.startswith("-e ")} == expected_local
+
   @mock.patch("generate_requirements.this_dir", create=True)
   @mock.patch("generate_requirements.shutil.copytree")
   def test_copy_local_requirements(self, mock_copytree, mock_this_dir):
