@@ -45,26 +45,11 @@ spec:
         pathType: ImplementationSpecific
         path: /
   {{- end }}
-  {{- if .Values.api.enabled }}
-  - host: {{ .Values.api.domain }}
-    http:
-      paths:
-      - backend:
-          service:
-            name: hue-api
-            port:
-              number: 8005
-        pathType: ImplementationSpecific
-        path: /(.*)
-  {{- end }}
   tls:
   - hosts:
     - {{ .Values.ingress.domain }}
     {{- range .Values.ingress.extraHosts }}
     - {{ . | quote }}
-    {{- end }}
-    {{- if .Values.api.enabled }}
-    - {{ .Values.api.domain }}
     {{- end }}
     secretName: letsencrypt-hue-prod-tls
 {{- end -}}
