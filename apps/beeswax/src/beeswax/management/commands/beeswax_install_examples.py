@@ -15,13 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 import csv
-import pwd
 import json
 import logging
+import os
+import pwd
 
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from django.utils.translation import gettext as _
 
 from beeswax.conf import LOCAL_EXAMPLES_DATA_DIR
@@ -31,8 +31,8 @@ from desktop.conf import USE_NEW_EDITOR
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document2, Document2Permission
 from hadoop import cluster
-from notebook.models import MockRequest, _get_example_directory, import_saved_beeswax_query, make_notebook
-from useradmin.models import User, get_default_user_group, install_sample_user
+from notebook.models import _get_example_directory, import_saved_beeswax_query, make_notebook, MockRequest
+from useradmin.models import get_default_user_group, install_sample_user, User
 
 LOG = logging.getLogger()
 
@@ -42,8 +42,12 @@ class InstallException(Exception):
 
 
 class Command(BaseCommand):
-  args = '<hive|impala> <db_name>'
   help = 'Install examples but do not overwrite them.'
+
+  def add_arguments(self, parser):
+    # From the command line: beeswax_install_examples <hive|impala> [db_name]. Callers in the code use handle() with options.
+    parser.add_argument('args', nargs='*', metavar='dialect [db_name]',
+                        help='The dialect (hive or impala) and the database (default is "default").')
 
   def handle(self, *args, **options):
     if args:
@@ -55,6 +59,8 @@ class Command(BaseCommand):
       self.tables = None
       interpreter = None
     else:
+      if 'dialect' not in options:
+        raise CommandError('Expected arguments: <hive|impala> [db_name]')
       dialect = options['dialect']
       db_name = options.get('db_name', 'default')
       interpreter = options.get('interpreter')  # Only when connectors are enabled. Later will deprecate `dialect`.
@@ -288,7 +294,7 @@ class SampleTable(object):
       partition_dir = self._get_partition_dir(partition_spec)
       hdfs_root_destination = self._get_hdfs_root_destination(django_user, subdir=partition_dir)
       filename = filepath.split('/')[-1]
-      hdfs_file_destination = self._upload_to_hdfs(django_user, filepath, hdfs_root_destination, filename)
+      self._upload_to_hdfs(django_user, filepath, hdfs_root_destination, filename)
 
       hql = LOAD_PARTITION_HQL % {'tablename': self.name, 'partition_spec': partition_spec, 'filepath': hdfs_root_destination}
 

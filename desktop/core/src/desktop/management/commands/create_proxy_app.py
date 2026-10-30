@@ -16,10 +16,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import os
 import re
 import shutil
-import logging
 
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.translation import gettext as _
@@ -30,8 +30,11 @@ LOG = logging.getLogger()
 
 class Command(BaseCommand):
   help = _("Creates a Hue proxy application directory structure.")
-  args = "app_name app_web_url [app_dir]"
   label = _('application name')
+
+  def add_arguments(self, parser):
+    parser.add_argument('args', nargs='*', metavar='app_name [app_web_url] [app_dir]',
+                        help='The application name, its web URL and the directory where to create it (default is the current one).')
 
   def handle(self, *args, **options):
     if len(args) > 3 or len(args) == 0:

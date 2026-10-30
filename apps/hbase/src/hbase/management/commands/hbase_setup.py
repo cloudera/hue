@@ -24,19 +24,21 @@ from hbased.ttypes import AlreadyExists
 
 from desktop.lib.paths import get_apps_root
 from hbase.api import HbaseApi
-from useradmin.models import install_sample_user
+from useradmin.models import install_sample_user, User
 
 LOG = logging.getLogger()
 
 
 class Command(BaseCommand):
   help = 'Create and fill some demo tables in the first configured cluster.'
-  args = '<username>'
+
+  def add_arguments(self, parser):
+    parser.add_argument('args', nargs='*', metavar='username', help='The user that creates the tables (default is the sample user).')
 
   def handle(self, *args, **options):
     if args:
-      user = args[0]
-    elif options and options['user']:
+      user = User.objects.get(username=args[0])
+    elif options.get('user'):
       user = options['user']
     else:
       user = install_sample_user()
