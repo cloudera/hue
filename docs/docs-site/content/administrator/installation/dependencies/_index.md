@@ -62,6 +62,8 @@ Hue sets `options={"threaded": true}` for Oracle by default. If you override `op
 
 ## OS packages
 
+The [File Import API](/developer/api/rest/importer/) detects the file type with the `libmagic` library. Install it with the OS package manager: `libmagic1` on Ubuntu, `file-libs` on RHEL and `brew install libmagic` on macOS. Without it, Hue logs a warning and cannot guess the file type.
+
 ### Ubuntu
 
 ```bash
