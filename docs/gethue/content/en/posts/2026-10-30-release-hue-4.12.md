@@ -46,7 +46,7 @@ categories:
 
 Hi Data Explorers,
 
-Hue 4.12 is out! It is the first release since January 2023, with more than 890 commits from 36 contributors.
+Hue 4.12 is out! It is the first release since January 2023, with more than 900 commits from 36 contributors.
 
 **Note: Hue 4.12 requires Python 3.11 and is built on Django 5.2. Read the [upgrade notes](https://docs.gethue.com/releases/release-notes-4.12.0/#upgrade-notes) before you upgrade from 4.11.**
 
@@ -88,7 +88,7 @@ The public API is versioned under `/api/v1/`, with a Swagger UI at `/api/swagger
 * Python 3.11, Django 5.2, Gunicorn 23 and Node.js 22.
 * CVE fixes in the backend and frontend dependencies, stricter permissions on the configuration APIs, fixes for the local file access of the importers, Content Security Policy support and non-persistent session cookies.
 
-Hue 4.12 has more than 890 commits. For a complete list, see the [release notes](https://docs.gethue.com/releases/release-notes-4.12.0/).
+Hue 4.12 has more than 900 commits. For a complete list, see the [release notes](https://docs.gethue.com/releases/release-notes-4.12.0/).
 
 Go grab it and give it a spin!
 
