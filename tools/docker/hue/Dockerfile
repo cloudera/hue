@@ -22,6 +22,7 @@ RUN apt-get update -y && apt-get install -y \
   libldap2-dev \
   libsnappy-dev \
   libffi-dev \
+  libmagic1 \
   pkg-config \
   rsync \
   curl \
@@ -72,6 +73,10 @@ RUN pip3 install --upgrade --no-cache-dir setuptools virtualenv==21.14.13 pip==2
 WORKDIR /usr/share/hue
 
 # Install DB connectors
+# The setup.py of ksql-python imports pip, which is not available in an isolated build environment.
+RUN ./build/env/bin/pip install --no-cache-dir --no-build-isolation \
+  git+https://github.com/bryanyang0528/ksql-python
+
 # To move to requirements_connectors.txt
 RUN ./build/env/bin/pip install --no-cache-dir \
   psycopg2-binary \
@@ -80,8 +85,6 @@ RUN ./build/env/bin/pip install --no-cache-dir \
   flower==2.0.1 \
   # Contains fix for SparkSql show tables \
   git+https://github.com/gethue/PyHive \
-  #ksql \
-  git+https://github.com/bryanyang0528/ksql-python \
   pydruid \
   # pybigquery \
   elasticsearch-dbapi \
