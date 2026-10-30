@@ -74,8 +74,27 @@ class TestApi(object):
       }
     }
 
-    with patch('notebook.connectors.sql_alchemy.create_engine'):
+    with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
       SqlAlchemyApi(self.user, interpreter)._create_engine()
+
+    url = create_engine.call_args.args[0]
+    assert 's3_staging_dir=s3%3A%2F%2Fgethue-athena%2Fscratch' in url
+    assert 'work_group=demo_group' in url
+    assert 'catalog_name=AwsDataCatalog' in url
+
+  def test_create_athena_engine_without_work_group_and_catalog_name(self):
+    interpreter = {
+      'name': 'hive',
+      'options': {
+        'url': 'awsathena+rest://XXXXXXXXXXXXXXX:XXXXXXXXXXXXXXXXXXX@athena.us-west-2.amazonaws.com:443/default?'
+            's3_staging_dir=s3://gethue-athena/scratch'
+      }
+    }
+
+    with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
+      SqlAlchemyApi(self.user, interpreter)._create_engine()
+
+    assert 's3_staging_dir=s3%3A%2F%2Fgethue-athena%2Fscratch' in create_engine.call_args.args[0]
 
   def test_fetch_result_empty(self):
     notebook = Mock()

@@ -174,12 +174,11 @@ class SqlAlchemyApi(Api):
       url = url.replace(url[17:37], urllib_quote_plus(url[17:37]))
       url = url.replace(url[38:50], urllib_quote_plus(url[38:50]))
       parsed = urllib_urlparse(url)
-      s3_staging_dir = urllib_parse_qs(parsed.query)['s3_staging_dir'][0]
-      url = url.replace(s3_staging_dir, urllib_quote_plus(s3_staging_dir))
-      work_group = urllib_parse_qs(parsed.query)['work_group'][0]
-      url = url.replace(work_group, urllib_quote_plus(work_group))
-      catalog_name = urllib_parse_qs(parsed.query)['catalog_name'][0]
-      url = url.replace(catalog_name, urllib_quote_plus(catalog_name))
+      query = urllib_parse_qs(parsed.query)
+      # The work group and the catalog name are optional, Athena uses its defaults when they are missing
+      for param in ('s3_staging_dir', 'work_group', 'catalog_name'):
+        for value in query.get(param, [])[:1]:
+          url = url.replace(value, urllib_quote_plus(value))
 
     m = re.search(URL_PATTERN, url)
     driver_name = m.group('driver_name')
