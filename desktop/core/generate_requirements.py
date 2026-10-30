@@ -39,6 +39,8 @@ class RequirementsGenerator:
       "boto-2.49.0",
       # Vendored to relax the hard Mako==1.2.3 pin of djangomako 1.3.2 (see its setup.py).
       "djangomako-1.3.2",
+      # Vendored without its pkg_resources.declare_namespace() call, which setuptools >= 82 can no longer serve.
+      "pyformance-0.3.2",
       "pysaml2-7.3.1",
       "python-sasl-0.3.1",
     ]
@@ -54,10 +56,10 @@ class RequirementsGenerator:
       # also drops the remaining emSign roots. It is a transitive dependency of requests; pin it so the CA
       # bundle never depends on whatever is newest at build time.
       "certifi==2026.10.23",
-      # cryptography 46.x requires cffi >= 2.0.0. Held at 2.0.0 because 2.1.0 needs Python >= 3.10.
+      # cryptography requires cffi >= 2.0.0. Held at 2.0.0 because 2.1.0 needs Python >= 3.10.
       "cffi==2.0.0",
       "configobj==5.0.9",
-      "cryptography==46.0.7",
+      "cryptography==50.0.2",
       "cx-Oracle==8.3.0",
       "Django==5.2.18",
       "django-auth-ldap==5.3.0",
@@ -97,10 +99,10 @@ class RequirementsGenerator:
       "psutil==5.8.0",
       "pyarrow==23.0.1",
       "pydantic==2.10.6",
-      "pyformance==0.3.2",
       "PyJWT==2.15.1",
-      # Held at 26.0.0: 26.4.0 drops X509Req, which pysaml2 still needs. Caps cryptography at <47.
-      "pyOpenSSL==26.0.0",
+      # 26.3.0 is the first release that accepts cryptography 49 and 50. It no longer has X509Req, so the certificate
+      # request code of the vendored pysaml2 uses cryptography directly.
+      "pyOpenSSL==26.4.0",
       "python-daemon==2.2.4",
       "python-dateutil==2.8.2",
       "python-ldap==3.4.5",
@@ -135,7 +137,7 @@ class RequirementsGenerator:
       "numpy==1.24.4",
       "pandas==2.0.3",
       "pure-sasl==0.6.2",
-      "setuptools==80.9.0",
+      "setuptools==84.1.0",
       "sqlparse==0.6.0",
     ]
 

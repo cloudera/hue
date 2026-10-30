@@ -28,8 +28,8 @@ import os
 import sys
 import uuid
 from builtins import map, zip
+from importlib.metadata import version
 
-import pkg_resources
 from django.utils.translation import gettext_lazy as _
 
 import desktop.redaction
@@ -44,7 +44,7 @@ from desktop.lib.python_util import force_dict_to_strings
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', '..', '..'))
 
-HUE_DESKTOP_VERSION = pkg_resources.get_distribution("desktop").version or "Unknown"
+HUE_DESKTOP_VERSION = version("desktop") or "Unknown"
 NICE_NAME = "Hue"
 
 ENV_HUE_PROCESS_NAME = "HUE_PROCESS_NAME"

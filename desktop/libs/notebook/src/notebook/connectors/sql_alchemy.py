@@ -56,11 +56,13 @@ import logging
 import re
 import textwrap
 import uuid
+from importlib.metadata import entry_points
 from string import Template
 from urllib.parse import parse_qs as urllib_parse_qs, quote_plus as urllib_quote_plus, urlparse as urllib_urlparse
 
 from past.builtins import long
 from sqlalchemy import create_engine, inspect, MetaData, Table
+from sqlalchemy.dialects import registry
 from sqlalchemy.exc import CompileError, NoSuchTableError, OperationalError, ProgrammingError, UnsupportedCompilationError
 
 from desktop.lib.i18n import force_unicode
@@ -74,6 +76,26 @@ URL_PATTERN = '(?P<driver_name>.+?://)(?P<host>[^:/ ]+):(?P<port>[0-9]*).*'
 
 
 LOG = logging.getLogger()
+
+
+_BUILTIN_DIALECT_LOADER = registry.auto_fn
+
+
+def _load_dialect(name):
+  '''
+  SQLAlchemy 1.3 finds third-party dialects (trino://, phoenix://...) via pkg_resources, which setuptools >= 82
+  no longer ships. Look up the same "sqlalchemy.dialects" entry points with importlib.metadata instead, after
+  the built-in dialects, in the order SQLAlchemy uses.
+  '''
+  loader = _BUILTIN_DIALECT_LOADER(name)
+  if loader:
+    return loader
+
+  entry_point = next(iter(entry_points(group='sqlalchemy.dialects', name=name)), None)
+  return entry_point.load if entry_point else None
+
+
+registry.auto_fn = _load_dialect
 
 
 def query_error_handler(func):
