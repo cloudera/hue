@@ -13,6 +13,8 @@ The examples use `hue.example.com` as the server. Replace `<ACCESS_TOKEN>` with 
 
 ## Overview
 
+> **Note:** The File Import API is under development. It uploads a file, detects its format and header, previews it and lists the SQL types of a dialect. It does not create the table yet.
+
 The importer is turned off by default. An administrator turns it on with `is_enabled=true` in the `[desktop] [[importer]]` section of `hue.ini`. The `get_config` response reports the setting in `importer.is_enabled`.
 
 The File Import API allows you to:
