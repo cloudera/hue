@@ -802,7 +802,7 @@ It returns `200 OK` when all operations succeed. Otherwise, it returns `500` wit
 
 ## Importer
 
-Use the Importer endpoints to upload a file, detect its format and preview it before you create a table. Read the [File Import API](/developer/api/rest/importer/) for the parameters, responses and a full workflow.
+Use the Importer endpoints to upload a file, detect its format and preview it. These endpoints are under development and do not create the table yet. Read the [File Import API](/developer/api/rest/importer/) for the parameters, responses and a full workflow.
 
 | Purpose | Method and URL |
 |---------|----------------|

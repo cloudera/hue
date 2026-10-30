@@ -93,23 +93,6 @@ To learn more, watch the video on [Data Import Wizard](http://gethue.com/import-
 
 > **Note:** You can select files from the configured storage (for example HDFS or S3) or upload a small file. Hue detects the file format automatically. The wizard also helps with table partitioning, Kudu tables and nested types.
 
-#### New importer
-
-When the administrator sets `enable_new_importer=true` in the `[desktop]` section of `hue.ini` (the default is `false`), a new importer is available. It adds a second entry named **Import**, which opens the page at `/newimporter`. The existing importer stays available.
-
-To import a file with the new importer:
-
-1. Open the importer and select a source. Depending on your configuration, the choices are **Upload from File**, **HDFS**, **Amazon S3**, **Azure Storage**, **Google Storage** and **Ozone**.
-2. Select the file. Hue opens the **Preview** tab with a preview of the data.
-3. In the **Preview** tab, choose the database, the table name, the engine and the compute. Review and edit the column names, types and comments.
-4. In the **Settings** tab, check the file format: file type (CSV, JSON or Excel), whether the file has a header, the field separator and the quote character.
-5. Optional: add partitions in the **Partitions** tab.
-6. Click **Finish Import**.
-
-The new table is created in the selected database.
-
-> **Note:** Files above the supported size limit can't be uploaded in the importer. Use a file browser to upload them instead.
-
 #### CSV file
 
 You can ingest any small CSV file into a new index in a few clicks.
