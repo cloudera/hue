@@ -14,7 +14,7 @@ Hue is an open source SQL Cloud Assistant for querying [Databases & Data Warehou
 
 ### Summary
 
-Hue 4.12 is the first release since January 2023. It comes with more than 890 commits from 36 contributors. The main changes:
+Hue 4.12 is the first release since January 2023. It comes with more than 900 commits from 36 contributors. The main changes:
 
 * A new React **Storage Browser**.
 * A reworked **Trino** connector, and new **Flink SQL Gateway** and **Kyuubi** connectors.
@@ -143,6 +143,16 @@ Compatible with the two most recent versions of the following browsers:
 
 ### List of commits
 
+* [c2a593fd07](https://github.com/cloudera/hue/commit/c2a593fd07) [docker] Remove the Python 2 Dockerfile and use a single conf directory
+* [44ff8122ea](https://github.com/cloudera/hue/commit/44ff8122ea) [docs] Present the File Import API as under development
+* [6c81a43d93](https://github.com/cloudera/hue/commit/6c81a43d93) [docs] Document the libmagic dependency of the Importer
+* [e8c4a4d350](https://github.com/cloudera/hue/commit/e8c4a4d350) [docker] Fix the image build: ksql install and libmagic
+* [6fabd2aee5](https://github.com/cloudera/hue/commit/6fabd2aee5) [core] Load each app once when its entry point is found twice
+* [65bbe57883](https://github.com/cloudera/hue/commit/65bbe57883) [helm] Quote the chart appVersion so that helm lint passes
+* [b59674e7b6](https://github.com/cloudera/hue/commit/b59674e7b6) [release] Add the 4.12.0 release notes and blog post
+* [bf9729974d](https://github.com/cloudera/hue/commit/bf9729974d) [release] Regenerate NOTICE.txt for 4.12.0
+* [f5c7e8b5e6](https://github.com/cloudera/hue/commit/f5c7e8b5e6) [release] Bump the version to 4.12.0
+* [7b6ed8ddca](https://github.com/cloudera/hue/commit/7b6ed8ddca) [sqlalchemy] Make the Athena work_group and catalog_name optional
 * [6f01c16e72](https://github.com/cloudera/hue/commit/6f01c16e72) [core] Align hue.ini and the ini template with the code defaults
 * [e6f3d68c4a](https://github.com/cloudera/hue/commit/e6f3d68c4a) [helm] Remove the disabled hue-api chart pieces and the Compose doc
 * [7c23fca222](https://github.com/cloudera/hue/commit/7c23fca222) [core] Fix management commands with positional arguments on Django 5.2
