@@ -15,15 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import str
 import logging
-from datetime import datetime,  timedelta
+from builtins import str
+from datetime import datetime, timedelta
 
 from django.core.management.base import BaseCommand
 
 from beeswax.models import Session
 from beeswax.server import dbms
-
 
 LOG = logging.getLogger()
 
@@ -37,12 +36,17 @@ class Command(BaseCommand):
   Closing (all=True) queries older than 7 days...
   0 queries closed.
   """
-  args = '<age_in_days> (default is 7)'
   help = 'Close finished Hive queries older than 7 days.'
 
+  def add_arguments(self, parser):
+    parser.add_argument('age_in_days', nargs='?', type=int, default=7,
+                        help='Close the sessions older than this number of days (default is 7).')
+    parser.add_argument('scope', nargs='?', choices=['all'],
+                        help="Pass 'all' to close the sessions of all the applications, not only of Beeswax.")
+
   def handle(self, *args, **options):
-    days = int(args[0]) if len(args) >= 1 else 7
-    close_all = args[1] == 'all' if len(args) >= 2 else False
+    days = options['age_in_days']
+    close_all = options['scope'] == 'all'
 
     self.stdout.write('Closing (all=%s) HiveServer2 sessions older than %s days...\n' % (close_all, days))
 
@@ -56,6 +60,7 @@ class Command(BaseCommand):
     self.stdout.write('Found %d open HiveServer2 sessions to close' % len(sessions))
 
     import os
+
     import beeswax
     from beeswax import hive_site
 
