@@ -27,33 +27,37 @@ The Scratchpad is hosted within this page and points to [demo.gethue.com](https:
 
 ## Importing
 
-First install the NPM [package](/developer/components/) and import the component lib and its HTML element directly into the Web page:
+First install the [NPM package](/developer/components/#npm-registry) and import the component lib and its HTML element directly into the Web page:
 
-    <!DOCTYPE html>
-    <html>
+```html
+<!DOCTYPE html>
+<html>
 
-    <head>
-      <title>SQL Scratchpad</title>
-      <script type="text/javascript" src="./node_modules/gethue/lib/components/SqlScratchpadWebComponent.js"></script>
-    </head>
+<head>
+  <title>SQL Scratchpad</title>
+  <script type="text/javascript" src="./node_modules/gethue/lib/components/SqlScratchpadWebComponent.js"></script>
+</head>
 
-    <body>
-      <div style="position: absolute; height: 100%; width: 100%">
-        <sql-scratchpad api-url="https://demo.gethue.com" username="demo" password="demo" dialect="mysql" />
-      </div>
-    </body>
+<body>
+  <div style="position: absolute; height: 100%; width: 100%">
+    <sql-scratchpad api-url="https://demo.gethue.com" username="demo" password="demo" dialect="mysql" />
+  </div>
+</body>
 
-    </html>
+</html>
+```
 
-Then make sure *api-url* points to a running Hue or [Compose](https://github.com/gethue/compose) APIs. The API is the middleware between your Data Warehouse and Web Browser client and will provide the dynamic content like the list of tables and columns and enrich the autocomplete. The autocomplete is static and powered by the [parser](/developer/components/parsers/) selected by the value of *dialect*.
+Then make sure `api-url` points to a running Hue server. The API is the middleware between your Data Warehouse and Web Browser client and will provide the dynamic content like the list of tables and columns and enrich the autocomplete. The autocomplete is static and powered by the [parser](/developer/components/parsers/) selected by the value of `dialect`.
 
-Specify the credentials for the authentication via *username="demo" password="demo"*.
+Specify the credentials for the authentication via `username` and `password` (e.g. `username="demo" password="demo"`).
 
-Options to look-up a local JWT token or go via Login modal and so not requiring the credentials are coming shortly.
+Options to look up a local JWT token, or to use a login modal and so not require the credentials, are coming shortly.
 
 
-It is also possible to skip the whole `npm install` and directly grab the module via:
+You can also skip `npm install` and load the module directly via:
 
-    <script type="text/javascript" src="https://unpkg.com/gethue/lib/components/SqlScratchpadWebComponent.js"></script>
+```html
+<script type="text/javascript" src="https://unpkg.com/gethue/lib/components/SqlScratchpadWebComponent.js"></script>
+```
 
 !["SQL Scratchpad"](https://cdn.gethue.com/uploads/2021/05/sql-scratchpad-v0.5.png)

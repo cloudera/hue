@@ -5,15 +5,13 @@ draft: false
 weight: 3
 ---
 
-The file to edit is `hue.ini` (which is based on this [template](https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini)). The actual values used by the API server can be checked on the [Dump Config](/administrator/administration/operations/#configuration) page.
+You configure Hue in the `hue.ini` file. It is based on this [template](https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini). To check the values the server actually uses, open the [Dump Config](/administrator/administration/operations/#configuration) page.
 
+The most important sections to configure are:
 
-The most important sections to configure are about the:
+* [Server](/administrator/configuration/server/): for example, the relational database where Hue saves users and queries, the login method (such as LDAP), the look and feel, special features, and the apps to disable.
+* [Connectors](/administrator/configuration/connectors/): the data warehouse services you want users to query or browse. These are typically the databases users query with SQL and the filesystems they browse.
 
-* [API Server](/administrator/configuration/server/). e.g. pointing to a relational database where Hue saves users and queries, selecting the login method like LDAP, customizing the look & feel, activating special features, disabling some apps...
-* [Connectors](/administrator/configuration/connectors/). e.g. pointing to Data Warehouse services you want to make easy to query or browse. Those are typically which databases we want users to query with SQL or filesystems to browse.
+> **Note**: Restart the server after you change `hue.ini`.
 
-**Notes**
-
-* Restarting the server is currently required after for taking ini changes into consideration
-* In development mode (i.e. when using `./build/env/bin/hue runserver` and not `runcpserver`), the correct ini file is `desktop/conf/pseudo-distributed.ini`
+> **Note**: In development mode (when you start Hue with `./build/env/bin/hue runserver`), the ini file is `desktop/conf/pseudo-distributed.ini`.

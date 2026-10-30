@@ -5,18 +5,17 @@ draft: false
 weight: 3
 ---
 
-Browsers power the Data Catalog. They let you easily search, glance, import datasets or jobs.
+Browsers let you search, explore and import datasets, and monitor jobs.
 
-The browsers can be "enriched" with external [catalog/metadata services](/administrator/configuration/connectors/#storage/).
+You can enrich the browsers with an external catalog or metadata service. See the [connectors configuration](/administrator/configuration/connectors/).
 
 ## Catalogs
 
 ### Tables
 
-The Table Browser enables you to manage the databases, tables, and partitions of the metastore shared by the Hive and Impala. You can perform the following operations:
+The Table Browser lets you manage the databases, tables, and partitions of the metastore shared by Hive and Impala. You can perform the following operations:
 
--   Search and display metadata like tags and additional description
-
+-   Search and display metadata like tags and descriptions
 -   Databases
     -   Select a database
     -   Create a database
@@ -30,49 +29,49 @@ The Table Browser enables you to manage the databases, tables, and partitions of
     -   Import data into a table
     -   [Filter, Sort and Browse Partitions](http://gethue.com/filter-sort-browse-hive-partitions-with-hues-metastore/)
 
-### Data Catalogs
+### Data catalogs
 
-Before typing any query to get insights, users need to find and explore the correct datasets.  It is accessible from the top bar of the interface and offers free text search of SQL tables, columns, tags and saved queries. This is particularly useful for quickly looking up a table among thousands or finding existing queries already analyzing a certain dataset.
+Before you write a query, you need to find the right dataset. The Data Catalog search is in the top bar of the interface. It offers free text search of SQL tables, columns, tags and saved queries. This is particularly useful for quickly looking up a table among thousands or finding existing queries already analyzing a certain dataset.
 
-Existing tags, descriptions and indexed objects show up automatically, any additional tags you add appear back in metadata server, and the familiar metadata server search syntax is supported.
+Existing tags, descriptions and indexed objects show up automatically. Tags that you add are also sent back to the metadata server, and the metadata server search syntax is supported.
 
 ![Data Catalog top search](https://cdn.gethue.com/uploads/2018/04/blog_top_search_.png)
 
-Searching all the available queries or data in the cluster
+Searching all the available queries and data in the cluster.
 
 ![Data Catalog tags](https://cdn.gethue.com/uploads/2018/04/blog_tag_listing.png)
 
-Listing the possible tags to filter on. This also works for ‘types’.
+Listing the tags to filter on. This also works for types.
 
 #### Unification of metadata
 
-The list of tables and their columns is displayed in multiple part of the interface. This data is pretty costly to fetch and comes from different sources. In this new version, the information is now cached and reused by all the Hue components. As the sources are diverse, e.g. Apache Hive, Apache Atlas those are stored into a single object, so that it is easier and faster to display without caring about the underlying technical details.
+Hue shows the list of tables and their columns in multiple parts of the interface. This data comes from different sources, such as Apache Hive and Apache Atlas. Hue caches it in a single object and reuses it in all components, so it displays faster.
 
-In addition to editing the tags of any SQL objects like tables, views, columns… which has been available since version one, table descriptions can now also be edited. This allows a self service documentation of the metadata by the end users, which was not possible until now as directly editing Hive comments require some admin Sentry privileges which are not granted to regular users in a secure cluster.
+You can edit the tags of any SQL object, like tables, views and columns. You can also edit table descriptions. This lets you document the metadata yourself, without the admin privileges that editing Hive comments directly requires on a secure cluster.
 
 ![Data Catalog](https://cdn.gethue.com/uploads/2018/04/blog_metadata.png)
 
 #### Search
 
-By default, only tables and views are returned. To search for columns, partitions, databases use the ‘type:' filter.
+By default, only tables and views are returned. To search for columns, partitions or databases, use the `type:` filter.
 
-Example of searches:
+Examples of searches:
 
-Atlas
+**Apache Atlas**
 
-* sample → Any table or Hue document with prefix ‘sample’ will be returned
-* type:database → List all databases on this cluster
-* type:table → List all tables on this cluster
-* type:field name → List tables with field(column): ‘name’
-* ‘tag:classification_testdb5’ or ‘classification:classification_testdb5’→ List entities with classification ‘classification_testdb5’
-* owner:admin → List all tables owned by ‘admin’ user
+* `sample`: any table or Hue document with the prefix `sample`
+* `type:database`: all databases on this cluster
+* `type:table`: all tables on this cluster
+* `type:field name`: tables with a field (column) named `name`
+* `tag:classification_testdb5` or `classification:classification_testdb5`: entities with the classification `classification_testdb5`
+* `owner:admin`: all tables owned by the `admin` user
 
-Navigator
+**Cloudera Navigator** (deprecated in favor of the `[[catalog]]` configuration)
 
-* table:customer → Find the customer table
-* table:tax* tags:finance → List all the tables starting with tax and tagged with ‘finance'
-* owner:admin type:field usage → List all the fields created by the admin user that matches the usage string
-* parentPath:"/default/web_logs" type:FIELD  originalName:b* → List all the columns starting with `b` of the table `web_logs` in the database `default`.
+* `table:customer`: the `customer` table
+* `table:tax* tags:finance`: all tables starting with `tax` and tagged with `finance`
+* `owner:admin type:field usage`: all fields created by the `admin` user that match `usage`
+* `parentPath:"/default/web_logs" type:FIELD originalName:b*`: all columns starting with `b` of the table `web_logs` in the database `default`
 
 ![Data Catalog Search](https://cdn.gethue.com/uploads/2019/06/SearchWithType_field_name.png)
 
@@ -80,104 +79,123 @@ Learn more on the [Search](http://gethue.com/realtime-catalog-search-with-hue-an
 
 #### Tagging
 
-In addition, you can also now tag objects with names to better categorize them and group them to different projects. These tags are searchable, expediting the exploration process through easier, more intuitive discovery.
+You can tag objects with names to categorize them and group them by project. Tags are searchable, which makes discovery easier.
 
 ![Data Catalog](https://cdn.gethue.com/uploads/2016/04/tags.png)
 
-### Importing Data
+### Importing data
 
-The goal of the importer is to allow ad-hoc queries on data not yet in the clusters and simplifies self-service analytics.
+The Importer lets you query data that is not yet in the cluster. It creates a table from a file in a few steps.
 
-If you want to import your own data instead of installing the sample
-tables, open the importer from the left menu or from the little `+` in the left assist.
-
+To import your own data, open the importer from the left menu or from the `+` in the left assist panel.
 
 To learn more, watch the video on [Data Import Wizard](http://gethue.com/import-data-to-be-queried-via-the-self-service-drag-drop-create-table-wizard/).
 
-**Note** Files can be dragged & dropped, selected from HDFS or S3 (if configured), and their formats are automatically detected. The wizard also assists when performing advanced functionalities like table partitioning, Kudu tables, and nested types.
+> **Note:** You can select files from the configured storage (for example HDFS or S3) or upload a small file. Hue detects the file format automatically. The wizard also helps with table partitioning, Kudu tables and nested types.
+
+#### New importer
+
+When the administrator sets `enable_new_importer=true` in the `[desktop]` section of `hue.ini` (the default is `false`), a new importer is available. It adds a second entry named **Import**, which opens the page at `/newimporter`. The existing importer stays available.
+
+To import a file with the new importer:
+
+1. Open the importer and select a source. Depending on your configuration, the choices are **Upload from File**, **HDFS**, **Amazon S3**, **Azure Storage**, **Google Storage** and **Ozone**.
+2. Select the file. Hue opens the **Preview** tab with a preview of the data.
+3. In the **Preview** tab, choose the database, the table name, the engine and the compute. Review and edit the column names, types and comments.
+4. In the **Settings** tab, check the file format: file type (CSV, JSON or Excel), whether the file has a header, the field separator and the quote character.
+5. Optional: add partitions in the **Partitions** tab.
+6. Click **Finish Import**.
+
+The new table is created in the selected database.
+
+> **Note:** Files above the supported size limit can't be uploaded in the importer. Use a file browser to upload them instead.
 
 #### CSV file
 
-Any small CSV file can be ingested into a new index in a few clicks.
+You can ingest any small CSV file into a new index in a few clicks.
 
-#### Relational Databases
+#### Relational databases
 
-Import data from relational databases to HDFS file or Hive table using Apache Sqoop. It enables to bring large amount of data into the cluster in just few clicks via interactive UI. The imports run on YARN and are scheduled by Oozie.
+You can import data from relational databases into an HDFS file or a Hive table with Apache Sqoop. The imports run on YARN and are scheduled by Oozie. This option requires `enable_sqoop=true` in the `[indexer]` section of `hue.ini`.
 
-Learn more about it on the [ingesting data from traditional databases](http://gethue.com/importing-data-from-traditional-databases-into-hdfshive-in-just-a-few-clicks/) post.
+Learn more in the post on [ingesting data from traditional databases](http://gethue.com/importing-data-from-traditional-databases-into-hdfshive-in-just-a-few-clicks/).
 
-#### Apache Solr
+#### Apache Solr indexes
 
-In the past, indexing data into Solr to then explore it with a [Dynamic Dashboard](/user/querying/#dashboards) has been quite difficult. The task involved writing a Solr schema and a Morphlines file then submitting a job to YARN to do the indexing. Often times getting this correct for non trivial imports could take a few days of work. Now with Hue's new feature you can start your YARN indexing job in minutes.
+You can index data into Solr and then explore it with a [Dynamic Dashboard](/user/querying/#dashboard). The indexer builds the Solr schema and the Morphlines file for you and runs the indexing job on YARN.
 
-First you’ll need to have a running Solr cluster that Hue is configured with.
+Before you start, your administrator needs to:
 
-Next you’ll need to install these required libraries. To do so place them in a directory somewhere on HDFS and set the path for config_indexer_libs_path under indexer in the Hue ini to match by default, the config_indexer_libs_path value is set to /tmp/smart_indexer_lib. Additionally under indexer in the Hue ini you’ll need to set enable_new_indexer to true.
+- Configure Hue with a running Solr cluster.
+- Place the required libraries in a directory on HDFS and set `config_indexer_libs_path` in the `[indexer]` section of `hue.ini` to that path (the default is `/tmp/smart_indexer_lib`).
+- Keep `enable_new_indexer` set to `true` in the `[indexer]` section (this is the default).
 
-    [indexer]
+```ini
+[indexer]
+# Flag to turn on the morphline based Solr indexer.
+## enable_new_indexer=true
 
-    # Flag to turn on the morphline based Solr indexer.
-    enable_new_indexer=false
+# Filesystem directory containing Solr Morphline indexing libs.
+## config_indexer_libs_path=/tmp/smart_indexer_lib
+```
 
-    # Oozie workspace template for indexing.
-    ## config_indexer_libs_path=/tmp/smart_indexer_lib
-
-We’ll pick a name for our new collection and select our reviews data file from HDFS. Then we’ll click next.
+In this example, you pick a name for the new collection, select the reviews data file from HDFS and click **Next**.
 
 ![Solr Indexer](https://cdn.gethue.com/uploads/2016/08/indexer-wizard.png)
 
-Field selection and ETL
+**Field selection and ETL**
 
-On this tab we can see all the fields the indexer has picked up from the file. Note that Hue has also made an educated guess on the field type. Generally, Hue does a good job inferring data type. However, we should do a quick check to confirm that the field types look correct.
+This tab lists all the fields that the indexer found in the file. Hue also guesses the field types. Check that the types are correct.
 
 ![Solr Indexer](https://cdn.gethue.com/uploads/2016/08/indexer-wizard-fields.png)
 
-For our data we’re going to perform 4 operations to make a very searchable Solr Collection.
+In this example, you apply four operations to make the collection easy to search.
 
-Convert Date
+**Convert date**
 
-This operation is implicit. By setting the field type to date we inform Hue that we want to convert this date to a Solr Date. Hue can convert most standard date formats automatically. If we had a unique date format we would have to define it for Hue by explicitly using the convert date operation.
+This operation is implicit. When you set the field type to date, Hue converts the value to a Solr date. Hue converts most standard date formats automatically. For a custom date format, add the convert date operation explicitly.
 
 ![Solr Indexer](https://cdn.gethue.com/uploads/2016/08/indexer-op-date.png)
 
-Translate star ratings to integer ratings
+**Translate star ratings to integer ratings**
 
-Under the rating field we’ll change the field type from string to long and click add operation. We’ll then select the translate operation and setup the following translation mapping.
+Under the rating field, change the field type from string to long and click add operation. Select the translate operation and set up the following translation mapping.
 
 ![Solr Indexer](https://cdn.gethue.com/uploads/2016/08/indexer-translate-date.png)
 
-Grok the city from the full address field
+**Grok the city from the full address field**
 
-We’ll add a grok operation to the full address field, fill in the following regex .* (?<city>\w+),.* and set the number of expected fields to
+Add a grok operation to the full address field, enter the regex `.* (?<city>\w+),.*` and set the number of expected fields to 1.
 
 ![Solr Indexer](https://cdn.gethue.com/uploads/2016/08/indexer-op-grok.png)
 
-1. In the new child field we’ll set the name to city. This new field will now contain the value matching the city capture group in the regex.
+In the new child field, set the name to `city`. This field contains the value of the `city` capture group.
 
-Use a split operation to separate the latitude/longitude field into two separate floating point fields.
-Here we have an annoyance. Our data file contains the latitude and longitude of the place that’s being reviewed – Awesome! For some reason though they’ve been clumped into one field with a comma between the two numbers. We’ll use a split operation to grab each individually. Set the split value to ‘,’ and the number of output fields to 2. Then change the child fields’ types to doubles and give them logical names. In this case there’s not really much sense in keeping the parent field so let’s uncheck the “keep in index” box.
+**Split the latitude and longitude into two fields**
+
+The data file has the latitude and longitude in one field, separated by a comma. Add a split operation, set the split value to `,` and the number of output fields to 2. Change the child field types to double and give them clear names. Clear the **keep in index** box for the parent field.
 
 ![Solr Indexer](https://cdn.gethue.com/uploads/2016/08/indexer-op-split.png)
 
-Here we’ll add a geo ip operation and select iso_code as our output. This will give us the country code.
+**Add the country from the IP address**
+
+Add a geo ip operation and select `iso_code` as the output. This gives you the country code.
 
 ![Solr Indexer](https://cdn.gethue.com/uploads/2016/08/indexer-op-geoip.png)
 
-Before we index, let’s make sure everything looks good with a quick scan of the preview. This can be handy to avoid any silly typos or anything like that.
+Check the preview to catch typos. Then click **Index** and wait. A progress bar at the bottom of the screen shows the status: yellow means Hue is indexing the data and green means it is done. You can close the window. The indexing continues on the cluster.
 
-Now that we’ve defined our ETL Hue can do the rest. Click index and wait for Hue to index our data. At the bottom of this screen we can see a progress bar of the process. Yellow means our data is currently being indexed and green means it’s done. Feel free to close this window. The indexing will continue on your cluster.
-
-Once our data has been indexed into a Solr Collection we have access to all of Hue’s search features and can make a nice analytics dashboard like this one for our data.
+After the data is indexed into a Solr collection, you can use all the search features of Hue and build an analytics dashboard.
 
 ![Solr Dashboard](https://cdn.gethue.com/uploads/2016/08/indexer-dash.png)
 
 **Dependencies**
 
-The indexer libs path is where all required libraries for indexing should be. If you’d prefer you can assemble this directory yourself. There are three main components to the libs directory:
+The indexer libs path contains all the libraries required for indexing. You can assemble this directory yourself. It has three main components:
 
 1. JAR files required by the [MapReduceIndexerTool](http://www.cloudera.com/documentation/enterprise/5-5-x/topics/search_mapreduceindexertool.html)
 
-All required jar files should have shipped with CDH. Currently the list of required JARs is:
+The required JAR files ship with the Hadoop distribution that provides Solr search. The list of required JARs is:
 
     argparse4j-0.4.3.jar
     readme.txt
@@ -189,7 +207,7 @@ All required jar files should have shipped with CDH. Currently the list of requi
     solr-solrj-4.10.3-cdh5.8.0.jar
     noggit-0.5.jar
 
-Should this change and you get a missing class error, you can find whatever jar may be missing by grepping all the jars packaged with CDH for the missing class.
+If you get a missing class error, search the JARs of your distribution for the missing class.
 
 2. Maxmind GeoLite2 database
 
@@ -201,35 +219,43 @@ Any grok commands can be defined in text files within the grok_dictionaries sub 
 
 ### Streams
 
-Kafka topics, Streams, Tables can be listed via the [`ksql` connector](/administrator/configuration/connectors/#ksql).
+You can list Kafka topics, streams and tables with the [`ksql` connector](/administrator/configuration/connectors/#ksqldb).
 
 ### Permissions
 
-Sentry roles and privileges can directly be edited in the Security interface.
+You can edit Sentry roles and privileges in the Security interface.
 
-**Note** Apache Sentry is going to be replaced by Apache Ranger in [HUE-8748](https://issues.cloudera.org/browse/HUE-8748).
+> **Note:** If the administrator sets `enable_new_storage_browser=true`, the Storage Browser replaces the separate file browser entries in the menu.
 
-#### Sentry Tables
+> **Note:** Apache Sentry is being replaced by Apache Ranger.
 
-It can be tricky to grant a new user proper permissions on a secure cluster, let’s walk through the steps to enable any new user for table creation on a kerberized cluster. Depends on your cluster size, creating user and group on each node can be tedious. Here we use pssh (Parallel ssh) for this task.
+#### Sentry tables
 
-1. Install the tool and prepare a file which contains all your hosts.
+It can be tricky to grant a new user the right permissions on a secure cluster. This walkthrough enables a new user to create tables on a Kerberized cluster. Creating the user and group on each node can be tedious on a large cluster, so the example uses pssh (parallel ssh).
 
-For Mac user:
+1. Install the tool and prepare a file that contains all your hosts.
 
+    On macOS:
+
+    ```bash
     brew install pssh
+    ```
 
-For Debian or Ubuntu user:
+    On Debian or Ubuntu:
 
+    ```bash
     sudo apt-get install pssh
+    ```
 
+    ```bash
     cat ~/Documents/nodeshue.txt
     hue-1.test.cloudera.com
     hue-2.test.cloudera.com
     hue-3.test.cloudera.com
     hue-4.test.cloudera.com
+    ```
 
-2. Run follow commands to create user: t1 and group: grp1 on your cluster:
+2. Run the following commands to create user: t1 and group: grp1 on your cluster:
 
     ```
     pssh -h ~/Documents/nodeshue.txt -i useradd t1
@@ -251,9 +277,9 @@ For Debian or Ubuntu user:
     [4] 13:59:28 [SUCCESS] hue-4.test.cloudera.com
     ```
 
-3. Create same Hue user: t1 and group: grp1 and make “t1″a member of “grp1”.
+3. Create the same Hue user `t1` and group `grp1`, and make `t1` a member of `grp1`.
 
-4. Then log in as any user with sentry admin permission to run following queries in hive editor:
+4. Log in as a user with Sentry admin permission and run the following statements in the Hive editor:
 
     ```
     create role write_role;
@@ -261,14 +287,13 @@ For Debian or Ubuntu user:
     GRANT ALL ON SERVER server1 TO ROLE write_role;
     ```
 
-Now “t1” user or any user in “grp1” can log in and create table by running any hive/impala DDL queries or through Hue importer.
+Now the user `t1`, or any user in `grp1`, can log in and create tables with Hive or Impala DDL queries or with the importer.
 
+In most cases, you grant narrower permissions than `ALL` on `SERVER`. The next examples create a `read_only_role` and a `read_write_role` for specific databases.
 
-But mostly we would like to grant proper permissions for users instead of `ALL` on `server`. let’s walk through two other examples like `read_only_role` and `read_write_role` for specific databases.
+Create the user `t2` in group `grp2` and the user `t3` in group `grp3` on the cluster and in Hue, with similar commands. Then grant the permissions to each group:
 
-Using similar commands to create t2 user in group grp2 and t3 user in group grp3 on cluster and Hue. Then use following statements to grant proper permission to each group:
-
-1. Read write access to database: ‘s3db’ for any user in group ‘grp3’:
+1. Read and write access to the database `s3db` for any user in group `grp3`:
 
     ```
     create role read_write_s3db_role;
@@ -277,7 +302,7 @@ Using similar commands to create t2 user in group grp2 and t3 user in group grp3
     GRANT ALL ON URI 'hdfs://hue-1.test.cloudera.com:8020/user/t3' to ROLE read_write_s3db_role;
     ```
 
-2. Read only permission for database: ‘default’ for any user in group ‘grp2’:
+2. Read-only permission for the database `default` for any user in group `grp2`:
 
     ```
     create role read_only_defaultDb_role;
@@ -286,22 +311,22 @@ Using similar commands to create t2 user in group grp2 and t3 user in group grp3
     GRANT REFRESH ON DATABASE default TO ROLE read_only_defaultDb_role;
     ```
 
-Now ‘t3’ user can read and create new tables in `database:s3db` while ‘t2’ user can read database: default only.
+Now `t3` can read and create tables in the database `s3db`, and `t2` can only read the database `default`.
 
-We can grant those permission through Hue security page too, it should ends like following.
+You can also grant these permissions in the Hue Security page. The result looks like this:
 
 ![Listing of Sentry Table privileges](https://cdn.gethue.com/uploads/2019/04/HueSecurityRoles.png)
 
-Note: You have to grant URI permission to avoid following error during table creation:
+> **Note:** You must grant the URI permission. Otherwise, creating a table fails with this error:
 
     Error while compiling statement: FAILED: SemanticException No valid privileges User t3 does not have privileges for CREATETABLE The required privileges: Server=server1->URI=hdfs://hue-1.gce.cloudera.com:8020/user/t3/t3_dir->action=*->grantOption=false;
 
 
-#### Sentry Solr
+#### Sentry Solr privileges
 
-[Apache Solr](http://gethue.com/ui-to-edit-sentry-privilege-of-solr-collections/) privileges can be edited directly via the interface.
+You can edit [Apache Solr](http://gethue.com/ui-to-edit-sentry-privilege-of-solr-collections/) privileges in the interface.
 
-For listing collections, query and creating collection:
+To list collections, query and create a collection, grant:
 
     Admin=*->action=*
     Collection=*->action=*
@@ -325,68 +350,95 @@ End user error when querying a collection without the QUERY privilege
 End user error when modifying a record without the UPDATE privilege
 
 
-#### HDFS Acls
+#### HDFS ACLs
 
-Editing [HDFS acls](https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/HdfsPermissionsGuide.html#ACLs_.28Access_Control_Lists.29) in the Security app:
+You can edit [HDFS ACLs](https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/HdfsPermissionsGuide.html#ACLs_.28Access_Control_Lists.29) in the Security app.
+
 
 ![HDFS Acls](https://cdn.gethue.com/docs/user/storage_hdfs_acls.png)
 
 ## Data
 
-The File Browser application lets you interact with these file systems HDFS, S3 or ADLS:
+The File Browser lets you work with these file systems: HDFS, Amazon S3, Azure (ABFS and ADLS), Google Cloud Storage and Apache Ozone. An administrator must [configure the connection](/administrator/configuration/connectors/#storage) first. You can:
 
--   Create files and directories, upload and download files, upload zip
-    archives and extract them, rename, move, and delete files and directories.
--   Change a file's or directory's owner, group, and
-    permissions.
+-   Create files and directories, upload and download files, upload zip archives and extract them, rename, move, copy and delete files and directories.
+-   Change the owner, group and permissions of a file or directory (HDFS).
 -   View and edit files as text or binary.
--   Create external tables or export query results
+-   Create external tables or export query results.
 
-**Exploring in File Browser**
+### Browse files
 
-Once Hue is successfully [configured to connect](/administrator/configuration/connectors/#storage) to the storage, we can view all accessible folders within the account by clicking on the storage root. From here, we can view the existing keys (both directories and files) and create, rename, move, copy, or delete existing directories and files. Additionally, we can directly upload files to the storage.
+To browse files:
+
+1. Open the file browser from the left menu (**Storage Browser** if it is enabled, see below).
+2. Click the root of the storage to list the accessible folders.
+3. Click a folder to open it, or a file to view it.
+
+You can then create, rename, move, copy or delete directories and files, and upload files directly to the storage.
 
 ![Browse files](https://cdn.gethue.com/uploads/2016/08/image2.png)
 
-**Creating SQL Tables**
+### Storage Browser
 
-Hue’s table browser import wizard can create external Hive tables directly from files in the storage. This allows the data to be queried via SQL, without moving or copying the data into HDFS or the Hive Warehouse. To create an external table from the storage, navigate to the table browser, select the desired database and then click the plus icon in the upper right. Select a file using the file picker and browse to a file on the storage.
+When the administrator sets `enable_new_storage_browser=true` in the `[desktop]` section of `hue.ini` (the default is `false`), the left menu shows **Storage Browser** instead of the separate file browser entries. The Storage Browser shows one tab per configured file system. In it you can:
 
-Choose your input files’ delimiter and press next. Keep unchecked “Store in Default location” if you want the file to stay intact on the storage, update the column definition options and finally click “Submit” when you’re ready to create the table. Once created, you should see the newly created table details in the table browser.
+-   Search in the current folder and refresh the list.
+-   Create a new file or folder. Depending on the location, you can also create a bucket (S3, Google Storage, Ozone), a volume (Ozone) or a file system (ABFS).
+-   Upload files and download files.
+-   Rename, copy, move, compress and extract files and folders.
+-   Preview files and edit text files.
+-   Change the owner, group and permissions, and set the replication factor (HDFS).
+-   View the summary of a folder, such as the number of files and the disk space used.
+-   Move items to the trash, restore them and empty the trash (HDFS).
+
+> **Note:** The available actions depend on the file system and your permissions. Archive extraction requires `enable_extract_uploaded_archive` to be `true` in the `[filebrowser]` section. It is on by default only when the Oozie app is enabled, and the Storage Browser offers it only for HDFS.
+
+### Create SQL tables from files
+
+The table import wizard can create external Hive tables directly from files in the storage. You can then query the data with SQL without copying it into HDFS or the Hive warehouse.
+
+To create an external table from a file:
+
+1. Open the Table Browser and select the database.
+2. Click the plus icon in the upper right.
+3. Use the file picker to select a file on the storage.
+4. Choose the delimiter of the file and click **Next**.
+5. Clear **Store in Default location** to keep the file where it is.
+6. Update the column definitions and click **Submit**.
+
+The new table appears in the Table Browser.
 
 ![Create tables from external files](https://cdn.gethue.com/uploads/2017/11/image4-1.png)
 
-**Saving Query Results**
+### Save query results to storage
 
-Now that we have created external Hive tables created from our data, we can jump into either the Hive or Impala editor and start querying the data directly from the storage seamlessly. These queries can join tables. Query results can then easily be saved back to the storage.
+After you create external tables, you can query them in the Hive or Impala editor, including joins. You can then save the query results back to the storage.
 
 ![Save results to storage](https://cdn.gethue.com/uploads/2017/11/image1-1.png)
 
 ### HDFS
 
-Hue is fully compatible with HDFS and is handy for browsing, peeking at file content, upload or downloading data.
+You can browse HDFS, peek at the content of files, and upload and download data.
 
 ### AWS S3
 
-Hue can be setup to read and write to a configured S3 account, and users get autocomplete capabilities and can directly query from and save data to S3 without any intermediate moving/copying to HDFS.
+When the administrator configures an S3 account, you can read and write data on S3. You get autocomplete, and you can query and save data on S3 without moving it to HDFS first.
 
 ### Azure
 
-ADLS v1 as well as ABFS (ADLS v2) are supported.
+ABFS (ADLS Gen2) and ADLS Gen1 are supported.
 
-### GCS
+### Google Cloud Storage
 
-Google Cloud Storage is currently a work in progress [HUE-8978](https://issues.cloudera.org/browse/HUE-8978)
+Google Cloud Storage (`gs://` paths) is supported when the administrator configures it.
 
-### Streams
+### Apache Ozone
 
-#### Kafka
-
-Topics, Streams can be listed via the [`ksql` connector](/administrator/configuration/connectors/#ksql).
+Apache Ozone (`ofs://` paths) is supported when the administrator configures it.
 
 ### HBase
 
-#### Smart View
+#### Smart view
 
 The smartview is the view that you land on when you first enter a table.
 On the left hand side are the row keys and hovering over a row reveals a
@@ -433,7 +485,7 @@ operations:
 ![HBase](https://cdn.gethue.com/uploads/2021/10/hbase_4.png)
 
 
-#### Smart Searchbar
+#### Smart searchbar
 
 The "Smart Searchbar" is a sophisticated tool that helps you zero-in on
 your data. The smart search supports a number of operations. The most
@@ -511,7 +563,7 @@ performed exactly like a regular scan, but with a prefixed row.
 
 
 Finally, as a new feature, you can also take full advantage of the
-[HBase filtering](denied:about:blank)language, by typing your filter
+[HBase filter language](https://hbase.apache.org/book.html#thrift.filter_language), by typing your filter
 string between curly braces. HBase Browser autocompletes your filters
 for you so you don't have to look them up every time. You can apply
 filters to rows or scans.
@@ -527,76 +579,68 @@ will suggest next steps to complete your query.
 
 ### Indexes
 
-Apache Solr indexes can be created via the [importer](/user/browsing/#data-importer) and are listed in the interface.
+You can create Apache Solr indexes with the [importer](/user/browsing/#importing-data). They are listed in the interface.
 
 ![Solr Indexer](https://cdn.gethue.com/uploads/2016/08/indexer-op-grok.png)
 
 ## Jobs
 
-The Job Browser application lets you to examine multiple types of jobs
-jobs running in the cluster. Job Browser presents the job and
-tasks in layers for quick access to the logs and troubleshooting.
+The Job Browser lets you examine the jobs that run in the cluster. It presents jobs and tasks in layers, so you can quickly reach the logs and troubleshoot.
 
-### SQL Queries
+### SQL queries
 
-There are three ways to access the Query browser:
+You can open the query browser in three ways:
 
-* Best: Click on the query ID after executing a SQL query in the editor. This will open the mini job browser overlay at the current query. Having the query execution information side by side the SQL editor is especially helpful to understand the performance characteristics of your queries.
-* Open the mini job browser overlay and navigate to the queries tab.
-* Open the job browser and navigate to the queries tab.
+* Click the query ID after you run a SQL query in the editor. This opens the mini job browser overlay at the current query. You see the execution details next to the SQL editor, which helps you understand the performance of your query. This is the recommended way.
+* Open the mini job browser overlay and go to the **Queries** tab.
+* Open the Job Browser and go to the **Queries** tab.
+
+The Impala query section requires `enable_query_browser=true` in the `[jobbrowser]` section of `hue.ini` (the default). The Hive query history requires `enable_hive_query_browser=true`.
 
 ![Pretty Query Profile](https://cdn.gethue.com/uploads/2019/03/Screen-Shot-2019-03-07-at-11.40.24-AM.png)
 
-There are three ways to access the new browser:
-
-Best: Click on the query ID after executing a SQL query in the editor. This will open the mini job browser overlay at the current query. Having the query execution information side by side the SQL editor is especially helpful to understand the performance characteristics of your queries.
-Open the mini job browser overlay and navigate to the queries tab.
-Open the job browser and navigate to the queries tab.
-
-
 **Query capabilities**
 
-Display the list of currently running queries on the user’s current Impala coordinator and a certain number of completed queries based on your configuration (25 by default).
+The query browser displays the list of currently running queries on your current Impala coordinator, and a number of completed queries based on your configuration (25 by default).
 
-![Pretty Query Profile](https://cdn.gethue.com/uploads/2017/12/JB.png)
+![Query list](https://cdn.gethue.com/uploads/2017/12/JB.png)
 
+Display the explain plan, which shows the logical execution steps. Check that the execution does not proceed in an unexpected way, such as a wrong join type, join order or projection order. This can happen when the table statistics are out of date, as the image below shows with "cardinality: unavailable". To update the statistics, run:
 
-Display the explain plan which outlines logical execution steps. You can verify here that the execution will not proceed in an unexpected way (i.e. wrong join type, join order, projection order). This can happen if the statistics for the table are out of date as shown in the image below by the mention of “cardinality: unavailable”. You can obtain statistics by running:
+```sql
+COMPUTE STATS <TABLE_NAME>
+```
 
-    COMPUTE STATS <TABLE_NAME>
+![Explain plan](https://cdn.gethue.com/uploads/2017/11/Explain.png)
 
-![Pretty Query Profile](https://cdn.gethue.com/uploads/2017/11/Explain.png)
+Display the summary report, which shows the physical timing and memory information of each operation of the explain plan. You can find bottlenecks and fix them by replacing expensive operations, repartitioning, changing the file format or moving data.
 
-Display the summary report which shows physical timing and memory information of each operation of the explain plan. You can quickly find bottlenecks in the execution of the query which you can resolve by replacing expensive operations, repartitioning, changing file format or moving data.
+![Summary report](https://cdn.gethue.com/uploads/2017/11/Summary.png)
 
-![Pretty Query Profile](https://cdn.gethue.com/uploads/2017/11/Summary.png)
+Display the query plan, a condensed graphical version of the summary report.
 
-Display the query plan which is a condensed version of the summary report in graphical form.
+![Query plan](https://cdn.gethue.com/uploads/2017/12/Plan.png)
 
-![Pretty Query Profile](https://cdn.gethue.com/uploads/2017/12/Plan.png)
+Display the memory profile, which shows the memory used during the execution of the query. Use it to check whether the memory available to your query is sufficient.
 
-Display the memory profile which contains information about the memory usage during the execution of the query. You can use this to determine if the memory available to your query is sufficient.
+![Memory profile](https://cdn.gethue.com/uploads/2017/11/Memory.png)
 
-![Pretty Query Profile](https://cdn.gethue.com/uploads/2017/11/Memory.png)
+Display the profile, which gives the physical execution of the query in great detail. Use it to analyze data exchange between operators and I/O performance (disk, network, CPU). You can use it to reorganize the location of your data (on disk, in memory, different partitions or file formats).
 
-Display the profile which gives you physical execution of the query in great detail. This view is used to analyze data exchange between the various operator and the performance of the IO (disk, network, CPU). You can use this to reorganize the location of your data (on disk, in memory, different partitions or file formats).
+![Query profile](https://cdn.gethue.com/uploads/2017/12/Profile.png)
 
-![Pretty Query Profile](https://cdn.gethue.com/uploads/2017/12/Profile.png)
-
-Manually close an opened query.
-
+You can also manually close an open query.
 
 ### YARN (Spark, MapReduce, Tez)
 
-Any job running on the Resource Manager will be automatically listed. The information will be fetched accordingly if the job got moved to one of the history servers.
+Any job running on the Resource Manager is listed automatically. If the job moved to a history server, Hue fetches the information from there.
 
+### Oozie workflows and schedules
 
-### Oozie Workflow / Schedules
-
-List submitted workflows, schedules and bundles.
+You can list submitted workflows, schedules and bundles.
 
 ![Oozie jobs](https://cdn.gethue.com/uploads/2016/04/hue-dash-oozie.png)
 
-### Spark / Livy
+### Spark and Livy
 
-List [Spark Livy](/user/querying/#spark) sessions and submitted statements.
+You can list [Spark Livy](/user/querying/#spark) sessions and submitted statements.

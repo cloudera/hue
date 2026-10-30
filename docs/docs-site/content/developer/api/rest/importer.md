@@ -5,11 +5,15 @@ draft: false
 weight: 4
 ---
 
-The File Import API provides endpoints for uploading, analyzing, and previewing files that can be imported into various SQL engines. This API simplifies the process of creating database tables from files like CSV, TSV, and Excel spreadsheets.
+Use the File Import API to upload, analyze and preview files before you import them into a SQL engine. It supports CSV, TSV, other delimited files and Excel spreadsheets.
 
-> **Note**: All API endpoints require authentication. For endpoints that work with remote files (`import_type=remote`), the API uses the file system permissions associated with the authenticated user's session.
+All endpoints require [authentication](/developer/api/rest/#authentication). For remote files (`import_type=remote`), the API uses the file system permissions of the authenticated user.
+
+The examples use `hue.example.com` as the server. Replace `<ACCESS_TOKEN>` with the `access` token of your session.
 
 ## Overview
+
+The importer is turned off by default. An administrator turns it on with `is_enabled=true` in the `[desktop] [[importer]]` section of `hue.ini`. The `get_config` response reports the setting in `importer.is_enabled`.
 
 The File Import API allows you to:
 
@@ -19,7 +23,7 @@ The File Import API allows you to:
 - Preview file content with data types
 - Get SQL type mappings for different SQL dialects
 
-## Typical Import Workflow
+## Typical import workflow
 
 A typical workflow for importing a file into a database table involves these steps:
 
@@ -29,42 +33,42 @@ A typical workflow for importing a file into a database table involves these ste
 4. **Preview the file** with column type detection using the `/api/v1/importer/file/preview/` endpoint
 5. Use the preview data to create a table in your SQL engine of choice
 
-## Upload a Local File
+## Upload a local file
 
 Upload a file from your local system to the Hue server.
 
-**Endpoint:** `/api/v1/importer/upload/file/`
+**Method and URL:** `POST /api/v1/importer/upload/file/`
 
-**Method:** `POST`
+**Content type:** `multipart/form-data`
 
-**Content Type:** `multipart/form-data`
-
-**Request Parameters:**
+**Request parameters:**
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| file | File | Yes | The file to upload (csv, tsv, excel) |
+| file | file | Yes | The file to upload (CSV, TSV or Excel). |
 
-**Example using cURL:**
+The server saves the file in its temporary directory. Use the returned `file_path` with `import_type=local` in the other calls. Only the user who uploaded the file can use that path.
+
+**Example request (curl):**
 
 ```bash
 curl -X POST \
-  -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \
+  -H "Authorization: Bearer <ACCESS_TOKEN>" \
   -F "file=@/path/to/sales_data.csv" \
-  https://demo.gethue.com/api/v1/importer/upload/file/
+  https://hue.example.com/api/v1/importer/upload/file/
 ```
 
-**Example using JavaScript:**
+**Example request (JavaScript):**
 
 ```javascript
 // Using fetch API
 const formData = new FormData();
 formData.append('file', fileInputElement.files[0]);
 
-fetch('https://demo.gethue.com/api/v1/importer/upload/file/', {
+fetch('https://hue.example.com/api/v1/importer/upload/file/', {
   method: 'POST',
   headers: {
-    'Authorization': 'Bearer <YOUR_JWT_TOKEN>'
+    'Authorization': 'Bearer <ACCESS_TOKEN>'
   },
   body: formData
 })
@@ -73,7 +77,7 @@ fetch('https://demo.gethue.com/api/v1/importer/upload/file/', {
 .catch(error => console.error('Error:', error));
 ```
 
-**Response:**
+**Example response:**
 
 ```json
 {
@@ -81,53 +85,52 @@ fetch('https://demo.gethue.com/api/v1/importer/upload/file/', {
 }
 ```
 
-**Status Codes:**
+**Status codes:**
 
 - `201 Created` - File was uploaded successfully
 - `400 Bad Request` - Invalid file format or size
 - `500 Internal Server Error` - Server-side error
 
 **Restrictions:**
-- Maximum file size is determined by the configuration `IMPORTER.MAX_LOCAL_FILE_SIZE_UPLOAD_LIMIT`
-- Certain file extensions may be restricted based on `IMPORTER.RESTRICT_LOCAL_FILE_EXTENSIONS`
 
-## Guess File Metadata
+- The maximum file size is set by `max_local_file_size_upload_limit` in the `[desktop] [[importer]]` section of `hue.ini`. The default is 150 MiB.
+- An administrator can block file extensions with `restrict_local_file_extensions` in the same section.
+
+## Guess file metadata
 
 Analyze a file to determine its type and metadata properties such as delimiters for CSV files or sheet names for Excel files.
 
-**Endpoint:** `/api/v1/importer/file/guess_metadata/`
+**Method and URL:** `GET /api/v1/importer/file/guess_metadata/`
 
-**Method:** `GET`
-
-**Request Parameters:**
+**Request parameters:**
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| file_path | String | Yes | Full path to the file to analyze |
-| import_type | String | Yes | Type of import, either `local` or `remote` |
+| file_path | string | Yes | Full path to the file to analyze |
+| import_type | string | Yes | Type of import, either `local` or `remote` |
 
-**Example using cURL:**
+**Example request (curl):**
 
 ```bash
 # For a local file uploaded previously
 curl -X GET \
-  -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \
-  "https://demo.gethue.com/api/v1/importer/file/guess_metadata/?file_path=/tmp/username_abc123_sales_data.csv&import_type=local"
+  -H "Authorization: Bearer <ACCESS_TOKEN>" \
+  "https://hue.example.com/api/v1/importer/file/guess_metadata/?file_path=/tmp/username_abc123_sales_data.csv&import_type=local"
 
 # For a remote file on HDFS
 curl -X GET \
-  -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \
-  "https://demo.gethue.com/api/v1/importer/file/guess_metadata/?file_path=/user/hue/data/sales_data.csv&import_type=remote"
+  -H "Authorization: Bearer <ACCESS_TOKEN>" \
+  "https://hue.example.com/api/v1/importer/file/guess_metadata/?file_path=/user/hue/data/sales_data.csv&import_type=remote"
 ```
 
-**Example using JavaScript:**
+**Example request (JavaScript):**
 
 ```javascript
 // Using fetch API for a local file
-fetch('https://demo.gethue.com/api/v1/importer/file/guess_metadata/?file_path=/tmp/username_abc123_sales_data.csv&import_type=local', {
+fetch('https://hue.example.com/api/v1/importer/file/guess_metadata/?file_path=/tmp/username_abc123_sales_data.csv&import_type=local', {
   method: 'GET',
   headers: {
-    'Authorization': 'Bearer <YOUR_JWT_TOKEN>'
+    'Authorization': 'Bearer <ACCESS_TOKEN>'
   }
 })
 .then(response => response.json())
@@ -135,7 +138,7 @@ fetch('https://demo.gethue.com/api/v1/importer/file/guess_metadata/?file_path=/t
 .catch(error => console.error('Error:', error));
 ```
 
-**Response Examples:**
+**Example responses:**
 
 For CSV files:
 ```json
@@ -143,7 +146,7 @@ For CSV files:
   "type": "csv",
   "field_separator": ",",
   "quote_char": "\"",
-  "record_separator": "\n"
+  "record_separator": "\r\n"
 }
 ```
 
@@ -153,7 +156,7 @@ For TSV files:
   "type": "tsv",
   "field_separator": "\t",
   "quote_char": "\"",
-  "record_separator": "\n"
+  "record_separator": "\r\n"
 }
 ```
 
@@ -165,44 +168,42 @@ For Excel files:
 }
 ```
 
-**Status Codes:**
+**Status codes:**
 
 - `200 OK` - Metadata detected successfully
 - `400 Bad Request` - File not found or invalid parameters
 - `500 Internal Server Error` - Server-side error during detection
 
-## Guess File Header
+## Guess file header
 
 Analyze a file to determine if it has a header row. This API uses heuristics to detect if the first row appears to contain column names rather than data.
 
-**Endpoint:** `/api/v1/importer/file/guess_header/`
+**Method and URL:** `GET /api/v1/importer/file/guess_header/`
 
-**Method:** `GET`
-
-**Request Parameters:**
+**Request parameters:**
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| file_path | String | Yes | Full path to the file to analyze |
-| file_type | String | Yes | Type of file (`csv`, `tsv`, `excel`, `delimiter_format`) |
-| import_type | String | Yes | Type of import, either `local` or `remote` |
-| sheet_name | String | No | Sheet name (required for Excel files) |
+| file_path | string | Yes | Full path to the file to analyze |
+| file_type | string | Yes | Type of file (`csv`, `tsv`, `excel`, `delimiter_format`) |
+| import_type | string | Yes | Type of import, either `local` or `remote` |
+| sheet_name | string | No | Sheet name (required for Excel files) |
 
-**Example using cURL:**
+**Example request (curl):**
 
 ```bash
 # For a CSV file
 curl -X GET \
-  -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \
-  "https://demo.gethue.com/api/v1/importer/file/guess_header/?file_path=/tmp/username_abc123_sales_data.csv&file_type=csv&import_type=local"
+  -H "Authorization: Bearer <ACCESS_TOKEN>" \
+  "https://hue.example.com/api/v1/importer/file/guess_header/?file_path=/tmp/username_abc123_sales_data.csv&file_type=csv&import_type=local"
 
 # For an Excel file
 curl -X GET \
-  -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \
-  "https://demo.gethue.com/api/v1/importer/file/guess_header/?file_path=/tmp/username_abc123_financial_report.xlsx&file_type=excel&import_type=local&sheet_name=Q1_Results"
+  -H "Authorization: Bearer <ACCESS_TOKEN>" \
+  "https://hue.example.com/api/v1/importer/file/guess_header/?file_path=/tmp/username_abc123_financial_report.xlsx&file_type=excel&import_type=local&sheet_name=Q1_Results"
 ```
 
-**Example using JavaScript:**
+**Example request (JavaScript):**
 
 ```javascript
 const params = new URLSearchParams({
@@ -211,10 +212,10 @@ const params = new URLSearchParams({
   import_type: 'local'
 });
 
-fetch(`https://demo.gethue.com/api/v1/importer/file/guess_header/?${params.toString()}`, {
+fetch(`https://hue.example.com/api/v1/importer/file/guess_header/?${params.toString()}`, {
   method: 'GET',
   headers: {
-    'Authorization': 'Bearer <YOUR_JWT_TOKEN>'
+    'Authorization': 'Bearer <ACCESS_TOKEN>'
   }
 })
 .then(response => response.json())
@@ -225,7 +226,7 @@ fetch(`https://demo.gethue.com/api/v1/importer/file/guess_header/?${params.toStr
 .catch(error => console.error('Error:', error));
 ```
 
-**Response:**
+**Example response:**
 
 ```json
 {
@@ -233,63 +234,64 @@ fetch(`https://demo.gethue.com/api/v1/importer/file/guess_header/?${params.toStr
 }
 ```
 
-**How Header Detection Works:**
+**How header detection works:**
 
-The header detection algorithm uses multiple factors to make an educated guess:
+Hue reads a sample of the file and uses the heuristic of the Python [`csv.Sniffer.has_header`](https://docs.python.org/3/library/csv.html#csv.Sniffer.has_header) method. For Excel files, it first converts the first 20 rows of the sheet to CSV. The result is a guess. Let the user confirm it.
 
-1. Checks if the first row contains text while subsequent rows contain numeric values
-2. Examines if the first row's data types differ from the majority of other rows
-3. Looks for common header naming patterns (e.g., id, name, date, etc.)
-4. Checks if the first row has no duplicate values while data rows might have duplicates
-
-**Status Codes:**
+**Status codes:**
 
 - `200 OK` - Header detection successful
 - `400 Bad Request` - Invalid parameters or file not found
 - `500 Internal Server Error` - Server-side error
 
-## Preview File
+## Preview file
 
-Generate a preview of a file's content with column type mapping for creating SQL tables.
+Generate a preview of a file's content with column type mapping for creating SQL tables. The preview contains at most 50 rows. `preview_data` maps each column name to its list of values, and it is empty for an empty file.
 
-**Endpoint:** `/api/v1/importer/file/preview/`
+**Method and URL:** `GET /api/v1/importer/file/preview/`
 
-**Method:** `GET`
-
-**Request Parameters:**
+**Request parameters:**
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| file_path | String | Yes | Full path to the file to preview |
-| file_type | String | Yes | Type of file (`csv`, `tsv`, `excel`, `delimiter_format`) |
-| import_type | String | Yes | Type of import (`local` or `remote`) |
-| sql_dialect | String | Yes | SQL dialect for type mapping (`hive`, `impala`, `trino`, `phoenix`, `sparksql`) |
-| has_header | Boolean | Yes | Whether the file has a header row |
-| sheet_name | String | No | Sheet name (required for Excel files) |
-| field_separator | String | No | Field separator character (defaults to `,` for CSV, `\t` for TSV, required for `delimiter_format`) |
-| quote_char | String | No | Quote character (defaults to `"`) |
-| record_separator | String | No | Record separator character (defaults to `\n`) |
+| file_path | string | Yes | Full path to the file to preview |
+| file_type | string | Yes | Type of file (`csv`, `tsv`, `excel`, `delimiter_format`) |
+| import_type | string | Yes | Type of import (`local` or `remote`) |
+| sql_dialect | string | Yes | SQL dialect for type mapping (`hive`, `impala`, `trino`, `phoenix`, `sparksql`) |
+| has_header | boolean | Yes | Whether the file has a header row |
+| sheet_name | string | No | Sheet name (required for Excel files) |
+| field_separator | string | No | Field separator character (defaults to `,` for CSV, `\t` for TSV, required for `delimiter_format`) |
+| quote_char | string | No | Quote character (defaults to `"`) |
+| record_separator | string | No | Record separator character (defaults to `\n`). `\r\n` is treated as `\n`. |
 
-**Example using cURL:**
+The `field_separator`, `quote_char` and `record_separator` values are read as escape sequences. Send the two characters `\t` for a tab and `\n` for a line feed.
+
+**Example request (curl):**
 
 ```bash
 # For a CSV file with header
 curl -X GET \
-  -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \
-  "https://demo.gethue.com/api/v1/importer/file/preview/?file_path=/tmp/username_abc123_sales_data.csv&file_type=csv&import_type=local&sql_dialect=hive&has_header=true"
+  -H "Authorization: Bearer <ACCESS_TOKEN>" \
+  "https://hue.example.com/api/v1/importer/file/preview/?file_path=/tmp/username_abc123_sales_data.csv&file_type=csv&import_type=local&sql_dialect=hive&has_header=true"
 
 # For an Excel file with header
 curl -X GET \
-  -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \
-  "https://demo.gethue.com/api/v1/importer/file/preview/?file_path=/tmp/username_abc123_financial_report.xlsx&file_type=excel&import_type=local&sql_dialect=impala&has_header=true&sheet_name=Q1_Results"
+  -H "Authorization: Bearer <ACCESS_TOKEN>" \
+  "https://hue.example.com/api/v1/importer/file/preview/?file_path=/tmp/username_abc123_financial_report.xlsx&file_type=excel&import_type=local&sql_dialect=impala&has_header=true&sheet_name=Q1_Results"
 
 # For a custom pipe-delimited file using delimiter_format
-curl -X GET \
-  -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \
-  "https://demo.gethue.com/api/v1/importer/file/preview/?file_path=/tmp/username_abc123_pipe_data.txt&file_type=delimiter_format&import_type=local&sql_dialect=hive&has_header=true&field_separator=|&quote_char=\"&record_separator=\n"
+curl -G "https://hue.example.com/api/v1/importer/file/preview/" \
+  -H "Authorization: Bearer <ACCESS_TOKEN>" \
+  --data-urlencode "file_path=/tmp/username_abc123_pipe_data.txt" \
+  --data-urlencode "file_type=delimiter_format" \
+  --data-urlencode "import_type=local" \
+  --data-urlencode "sql_dialect=hive" \
+  --data-urlencode "has_header=true" \
+  --data-urlencode "field_separator=|" \
+  --data-urlencode 'record_separator=\n'
 ```
 
-**Example using JavaScript:**
+**Example request (JavaScript):**
 
 ```javascript
 // Parameters for previewing a CSV file
@@ -302,10 +304,10 @@ const params = new URLSearchParams({
 });
 
 // Make the fetch request
-fetch(`https://demo.gethue.com/api/v1/importer/file/preview/?${params.toString()}`, {
+fetch(`https://hue.example.com/api/v1/importer/file/preview/?${params.toString()}`, {
   method: 'GET',
   headers: {
-    'Authorization': 'Bearer <YOUR_JWT_TOKEN>'
+    'Authorization': 'Bearer <ACCESS_TOKEN>'
   }
 })
 .then(response => response.json())
@@ -316,7 +318,7 @@ fetch(`https://demo.gethue.com/api/v1/importer/file/preview/?${params.toString()
 .catch(error => console.error('Error:', error));
 ```
 
-**Response:**
+**Example response:**
 
 For a sales data CSV file:
 ```json
@@ -348,12 +350,14 @@ For a sales data CSV file:
       "type": "DATE"
     }
   ],
-  "preview_data": [
-    ["1001", "Laptop XPS 13", "Electronics", "1299.99", "1", "2025-01-15"],
-    ["1002", "Wireless Headphones", "Electronics", "149.99", "2", "2025-01-15"],
-    ["1003", "Office Chair", "Furniture", "249.50", "1", "2025-01-16"],
-    ["1004", "Notebook Set", "Office Supplies", "24.95", "5", "2025-01-17"]
-  ]
+  "preview_data": {
+    "transaction_id": [1001, 1002, 1003, 1004],
+    "product_name": ["Laptop XPS 13", "Wireless Headphones", "Office Chair", "Notebook Set"],
+    "category": ["Electronics", "Electronics", "Furniture", "Office Supplies"],
+    "price": [1299.99, 149.99, 249.5, 24.95],
+    "quantity": [1, 2, 1, 5],
+    "purchase_date": ["2025-01-15", "2025-01-15", "2025-01-16", "2025-01-17"]
+  }
 }
 ```
 
@@ -394,41 +398,39 @@ The `delimiter_format` file type allows you to process custom delimited files th
   - Use `record_separator` from guess_metadata response
 - When `import_type` is set to `remote`, the API uses the file system associated with the user's request
 
-**Status Codes:**
+**Status codes:**
 
 - `200 OK` - Preview generated successfully
 - `400 Bad Request` - Invalid parameters or file not found
 - `500 Internal Server Error` - Server-side error
 
-## Get SQL Type Mapping
+## Get SQL type mapping
 
 Get the list of unique SQL data types supported by a specific SQL dialect. This helps in understanding what SQL types are available when creating tables in different SQL engines.
 
-**Endpoint:** `/api/v1/importer/sql_type_mapping/`
+**Method and URL:** `GET /api/v1/importer/sql_type_mapping/`
 
-**Method:** `GET`
-
-**Request Parameters:**
+**Request parameters:**
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| sql_dialect | String | Yes | SQL dialect for type mapping (`hive`, `impala`, `trino`, `phoenix`, `sparksql`) |
+| sql_dialect | string | Yes | SQL dialect for type mapping (`hive`, `impala`, `trino`, `phoenix`, `sparksql`) |
 
-**Example using cURL:**
+**Example request (curl):**
 
 ```bash
 curl -X GET \
-  -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \
-  "https://demo.gethue.com/api/v1/importer/sql_type_mapping/?sql_dialect=hive"
+  -H "Authorization: Bearer <ACCESS_TOKEN>" \
+  "https://hue.example.com/api/v1/importer/sql_type_mapping/?sql_dialect=hive"
 ```
 
-**Example using JavaScript:**
+**Example request (JavaScript):**
 
 ```javascript
-fetch('https://demo.gethue.com/api/v1/importer/sql_type_mapping/?sql_dialect=hive', {
+fetch('https://hue.example.com/api/v1/importer/sql_type_mapping/?sql_dialect=hive', {
   method: 'GET',
   headers: {
-    'Authorization': 'Bearer <YOUR_JWT_TOKEN>'
+    'Authorization': 'Bearer <ACCESS_TOKEN>'
   }
 })
 .then(response => response.json())
@@ -439,7 +441,7 @@ fetch('https://demo.gethue.com/api/v1/importer/sql_type_mapping/?sql_dialect=hiv
 .catch(error => console.error('Error:', error));
 ```
 
-**Response:**
+**Example response:**
 
 The response is a sorted list of unique SQL data types supported by the specified dialect.
 
@@ -557,57 +559,48 @@ Different SQL dialects support different sets of SQL types. Here are the unique 
 ]
 ```
 
-**Key Differences Between Dialects:**
+**Key differences between dialects:**
 
 - **Impala**: Does not support `INTERVAL` types (uses `STRING` for duration data)
 - **Trino**: Uses `INTEGER` instead of `INT`, `REAL` instead of `FLOAT`, `VARCHAR` instead of `STRING`, `ROW` instead of `STRUCT`, and supports `JSON` type
 - **Phoenix**: Supports unsigned integer types (`UNSIGNED_INT`, `UNSIGNED_LONG`, etc.) and has a dedicated `TIME` type
-- **Spark SQL**: Similar to Hive but follows more standard SQL conventions
+- **Spark SQL**: Uses the same types as Hive.
 
-**Status Codes:**
+**Status codes:**
 
 - `200 OK` - Mapping retrieved successfully
 - `400 Bad Request` - Invalid SQL dialect
 - `500 Internal Server Error` - Server-side error
 
-## Error Handling
+## Error handling
 
-All endpoints follow a consistent error response format:
+The API returns these status codes:
+
+- `400 Bad Request`: a parameter is missing or invalid, or the file does not exist.
+- `401 Unauthorized`: the credentials are missing or invalid.
+- `500 Internal Server Error`: the server failed to process the file.
+
+Parameter validation errors list the invalid fields:
 
 ```json
 {
-  "error": "Error message describing what went wrong"
+  "sql_dialect": ["\"oracle\" is not a valid choice."]
 }
 ```
 
-**Example Error Responses:**
+Other errors return a message:
 
-File not found:
 ```json
 {
-  "error": "File /tmp/nonexistent_file.csv not found"
+  "error": "Remote file does not exist: /user/hue/data/missing.csv"
 }
 ```
 
-Invalid parameter:
-```json
-{
-  "error": "Sheet name is required for Excel files"
-}
-```
+If an uploaded file is larger than the limit, the upload fails with `400 Bad Request`. The default limit is 150 MiB. An administrator can change it with `max_local_file_size_upload_limit` in the `[desktop] [[importer]]` section of `hue.ini`.
 
-File size limit exceeded:
-```json
-{
-  "error": "File too large. Maximum file size is 100 MiB."
-}
-```
+If a `guess_metadata` or `preview` call with `import_type=local` fails, Hue deletes the uploaded temporary file. Upload the file again before you retry.
 
-Authentication errors will return a standard HTTP 401 Unauthorized response.
-
-> **Note**: Authentication tokens can be obtained through Hue's authentication API. See the [Authentication API](/developer/api/rest/#authentication) documentation for details.
-
-## Complete Workflow Example
+## Complete workflow example
 
 Here's an example workflow that combines all the APIs to import a CSV file into a Hive table:
 
@@ -618,10 +611,10 @@ Here's an example workflow that combines all the APIs to import a CSV file into 
 const formData = new FormData();
 formData.append('file', fileInputElement.files[0]);
 
-const uploadResponse = await fetch('https://demo.gethue.com/api/v1/importer/upload/file/', {
+const uploadResponse = await fetch('https://hue.example.com/api/v1/importer/upload/file/', {
   method: 'POST',
   headers: {
-    'Authorization': 'Bearer <YOUR_JWT_TOKEN>'
+    'Authorization': 'Bearer <ACCESS_TOKEN>'
   },
   body: formData
 });
@@ -639,10 +632,10 @@ const metadataParams = new URLSearchParams({
   import_type: 'local'
 });
 
-const metadataResponse = await fetch(`https://demo.gethue.com/api/v1/importer/file/guess_metadata/?${metadataParams.toString()}`, {
+const metadataResponse = await fetch(`https://hue.example.com/api/v1/importer/file/guess_metadata/?${metadataParams.toString()}`, {
   method: 'GET',
   headers: {
-    'Authorization': 'Bearer <YOUR_JWT_TOKEN>'
+    'Authorization': 'Bearer <ACCESS_TOKEN>'
   }
 });
 
@@ -663,10 +656,10 @@ const headerParams = new URLSearchParams({
   import_type: 'local'
 });
 
-const headerResponse = await fetch(`https://demo.gethue.com/api/v1/importer/file/guess_header/?${headerParams.toString()}`, {
+const headerResponse = await fetch(`https://hue.example.com/api/v1/importer/file/guess_header/?${headerParams.toString()}`, {
   method: 'GET',
   headers: {
-    'Authorization': 'Bearer <YOUR_JWT_TOKEN>'
+    'Authorization': 'Bearer <ACCESS_TOKEN>'
   }
 });
 
@@ -689,10 +682,10 @@ const previewParams = new URLSearchParams({
   record_separator: recordSeparator
 });
 
-const previewResponse = await fetch(`https://demo.gethue.com/api/v1/importer/file/preview/?${previewParams.toString()}`, {
+const previewResponse = await fetch(`https://hue.example.com/api/v1/importer/file/preview/?${previewParams.toString()}`, {
   method: 'GET',
   headers: {
-    'Authorization': 'Bearer <YOUR_JWT_TOKEN>'
+    'Authorization': 'Bearer <ACCESS_TOKEN>'
   }
 });
 
@@ -716,18 +709,9 @@ console.log(createTableSQL);
 // You can then execute this SQL using the SQL execution API
 ```
 
-## Best Practices
+## Best practices
 
-1. **Error Handling**: Always implement proper error handling for API responses, especially for file uploads which may fail due to size limitations or network issues.
-
-2. **Progress Feedback**: For large file uploads, consider implementing progress indicators using XHR instead of fetch to track upload progress.
-
-3. **Type Checking**: When parsing and validating file data, always check that the inferred types match what you expect for your business data.
-
-4. **Sequential Processing**: Process API calls in the proper sequence as shown in the workflow example to ensure each step has the required data.
-
-5. **User Confirmation**: Allow users to review and modify the automatic type detection before creating tables, especially for large datasets.
-
-6. **Access Control**: Ensure file permissions are properly set for any uploaded files, especially in multi-user environments.
-
-7. **Cleanup**: Consider implementing cleanup mechanisms for temporary uploaded files that are no longer needed. Files uploaded via the `/api/v1/importer/upload/file/` endpoint are stored in temporary locations (typically `/tmp/`) and should be cleaned up after processing.
+1. Handle errors for every call. Uploads can fail on size or file type limits.
+2. Call the endpoints in the order of the workflow. Each step needs the output of the previous one.
+3. Let users review and change the detected header, separators and column types before you create a table.
+4. Delete the temporary files you no longer need. Hue stores uploaded files in the server temporary directory.

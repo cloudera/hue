@@ -11,12 +11,13 @@ users and groups individually, or import them from an LDAP directory.
 Group permissions define the Hue applications visible to group members
 when they log into Hue and the application features available to them.
 
-Click the **Hue Administration** icon in the top right navigation bar under your username.
+To open the User Admin application, click your username in the top right navigation bar, then click **Manage Users**.
 
 ## LDAP
 
-[LDAP or PAM pass-through authentication with Hive or Impala and Impersonation
-](http://gethue.com/ldap-or-pam-pass-through-authentication-with-hive-or-impala/).
+Read how to use [LDAP or PAM pass-through authentication with Hive or Impala and impersonation](https://gethue.com/ldap-or-pam-pass-through-authentication-with-hive-or-impala/).
+
+To restrict which LDAP groups can log in, see [Limit who can log in](#limit-who-can-log-in).
 
 
 ## Users
@@ -125,66 +126,70 @@ groups. It does not import any new users or groups.
 
 ### Reset a password
 
-**Programmatically**
+**With a command**
 
-When a Hue administrator loses their password, a more programmatic approach is required to secure the administrator again. Hue comes with a wrapper around the python interpreter called the “shell” command. It loads all the libraries required to work with Hue at a programmatic level. To start the Hue shell, type the following command from the Hue installation root.
+Go to the Hue installation directory and run:
 
-If using CM:
+```bash
+build/env/bin/hue changepassword [username]
+```
 
-    export HUE_CONF_DIR="/var/run/cloudera-scm-agent/process/`ls -alrt /var/run/cloudera-scm-agent/process | grep HUE | tail -1 | awk '{print $9}'`"
+When you omit the username, the command uses the currently logged in Unix user.
 
-Then:
+**With the Hue shell**
 
-    cd /usr/lib/hue (or /opt/cloudera/parcels/CDH-XXXXX/share/hue if using parcels and CM)
-    build/env/bin/hue shell
+If a Hue administrator loses their password, use the Hue `shell` command. It is a wrapper around the Python interpreter that loads the libraries required to work with Hue. From the Hue installation directory, run:
 
-The following is a small script, that can be executed within the Hue shell, to change the password for a user named “example”:
+```bash
+build/env/bin/hue shell
+```
 
-    from django.contrib.auth.models import User
-    user = User.objects.get(username='example')
-    user.set_password('some password')
-    user.save()
+The following script changes the password of a user named `example`. Run it in the Hue shell:
 
-The script can also be invoked in the shell by using input redirection (assuming the script is in a file named script.py):
+```python
+from django.contrib.auth.models import User
+user = User.objects.get(username='example')
+user.set_password('some password')
+user.save()
+```
 
-    build/env/bin/hue shell < script.py
+You can also run a script file (here `script.py`) with input redirection:
 
-**Via a command**
+```bash
+build/env/bin/hue shell < script.py
+```
 
-Go on the Hue machine, then in the Hue home directory and either type:
+### Reset an admin
 
-To change the password of the currently logged in Unix user:
+**With the Hue shell**
 
-    build/env/bin/hue changepassword
+To make a user a Hue admin, start the shell:
 
-### Reset an Admin
+```bash
+build/env/bin/hue shell
+```
 
-**Programmatically**
+Then set these properties:
 
-How to make a certain user a Hue admin
+```python
+from django.contrib.auth.models import User
 
-    build/env/bin/hue  shell
+a = User.objects.get(username='hdfs')
+a.is_staff = True
+a.is_superuser = True
+a.set_password('my_secret')
+a.save()
+```
 
-Then set these properties to true:
+**With a command**
 
-    from django.contrib.auth.models import User
+If you do not remember the admin username, create a new Hue admin. You can then log in and change the password of another user in Hue:
 
-    a = User.objects.get(username='hdfs')
-    a.is_staff = True
-    a.is_superuser = True
-    a.set_password('my_secret')
-    a.save()
+```bash
+build/env/bin/hue createsuperuser
+```
 
-**Via a command**
-
-If you don't remember the admin username, create a new Hue admin (you will then also be able to login and could change the password of another user in Hue):
-
-    build/env/bin/hue createsuperuser
-
-<div class="note">
-Above works with the `AllowFirstUserBackend`, it might be different if another backend is used.
-</div>
-
+> **Note:** This works with the `AllowFirstUserDjangoBackend` authentication backend. It can differ with another backend.
 
 ## Groups
 
@@ -209,11 +214,15 @@ import groups from an LDAP directory.
 3.  Click **Add group**.
 
 
-### Limit users can login
+### Limit who can log in
 
-    [desktop]
-    [[ldap]]
-    login_groups=ldap_grp1,ldap_grp2,ldap_grp3
+To allow only the users of some LDAP groups to log in, set `login_groups` in the `hue.ini`:
+
+```ini
+[desktop]
+[[ldap]]
+login_groups=ldap_grp1,ldap_grp2,ldap_grp3
+```
 
 ### Importing Groups
 
@@ -239,55 +248,57 @@ Hue and the application features available to them.
 
 A company would like to use the following LDAP users and groups in Hue:
 
-  John Smith belonging to team A
-  Helen Taylor belonging to team B
+* John Smith belongs to team A.
+* Helen Taylor belongs to team B.
 
 Assuming the following access requirements:
 
-  Team A should be able to use Beeswax, but nothing else.
-  Team B should only be able to see the Oozie dashboard with readonly permissions.
+* Team A can use Beeswax, but nothing else.
+* Team B can only see the Oozie dashboard, with read-only permissions.
 
-In Hue 2 the scenarios can be addressed more appropriately. Users can be imported from LDAP by clicking “Add/Sync LDAP user” in Useradmin > Users:
+To implement these requirements, import the users from LDAP by clicking **Add/Sync LDAP user** in **Users**.
 
-Similarly, groups can be imported from LDAP by clicking “Add/Sync LDAP group” in Useradmin > Groups.
+Similarly, import the groups from LDAP by clicking **Add/Sync LDAP group** in **Groups**.
 
-If a previously imported user’s information was updated recently, the information in Hue will need to be resynchronized. This can be achieved through the LDAP sync feature:
+If the information of a previously imported user changed in LDAP, resynchronize it with the LDAP sync feature.
 
-Part A of the example can be addressed by explicitly allowing access Beeswax for Team A. This is managed in the “Groups” tab of the Useradmin app:
+For team A, explicitly allow access to Beeswax in the **Groups** tab of the User Admin application.
 
-The Team A group can be edited by clicking on its name, where access privileges for the group are selectable. Here, the “beeswax.access” permission would be selected and the others would be unselected:
+Click the name of the team A group to edit its permissions. Select the `beeswax.access` permission and unselect the others.
 
 
-Part B of the example can be handled by explicitly defining access for Team B. This can be accomplished by following the same steps in part A, except for Team B. Every permission would be unselected except “oozie.dashboard_jobs_access”:
+For team B, follow the same steps. Unselect every permission except `oozie.dashboard_jobs_access`.
 
-By explicitly setting the app level permissions, the apps that these users will be able to see will change. For instance, Helen, who is a member of Team B, will only see the Oozie app available:
+With explicit application-level permissions, the users see different applications. For example, Helen, who belongs to team B, only sees the Oozie dashboard.
 
 ### Programmatically
 
-Set permissions to a group via a Bash shell:
+To set the permissions of a group with a Bash script:
 
-    #!/bin/env bash
+```bash
+#!/usr/bin/env bash
 
-    set -eu
+set -eu
 
-    host="localhost"
-    port="8888"
-    credentials="/home/hadoop/hue-config/hue_access_admin.txt" # password file
-    user="admin"
-    protocol="http"
-    group_name="spark02-user"
-    permissions_id1="10" # jobbrowser.access
-    permissions_id2="18" # spark.access
-    list_of_users="members=10&members=9&members=4" # number here is an order number for a user in the list of users
+host="localhost"
+port="8888"
+credentials="/home/hadoop/hue-config/hue_access_admin.txt" # password file
+user="admin"
+protocol="http"
+group_name="spark02-user"
+permissions_id1="10" # jobbrowser.access
+permissions_id2="18" # spark.access
+list_of_users="members=10&members=9&members=4" # number here is an order number for a user in the list of users
 
-    password=$(cat /home/hadoop/hue-config/hue_access_admin.txt | sed -n 's/admin:(.*)/\1/p')
+password=$(sed -n 's/admin:\(.*\)/\1/p' "${credentials}")
 
-    curl ${protocol}://${host}:${port}/hue/accounts/login/?fromModal=true -o /dev/null -D - -c cookies.txt -s
-    x_csrftoken=$(grep csrftoken cookies.txt | cut -f 7)
+curl ${protocol}://${host}:${port}/hue/accounts/login/?fromModal=true -o /dev/null -D - -c cookies.txt -s
+x_csrftoken=$(grep csrftoken cookies.txt | cut -f 7)
 
-    curl -i -X POST ${protocol}://${host}:${port}/hue/accounts/login/?fromModal=true -d "username=${user}&password=${password}" -o /dev/null -D - -c cookies.txt -b cookies.txt -H "X-CSRFToken: ${x_csrftoken}" -s
-    x_csrftoken=$(grep csrftoken cookies.txt | cut -f 7)
+curl -i -X POST ${protocol}://${host}:${port}/hue/accounts/login/?fromModal=true -d "username=${user}&password=${password}" -o /dev/null -D - -c cookies.txt -b cookies.txt -H "X-CSRFToken: ${x_csrftoken}" -s
+x_csrftoken=$(grep csrftoken cookies.txt | cut -f 7)
 
-    curl -X POST ${protocol}://${host}:${port}/useradmin/groups/edit/${group_name}
-    -d "csrfmiddlewaretoken=${x_csrftoken}&name=${group_name}&permissions=${permissions_id1}&permissions=${permissions_id2}&${list_of_users}&is_embeddable=true",
-    -b cookies.txt -H "X-CSRFToken: ${x_csrftoken}"
+curl -X POST ${protocol}://${host}:${port}/useradmin/groups/edit/${group_name} \
+  -d "csrfmiddlewaretoken=${x_csrftoken}&name=${group_name}&permissions=${permissions_id1}&permissions=${permissions_id2}&${list_of_users}&is_embeddable=true" \
+  -b cookies.txt -H "X-CSRFToken: ${x_csrftoken}"
+```

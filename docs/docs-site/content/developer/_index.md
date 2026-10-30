@@ -6,10 +6,10 @@ chapter = false
 pre = "<b>3. </b>"
 +++
 
-Those are the main categories of development:
+These are the main categories of development:
 
-* **[Develop](/developer/development)**: Ramping-up with on the Hue development service and SQL parsers
-* **[Components](/developer/components)**: Packaged library of reusable SQL parsers and SQL Editor
-* **[API](/developer/api)**: Directly interact with the API server
+* **[Develop](/developer/development)**: Ramp up on the Hue development environment and the SQL parsers
+* **[Components](/developer/components)**: Reusable packages, such as the SQL parsers and the SQL Editor
+* **[API](/developer/api)**: Call the server with the REST API or the Python shell
 
-Also check on how to get started on [contribution](https://github.com/cloudera/hue/blob/master/CONTRIBUTING.md) ideas.
+To contribute, read the [contribution guide](https://github.com/cloudera/hue/blob/master/CONTRIBUTING.md).

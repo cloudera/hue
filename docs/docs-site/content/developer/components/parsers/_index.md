@@ -6,7 +6,7 @@ weight: 2
 
 The parsers are the flagship part of Hue and power advanced autocompletes and other [SQL functionalities](/user/querying/#autocomplete).
 
-Refer the [SQL Parser Documentation](/developer/development/#sql-parsers) for how they works and are built.
+Refer to the [SQL parsers documentation](/developer/development/#sql-parsers) to learn how they work and how they are built.
 
 ## Live Demo
 
@@ -63,22 +63,19 @@ Refer the [SQL Parser Documentation](/developer/development/#sql-parsers) for ho
 
 ## Import
 
-Import the parser you need with something like below and run it on an SQL statement:
+Install the [gethue](https://www.npmjs.com/package/gethue) NPM package (`npm install --save gethue`). Then import the parser you need with something like below and run it on an SQL statement:
 
-    import sqlAutocompleteParser from 'gethue/parse/sql/hive/hiveAutocompleteParser';
+```js
+import sqlAutocompleteParser from 'gethue/lib/parsers/hiveAutocompleteParser';
 
-    const beforeCursor = 'SELECT col1, col2, tbl2.col3 FROM tbl; '; // Note extra space at end
-    const afterCursor = '';
-    const dialect = 'hive';
-    const debug = false;
+const beforeCursor = 'SELECT col1, col2, tbl2.col3 FROM tbl; '; // Note extra space at end
+const afterCursor = '';
+const debug = false;
 
-    console.log(
-      JSON.stringify(
-        sqlAutocompleteParser.parseSql(beforeCursor, afterCursor, dialect, debug),
-        null,
-        2
-      )
-    );
+console.log(
+  JSON.stringify(sqlAutocompleteParser.parseSql(beforeCursor, afterCursor, debug), null, 2)
+);
+```
 
 Which then will output keywords suggestions and all the known locations:
 

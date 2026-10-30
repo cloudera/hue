@@ -1,22 +1,34 @@
-# Docs Site
+# Docs site
 
-## Update GetHue version
+The source of [docs.gethue.com](https://docs.gethue.com), built with [Hugo](https://gohugo.io).
 
-Docs depends on gethue NPM package for live demos. Kindly follow these steps to update gethue to the version of your choice.
+## Update the GetHue version
+
+The docs depend on the `gethue` npm package for the live demos. Follow these steps to update it.
+
+### Prerequisites
+
+- Node.js 22.13 or later
+- A shell in the `docs/docs-site` directory
 
 ### 1. Install GetHue
 
-    # x.x.x - Version you are updating to
-    npm install --dev-save gethue@x.x.x
+Replace `x.x.x` with the version you want to use:
 
-### 2. Update static resources
+```bash
+npm install --save-dev gethue@x.x.x
+```
 
-    npm run update-static
+### 2. Update the static resources
 
-This must update the resources used in the docs. On `git status` you must see modifications on `./package.json`, `./package-lock.json` & `static/js/gethue/`.
+```bash
+npm run update-static
+```
 
-On `hugo serve` you must see the updated resources in the docs UI.
+`git status` shows changes in `package.json`, `package-lock.json`, and `static/js/gethue/`.
 
-### 3. Commit changes
+Run `hugo serve` and check that the docs UI uses the updated resources.
 
-If you want to share the updated version with everyone, commit the changed files.
+### 3. Commit the changes
+
+To share the new version, commit the changed files.
