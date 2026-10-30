@@ -37,6 +37,22 @@ APP_DIRS = [
 
 LOG = logging.getLogger()
 
+
+def _unique_entry_points(group):
+  """
+  Entry points of a group, without the duplicates.
+
+  A distribution found at several places of sys.path (e.g. an editable install and its source egg-info) is
+  returned several times by the older versions of importlib.metadata, which would load an app twice.
+  """
+  seen = set()
+
+  for entry_point in entry_points(group=group):
+    if entry_point.name not in seen:
+      seen.add(entry_point.name)
+      yield entry_point
+
+
 ######################################################################
 # Global variables set after calling load_apps()
 ######################################################################
@@ -236,7 +252,7 @@ def load_libs():
     raise Exception("load_apps already has been called.")
   DESKTOP_LIBS = []
 
-  for lib in entry_points(group="desktop.sdk.lib"):
+  for lib in _unique_entry_points("desktop.sdk.lib"):
     m = lib.load()
     DESKTOP_LIBS.append(DesktopModuleInfo(m))
 
@@ -260,7 +276,7 @@ def load_apps(app_blacklist):
     raise Exception(_("load_apps has already been called."))
   DESKTOP_APPS = []
 
-  for sdk_app in entry_points(group="desktop.sdk.application"):
+  for sdk_app in _unique_entry_points("desktop.sdk.application"):
 
     if desktop.conf.CSP_NONCE.get():
       # This Apps are not supported CSP Nonce is enabled.
