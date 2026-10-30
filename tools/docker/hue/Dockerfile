@@ -58,7 +58,7 @@ RUN pip3 install --upgrade --no-cache-dir setuptools virtualenv==21.14.13 pip==2
   npm cache clean --force && \
   pip cache purge && \
   rm -rf /var/lib/apt/lists/* && \
-  cp -r /hue/tools/docker/hue/conf3/* /usr/share/hue/desktop/conf/ && \
+  cp -r /hue/tools/docker/hue/conf/* /usr/share/hue/desktop/conf/ && \
   cp /hue/tools/docker/hue/startup.sh /usr/share/hue/startup.sh && \
   # Include tools/scripts for Hue CLI wrappers and helpers
   mkdir -p /usr/share/hue/tools/scripts && \
