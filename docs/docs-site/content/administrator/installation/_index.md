@@ -5,22 +5,21 @@ draft: false
 weight: 1
 ---
 
-## Quick Start
+## Quick start
 
-If you just want to:
+To run Hue:
 
-* Start Hue, follow the [Container](/administrator/installation/cloud/) section
-* Test some small code changes, see the [Development Quick Start](https://github.com/cloudera/hue#getting-started)
-
+* In a container, follow the [Container](/administrator/installation/cloud/) section.
+* From source, install the [dependencies](/administrator/installation/dependencies/) and follow the [Install](/administrator/installation/install/) section.
+* To test small code changes, see the [development quick start](/developer/development/#quick-start).
 
 ## Installation
 
-Continue to the [next sections](/administrator/installation/dependencies/) for detailed instructions on how to install & run the service.
+Continue to the [next sections](/administrator/installation/dependencies/) for detailed instructions on how to install and run the service.
 
-You can also find distributions of Hue via these companies:
+## Third-party distributions
 
-* [Cloudera Data Platform - Hue](https://www.cloudera.com/products/cloudera-data-platform.html)
-* Amazon AWS EMR - Hue
-* [Google Cloud Dataproc - Hue](https://github.com/GoogleCloudPlatform/dataproc-initialization-actions/tree/master/hue)
-* [Azure HDInsight - Hue](https://docs.microsoft.com/en-us/azure/hdinsight/hdinsight-hadoop-hue-linux)
-* Open Data Hub - Data Catalog
+Other companies distribute Hue. Their versions can differ from the open-source release:
+
+* [Google Cloud Dataproc](https://github.com/GoogleCloudPlatform/dataproc-initialization-actions/tree/master/hue)
+* [Azure HDInsight](https://docs.microsoft.com/en-us/azure/hdinsight/hdinsight-hadoop-hue-linux)

@@ -5,384 +5,290 @@ draft: false
 weight: 2
 ---
 
-## Admin Wizard
+## Hue Administration
 
-The Quick Start wizard allows you to perform the following Hue setup operations by clicking the tab of each step or sequentially by clicking
-Next in each screen:
+Superusers can open the administration page at `http://<hue>/about/`. It contains these tabs:
 
-1.  **Check Configuration** validates your Hue configuration. It will note any potential misconfiguration and provide hints as to how to
-    fix them. You can edit the configuration file described in the next section.
-2.  **Connectors** The list of services to query or browse
-3.  **Examples** get started with examples of SQL tables, queries, workflows and jobs to run.
-4.  **Users** contains a link to the User Admin application to create or import users and a checkbox to enable and disable collection of
-    usage information.
+1. **Overview** has three sections:
+    * **Config Status** validates your Hue configuration. It lists potential misconfigurations and hints on how to fix them.
+    * **Examples** installs examples of SQL tables and queries.
+    * **Analytics** turns the collection of anonymous usage analytics on or off.
+2. **Configuration** displays the configuration sections of the installed Hue applications.
+3. **Metrics** shows the server metrics.
+4. **Server Logs** displays the Hue server log.
 
 ### Configuration
 
-Displays a list of the installed Hue applications and their configuration.
+Hue ships with a default configuration that assumes a set of services is present. Customize it for your cluster in a `.ini` file:
 
-Hue ships with a default configuration that assumes a various set of services to be present in the cluster. If you are running on a real cluster, you can customize the `hue.ini` configuration file (`/etc/hue/hue.ini` when installed from the package version) or `pseudo-distributed.ini` in `desktop/conf` when in development mode).
+* In the installation directory, edit a file in `desktop/conf`, for example `pseudo-distributed.ini` when you build from source.
+* If the `HUE_CONF_DIR` environment variable is set, Hue reads the files in that directory instead.
 
-Click the tabs under **Configuration Sections** to see the settings configured for each application. For information on configuring
-these settings, see [Configuration](/administrator/configuration/).
+Click the tabs under **Configuration Sections** to see the settings of each application. For information on the settings, see [Configuration](/administrator/configuration/).
 
-Hue loads and merges all of the files with extension `.ini` located in the `/etc/hue` directory. Files that are alphabetically later take precedence.
+Hue loads and merges all the files with the `.ini` extension in the configuration directory. Files that are alphabetically later take precedence.
 
-After editing the ini file, Hue needs to be restarted.
+After editing an `.ini` file, restart Hue.
 
-### Configuration Validation
+### Configuration validation
 
-To view the configuration of a running Hue instance, navigate to:
+To view the configuration of a running Hue instance, go to:
 
-    http://<hue>/hue/dump_config
+```text
+http://<hue>/desktop/dump_config
+```
 
-The location of the folder containing the Hue ini files is shown at the top of the page as well as all the configuration values with help and information on the default values.
+The page shows the location of the configuration files and all the configuration values, with their help and default values.
 
-To list all available configuration options via the command line, run:
+To list all the available configuration options on the command line, run:
 
-    /usr/share/hue/build/env/bin/hue config_help | less
+```bash
+build/env/bin/hue config_help | less
+```
 
-### Server Logs
+### Server logs
 
-Displays the Hue Server log and allows you to download them to your local system in a zip file.
-
-### Threads
-
-Threads page can be very helpful in debugging purposes. It includes a daemonic thread and the thread objects serving concurrent requests. The host name, thread name identifier and current stack frame of each are displayed. Those are useful when Hue “hangs”, sometimes in case of a request too CPU intensive. There is also a REST API to get the dump of Threads using `desktop/debug/threads`.
+The **Server Logs** tab displays the Hue server log. You can download the logs to your computer in a zip file.
 
 ### Metrics
 
-Hue uses the **PyFormance** Python library to collect the metrics. These metrics are represented as gauge, counters, meter, rate of events over time, histogram, statistical distribution of values. A REST API endpoint `/desktop/metrics/` to get all the metrics dump as json is also exposed
+Hue uses the **PyFormance** Python library to collect metrics. The metrics are gauges, counters, meters (rate of events over time), and histograms (statistical distribution of values). The `/desktop/metrics/` endpoint returns all the metrics as JSON.
 
-The below metrics of most concern to us are displayed on the page:
+The **Metrics** tab shows, among others:
 
-- requests.active
-- requests.exceptions
-- requests.response-time
-- threads.daemon
-- threads.total
-- users
-- users.active
+* `requests.active`
+* `requests.exceptions`
+* `requests.response-time`
+* `threads.daemon`
+* `threads.total`
+* `users`
+* `users.active`
 
-One of the most useful ones are the percentiles of response time of requests and the count of active users.
-Admins can either filter a particular property in all the metrics or select a particular metric for all properties
+The most useful ones are the percentiles of the request response time and the count of active users. You can filter a property across all the metrics, or select a metric to see all its properties.
 
 ### Logging
 
-The Hue logs are found in `/var/log/hue`, or in a `logs` directory under your
-Hue installation root. Inside the log directory you can find:
+The Hue logs are in the `logs` directory under your Hue installation root. To use another directory, start the supervisor with the `--log-dir` option. The log directory contains:
 
-* An `access.log` file, which contains a log for all requests against the Hue web server.
-* A `supervisor.log` file, which contains log information for the supervisor process.
-* A `supervisor.out` file, which contains the stdout and stderr for the supervisor process.
-* A `.log` file for each supervised process described above, which contains the logs for that process.
-* A `.out` file for each supervised process described above, which contains the stdout and stderr for that process.
+* `access.log`: all the requests against the Hue web server.
+* `supervisor.log`: the log of the supervisor process.
+* `supervisor.out`: the stdout and stderr of the supervisor process.
+* A `.log` file for each supervised process: the logs of that process.
+* A `.out` file for each supervised process: the stdout and stderr of that process.
 
-If users on your cluster have problems running Hue, you can often find error messages in these log files. If you are unable to start Hue from the init script, the `supervisor.log` log file can often contain clues.
+If users have problems running Hue, you can often find error messages in these log files. If you cannot start Hue, the `supervisor.log` file can contain clues.
 
-In addition to logging `INFO` level messages to the `logs` directory, the Hue web server keeps a small buffer of log messages at all levels in memory. You can view these logs by visiting `http://myserver:8888/hue/logs`. The `DEBUG` level messages shown can sometimes be helpful in troubleshooting issues.
+Besides logging `INFO` level messages to the `logs` directory, the Hue web server keeps a small buffer of log messages at all levels in memory. To view them, go to `http://myserver:8888/logs`. The `DEBUG` level messages can help you troubleshoot.
 
 ## Commands
 
-Commands are utils handy for performing some tasks like update some user password, creating a super user, cleaning-up old sessions and documents.
+Commands are utilities for tasks like changing a user password, creating a superuser, and cleaning up old sessions and documents.
 
-Type the following command from the Hue installation root.
+Run the commands from the Hue installation root. For example:
 
-    cd /usr/lib/hue (or /opt/cloudera/parcels/CDH-XXXXX/share/hue if using parcels and CM)
+```bash
+cd /usr/share/hue
+```
 
 To list all the available commands:
 
-    build/env/bin/hue
+```bash
+build/env/bin/hue
+```
 
-    > Type 'hue help <subcommand>' for help on a specific subcommand.
+To get help on a command:
 
-    Available subcommands:
+```bash
+build/env/bin/hue help <command>
+```
 
-    [auth]
-        changepassword
-        createsuperuser
+Commonly used commands:
 
-    [axes]
-        axes_list_attempts
-        axes_reset
-
-    [beeswax]
-        beeswax_install_examples
-        beeswax_install_examples_tests
-        close_queries
-        close_sessions
-        create_table_query_data
-
-    [contenttypes]
-        remove_stale_contenttypes
-
-    [desktop]
-        config_dump
-        config_help
-        config_override
-        config_upgrade
-        convert_documents
-        create_desktop_app
-        create_proxy_app
-        create_test_fs
-        create_user_directories
-        desktop_document_cleanup
-        generate_mdl
-        is_db_alive
-        kt_renewer
-        ldaptest
-        runcelery
-        runcherrypyserver
-        runcpserver
-        rungunicornserver
-        runpylint
-        sync_documents
-        syncdb
-        test
-        version
-
-    [django]
-        check
-        compilemessages
-        createcachetable
-        dbshell
-        diffsettings
-        dumpdata
-        flush
-        inspectdb
-        loaddata
-        makemessages
-        makemigrations
-        migrate
-        sendtestemail
-        shell
-        showmigrations
-        sqlflush
-        sqlmigrate
-        sqlsequencereset
-        squashmigrations
-        startapp
-        startproject
-        testserver
-
-    [django_extensions]
-        admin_generator
-        clean_pyc
-        clear_cache
-        compile_pyc
-        create_app
-        create_command
-        create_jobs
-        create_template_tags
-        delete_squashed_migrations
-        describe_form
-        drop_test_database
-        dumpscript
-        export_emails
-        find_template
-        generate_secret_key
-        graph_models
-        mail_debug
-        notes
-        passwd
-        pipchecker
-        print_settings
-        print_user_for_session
-        reset_db
-        runjob
-        runjobs
-        runprofileserver
-        runscript
-        runserver_plus
-        set_default_site
-        set_fake_emails
-        set_fake_passwords
-        shell_plus
-        show_template_tags
-        show_templatetags
-        show_urls
-        sqlcreate
-        sqldiff
-        sqldsn
-        sync_s3
-        syncdata
-        unreferenced_files
-        update_permissions
-        validate_templates
-
-    [indexer]
-        indexer_setup
-
-    [notebook]
-        dbproxy_server
-        notebook_setup
-        send_query_stats
-
-    [oozie]
-        oozie_setup
-
-    [sessions]
-        clearsessions
-
-    [staticfiles]
-        collectstatic
-        findstatic
-        runserver
-
-    [useradmin]
-        import_ldap_group
-        import_ldap_user
-        sync_ldap_users_and_groups
-        useradmin_sync_with_unix
+| Command | Description |
+|---|---|
+| `changepassword` | Change the password of a user |
+| `createsuperuser` | Create a superuser |
+| `migrate` | Create or update the database tables |
+| `dumpdata`, `loaddata` | Export and import data as JSON |
+| `dbshell` | Open the shell of the Hue database |
+| `shell` | Open a Python shell with Hue loaded |
+| `config_help` | List all the configuration options |
+| `desktop_document_cleanup` | Delete old documents |
+| `clearsessions` | Delete expired sessions |
+| `close_queries`, `close_sessions` | Close old Hive queries and sessions |
+| `sync_ldap_users_and_groups`, `import_ldap_user`, `import_ldap_group` | Import and sync users and groups from LDAP |
+| `is_db_alive` | Check that the Hue database is reachable |
+| `version` | Print the Hue version |
 
 ## Troubleshooting
 
 ### Instrumentation
 
-To troubleshoot why Hue is slow or consuming high memory, admin can enable instrumentation by setting the `instrumentation` flag to True.
+To find out why Hue is slow or uses a lot of memory, set the `instrumentation` flag to `true`:
 
-    [desktop]
-    instrumentation=true
+```ini
+[desktop]
+instrumentation=true
+```
 
-If `django_debug_mode` is enabled, instrumentation is automatically enabled. This flag appends the response time and the total peak memory used since Hue started for every logged request.
+If `django_debug_mode` is enabled, instrumentation is enabled automatically. The flag appends the response time and the peak memory used since Hue started to every logged request.
 
 Instrumentation enabled:
 
-    [17/Apr/2018 15:18:43 -0700] access       INFO     127.0.0.1 admin - "POST /jobbrowser/jobs/ HTTP/1.1" `returned in 97ms (mem: 135mb)`
+```text
+[17/Apr/2018 15:18:43 -0700] access       INFO     127.0.0.1 admin - "POST /jobbrowser/jobs/ HTTP/1.1" `returned in 97ms (mem: 135mb)`
+```
 
 Instrumentation not enabled:
 
-    [23/Apr/2018 10:59:01 -0700] INFO     127.0.0.1 admin - "POST /jobbrowser/jobs/ HTTP/1.1" returned in 88ms
+```text
+[23/Apr/2018 10:59:01 -0700] INFO     127.0.0.1 admin - "POST /jobbrowser/jobs/ HTTP/1.1" returned in 88ms
+```
 
 ### Change or reset a password
 
-Via the Hue commands, to change the password of the currently logged in Unix user:
+To change the password of a user, run the `changepassword` command. It uses the currently logged in Unix user when you omit the username:
 
-    build/env/bin/hue changepassword
+```bash
+build/env/bin/hue changepassword [username]
+```
 
-If you don’t remember the admin username, create a new Hue admin (you will then also be able to login and could change the password of another user in Hue):
+If you do not remember the admin username, create a new Hue admin. You can then log in and change the password of another user in Hue:
 
-    build/env/bin/hue createsuperuser
+```bash
+build/env/bin/hue createsuperuser
+```
 
-### Make a certain user admin
+### Make a user an admin
 
-It is recommended to just do it as an admin via the [Admin UI](https://gethue.com/password-management-in-hue/).
+As an admin, use the [Admin UI](https://gethue.com/password-management-in-hue/).
 
-In case this is not possible (e.g. nobody is admin), doing it on the command line is explained in the examples of the [Python API](/developer/api/#python).
+If this is not possible (for example when nobody is admin), use the command line as explained in the examples of the [Python API](/developer/api/#python).
 
-At the last recourse, the database user records can be updated via SQL.
+As a last resort, update the user records in the database with SQL.
 
-### Exporting Documents
+### Export documents
 
 Export all documents:
 
-    ./build/env/bin/hue dumpdata desktop.Document2 --indent 2 --natural > data.json
+```bash
+./build/env/bin/hue dumpdata desktop.Document2 --indent 2 --natural > data.json
+```
 
 Export specific documents:
 
-20000013 is the id you can see in the URL of the dashboard.
+`20000013` is the ID that you can see in the URL of the document.
 
-    ./build/env/bin/hue dumpdata desktop.Document2 --indent 2 --pks=20000013 --natural > data.json
+```bash
+./build/env/bin/hue dumpdata desktop.Document2 --indent 2 --pks=20000013 --natural > data.json
+```
 
-You can specify more than one id:
+To export more than one document, list several IDs:
 
-    --pks=20000013,20000014,20000015
+```text
+--pks=20000013,20000014,20000015
+```
 
 Load the documents:
 
-    ./build/env/bin/hue loaddata data.json
+```bash
+./build/env/bin/hue loaddata data.json
+```
 
 
 ### Large downloads
 
-Download and export options with limited scalability unless using the [Task Server](/administrator/administration/reference/#task-server) is enabled. Restrict the number of rows or bytes transferred using the [following options](/administrator/configuration/apps/#downloads) respectively in your hue.ini.
+Downloading and exporting results does not scale well unless the [Task Server](/administrator/administration/reference/#task-server) is enabled. Restrict the number of rows or bytes transferred with the [download options](/administrator/configuration/apps/#downloads) in your `hue.ini`.
 
-### Slow because too documents
+### Slow because of too many documents
 
-When the database has too many entries, it will cause performance issue. The config check will help superuser to find this issue. Login as superuser and go to “Hue Administration”, this sample screenshot will be displayed in the quick start wizard when the tables have too many entries.
+Too many entries in the database cause performance issues. The configuration check warns superusers about it: log in as a superuser and open **Hue Administration**.
 
 ![Check config too many documents](https://cdn.gethue.com/uploads/2019/03/Doc2CountCheck.png)
 
-To clean up Hue database, go to Hue directory and run following clean up command:
+To clean up the Hue database, go to the Hue directory and run:
 
-    ./build/env/bin/hue desktop_document_cleanup
+```bash
+./build/env/bin/hue desktop_document_cleanup
+```
 
 ### Too many connections
 
-When getting an error similar to `OperationalError: (1040, 'Too many connections')`, this indicates that the Hue database is overloaded and out of connections. Hue only needs 2 but often the database is used by other services that might "hog" them. Increasing max_connections to around 1000 should be sufficient. e.g. for MySQL, connect to it and set below parameter:
+When getting an error similar to `OperationalError: (1040, 'Too many connections')`, the Hue database is out of connections. Hue only needs 2 connections, but other services that use the same database can take them all. Increase `max_connections` to around 1000. For example, in MySQL:
 
-    mysql> SET GLOBAL max_connections = 1000;
+```sql
+SET GLOBAL max_connections = 1000;
+```
 
-### Testing SQL connection from a Pod
+### Test a SQL connection from a pod
 
-First check your Hive version in the SQL Editor:
+1. Check your Hive version in the SQL Editor:
 
-    SELECT version()
-    > 2.3.2 r857a9fd8ad725a53bd95c1b2d6612f9b1155f44d
+   ```sql
+   SELECT version()
+   ```
 
-Then list the Hue pods:
+   Example result: `2.3.2 r857a9fd8ad725a53bd95c1b2d6612f9b1155f44d`
 
-    kubectl get pods
-    > NAME                                        READY   STATUS      RESTARTS   AGE
-    hue-758466dc77-wpcx8                        2/2     Running     0          22h
-    ingress-nginx-controller-5d6fbbddb6-8kd86   1/1     Running     0          23h
-    postgres-hue-64c9cc8744-dpk47               1/1     Running     1          47d
+2. List the Hue pods:
 
-Connect to it:
+   ```bash
+   kubectl get pods
+   ```
 
-    kubectl exec -it hue-758466dc77-wpcx8 hue -- bash
+   Example output:
 
-Then get the client files of the same Hive version from:
+   ```text
+   NAME                                        READY   STATUS      RESTARTS   AGE
+   hue-758466dc77-wpcx8                        2/2     Running     0          22h
+   ingress-nginx-controller-5d6fbbddb6-8kd86   1/1     Running     0          23h
+   postgres-hue-64c9cc8744-dpk47               1/1     Running     1          47d
+   ```
 
-    https://archive.apache.org/dist/hadoop/core
-    https://archive.apache.org/dist/hive
+3. Open a shell in the Hue pod:
 
-And install them:
+   ```bash
+   kubectl exec -it hue-758466dc77-wpcx8 -- bash
+   ```
 
-    sudo apt-get install wget
-    wget https://archive.apache.org/dist/hadoop/core/hadoop-2.7.4/hadoop-2.7.4.tar.gz
-    wget https://archive.apache.org/dist/hive/hive-2.3.2/apache-hive-2.3.2-bin.tar.gz
+4. Download the Hadoop and Hive client files of the same version as your Hive from [Hadoop](https://archive.apache.org/dist/hadoop/core) and [Hive](https://archive.apache.org/dist/hive), and set the environment:
 
-    tar -xvzf hadoop-2.7.4.tar.gz
-    tar -xvzf apache-hive-2.3.2-bin.tar.gz
+   ```bash
+   wget https://archive.apache.org/dist/hadoop/core/hadoop-2.7.4/hadoop-2.7.4.tar.gz
+   wget https://archive.apache.org/dist/hive/hive-2.3.2/apache-hive-2.3.2-bin.tar.gz
 
-    export HADOOP_HOME=`pwd`/hadoop-2.7.4
-    export HIVE_HOME=`pwd`/apache-hive-2.3.2-bin
-    export JAVA_HOME=/usr/lib/jvm/java-1.11.0-openjdk-amd64
+   tar -xvzf hadoop-2.7.4.tar.gz
+   tar -xvzf apache-hive-2.3.2-bin.tar.gz
 
-    PATH=$PATH:$HIVE_HOME/bin
+   export HADOOP_HOME=`pwd`/hadoop-2.7.4
+   export HIVE_HOME=`pwd`/apache-hive-2.3.2-bin
+   export JAVA_HOME=/usr/lib/jvm/java-1.11.0-openjdk-amd64
 
-And now you are ready to connect:
+   export PATH=$PATH:$HIVE_HOME/bin
+   ```
 
-    beeline -u 'jdbc:hive2://172.21.0.3:10000'
-    > SLF4J: Class path contains multiple SLF4J bindings.
-    SLF4J: Found binding in [jar:file:/usr/share/hue/apache-hive-2.3.2-bin/lib/log4j-slf4j-impl-2.6.2.jar!/org/slf4j/impl/StaticLoggerBinder.class]
-    SLF4J: Found binding in [jar:file:/usr/share/hue/hadoop-2.7.4/share/hadoop/common/lib/slf4j-log4j12-1.7.10.jar!/org/slf4j/impl/StaticLoggerBinder.class]
-    SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
-    SLF4J: Actual binding is of type [org.apache.logging.slf4j.Log4jLoggerFactory]
-    Connecting to jdbc:hive2://172.21.0.3:10000
-    Connected to: Apache Hive (version 2.3.2)
-    Driver: Hive JDBC (version 2.3.2)
-    Transaction isolation: TRANSACTION_REPEATABLE_READ
-    Beeline version 2.3.2 by Apache Hive
-    0: jdbc:hive2://172.21.0.3:10000> SHOW TABLES;
-    +--------------------+
-    |      tab_name      |
-    +--------------------+
-    | about              |
-    | amandine_test      |
-    | city_cases         |
-    | cricketer          |
-    | cust1              |
-    | cust2              |
-    | customer           |
-    | customers          |
-    | student_info       |
-    | ........           |
-    | web_logs           |
-    | yash_contact_test  |
-    +--------------------+
-    52 rows selected (0.098 seconds)
+5. Connect with Beeline:
+
+   ```bash
+   beeline -u 'jdbc:hive2://172.21.0.3:10000'
+   ```
+
+   Example output:
+
+   ```text
+   Connecting to jdbc:hive2://172.21.0.3:10000
+   Connected to: Apache Hive (version 2.3.2)
+   Driver: Hive JDBC (version 2.3.2)
+   Transaction isolation: TRANSACTION_REPEATABLE_READ
+   Beeline version 2.3.2 by Apache Hive
+   0: jdbc:hive2://172.21.0.3:10000> SHOW TABLES;
+   +--------------------+
+   |      tab_name      |
+   +--------------------+
+   | customers          |
+   | web_logs           |
+   +--------------------+
+   ```
 
 Read more on the Hive wiki about the [beeline command line](https://cwiki.apache.org/confluence/display/Hive/HiveServer2+Clients#HiveServer2Clients-Beeline%E2%80%93CommandLineShell).
 

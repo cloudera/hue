@@ -5,263 +5,304 @@ draft: false
 weight: 4
 ---
 
-Hue requires a SQL database to store small amounts of data, including user account information as well as history of queries and sharing permissions.
+Hue stores a small amount of data in a SQL database: user accounts, query history, saved documents, and sharing permissions.
 
-By default, Hue is configured to use an embedded SQLite database so that it starts but many errors will come up due to the lack of transactions.
+By default, Hue uses an embedded SQLite database so that it starts without setup. SQLite does not support concurrent writes well, so you can get `database is locked` errors. Use another database for anything beyond a test.
 
-This section contains instructions for configuring Hue with another database.
+This page describes how to configure Hue with another database and how to operate it.
 
-## Configuring with another Database
+## Prerequisites
 
-Although SQLite is the default database type, some advanced users may prefer
-to have Hue access an alternate database type. Note that if you elect to
-configure Hue to use an external database, upgrades may require more manual
-steps in the future.
+* A running MySQL, MariaDB, PostgreSQL, or Oracle server.
+* The Python client library of your database installed in the Hue virtual environment. See [Database dependencies](/administrator/installation/dependencies/#database).
+* The path to your `hue.ini`. Hue loads all the `.ini` files of the `desktop/conf` directory (or of the `HUE_CONF_DIR` directory), and later files in alphabetical order take precedence.
 
-The following instructions are for MySQL, though you can also configure Hue to work with other common databases such as PostgreSQL and Oracle.
+> **Note:** If you use an external database, upgrades can require more manual steps.
 
+The settings of the `[[database]]` section of the `hue.ini` are:
+
+| Setting | Description |
+|---|---|
+| `engine` | `mysql` (also for MariaDB), `postgresql_psycopg2`, `oracle`, or `sqlite3` (default) |
+| `host` | Database server host |
+| `port` | Database server port |
+| `user` | Database user |
+| `password` | Database password. Alternatively, set `password_script` to a script that prints it. |
+| `name` | Database name. For `sqlite3`, the path of the file. |
+| `options` | Extra connection options |
+| `conn_max_age` | Seconds to keep connections open (default `0`) |
+
+Run `build/env/bin/hue config_help | less` to list all the options.
+
+## Configure another database
+
+The steps below use `/usr/share/hue` as the Hue installation directory. Replace it with yours.
 
 ### MySQL
 
-To configure Hue to store data in MySQL:
+1. Create a database and a user in MySQL:
 
-1. Create a new database in MySQL and grant privileges to a Hue user to manage
-   this database.
+   ```sql
+   CREATE DATABASE hue;
+   CREATE USER 'hue'@'localhost' IDENTIFIED BY 'secretpassword';
+   GRANT ALL ON hue.* TO 'hue'@'localhost';
+   ```
 
-    mysql> create database hue;
-    Query OK, 1 row affected (0.01 sec)
-    mysql> grant all on hue.* to 'hue'@'localhost' identified by 'secretpassword';
-    Query OK, 0 rows affected (0.00 sec)
+2. Stop Hue if it is running.
 
-2. Shut down Hue if it is running.
+3. To keep your existing data, dump it to a file. The `.json` extension is required:
 
-3. To migrate your existing data to MySQL, use the following command to dump the
-   existing database data to a text file. Note that using the ".json" extension
-   is required.
+   ```bash
+   /usr/share/hue/build/env/bin/hue dumpdata > /tmp/hue_database_dump.json
+   ```
 
-    /usr/share/hue/build/env/bin/hue dumpdata > $some-temporary-file.json
+4. Open the `hue.ini` file in a text editor. Under `[desktop]`, add the options below directly after the `[[database]]` line, and modify them for your setup:
 
-4. Open the `hue.ini` file in a text editor. Directly below the
-   `[[database]]` line, add the following options (and modify accordingly for
-   your MySQL setup):
+   ```ini
+   [desktop]
+   [[database]]
+   host=localhost
+   port=3306
+   engine=mysql
+   user=hue
+   password=secretpassword
+   name=hue
+   ```
 
-    host=localhost
-    port=3306
-    engine=mysql
-    user=hue
-    password=secretpassword
-    name=hue
+5. As the Hue user, create the database tables:
 
-5. As the Hue user, configure Hue to load the existing data and create the database tables:
+   ```bash
+   /usr/share/hue/build/env/bin/hue migrate
+   ```
 
-    /usr/share/hue/build/env/bin/hue migrate
-    mysql -uhue -psecretpassword -e "DELETE FROM hue.django_content_type;"
-    /usr/share/hue/build/env/bin/hue loaddata $temporary-file-containing-dumped-data.json
+6. If you dumped your data, remove the content types created by the migration, then load the dump:
 
-Your system is now configured and you can start the Hue server as normal.
+   ```bash
+   mysql -uhue -p -e "DELETE FROM hue.django_content_type;"
+   /usr/share/hue/build/env/bin/hue loaddata /tmp/hue_database_dump.json
+   ```
+
+You can now start the Hue server as usual.
 
 ### PostgreSQL
 
-Log on to PostgreSQL:
-    psql -h localhost -U hue -d hue
+1. Create a database and a user:
 
-Password for user hue:
+   ```sql
+   CREATE USER hue WITH PASSWORD 'secretpassword';
+   CREATE DATABASE hue OWNER hue;
+   ```
 
-Drop the foreign key constraint from auth_permission:
+2. Set the `[[database]]` section of the `hue.ini`:
 
-    \d auth_permission;
-    ALTER TABLE auth_permission DROP CONSTRAINT content_type_id_refs_id_<id value>;
+   ```ini
+   [desktop]
+   [[database]]
+   host=localhost
+   port=5432
+   engine=postgresql_psycopg2
+   user=hue
+   password=secretpassword
+   name=hue
+   ```
 
-Delete the contents of django_content_type:
+3. Stop Hue, dump your data as in the MySQL steps, then create the tables:
 
-    TRUNCATE django_content_type CASCADE;
+   ```bash
+   /usr/share/hue/build/env/bin/hue migrate
+   ```
 
-Load Database.
+4. To load a dump, log on to PostgreSQL and drop the foreign key constraint from `auth_permission`:
 
-    Add the foreign key, content_type_id, to auth_permission:
-    ALTER TABLE auth_permission ADD FOREIGN KEY (content_type_id) REFERENCES django_content_type(id) DEFERRABLE INITIALLY DEFERRED;
+   ```bash
+   psql -h localhost -U hue -d hue
+   ```
+
+   ```sql
+   \d auth_permission;
+   ALTER TABLE auth_permission DROP CONSTRAINT content_type_id_refs_id_<id value>;
+   ```
+
+5. Delete the contents of `django_content_type`:
+
+   ```sql
+   TRUNCATE django_content_type CASCADE;
+   ```
+
+6. Load the data, then add the foreign key back:
+
+   ```bash
+   /usr/share/hue/build/env/bin/hue loaddata /tmp/hue_database_dump.json
+   ```
+
+   ```sql
+   ALTER TABLE auth_permission ADD FOREIGN KEY (content_type_id) REFERENCES django_content_type(id) DEFERRABLE INITIALLY DEFERRED;
+   ```
 
 ### Oracle
 
-Oracle users should delete all content from the Oracle tables after synchronizing and before loading:
+To migrate data to Oracle, delete all content from the Oracle tables after running `migrate` and before loading the data:
 
 Log on to Oracle:
 
-    su - oracle
-    sqlplus / as sysdba
+```bash
+su - oracle
+sqlplus / as sysdba
+```
 
 Grant a quota to the tablespace where tables are created (the default is SYSTEM). For example:
 
-    ALTER USER hue quota 100m on system;
+```sql
+ALTER USER hue quota 100m on system;
+```
 
 Log on as the hue:
 
-    sqlplus hue/<hue password>
+```bash
+sqlplus hue/<hue password>
+```
 
 Create a spool script that creates a delete script to clean the content of all tables.
 
-    vi spool_statements.ddl
+```bash
+vi spool_statements.ddl
+```
 
 Save in spool_statements.ddl (which generates delete_from_tables.ddl)
 
-    spool delete_from_tables.ddl
-    set pagesize 100;
-    SELECT 'DELETE FROM ' || table_name || ';' FROM user_tables;
-    commit;
-    spool off
-    quit
+```sql
+spool delete_from_tables.ddl
+set pagesize 100;
+SELECT 'DELETE FROM ' || table_name || ';' FROM user_tables;
+commit;
+spool off
+quit
+```
 
 Run both scripts:
 
-    -- Create delete_from_tables.ddl
-    sqlplus hue/<your hue password> < spool_statements.ddl
+```text
+-- Create delete_from_tables.ddl
+sqlplus hue/<your hue password> < spool_statements.ddl
 
-    -- Run delete_from_tables.ddl
-    sqlplus hue/<your hue password> < delete_from_tables.ddl
+-- Run delete_from_tables.ddl
+sqlplus hue/<your hue password> < delete_from_tables.ddl
+```
 
 #### RAC
 
-The current setup of Oracle is this way:
+Set the database in the `[[database]]` section of the `hue.ini`:
 
-    Hostname : ORACLE IP
-    Database Type: Oracle
-    Database Name: <Service Name/SID of one of the instance>
-    Username: <username>
-    Password: <password>
+```ini
+[desktop]
+[[database]]
+engine=oracle
+host=<oracle host>
+port=<port>
+user=<username>
+password=<password>
+name=<service name or SID of one of the instances>
+```
 
-This would be an alternate way to address the Oracle RAC issue:
+You can also use the Oracle service name with `host` and `port` set and `name=<host>:<port>/<service_name>`.
 
-1. Go to Hue > Configuration > Database > Hue Database Name
-2. Enter the database name in the following format
-Hue Database Name=(DESCRIPTION=(LOAD_BALANCE=off)(FAILOVER=on)(CONNECT_TIMEOUT=5)(TRANSPORT_CONNECT_TIMEOUT=3)(RETRY_COUNT=3)(ADDRESS=(PROTOCOL=TCP)(HOST=<scan ip>)(PORT=<port>))(CONNECT_DATA=(SERVICE_NAME=<service name>)))
+If this does not work for your RAC cluster, set `port=0` and use a full connect descriptor as the name:
 
-If the above does not work, then use the below config info `hue_safety_valve_server` for database:
+```ini
+[desktop]
+[[database]]
+engine=oracle
+port=0
+user=<username>
+password=<password>
+name=(DESCRIPTION=(LOAD_BALANCE=off)(FAILOVER=on)(CONNECT_TIMEOUT=5)(TRANSPORT_CONNECT_TIMEOUT=3)(RETRY_COUNT=3)(ADDRESS=(PROTOCOL=TCP)(HOST=<scan ip>)(PORT=<port>))(CONNECT_DATA=(SERVICE_NAME=<service name>)))
+```
 
-    engine=oracle
-    port=0
-    user=<username>
-    password=<password>
-    name=(DESCRIPTION=(LOAD_BALANCE=off)(FAILOVER=on)(CONNECT_TIMEOUT=5)(TRANSPORT_CONNECT_TIMEOUT=3)(RETRY_COUNT=3)(ADDRESS=(PROTOCOL=TCP)(HOST=<scan ip>)(PORT=<port>))(CONNECT_DATA=(SERVICE_NAME=<service name>)))
+Hue sets `options={"threaded": True}` by default for Oracle, which is required in a multithreaded environment.
 
 ## Operation
 
-### Inspecting
+### Inspect the database
 
-You can inspect your database via its standard own Shell, Hue [SQL Editor](/administrator/configuration/connectors/#databases) itself, or from the command line using the db shell:
+Use the standard shell of your database, the Hue [SQL Editor](/administrator/configuration/connectors/#databases), or the Django database shell:
 
-    /usr/share/hue/build/env/bin/hue dbshell
+```bash
+/usr/share/hue/build/env/bin/hue dbshell
+```
 
-It is strongly recommended that you avoid making any modifications to the database directly, though this trick can be useful for management or troubleshooting.
+> **Warning:** Avoid modifying the database directly. Use direct access only for management or troubleshooting.
 
-### Backing up
+### Back up the database
 
-It is recommended that you back it up on a regular schedule, and also that you back it up before any upgrade to a new version or doing a data change in the database.
+Back up the database on a regular schedule, and before any upgrade or data change. Use the standard backup tools of your database, or dump the records as described in [Migrate to another database](#migrate-to-another-database).
 
-Backing up can be done the standard way of the chosen database or via dumping the records similarly to doing a [migration](#migrating).
+### Clean up the database
 
-### Clean up
+Too many entries in some tables, such as documents, cause performance issues. The Hue configuration check warns superusers about this. Log in as a superuser and open **Hue Administration** to see it.
 
-When the database has too many entries in certain tables, it will cause performance issue. Now Hue config check will help superuser to find this issue. Login as superuser and go to "Administration, this sample screenshot will be displayed in the quick start wizard when the tables have too many entries:
+![Config check for too many documents](https://cdn.gethue.com/uploads/2019/03/Doc2CountCheck.png)
 
-[<img class="size-full wp-image-5802 aligncenter" src="https://cdn.gethue.com/uploads/2019/03/Doc2CountCheck.png"/>][1]
+To clean up old entries, go to the Hue installation directory and run:
 
-Run following clean up command:
+```bash
+./build/env/bin/hue desktop_document_cleanup
+```
 
-    cd /opt/cloudera/parcels/CDH/lib/hue  # Hue home directory
-    ./build/env/bin/hue desktop_document_cleanup
+### Migrate to another database
 
-### Migrating
+You can migrate the existing data when you change databases, for example from SQLite to MySQL or PostgreSQL.
 
-Hue Custom Databases includes database-specific pages on how to migrate from an old to a new database (e.g. sqlite to Oracle or MySQL). This page summarizes across supported database types.
+1. Stop Hue and dump the data with `dumpdata`, as in the [MySQL](#mysql) steps.
+2. Edit the dump file and remove all the objects whose `model` is `useradmin.userprofile`. For example:
 
-When you change Hue databases, you can migrate the existing data to your new database.
+   ```bash
+   grep -c useradmin.userprofile /tmp/hue_database_dump.json
+   ```
 
-#### Dump Database
+   ```json
+   {
+     "pk": 1,
+     "model": "useradmin.userprofile",
+     "fields": {
+       "last_activity": "2016-10-03T10:06:13",
+       "creation_method": "HUE",
+       "first_login": false,
+       "user": 1,
+       "home_directory": "/user/admin"
+     }
+   },
+   ```
 
-Ensure that the Hue service is stopped and dump the database content like explained in the top section and the `dumpdata` command.
+3. Configure the new database in the `hue.ini` as described above, and run `migrate`.
+4. Load the data as described for your database.
+5. Start Hue and check on the Hue home page that all the documents were migrated.
 
-Edit `/tmp/hue_database_dump.json` by removing all objects with useradmin.userprofile in the model field.
+#### MySQL foreign key
 
-For example:
+If loading the data fails on MySQL, drop the foreign key constraint from `hue.auth_permission` before the load and add it back after.
 
-    grep -c useradmin.userprofile /tmp/hue_database_dump.json
+1. Find the constraint name:
 
-    vi /tmp/hue_database_dump.json
-    {
-      "pk": 1,
-      "model": "useradmin.userprofile",
-      "fields": {
-        "last_activity": "2016-10-03T10:06:13",
-        "creation_method": "HUE",
-        "first_login": false,
-        "user": 1,
-        "home_directory": "/user/admin"
-      }
-    },
+   ```sql
+   SHOW CREATE TABLE hue.auth_permission;
+   ```
 
-#### Connect to the new Database
+   In the output, find the name in the `CONSTRAINT` clause, for example `content_type_id_refs_id_d043b34a`.
 
-Set the appropriate database parameters :
+2. Drop the constraint, using your constraint name:
 
-    Hue Database Type: MySQL or PostgreSQL or Oracle
-    Hue Database Hostname: <fqdn of host with database server>
-    Hue Database Port: 3306 or 5432 or 1521
-    Hue Database Username: <hue database username>
-    Hue Database Password: <hue database password>
-    Hue Database Name: <hue database name or SID>
+   ```sql
+   ALTER TABLE hue.auth_permission DROP FOREIGN KEY content_type_id_refs_id_d043b34a;
+   ```
 
-Oracle users only should add support for a multithreaded environment:
+3. Delete the contents of `django_content_type`:
 
-Add support for a multithreaded environment by setting in the hue.ini:
+   ```sql
+   DELETE FROM hue.django_content_type;
+   ```
 
-    [desktop]
-    [[database]]
-    options={"threaded":True}
+4. Load the data, then add the foreign key back:
 
-In the Hue Web UI, click the home icon Hue Home icon to ensure that all documents were migrated.
-
-    MariaDB / MySQL
-    Synchronize Database in Cloudera Manager.
-    Log on to MySQL:
-    mysql -u root -p
-    Enter password: <root password>
-
-Drop the foreign key constraint from the hue.auth_permission table:
-
-Execute the following statement to find the `content_type_id_refs_id_<value>` in the CONSTRAINT clause of the CREATE TABLE statement for the `hue.auth_permission` table:
-
-    SHOW CREATE TABLE hue.auth_permission;
-
-This SHOW CREATE TABLE statement produces output similar to the following:
-
-    |  auth_permission | CREATE TABLE 'auth_permission' (
-      'id' int(11) NOT NULL AUTO-INCREMENT,
-      'name' varchar(50) NOT NULL,
-      'content_type_id' int(11) NOT NULL,
-      'CODENAME' VARCHAR(100) NOT NULL,
-      PRIMARY KEY ('id'),
-      UNIQUE KEY 'content_type_id' ('content_type_id', 'codename'),
-      KEY 'auth_permission_37ef4eb4' ('content_type_id'),
-      CONSTRAINT 'content_type_id_refs_id_d043b34a' FOREIGN KEY ('content_type_id')
-    REFERENCES 'django_content_type' ('id')
-    ) ENGINE=InnoDB AUTO_INCREMENT=229 DEFAULT CHARSET=utf8 |
-
-Then execute the following statement to drop the foreign key constraint:
-
-    ALTER TABLE hue.auth_permission DROP FOREIGN KEY
-    content_type_id_refs_id_<value>;
-
-For example, if you used the above output from the SHOW CREATE TABLE statement, you would use the following ALTER TABLE statement:
-
-    ALTER TABLE hue.auth_permission DROP FOREIGN KEY
-    content_type_id_refs_id_d043b34a;
-
-Delete the contents of django_content_type:
-
-    DELETE FROM hue.django_content_type;
-
-Load Database.
-
-    Add the foreign key, content_type_id, to auth_permission:
-
-    ALTER TABLE hue.auth_permission ADD FOREIGN KEY (content_type_id) REFERENCES django_content_type (id);
+   ```sql
+   ALTER TABLE hue.auth_permission ADD FOREIGN KEY (content_type_id) REFERENCES django_content_type (id);
+   ```

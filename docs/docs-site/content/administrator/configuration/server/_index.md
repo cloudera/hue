@@ -5,821 +5,807 @@ draft: false
 weight: 1
 ---
 
-This section is about configuring the Hue server itself.
-These configuration variables are under the `[desktop]` section in
-the `conf/hue.ini` configuration file.
+This page explains how to configure the Hue server itself.
+Unless stated otherwise, the properties below go under the `[desktop]` section of the `hue.ini` file.
 
 ## Basics
 
-### Point to MySQL or Postgres
+### Point to MySQL or PostgreSQL
 
-Directly below the `[[database]]` line, add the following options (and modify accordingly for
-your MySQL setup):
+Hue stores users and saved queries in a database. To use MySQL or PostgreSQL instead of the default SQLite, add the following options directly below the `[[database]]` line (under `[desktop]`). Change them to match your setup:
 
+```ini
+[desktop]
+  [[database]]
     host=localhost
     port=3306
     engine=mysql
     user=hue
     password=secretpassword
     name=hue
+```
 
-And run the table creation one time:
+For PostgreSQL, set `engine=postgresql_psycopg2` and use your PostgreSQL port.
+For MariaDB, use the `mysql` engine.
 
-    ./build/env/bin/hue migrate
+Then create the tables. You only need to do this once:
 
-### Specifying the HTTP port
+```bash
+./build/env/bin/hue migrate
+```
 
-Hue uses CherryPy web server.  You can use the following options to
-change the IP address and port that the web server listens on.
-The default setting is port 8888 on all configured IP addresses.
+See [Configuring with another database](/administrator/administration/database/#configure-another-database) for the full steps, including how to migrate existing data.
 
-    # Webserver listens on this address and port
-    http_host=0.0.0.0
-    http_port=8888
+### Specify the HTTP port
+
+Use the following options to change the IP address and port that the web server listens on.
+The default is port 8888 on all configured IP addresses.
+
+```ini
+[desktop]
+  # Webserver listens on this address and port
+  http_host=0.0.0.0
+  http_port=8888
+```
 
 ### Gunicorn server
 
-Instead of running CherryPy, [Gunicorn](https://gunicorn.org/) will be launched:
+Hue serves requests with [Gunicorn](https://gunicorn.org/) by default. You can tune it with these options:
 
-      # Set to true to use CherryPy as the webserver, set to false
-      # to use Gunicorn as the webserver. Defaults to CherryPy if
-      # key is not specified.
-      use_cherrypy_server=false
+```ini
+[desktop]
+  # Gunicorn worker class: gevent, eventlet, gthread or sync.
+  gunicorn_work_class=gthread
 
-      # Gunicorn work class: gevent or evenlet, gthread or sync.
-      gunicorn_work_class=sync
+  # Number of Gunicorn worker processes.
+  gunicorn_number_of_workers=1
 
-### Specifying the Secret Key
+  # Workers silent for more than this many seconds are killed and restarted.
+  gunicorn_worker_timeout=900
 
-For security, you should also specify the secret key that is used for secure
-hashing in the session store. Enter a long series of random characters
-(30 to 60 characters is recommended).
+  # After a restart signal, workers have this many seconds to finish their requests.
+  gunicorn_worker_graceful_timeout=900
+```
 
-    secret_key=jFE93j;2[290-eiw.KEiwN2s3['d;/.q[eIW^y#e=+Iei*@Mn<qW5o
+> **Note**: `use_cherrypy_server` is still a valid option, but CherryPy is no longer part of the Hue Python requirements. On Python 3 the default is `false`: keep it and use Gunicorn.
 
-NOTE: If you don't specify a secret key, your session cookies will not be
-secure. Hue will run but it will also display error messages telling you to
-set the secret key.
+### Specify the secret key
 
-### Disabling some apps
+Set a secret key to protect the hashing of the session store. Use a long series of random characters (30 to 60 characters is recommended).
 
-In the Hue ini configuration file, in the [desktop] section, you can enter the names of the app to hide:
+```ini
+[desktop]
+  secret_key=jFE93j;2[290-eiw.KEiwN2s3['d;/.q[eIW^y#e=+Iei*@Mn<qW5o
+```
 
-    [desktop]
-    # Comma separated list of apps to not load at server startup.
-    app_blacklist=beeswax,impala,security,filebrowser,jobbrowser,rdbms,jobsub,pig,hbase,sqoop,zookeeper,metastore,spark,oozie,indexer
+You can also generate the key with a script by setting `secret_key_script`, or by setting the `HUE_SECRET_KEY` environment variable.
+
+> **Note**: If you don't set a secret key, your session cookies are not secure. Hue runs, but it displays error messages telling you to set the key.
+
+### Disable some apps
+
+To hide apps, list their names in `app_blacklist`:
+
+```ini
+[desktop]
+  # Comma separated list of apps to not load at server startup.
+  app_blacklist=pig,hbase,sqoop,zookeeper,oozie
+```
 
 [Read more about it here](http://gethue.com/mini-how-to-disabling-some-apps-from-showing-up/).
 
 ## Authentication
 
-By default (`AllowFirstUserDjangoBackend`), the first user who logs in to Hue can choose any
-username and password and becomes an administrator automatically. This
-user can create other user and administrator accounts. User information is
-stored in the Django database in the Django backend.
+By default, Hue uses the `AllowFirstUserDjangoBackend` backend. The first user who logs in can choose any username and password and becomes an administrator automatically. This user can create other users and administrators. Hue stores user information in its database.
 
-The authentication system is pluggable. Here is a list of some of the possible authentications:
+The authentication system is pluggable. You select one or more backends with the `backend` property in the `[[auth]]` section. These are the main options.
 
-### Username / Password
+### Username and password
 
-This is the default Hue backend. It creates the first user that logs in as the super user. After this, it relies on Django and the user manager to authenticate users.
+This is the default Hue backend. It makes the first user who logs in the superuser. After that, it relies on Django and the user manager to authenticate users.
 
-    desktop.auth.backend.AllowFirstUserDjangoBackend
+```ini
+[desktop]
+  [[auth]]
+    backend=desktop.auth.backend.AllowFirstUserDjangoBackend
+```
 
-### Allow All
+### Allow all
 
-This backend does not require a password for users to log in. All users are automatically authenticated and the username is set to what is provided.
+This backend does not require a password. Hue authenticates every user automatically and uses the username that is provided.
 
-    desktop.auth.backend.AllowAllBackend
+```ini
+[desktop]
+  [[auth]]
+    backend=desktop.auth.backend.AllowAllBackend
+```
+
+> **Warning**: Do not use this backend on a server that others can reach.
 
 ### LDAP
 
-Authenticates users against an LDAP service.
+This backend authenticates users against an LDAP service.
 
-    desktop.auth.backend.LdapBackend
+```ini
+[desktop]
+  [[auth]]
+    backend=desktop.auth.backend.LdapBackend
+```
 
-There are two ways to bind Hue with an LDAP directory service:
+There are two ways to bind Hue to an LDAP directory service:
 
-* Search Bind: Hue searches for user credentials with search base (and attribute and filter).
-* Direct Bind: Hue authenticates (without searching) in one of two ways:
-  * NT Domain: Bind to Microsoft Active Directory with username@domain (the UPN)or
-  * Username Pattern: Bind to open standard LDAP with full path of directory information tree (DIT).
+* Search bind: Hue searches for the user with a search base (and optionally an attribute and a filter), then binds with the DN it found.
+* Direct bind: Hue authenticates without searching, in one of two ways:
+  * NT domain: bind to Microsoft Active Directory with `username@domain` (the UPN).
+  * Username pattern: bind to an open standard LDAP server with the full path in the directory information tree (DIT).
 
-Note: Username pattern does not work with AD because AD inserts spaces into the UID which Hue cannot process.
+> **Note**: The username pattern does not work with Active Directory (AD), because AD inserts spaces into the UID, which Hue cannot process.
 
-Encryption: To prevent credentials from transmitting in the clear, encrypt with LDAP over SSL, using the LDAPS protocol on the LDAPS port (636 by default); or encrypt with the StartTLS extension using the standard LDAP protocol and port (389 by default). Cloudera recommends LDAPS. You must have a CA Certificate in either case.
+To avoid sending credentials in the clear, encrypt the connection. Use LDAP over SSL (LDAPS) on port 636 by default, or the StartTLS extension on the standard LDAP port (389 by default). LDAPS is recommended. In both cases you need a CA certificate.
 
-Hue Supported LDAP Authentication and Encryption Methods
+The following table lists the supported combinations of authentication method and encryption.
 
-    LDAP Auth Action	Encrypted (LDAPS)	Encrypted (LDAP+TLS)	Not Encrypted (LDAP)
-    Search Bind	AD, LDAP	AD, LDAP	AD, LDAP
-    Direct Bind - NT Domain	AD	AD	AD
-    Direct Bind - User Pattern	LDAP	LDAP	LDAP
+| LDAP auth action           | Encrypted (LDAPS) | Encrypted (LDAP+TLS) | Not encrypted (LDAP) |
+| -------------------------- | ----------------- | -------------------- | -------------------- |
+| Search bind                | AD, LDAP          | AD, LDAP             | AD, LDAP             |
+| Direct bind - NT domain    | AD                | AD                   | AD                   |
+| Direct bind - user pattern | LDAP              | LDAP                 | LDAP                 |
 
-Example of a Search Bind configuration encrypted with LDAPS:
+#### Search bind
 
-    [[custom]]
-    [[auth]]
+Search bind does an `ldapsearch` against one or more directory services and binds with the DN it finds and the user's password. Hue searches the subtree below the base DN. If `user_name_attr` is set, Hue looks for an entry whose attribute has the same value as the short name entered at login.
+
+> **Note**: Search bind works with all directory service types. It is also the only method that can synchronize groups at login (set `sync_groups_on_login`).
+
+Example of a search bind configuration encrypted with LDAPS:
+
+```ini
+[desktop]
+  [[auth]]
     backend=desktop.auth.backend.LdapBackend
 
-    [[ldap]]
-    ldap_url=ldaps://w2k8-1.ad.sec.cloudera.com:636
+  [[ldap]]
+    ldap_url=ldaps://ldap.example.com:636
     search_bind_authentication=true
-    ldap_cert=/<path_to_cacert>/w2k8-1-root.pem
+    ldap_cert=/<path_to_cacert>/ca-root.pem
     use_start_tls=false
     create_users_on_login=true
-    base_dn="DC=ad,DC=sec,DC=cloudera,DC=com"
-    bind_dn="<username>@ad.sec.cloudera.com"
+    base_dn="DC=ad,DC=example,DC=com"
+    bind_dn="<username>@ad.example.com"
     bind_password_script=<path_to_password_script>/<script.sh>
     test_ldap_user="testuser1"
     test_ldap_group="testgroup1"
 
     [[[users]]]
-    user_filter="objectclass=user"
-    user_name_attr="sAMAccountName"
+      user_filter="objectclass=user"
+      user_name_attr="sAMAccountName"
 
     [[[groups]]]
-    group_filter="objectclass=group"
-    group_name_attr="cn"
-    group_member_attr="member"
+      group_filter="objectclass=group"
+      group_name_attr="cn"
+      group_member_attr="member"
+```
 
-Example of a Direct Bind configuration for Active Directory encrypted with LDAPS:
+The main properties are:
 
-    [[ldap]]
-    ldap_url=ldaps://w2k8-1.ad.sec.cloudera.com:636
+| Property                     | Value                                                                  |
+| ---------------------------- | ---------------------------------------------------------------------- |
+| `ldap_url`                   | `ldaps://<ldap_server>:636` (or `ldap://<ldap_server>:389`)            |
+| `ldap_cert`                  | Path to the CA certificate of the LDAP server, for example `/path_to_certificate/cert.pem` |
+| `base_dn`                    | The search base, for example `DC=mycompany,DC=com`                     |
+| `bind_dn`                    | The bind user, in the form `username@domain`                           |
+| `bind_password_script`       | Script that prints the bind user password (see [Store passwords in a script](#store-passwords-in-a-script)) |
+| `search_bind_authentication` | `true`                                                                 |
+| `use_start_tls`              | `false` for LDAPS or no encryption, `true` for StartTLS                |
+| `create_users_on_login`      | `true`                                                                 |
+
+> **Note**: To encrypt with StartTLS, set `ldap_url` to `ldap://<ldap_server>:389` and `use_start_tls=true`. For a proof of concept without encryption, use `ldap://<ldap_server>:389`, remove `ldap_cert`, and set `use_start_tls=false`.
+
+You can optionally improve the search performance with filters and attributes:
+
+| Property            | Value                                                      |
+| ------------------- | ---------------------------------------------------------- |
+| `user_filter`       | For example `objectclass=user`                             |
+| `user_name_attr`    | `sAMAccountName` for AD, `uid` for most other LDAP servers |
+| `group_filter`      | For example `objectclass=group`                            |
+| `group_name_attr`   | `cn`                                                       |
+| `group_member_attr` | `member`                                                   |
+
+> **Note**: With these user settings, the LDAP search filter looks like `(&(objectClass=user)(sAMAccountName=<username entered at login>))`.
+
+To test your configuration, set `test_ldap_user` and `test_ldap_group` to a valid user and a valid group.
+
+> **Note**: The syntax of `bind_dn` depends on the bind method.
+>
+> * Search bind: `username@domain`
+> * Direct bind with NT domain: `username`
+> * Direct bind with username pattern: a DN string (the full DIT path)
+
+Skip `bind_dn` and `bind_password_script` if your server supports anonymous binding.
+
+You can test your settings with `ldapsearch` on the command line:
+
+```bash
+LDAPTLS_CACERT=/<path_to_cert>/<ca_certificate> ldapsearch -H ldaps://<ldap_server>:636 \
+  -D "<bind_dn>" -w <bind_password> -b <base_dn> "samaccountname=<user>"
+```
+
+> **Note**: To run `ldapsearch` with a CA certificate, you might need to install `ldap-utils` on Debian/Ubuntu or `openldap-clients` on RHEL/CentOS.
+
+#### Direct bind
+
+For direct bind, Hue needs either the user principal name (UPN) for Active Directory, or the full path to the LDAP user in the DIT for open standard LDAP.
+
+> **Note**: Direct bind only works with one domain. For multiple directories, use search bind.
+
+To bind directly to an Active Directory server with an NT domain, configure the properties like a search bind, with these changes:
+
+* Set `nt_domain` to your NT domain.
+* Set `bind_dn` to the username only (not `username@domain`).
+* Set `search_bind_authentication=false`.
+
+```ini
+[desktop]
+  [[ldap]]
+    ldap_url=ldaps://ldap.example.com:636
     search_bind_authentication=false
-    nt_domain=ad.sec.cloudera.com
-    ldap_cert=/<path_to_cacert>/w2k8-1-root.pem
+    nt_domain=ad.example.com
+    ldap_cert=/<path_to_cacert>/ca-root.pem
     use_start_tls=false
     create_users_on_login=true
-    base_dn="DC=ad,DC=sec,DC=cloudera,DC=com"
+    base_dn="DC=ad,DC=example,DC=com"
     bind_dn="<username>"
     bind_password_script=<path_to_password_script>/<script.sh>
-    ...
+```
 
-Example of a Direct Bind configuration for Active Directory encrypted with StartTLS:
+To use StartTLS instead of LDAPS, set `ldap_url=ldap://ldap.example.com:389` and `use_start_tls=true`.
 
-    [[ldap]]
-    ldap_url=ldap://w2k8-1.ad.sec.cloudera.com:389
-    search_bind_authentication=false
-    nt_domain=ad.sec.cloudera.com
-    ldap_cert=/opt/cloudera/security/cacerts/w2k8-1-root.pem
-    use_start_tls=true
-    create_users_on_login=true
-    base_dn="DC=ad,DC=sec,DC=cloudera,DC=com"
-    bind_dn="cconner"
-    bind_password_script=<path_to_password_script>/<script.sh>
-    ...
+To bind directly to an open standard LDAP server with a username pattern:
 
+* Leave `nt_domain` empty.
+* Set `ldap_username_pattern` to a DN string that represents the full path in the DIT, from the UID up to the top-level domain.
+* Set `bind_dn` to a DN string in the same format.
 
-#### Search Bind
+> **Note**: With direct bind, set `base_dn` anyway. You can log in to Hue without it, but you need it to synchronize Hue with the LDAP server.
 
-Search bind authentication does an ldapsearch against one or more directory services and binds with the found distinguished name (DN) and password. Hue searches the subtree from the base distinguished name. If LDAP Username Attribute is set, Hue looks for an entry whose attribute has the same value as the short name given at login.
+Test your LDAP configuration, then restart Hue.
 
-Important: Search binding works with all directory service types. It is also the only method that allows synchronizing groups at login (set with sync_groups_on_login in a safety-valve).
+#### Troubleshooting LDAP
 
-Set the following required properties:
+**Issue**: Hue cannot synchronize an LDAP group and reports `Could not get LDAP details for groups in pattern <group_name>`.
 
-Authentication Backend	desktop.auth.backend.LdapBackend
-
-    LDAP URL	ldaps://<ldap_server>:636 (or ldap://<ldap_server>:389)
-    LDAP Server CA Certificate	/path_to_certificate/cert.pem
-    LDAP Search Base	DC=mycompany,DC=com
-    LDAP Bind User Distinguished Name	username@domain
-    LDAP Bind Password	bind_user_password
-    Use Search Bind Authentication	TRUE
-    Enable LDAP TLS	FALSE if using LDAPS or not encrypting
-    Create LDAP users on login	TRUE
-
-Note: To encrypt with TLS, set LDAP URL to ldap://<ldap_server>:389 and check Enable LDAP TLS. For a proof of concept without encryption, use ldap://<ldap_server>:389, remove the value for LDAP Server CA Certificate, and uncheck Enable LDAP TLS.
-
-You can optionally improve search performance with attributes and filters.
-
-    LDAP User Filter	objectclass=user (default = *)
-    LDAP Username Attribute	sAMAccountName (AD default), uid (LDAP default)
-    LDAP Group Filter	objectclass=group (default = *)
-    LDAP Group Name Attribute	cn (default)
-    LDAP Group Membership Attribute	member (default)
-
-Note: With the user settings in the table above, the LDAP search filter has the form: (&(objectClass=user)(sAMAccountName=<user entered username>)).
-
-Add any valid user and/or valid group to quickly test your LDAP configuration.
-
-    LDAP Username for Test LDAP Configuration	Any valid user
-    LDAP Group Name for Test LDAP Configuration	Any valid group
-
-Note: The syntax of Bind Distinguished Name differs per bind method:
-
-    Search Bind: username@domain
-    Direct Bind with NT Domain: username
-    Direct Bind with Username Pattern: DN string (full DIT path)
-
-Do not use if anonymous binding is supported.
-
-    ## You can test ldapsearch at the command line as follows:
-    LDAPTLS_CACERT=/<path_to_cert>/<ca_certificate> ldapsearch -H ldaps://<ldap_server>:636 \
-    -D "<bind_dn>" -w <bind_password> -b <base_dn> "samaccountname=<user>"
-
-Note: To run ldapsearch with a CA certificate, you may need to install ldap_utils on Debian/Ubuntu and openldap-clients on RHEL/CentOS.
-
-#### Direct Bind
-
-To authenticate with direct binding, Hue needs either the User Principal Name (UPN) for Active Directory, or the full path to the LDAP user in the Directory Information Tree (DIT) for open standard LDAP.
-
-Important: Direct binding only works with one domain. For multiple directories, use Search Bind.
-
-To directly bind to an Active Directory/LDAP server with NT domain:
-
-Click the Configuration tab and filter by scope=Service-wide and category=Security.
-
-Set LDAP properties exactly like Search Bind with these exceptions:
-    Active Directory Domain	<your NT domain>
-    LDAP Bind User Distinguished Name	<username only> (not username@domain)
-    Use Search Bind Authentication	FALSE
-
-Test your LDAP configuration, and when successful, Restart Hue.
-To directly bind to an open standard LDAP server with a username pattern:
-
-Remove the value for Active Directory Domain.
-
-Set both LDAP Username Pattern and LDAP Bind User Distinguished Name to a DN string that represents the full path of the directory information tree, from UID to top level domain.
-
-Note: When using direct bind, set LDAP Search Base, not for authentication (you can log on to Hue without it), but to Synchronize Hue with LDAP Server.
-
-#### Troubleshooting
-
-##### Issue:
-Hue is not able to sync the LDAP group in Hue and it reports the following error : Could not get LDAP details for groups in pattern <group_name>
-
-##### Solution:
-check your configuration if 'subgroups' is set under [[ldap]] and remove it.
-
+**Solution**: Check your configuration. If `subgroups` is set under `[[ldap]]`, remove it.
 
 ### SAML
 
-Secure Assertion Markup Language (SAML) single sign-on (SSO) backend. Delegates authentication to the configured Identity Provider. See Configuring Hue for SAML for more details.
+The Security Assertion Markup Language (SAML) single sign-on (SSO) backend delegates authentication to the Identity Provider you configure.
 
-    libsaml.backend.SAML2Backend
-
-
-Authenticate Hue Users with SAML
-
-Hue supports SAML (Security Assertion Markup Language) for Single Sign-on (SSO) authentication.
+```ini
+[desktop]
+  [[auth]]
+    backend=libsaml.backend.SAML2Backend
+```
 
 The SAML 2.0 Web Browser SSO profile has three components:
 
-* User Agent - Browser that represents you, the user, seeking resources.
-* Service Provider (SP) - Service (Hue) that sends authentication requests to SAML.
-* Identity Provider (IdP) - SAML service that authenticates users.
+* User Agent: the browser that represents you, the user, requesting resources.
+* Service Provider (SP): the service (Hue) that sends authentication requests to SAML.
+* Identity Provider (IdP): the SAML service that authenticates users.
 
 When a user requests access to an application, the Service Provider (Hue) sends an authentication request from the User Agent (browser) to the Identity Provider. The Identity Provider authenticates the user, sends a response, and redirects the browser back to Hue.
-This page explains how to configure Hue, the Service Provider, and gives guidance on how to configure the Identity Provider, which differs per product.
 
-Configure Hue for SAML Authentication
+This section explains how to configure Hue as the Service Provider. How you configure the Identity Provider differs per product.
 
-The Service Provider (Hue) and the Identity Provider use a metadata file to confirm each other's identity. Hue stores metadata from the SAML server, and the IdP stores metadata from Hue server.
+#### Configure Hue for SAML
 
-In Configure Hue at the Command Line, you must copy the metadata from your IdP's SAML server and store it in an XML file on every host with a Hue server.
-Important: Read the documentation of your Identity Provider for details on how to procure the XML of the SAML server metadata.
+The Service Provider (Hue) and the Identity Provider use a metadata file to confirm each other's identity. Hue stores the metadata from the SAML server, and the IdP stores the metadata from the Hue server.
 
-Configure Hue at the Command Line
-Important: You may need to disable cipher algorithms. See SAML SSL Error in Troubleshooting below.
+1. Install the build libraries on every host that runs a Hue server:
 
-Install the following libraries on all hosts in your cluster:
+   ```bash
+   # RHEL/CentOS
+   yum install git gcc python3-devel swig openssl
+   # Ubuntu/Debian
+   apt-get install git gcc python3-dev swig openssl
+   # SLES
+   zypper install git gcc python3-devel swig openssl make libxslt-devel libltdl-devel
+   ```
 
-    ## RHEL/CentOS
-    yum install git gcc python-devel swig openssl
-    ## Ubuntu/Debian
-    apt-get install git gcc python-dev swig openssl
-    ## SLES
-    zypper install git gcc python-devel swig openssl make libxslt-devel libltdl-devel
+2. Install `xmlsec1` on every host that runs a Hue server. Make sure the user that runs Hue can execute it.
 
-Install xmlsec1 and xmlsec1-openssl on all hosts in the cluster:
+   ```bash
+   # RHEL/CentOS
+   yum install xmlsec1 xmlsec1-openssl
+   # Ubuntu/Debian
+   apt-get install xmlsec1 libxmlsec1-openssl
+   ```
 
-Important: Ensure that the xmlsec1 package is executable by the user, hue.
+3. Copy the metadata from your IdP's SAML server and save it as an XML file on every host with a Hue server. Read the documentation of your Identity Provider to find how to get this metadata. For example, with Shibboleth, open `https://<idp_host>:8443/idp/shibboleth`, copy the metadata content, and paste it into an `.xml` file.
 
-    ## RHEL/CentOS
-    yum install xmlsec1 xmlsec1-openssl
-    Note: If xmlsec libraries are not available, use the appropriate epel repository:
-    ## For RHEL/CentOS 7
-    wget http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-6.noarch.rpm
-    rpm -ivh epel-release-7-6.noarch.rpm
-    ## Ubuntu/Debian
-    apt-get install xmlsec1 libxmlsec1-openssl
-    ## SLES (get latest version)
-    wget http://www.aleksey.com/xmlsec/download/xmlsec1-1.2.24.tar.gz
-    tar -xvzf xmlsec1-1.2.24.tar.gz
-    cd xmlsec1-1.2.24
-    ./configure && make
-    make install
+   > **Note**: You might need to edit the copied metadata. For example, the IdP port number (8443) can be missing from its URL.
 
-Copy metadata from your IdP's SAML server and save it as an XML file on every host with a Hue server.
-For example, if your Identity Provider is Shibboleth, visit https://<idp_host>:8443/idp/shibboleth, copy the metadata content, and paste it into an .xml file.
+   ```bash
+   mkdir -pm 755 /path/to/saml/
+   cd /path/to/saml/
+   vim idp-<your idp provider>-metadata.xml
+   ```
 
-Note: You may have to edit the copied metadata; for example, the IdP's port number (8443) may be missing from its URL.
+4. Set `key_file` and `cert_file` (see the [SAML properties](#saml-properties)).
 
-    mkdir -pm 755 /opt/cloudera/security/saml/
-    cd /opt/cloudera/security/saml/
-    vim idp-<your idp provider>-metadata.xml
+   > **Warning**: Set the key and certificate files even if you do not encrypt assertions. Hue checks that these files exist and are valid, even when they are not needed. They cannot be empty files. This is a known issue.
 
-Add key_file and cert_file for encrypted assertions–see Table of SAML Parameters.
+   If necessary, create dummy files:
 
-Warning: Add key and cert files even if not encrypting assertions. Hue checks for the existence and validity of these files even if they are not needed! They cannot be empty files. This is a known issue.
+   ```bash
+   openssl genrsa -des3 -out dummy.key 2048
+   openssl rsa -inform PEM -outform PEM -in dummy.key -pubout -out dummy-nopass.pem
+   ```
 
-If necessary, create "valid" dummy files:
+5. Add the SAML settings to `hue.ini`. Example with OpenAM:
 
-    openssl genrsa -des3 -out dummy.key 2048
-    openssl rsa -inform PEM -outform PEM -in dummy.key -pubout -out dummy-nopass.pem
+   ```ini
+   [desktop]
+     redirect_whitelist="^\/.*$,^http:\/\/<saml_server_fqdn>:8080\/.*$"
+     [[auth]]
+       backend=libsaml.backend.SAML2Backend
 
-Configure Hue
+   [libsaml]
+     xmlsec_binary=/usr/bin/xmlsec1
+     metadata_file=/path/to/saml/idp-openam-metadata.xml
+     key_file=/path/to/saml/host.key
+     cert_file=/path/to/saml/host.pem
+     username_source=nameid
+     name_id_format="urn:oasis:names:tc:SAML:2.0:nameid-format:transient"
+     entity_id=<host base name>
+     logout_enabled=false
+   ```
 
-Currently, all hue.ini properties for SAML must be added to Hue Service safety-valve in Cloudera Manager.
-Log on to Cloudera Manager and go to Hue > Configuration.
+   > **Note**: On SLES, the `xmlsec1` binary can be in `/usr/local/bin/`. If so, set `xmlsec_binary=/usr/local/bin/xmlsec1` and add `/usr/local/lib/` to `LD_LIBRARY_PATH` for the Hue process.
 
-    ## Example Settings using Open AM:
-    [desktop]
-    redirect_whitelist="^\/.*$,^http:\/\/clr.sec.cloudera.com:8080\/.*$"
-    [[auth]]
-    backend=libsaml.backend.SAML2Backend
-    [libsaml]
-    xmlsec_binary=/usr/bin/xmlsec1
-    metadata_file=/opt/cloudera/security/saml/idp-openam-metadata.xml
-    key_file=/opt/cloudera/security/saml/host.key
-    cert_file=/opt/cloudera/security/saml/host.pem
-    username_source=nameid
-    name_id_format="urn:oasis:names:tc:SAML:2.0:nameid-format:transient"
-    entity_id=<host base name>
-    logout_enabled=false
+6. Restart Hue.
 
-Note: For SLES distributions, the xmlsec binary may be in /usr/local/bin/. If so:
+#### Integrate the IdP with Hue
 
-* Set Hue Service Advanced Configuration Snippet: xmlsec_binary=/usr/local/bin/xmlsec1
-* Set Hue Service Environment Advanced Configuration Snippet: LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/
+After you configure and restart Hue, send the metadata that Hue generates to your Identity Provider so that they can configure the SAML server.
 
-Integrate IdP SAML Server with Hue
+1. Make sure Hue is configured, restarted, and running.
+2. Open `http://<hue_fqdn>:<http_port>/saml2/metadata/` (port 8888 by default).
+3. Copy the metadata and send it to your Identity Provider.
+4. Make sure your Identity Provider configures the SAML server with the Hue metadata, just as you configured Hue with the SAML server metadata.
 
-After Hue is configured and restarted, copy the metadata generated by Hue server and send it to your Identity Provider so they can configure the SAML server.
+#### SAML properties
 
-Ensure Hue is configured, restarted, and running.
-Go to http://<hue_fqdn>:8889/saml2/metadata.
+The following properties go in the `[libsaml]` section unless stated otherwise.
 
-Copy the metadata and send it to your Identity Provider.
+| Property                  | Description                                                                                                                                         |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `authn_requests_signed`   | Boolean. When true, signs Hue-initiated authentication requests with an X.509 certificate.                                                           |
+| `backend`                 | In `[desktop]` > `[[auth]]`. Set to `libsaml.backend.SAML2Backend`.                                                                                  |
+| `base_url`                | URL that the SAML Identity Provider uses for responses. Typically used in load-balanced Hue environments.                                            |
+| `cert_file`               | Path to the X.509 certificate sent with the encrypted metadata. The file must be in PEM format.                                                      |
+| `create_users_on_login`   | Boolean. When true, creates users on successful login.                                                                                               |
+| `entity_id`               | Service provider ID. Accepts a pattern where `<base_url>` is replaced with the server URL base.                                                      |
+| `key_file`                | Path to the private key used to encrypt the metadata. The file must be in PEM format.                                                                |
+| `key_file_password`       | Password used to decrypt the X.509 certificate in memory. You can use `key_file_password_script` instead.                                           |
+| `logout_enabled`          | Boolean. When true, enables single logout.                                                                                                           |
+| `logout_requests_signed`  | Boolean. When true, signs Hue-initiated logout requests with an X.509 certificate.                                                                   |
+| `metadata_file`           | Path to the readable metadata XML file copied from the Identity Provider.                                                                            |
+| `name_id_format`          | Format of the NameID that Hue requests from the SAML server.                                                                                         |
+| `optional_attributes`     | Comma-separated list of optional attributes that Hue requests from the Identity Provider.                                                            |
+| `required_attributes`     | Comma-separated list of required attributes that Hue requests from the Identity Provider. For example, `uid` and `email`.                           |
+| `redirect_whitelist`      | In `[desktop]`. Comma-separated regular expressions of allowed redirect URLs, such as `^\/.*$,^https:\/\/<SAML_server_FQDN>\/.*$`.                   |
+| `user_attribute_mapping`  | Map of Identity Provider attributes to Hue Django user attributes. For example, `{'uid':'username', 'email':'email'}`.                              |
+| `username_source`         | Source of the username: `nameid` or `attributes`.                                                                                                    |
+| `xmlsec_binary`           | Path to the `xmlsec1` binary that signs, verifies, encrypts, and decrypts SAML requests and assertions. The Hue user must be able to execute it. To find the path, run `which xmlsec1`. |
 
-Ensure that your Identity Provider configures the SAML server with the Hue metadata (just as you configured the Hue server with SAML metadata).
+Notes:
 
-SAML Properties in hue.ini
+* `redirect_whitelist` protects Hue from redirecting to unapproved URLs. Set it so that Hue can redirect to your SAML server for authentication.
+* To encrypt communication between Hue and the Identity Provider, you need a private key and a certificate. Both files must be in PEM format.
+* If your certificate is password protected, set `key_file_password`. Hue uses it to decrypt the certificate in memory and passes it to `xmlsec1` through a named pipe. The decrypted certificate never touches the disk. This only works on POSIX-compatible platforms.
 
-Table of SAML Parameters
+#### Troubleshooting SAML
 
-SAML Parameter	Description
-    authn_requests_signed	Boolean, that when True, signs Hue-initiated authentication requests with X.509 certificate.
-    backend	Hard-coded value set to SAML backend library packaged with Hue (libsaml.backend.SAML2Backend).
-    base_url	URL that SAML Identity Provider uses for responses. Typically used in Load balanced Hue environments.
-    cert_file	Path to X.509 certificate sent with encrypted metadata. File format must be .PEM.
-    create_users_on_login	Boolean, that when True, creates users from OpenId, upon successful login.
-    entity_id	Service provider ID. Can also accept pattern where '<base_url>' is replaced with server URL base.
-    key_file	Path to private key used to encrypt metadata. File format must be .PEM.
-    key_file_password	Password used to decrypt the X.509 certificate in memory.
-    logout_enabled	Boolean, that when True, enables single logout.
-    logout_requests_signed	Boolean, that when True, signs Hue-initiated logout requests with an X.509 certificate.
-    metadata_file	Path to readable metadata XML file copied from Identity Provider.
-    name_id_format	Format of NameID that Hue requests from SAML server.
-    optional_attributes	Comma-separated list of optional attributes that Hue requests from Identity Provider.
-    required_attributes	Comma-separated list of required attributes that Hue requests from Identity Provider. For example, uid and email.
-    redirect_whitelist	Fully qualified domain name of SAML server: "^\/.*$,^https:\/\/<SAML_server_FQDN>\/.*$".
-    user_attribute_mapping	Map of Identity Provider attributes to Hue django user attributes. For example, {'uid':'username', 'email':'email'}.
-    username_source	Declares source of username as nameid or attributes.
-    xmlsec_binary	Path to xmlsec_binary that signs, verifies, encrypts/decrypts SAML requests and assertions. Must be executable by user, hue.
-    Description of some properties to be set in hue.ini (via Cloudera Manager):
-    redirect_whitelist [desktop]
+Enable `DEBUG` logging first.
 
-Set to the fully qualified domain name of the SAML server so that Hue can redirect to the SAML server for authentication.
+**SAML decrypt error**
 
-    [desktop]
-    redirect_whitelist=^\/.$,^https:\/\/<SAML_server_fully_qualified_domain_name>\/.$
-    Note: Hue uses redirect_whitelist to protect itself from redirecting to unapproved URLs.
-    backend [desktop]>[[auth]]
-    Point to the SAML backend (packaged with Hue):
-    backend=libsaml.backend.SAML2Backend
-    xmlsec_binary [libsaml]
-    Point to the xmlsec1 library path:
-    xmlsec_binary=/usr/bin/xmlsec1
-    Note: To find the path, run: which xmlsec1
-    metadata_file [libsaml]
-    Point to the path of the XML file you created from the IdP's metadata:
-    metadata_file=/path/to/<your_idp_metadata_file>.xml
-    key_file and cert_file [libsaml]
+This error means that your Identity Provider uses a slightly different SAML protocol than Hue expects:
 
-To encrypt communication between Hue and the Identity Provider, you need a private key and certificate. The private key signs requests sent to the Identity Provider and the certificate file encrypts and decrypts messages from the Identity Provider.
+```text
+Error: ('failed to decrypt', -1)
+```
 
-Copy these files from the Identity Provider and set key_file and cert_file to their respective paths. Both files are in PEM format and must be named with the .PEM extension.
+To resolve it:
 
-Note: The key and certificate files specified by the key_file and cert_file parameters in hue.ini must be .PEM files.
-Users with password-protected certificates can set the property, key_file_password in hue.ini. Hue uses the password to decrypt the SAML certificate in memory and passes it to xmlsec1 through a named pipe. The decrypted certificate never touches the disk. This only works for POSIX-compatible platforms.
+1. Download the `fix-xmlsec1.txt` script and rename it:
 
-Troubleshooting
+   ```bash
+   wget http://www.cloudera.com/documentation/other/shared/fix-xmlsec1.txt -O fix-xmlsec1.py
+   ```
 
-Remember to Enable DEBUG for logging.
+2. Make it executable:
 
-SAML SSL Error
+   ```bash
+   chmod 755 fix-xmlsec1.py
+   ```
 
-OpenSSL might fail in CDH 5.5.x and higher with this message:
+3. In `hue.ini`, set `xmlsec_binary=<path_to_script>/fix-xmlsec1.py`.
 
-    SSLError: [Errno bad handshake] [('SSL routines', 'SSL3_CHECK_CERT_AND_ALGORITHM', 'dh key too small')]
+The script fixes a known issue: `xmlsec1` is not compiled with `RetrievalMethod` and cannot find the encrypted key. SAML2 responses sometimes place `EncryptedKey` outside of the `EncryptedData` tree. The script moves `EncryptedKey` under `EncryptedData`.
 
-To resolve, append the following code to the file, /usr/java/<your_jdk_version>-cloudera/jre/lib/security/java.security:
+### SPNEGO
 
-    jdk.tls.disabledAlgorithms=MD5, RC4, DH
+SPNEGO is an authentication mechanism negotiation protocol. Depending on the negotiated mechanism, authentication can be delegated to an authentication server, such as a Kerberos KDC.
 
-SAML Decrypt Error
-
-The following error is an indication that you are using a slightly different SAML protocol from what Hue expects:
-
-    Error: ('failed to decrypt', -1)
-
-To resolve:
-
-Download and rename Python script, fix-xmlsec1.txt.
-
-    wget http://www.cloudera.com/documentation/other/shared/fix-xmlsec1.txt -O fix-xmlsec1.py
-
-Change permissions as appropriate, for example:
-
-    chmod 755 fix-xmlsec1.py
-
-In hue.ini, set xmlsec_binary=<path_to_script>/fix-xmlsec1.py.
-Run fix-xmlsec1.py.
-
-This script repairs the known issue whereby xmlsec1 is not compiled with RetrievalMethod and cannot find the location of the encrypted key. SAML2 responses would sometimes place EncryptedKey outside of the EncryptedData tree. This script moves EncryptedKey under EncryptedData.
-
-
-### Spnego
-
-SPNEGO is an authentication mechanism negotiation protocol. Authentication can be delegated to an authentication server, such as a Kerberos KDC, depending on the mechanism negotiated.
-
-    desktop.auth.backend.SpnegoDjangoBackend
+```ini
+[desktop]
+  [[auth]]
+    backend=desktop.auth.backend.SpnegoDjangoBackend
+```
 
 ### PAM
 
-Authenticates users with PAM (pluggable authentication module). The authentication mode depends on the PAM module used.
+This backend authenticates users with PAM (pluggable authentication modules). The authentication mode depends on the PAM module you use.
 
-    desktop.auth.backend.PamBackend
+```ini
+[desktop]
+  [[auth]]
+    backend=desktop.auth.backend.PamBackend
+```
 
-### OAuth Connect
+### OAuth
 
-Delegates authentication to a third-party OAuth server.
+This backend delegates authentication to a third-party OAuth server.
 
-    desktop.auth.backend.OAuthBackend
+```ini
+[desktop]
+  [[auth]]
+    backend=desktop.auth.backend.OAuthBackend
+```
 
-### Multiple Authentication Backends
+### Multiple authentication backends
 
-For example, to enable Hue to first attempt LDAP directory lookup before falling back to the database-backed user model, we can update the hue.ini configuration file or Hue safety valve in Cloudera Manager with a list containing first the LdapBackend followed by either the ModelBackend or custom AllowFirstUserDjangoBackend (permits first login and relies on user model for all subsequent authentication):
+You can list several backends. Hue tries them in order.
 
-    [desktop]
-      [[auth]]
-      backend=desktop.auth.backend.LdapBackend,desktop.auth.backend.AllowFirstUserDjangoBackend
+For example, to try an LDAP lookup first and fall back to the database-backed user model, list `LdapBackend` first and `AllowFirstUserDjangoBackend` second:
 
-This tells Hue to first check against the configured LDAP directory service, and if the username is not found in the directory, then attempt to authenticate the user with the Django user manager.
+```ini
+[desktop]
+  [[auth]]
+    backend=desktop.auth.backend.LdapBackend,desktop.auth.backend.AllowFirstUserDjangoBackend
+```
+
+Hue first checks the configured LDAP directory. If it does not find the username there, it authenticates the user with the Django user manager.
 
 [Read more about it here](http://gethue.com/configuring-hue-multiple-authentication-backends-and-ldap/).
 
 ## Security
 
-### Configure a Proxy
+### Configure a proxy
 
-We explained how to run Hue with NGINX serving the static files or under Apache. If you use another proxy, you might need to set these options:
+If you run Hue behind a proxy other than NGINX or Apache, you might need to set these options:
 
-<pre>
-  [desktop]
+```ini
+[desktop]
   # Enable X-Forwarded-Host header if the load balancer requires it.
   use_x_forwarded_host=false
 
   # Support for HTTPS termination at the load-balancer level with SECURE_PROXY_SSL_HEADER.
   secure_proxy_ssl_header=false
-</pre>
+```
 
-### Configuring SSL
+### Configure SSL
 
 You can configure Hue to serve over HTTPS.
 
-1. Configure Hue to use your private key by adding the following
-options to the `hue.ini` configuration file:
+1. Point Hue to your private key and certificate in `hue.ini`:
 
-    ssl_certificate=/path/to/certificate
-    ssl_private_key=/path/to/key
+   ```ini
+   [desktop]
+     ssl_certificate=/path/to/certificate
+     ssl_private_key=/path/to/key
+   ```
 
-2. Ideally, you would have an appropriate key signed by a Certificate Authority.
-If you're just testing, you can create a self-signed key using the `openssl`
-command that may be installed on your system:
+2. Use a key signed by a Certificate Authority. For testing only, you can create a self-signed certificate with `openssl`:
 
-Create a key:
+   ```bash
+   # Create a key
+   openssl genrsa 2048 > host.key
 
-    openssl genrsa 1024 > host.key
+   # Create a self-signed certificate
+   openssl req -new -x509 -nodes -sha256 -key host.key > host.cert
+   ```
 
-Create a self-signed certificate:
+> **Note**: To upload files with the File Browser over HTTPS, you need a proper SSL certificate. Self-signed certificates do not work.
 
-    openssl req -new -x509 -nodes -sha1 -key host.key > host.cert
-
-
-<div class="note">
-Self-signed Certificates and File Uploads
-
-To upload files using the Hue File Browser over HTTPS requires
-using a proper SSL Certificate.  Self-signed certificates don't
-work.
-</div>
-
-Note: The security vulnerability SWEET32 is also called Birthday attacks against TLS ciphers with 64bit block size and it is assigned CVE-2016-2183. This is due to legacy block ciphers
-having block size of 64 bits are vulnerable to a practical collision attack when used in CBC mode.
-
-DES/3DES are the only ciphers has block size of 64-bit. One way to config Hue not to use them:
-
-    [desktop]
-    ssl_cipher_list=DEFAULT:!DES:!3DES
+> **Note**: The SWEET32 vulnerability (CVE-2016-2183) affects legacy block ciphers with a 64-bit block size, used in CBC mode. DES and 3DES are the only ciphers with a 64-bit block size. To stop Hue from using them:
+>
+> ```ini
+> [desktop]
+>   ssl_cipher_list=DEFAULT:!DES:!3DES
+> ```
 
 ### SASL
 
-When getting a bigger result set from Hive/Impala or bigger files like images from HBase, the response requires to increase
-the buffer size of SASL lib for thrift sasl communication.
+Large result sets from Hive or Impala, or large files such as images from HBase, can require a bigger SASL buffer for Thrift SASL communication.
 
-<pre>
-  [desktop]
-  # This property specifies the maximum size of the receive buffer in bytes in thrift sasl communication,
-  # default value is 2097152 (2 MB), which equals to (2 * 1024 * 1024)
+```ini
+[desktop]
+  # Maximum size of the receive buffer in bytes in Thrift SASL communication.
+  # Default is 2097152 (2 MB), which equals 2 * 1024 * 1024.
   sasl_max_buffer=2097152
-</pre>
+```
 
-### Storing passwords in file script
+### Store passwords in a script
 
-Hue lets you secure passwords in one consolidated script, or multiple individual scripts. Hue runs each password script at startup and extracts passwords from stdout.
+Hue can read passwords from one consolidated script or from several individual scripts. Hue runs each password script at startup and reads the password from its standard output.
 
-Store scripts in a directory that only Hue can read, write, and execute. You can choose password script names but you cannot change hue.ini property names to which you assign those scripts.
+Store the scripts in a directory that only the Hue user can read, write, and execute. You can choose the script names, but you cannot change the `hue.ini` property names that you assign them to.
 
-At the command line, create one or more password scripts. For example, create a consolidated script named `my_passwords_script.sh`:
+For example, create a consolidated script named `password_script.sh`:
 
-    #!/bin/bash
+```bash
+#!/bin/bash
 
-    SERVICE=$1
+SERVICE=$1
 
-    if [[ ${SERVICE} == "ldap_password" ]]
-    then
-    echo "your_ldap_password"
-    fi
+if [[ ${SERVICE} == "ssl_password" ]]
+then
+  echo "your_ssl_password"
+fi
 
-    if [[ ${SERVICE} == "ssl_password" ]]
-    then
-    echo "your_ssl_password"
-    fi
+if [[ ${SERVICE} == "bind_password" ]]
+then
+  echo "your_bind_password"
+fi
 
-    if [[ ${SERVICE} == "bind_password" ]]
-    then
-    echo "your_bind_password"
-    fi
+if [[ ${SERVICE} == "db_password" ]]
+then
+  echo "your_database_password"
+fi
+```
 
-    if [[ ${SERVICE} == "db_password" ]]
-    then
-    echo "your_database_password"
-    fi
+Then reference it in `hue.ini`:
 
-Add script properties, for example:
+```ini
+[desktop]
+  ssl_password_script="/var/lib/hue/password_script.sh ssl_password"
 
-    [desktop]
-    ldap_username=hueservice
-    ldap_password_script="/var/lib/hue/password_script.sh ldap_password"
-    ssl_password_script="/var/lib/hue/password_script.sh ssl_password"
-
-    [[ldap]]
+  [[ldap]]
     bind_password_script="/var/lib/hue/password_script.sh bind_password"
 
-    [[database]]
-    db_password_script="/var/lib/hue/password_script.sh db_password"
+  [[database]]
+    password_script="/var/lib/hue/password_script.sh db_password"
+```
 
+### Login and session settings
 
-### Idle session timeout
+These properties are in the `[[auth]]` section:
 
-Hue now offers a new property, idle_session_timeout, that can be configured in the hue.ini file:
+```ini
+[desktop]
+  [[auth]]
+    # Users expire after n seconds without logging in. A negative number means users never expire.
+    expires_after=-1
 
-    [desktop]
-    [[auth]]
-    idle_session_timeout=600
+    # Apply 'expires_after' to superusers.
+    expire_superusers=true
 
-When idle_session_timeout is set, users will automatically be logged out after N (e.g. – 600) seconds of inactivity and be prompted to login again:
+    # Log users out after n seconds of inactivity. A negative number means idle sessions never time out.
+    idle_session_timeout=-1
+
+    # Force users to change their password on first login with desktop.auth.backend.AllowFirstUserDjangoBackend.
+    change_default_password=false
+
+    # Number of login attempts allowed before a record is created for failed logins.
+    login_failure_limit=3
+
+    # Lock out an IP (and optionally a user agent) after the allowed login attempts are exceeded.
+    login_lock_out_at_failure=false
+
+    # Period of inactivity, in hours, after which failed logins are forgotten.
+    # A value of 0 or None disables this check.
+    login_cooloff_time=None
+
+    # Lock out based on an IP address AND a user agent. Requests from different user agents
+    # but from the same IP are then treated differently.
+    login_lock_out_use_user_agent=false
+
+    # Lock out based on a combination of user and IP.
+    login_lock_out_by_combination_user_and_ip=false
+```
+
+When `idle_session_timeout` is set (for example, `idle_session_timeout=600`), users are logged out after that many seconds of inactivity and are prompted to log in again.
 
 [Read more about it here](http://gethue.com/introducing-the-new-login-modal-and-idle-session-timeout/).
 
-### Login
+### Concurrent user session limit
 
-In the section:
+You can limit the number of concurrent sessions per user. A value of `1` allows one browser session per user. The default is `0` (unlimited).
 
-    [desktop]
-    [[auth]]
-
-Users will expire after they have not logged in for 'n' amount of seconds. A negative number means that users will never expire.
-
-    expires_after=-1
-
-Apply 'expires_after' to superusers.
-
-    expire_superusers=true
-
-Users will automatically be logged out after 'n' seconds of inactivity. A negative number means that idle sessions will not be timed out.
-
-    idle_session_timeout=-1
-
-Force users to change password on first login with desktop.auth.backend.AllowFirstUserDjangoBackend
-
-    change_default_password=false
-
-Number of login attempts allowed before a record is created for failed logins
-
-    login_failure_limit=3
-
-After number of allowed login attempts are exceeded, do we lock out this IP and optionally user agent?
-
-    login_lock_out_at_failure=false
-
-If set, defines period of inactivity in hours after which failed logins will be forgotten. A value of 0 or None will disable this check. Default: None
-
-    login_cooloff_time=None
-
-If True, lock out based on an IP address AND a user agent. This means requests from different user agents but from the same IP are treated differently.
-
-    login_lock_out_use_user_agent=false
-
-If True, lock out based on IP and user
-
-    login_lock_out_by_combination_user_and_ip=false
-
-### Auditing
-
-Read more about [Auditing User Administration Operations with Hue and Cloudera Navigator](http://gethue.com/auditing-user-administration-operations-with-hue-and-cloudera-navigator-2/).
-
-### Concurrent User Session Limit
-
-If set, limits the number of concurrent user sessions. 1 represents 1 browser session per user. Default: 0 (unlimited sessions per user)
-
-    [desktop]
-    [[session]]
+```ini
+[desktop]
+  [[session]]
     concurrent_user_session_limit=0
+```
 
 [Read more about it here](http://gethue.com/restrict-number-of-concurrent-sessions-per-user/).
 
 ## Query execution timeouts
 
-i.e. if the SQL query takes more than 30 seconds, it might timeout without it:
+A long SQL query can time out in a proxy with an error like this:
 
-    504 Gateway Time-out 504 Gateway Time-out nginx/1.17.10
+```text
+504 Gateway Time-out nginx/1.17.10
+```
 
-One solution is to  execute long blocking or resource intensive operations in tasks outside of the server. This is particularly useful for querying databases other than Hive or Impala that uses the SqlAlchemy interface which is blocking until the query actually finishes.
+One solution is to run long, blocking, or resource-intensive operations in tasks outside of the server. This is particularly useful for databases other than Hive or Impala that use the SQLAlchemy interface, which blocks until the query finishes.
 
-Read more in the [Task Server section](/administrator/administration/reference/#task-server) of the Reference Guide.
+Read more in the [Task Server section](/administrator/administration/reference/#task-server) of the reference guide.
 
-An alternative is to increase the NGINX timeouts from 30s to more minutes:
+Another solution is to increase the NGINX timeouts from 30 seconds to several minutes. For example, with the Kubernetes NGINX ingress:
 
-    nginx.ingress.kubernetes.io/proxy-connect-timeout: '900'
-    nginx.ingress.kubernetes.io/proxy-read-timeout: '900'
-    nginx.ingress.kubernetes.io/proxy-send-timeout: '900'
+```yaml
+nginx.ingress.kubernetes.io/proxy-connect-timeout: '900'
+nginx.ingress.kubernetes.io/proxy-read-timeout: '900'
+nginx.ingress.kubernetes.io/proxy-send-timeout: '900'
+```
 
 ## Customization
 
 ### Language
 
-The user language is auto-detected and can also be manually overriden as a [per user basis](/user/concept/#changing-the-language).
+Hue detects the user language automatically. Users can also override it on a [per-user basis](/user/concept/#changing-the-language).
 
-If text strings are not all translated from English, feel free to improve the `django.po` files of the corresponding language and [recompile them](/developer/development/#internationalization). Those translation mappings are located across the project in [locale](https://github.com/cloudera/hue/tree/master/desktop/core/src/desktop/locale) directories.
+If some text strings are not translated from English, you can improve the `django.po` files of the language and [recompile them](/developer/development/#internationalization). The translation files are in the [locale](https://github.com/cloudera/hue/tree/master/desktop/core/src/desktop/locale) directories.
 
 ### Maps look and feel
 
-The properties we need to tweak are leaflet_tile_layer and leaflet_tile_layer_attribution, that can be configured in the hue.ini file:
+Change the `leaflet_tile_layer` and `leaflet_tile_layer_attribution` properties:
 
-    [desktop]
-    leaflet_tile_layer=https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}
-    leaflet_tile_layer_attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+```ini
+[desktop]
+  leaflet_tile_layer=https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}
+  leaflet_tile_layer_attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+```
 
 [Read more about it here](http://gethue.com/change-your-maps-look-and-feel/).
 
 ### Banner
-You can add a custom banner to the Hue Web UI by applying HTML directly to the property, banner_top_html. For example:
 
+Add a custom banner to the Hue web UI by setting HTML in `banner_top_html`:
+
+```ini
+[desktop]
+  [[custom]]
     banner_top_html=<H4>My company's custom Hue Web UI banner</H4>
+```
 
-### Splash Screen
-You can customize a splash screen on the login page by applying HTML directly to the property, login_splash_html. For example:
+### Splash screen
 
-    [desktop]
-    [[custom]]
+Add a splash screen to the login page by setting HTML in `login_splash_html`:
+
+```ini
+[desktop]
+  [[custom]]
     login_splash_html=WARNING: You are required to have authorization before you proceed.
+```
 
-### Custom Logo
+### Custom logo
 
-There is also the possibility to change the logo for further personalization.
+Replace the logo with your own SVG code in `logo_svg`. The SVG replaces the default logo in the top bar and on the sign-in screen. Design it to fit in a 160×40 pixel space.
 
-    [desktop]
-    [[custom]]
-    # SVG code to replace the default Hue logo in the top bar and sign in screen
+```ini
+[desktop]
+  [[custom]]
     # e.g. <image xlink:href="/static/desktop/art/hue-logo-mini-white.png" x="0" y="0" height="40" width="160" />
     logo_svg=
+```
 
-You can go crazy and write there any SVG code you want. Please keep in mind your SVG should be designed to fit in a 160×40 pixels space. To have the same ‘hearts logo' you can see above, you can type this code
+For example, this code shows a logo made of three hearts:
 
-    [desktop]
-    [[custom]]
+```ini
+[desktop]
+  [[custom]]
     logo_svg='<g><path stroke="null" id="svg_1" d="m44.41215,11.43463c-4.05017,-10.71473 -17.19753,-5.90773 -18.41353,-0.5567c-1.672,-5.70253 -14.497,-9.95663 -18.411,0.5643c-4.35797,11.71793 16.891,22.23443 18.41163,23.95773c1.5181,-1.36927 22.7696,-12.43803 18.4129,-23.96533z" fill="#ffffff"/> <path stroke="null" id="svg_2" d="m98.41246,10.43463c-4.05016,-10.71473 -17.19753,-5.90773 -18.41353,-0.5567c-1.672,-5.70253 -14.497,-9.95663 -18.411,0.5643c-4.35796,11.71793 16.891,22.23443 18.41164,23.95773c1.5181,-1.36927 22.76959,-12.43803 18.41289,-23.96533z" fill="#FF5A79"/> <path stroke="null" id="svg_3" d="m154.41215,11.43463c-4.05016,-10.71473 -17.19753,-5.90773 -18.41353,-0.5567c-1.672,-5.70253 -14.497,-9.95663 -18.411,0.5643c-4.35796,11.71793 16.891,22.23443 18.41164,23.95773c1.5181,-1.36927 22.76959,-12.43803 18.41289,-23.96533z" fill="#ffffff"/> </g>'
+```
 
-Read more about it in [Hue with a custom logo](http://gethue.com/hue-with-a-custom-logo/) post.
+[Read more about it here](http://gethue.com/hue-with-a-custom-logo/).
 
-## Source Version Control
+## Source version control
 
-By default Hue stores the [saved documents](/user/concept/#documents) in its database. This features aims at pointing to any source versioning systems like GitHub, BitBucket... to open and save queries.
+By default, Hue stores [saved documents](/user/concept/#documents) in its database. You can point Hue to a source version control system such as GitHub or Bitbucket to open and save queries.
 
-**Note** This feature is experimental and tracked in [HUE-951](https://issues.cloudera.org/browse/HUE-951).
+> **Note**: This feature is experimental.
 
-    [desktop]
+```ini
+[desktop]
+  [[vcs]]
+    [[[git-read-only]]]
+      # Base URL to the remote server
+      remote_url=https://github.com/cloudera/hue/tree/master
 
-    [[vcs]]
+      # Base URL to the version control API
+      api_url=https://api.github.com
 
-    ## [[[git-read-only]]]
-    ## Base URL to Remote Server
-    # remote_url=https://github.com/cloudera/hue/tree/master
+    [[[github]]]
+      remote_url=https://github.com/cloudera/hue/tree/master
+      api_url=https://api.github.com
 
-    ## Base URL to Version Control API
-    # api_url=https://api.github.com
+      # Required to write back to the repository.
+      # Client ID for the authorized application
+      client_id=
+      # Client secret for the authorized application
+      client_secret=
 
-    ## [[[github]]]
-    ## Base URL to Remote Server
-    # remote_url=https://github.com/cloudera/hue/tree/master
+    [[[svn]]]
+      remote_url=https://github.com/cloudera/hue/tree/master
+      api_url=https://api.github.com
 
-    ## Base URL to Version Control API
-    # api_url=https://api.github.com
-
-    # These will be necessary when you want to write back to the repository.
-    ## Client ID for Authorized Application
-    # client_id=
-
-    ## Client Secret for Authorized Application
-    # client_secret=
-
-    ## [[[svn]]
-    ## Base URL to Remote Server
-    # remote_url=https://github.com/cloudera/hue/tree/master
-
-    ## Base URL to Version Control API
-    # api_url=https://api.github.com
-
-    # These will be necessary when you want to write back to the repository.
-    ## Client ID for Authorized Application
-    # client_id=
-
-    ## Client Secret for Authorized Application
-    # client_secret=
+      # Required to write back to the repository.
+      client_id=
+      client_secret=
+```
 
 ## Slack
-Currently in **Beta**
 
-This [integration](/user/concept/#slack) with Hue helps users by assisting them with their SQL queries and have better collaboration/discussion with other users via Slack.
+Currently in **beta**.
 
-### Architectural View
+This [integration](/user/concept/#slack) helps users with their SQL queries and lets them collaborate and discuss with other users via Slack.
+
+### Architecture
+
 ![Share to Slack Architecture](https://cdn.gethue.com/uploads/2021/04/share_to_slack_architecture.png)
 
-One of the flows for sharing query/gist links, the main bot logic lies on top of the Hue server listening to the events posted by the Hue App from Slack to an endpoint, processing those events such as generating a rich preview to unfurl for the links shared in the Slack channels and using Slack API methods for sending these responses back to Slack.
+One flow shares query and gist links. The bot logic runs on top of the Hue server. It listens to the events that the Slack Hue app posts to an endpoint. It processes them, for example by generating a rich preview that unfurls the links shared in Slack channels. It then sends the responses back to Slack with the Slack API.
 
-The 'Smart Query Assistance' block on top of Hue server which drives the other flow for SQL Assistance is currently a work in progress for replying to users asking questions on how to find certain data tables or to query them.
+The Smart Query Assistance block on top of the Hue server drives the other flow, SQL assistance. It is a work in progress. It is meant to answer users who ask how to find certain data tables or query them.
 
-### Improved Slack App Installation
-Steps to be followed by the **Slack workspace admin** to set up their own Hue Slack app. The app needs to be created only once, other Hue users can simply [interact](/user/concept/#slack) with the App in the Slack channels!
+### Easier Slack app installation
 
-- Go to https://gethue.com/ and in the last section, give your **Hue instance hostname** _(e.g. hue.gethue.com:8000)_.
-- Choose the Slack workspace where you want to install the app and click **Next**.
-- You can review the configuration and simply click **Create**.
-- Once the app is created, install it in the workspace and plug-it with Hue by following this [last step](/administrator/configuration/server/#updating-your-hueini-config-file).
+The **Slack workspace admin** follows these steps to set up a Hue Slack app. You create the app only once. Other Hue users can then [interact](/user/concept/#slack) with the app in Slack channels.
+
+1. Go to https://gethue.com/ and, in the last section, enter your **Hue instance hostname** (for example, `hue.gethue.com:8000`).
+2. Choose the Slack workspace where you want to install the app and click **Next**.
+3. Review the configuration and click **Create**.
+4. Install the app in the workspace and connect it to Hue with the [last step of the manual installation](#update-your-hueini-file).
 
 ![Easier Installation GIF](https://cdn.gethue.com/uploads/2021/06/easier_installation_slack.gif)
 
-### Manual Slack App Installation
+### Manual Slack app installation
 
-#### App Manifest (YAML)
-The latest version of the manifest file is checked-in [here](https://github.com/cloudera/hue/blob/master/tools/slack/manifest.yml).
+#### App manifest (YAML)
 
-#### Changes needed in the YAML Manifest
-Update the two _demo.gethue.com_ with **your Hue instance hostname:**
-- Under **unfurl_domains**
-- Under **event_subscriptions**, in **request_url** `https://<hue-instance-hostname>/desktop/slack/events/`
+The latest manifest file is checked in [here](https://github.com/cloudera/hue/blob/master/tools/slack/manifest.yml).
 
-#### Creating your app
+#### Changes needed in the manifest
+
+Replace the two `demo.gethue.com` values with **your Hue instance hostname**:
+
+* Under `unfurl_domains`.
+* Under `event_subscriptions`, in `request_url`: `https://<hue-instance-hostname>/desktop/slack/events/`.
+
+#### Create your app
+
 1. Go to https://api.slack.com/apps and click **Create New App**.
-2. Choose **From an app manifest** option and workspace where you want to install the app and click **Next**.
-3. Choose **YAML** and paste the Manifest code (make sure you do the necessary changes mentioned above) and click **Next**.
-4. Read the review summary and if everything’s correct, click **Create**.
-5. Once the app is created, install it in the workspace.
+2. Choose **From an app manifest**, select the workspace where you want to install the app, and click **Next**.
+3. Choose **YAML**, paste the manifest (with the changes above), and click **Next**.
+4. Read the review summary. If everything is correct, click **Create**.
+5. Install the app in the workspace.
 
-#### Updating your hue.ini config file
-6. Go to the **OAuth & Permissions** page, copy the **Bot User OAuth Token** and update **slack_bot_user_token** (e.g. _xoxb-xxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxx_).
-7. Similarly, go to the **Basic Information** page, copy the **Verification Token** and update **slack_verification_token**.
-8. Paste this in your hue.ini file under `[desktop]` section.
+#### Update your hue.ini file
 
-        [[slack]]
-        is_enabled=true
-        slack_verification_token=<your-slack-verification-token>
-        slack_bot_user_token=<your-slack-bot-user-token>
+1. Go to the **OAuth & Permissions** page and copy the **Bot User OAuth Token** (for example, `xoxb-xxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxx`).
+2. Go to the **Basic Information** page and copy the **Verification Token**.
+3. Add both to the `[desktop]` section of your `hue.ini` file:
 
-Now add the Slack app in your desired channels and send some [query/gist links](/user/concept/#slack).
+```ini
+[desktop]
+  [[slack]]
+    is_enabled=true
+    slack_verification_token=<your-slack-verification-token>
+    slack_bot_user_token=<your-slack-bot-user-token>
+```
+
+Now add the Slack app to your channels and send some [query or gist links](/user/concept/#slack).

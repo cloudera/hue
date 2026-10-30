@@ -16,60 +16,54 @@
 
 </div>
 
-## 🗄️ Overview
+## Overview
 
-Hue is a mature SQL Assistant for querying Databases & Data Warehouses, trusted by:
+Hue is an open-source SQL Assistant for querying databases and data warehouses. Use it to explore your data, write SQL with autocomplete, and share the results.
 
-* **1000+ customers** worldwide
-* **Top Fortune 500** enterprises 
+### Key features
 
-Organizations use Hue to quickly answer questions via self-service querying, executing hundreds of thousands of queries daily.
+- **Interactive SQL editor** with syntax highlighting and autocomplete.
+- **File Browser** to navigate and operate on HDFS, S3, ABFS, Ozone, and Google Storage (GS) files.
+- **Job Browser** to monitor and manage Hive queries, Impala queries, YARN applications, and Livy Spark jobs.
+- **Table Browser** to explore and manage database tables, schemas, and metadata.
+- **Table Importer** to create Hive and Impala tables from CSV and Excel files, uploaded from your computer or imported from a remote file system (HDFS, S3, ABFS, Ozone, GS).
+- **Multiple database connectors**, including Hive, Impala, MySQL, and PostgreSQL.
 
-### Key Features
+## Useful links
 
-- ✏️ **Interactive SQL editing** with syntax highlighting and autocomplete
-- 📁 **File Browser** for navigating and operating on HDFS, S3, ABFS, Ozone, and Google Storage (GS) files
-- 📊 **Job Browser** for monitoring and managing Hive queries, Impala queries, YARN applications, and Livy Spark jobs
-- 🗃️ **Table Browser** for exploring and managing database tables, schemas, and metadata
-- 📤 **Table Importer** for creating Hive and Impala tables from CSV/Excel files, with support for uploading from local system or importing from remote filesystems (HDFS, S3, ABFS, Ozone, GS)
-- 🔗 **Multiple database connectors** including Hive, Impala, MySQL, PostgreSQL, and more
-
-## 🔗 Useful Links
-
-- 🏠 **Website**: [gethue.com](https://gethue.com)
-- 🔌 **Connect to a database**: [Configuration Guide](https://docs.gethue.com/administrator/configuration/connectors/)
-- 🛠️ **Build your own Editor**: [SQL Scratchpad](https://docs.gethue.com/developer/components/scratchpad/)
-- ⚙️ **Query Service**: [Kubernetes Setup](https://docs.gethue.com/administrator/installation/cloud/#kubernetes) and [API](https://docs.gethue.com/developer/api/)
+- **Website**: [gethue.com](https://gethue.com)
+- **Documentation**: [docs.gethue.com](https://docs.gethue.com)
+- **Connect to a database**: [Connectors](https://docs.gethue.com/administrator/configuration/connectors/)
+- **Build your own editor**: [SQL Scratchpad](https://docs.gethue.com/developer/components/scratchpad/)
+- **Query service**: [Kubernetes setup](https://docs.gethue.com/administrator/installation/cloud/#kubernetes) and [API](https://docs.gethue.com/developer/api/)
 
 ![Hue Editor](https://cdn.gethue.com/uploads/2021/02/hue-4.9.png)
 
-## 🚀 Getting Started
+## Get started
 
-### Try Hue Now
-
-- 🌐 **Live demo**: [demo.gethue.com](https://demo.gethue.com/)
-- 🧪 **Quick integrations**:
+- **Live demo**: [demo.gethue.com](https://demo.gethue.com/)
+- **Quick integrations**:
   - [Hive](https://docs.gethue.com/administrator/configuration/connectors/#apache-hive)
   - [Impala](https://gethue.com/blog/quickstart-sql-editor-for-apache-impala/)
-  - [Trino/Presto](https://docs.gethue.com/administrator/configuration/connectors/#trino-presto)
+  - [Trino/Presto](https://docs.gethue.com/administrator/configuration/connectors/#trino)
   - [Phoenix SQL / HBase](https://gethue.com/blog/querying-live-kafka-data-in-apache-hbase-with-phoenix/)
   - [Spark SQL](https://gethue.com/blog/querying-spark-sql-with-spark-thrift-server-and-hue-editor/)
 
-Choose one of these deployment options to start the server, then [configure the databases](https://docs.gethue.com/administrator/configuration/connectors/) you want to query:
+Choose a deployment option to start the server. Then [configure the databases](https://docs.gethue.com/administrator/configuration/connectors/) you want to query.
 
-### 🐳 Docker
+### Docker
 
-Start Hue instantly:
+Start Hue:
 
 ```bash
 docker run -it -p 8888:8888 gethue/hue:latest
 ```
 
-Hue will be available at [http://localhost:8888](http://localhost:8888)
+Open [http://localhost:8888](http://localhost:8888). The first user to log in becomes the superuser.
 
-📖 See the [Docker Guide](https://github.com/cloudera/hue/tree/master/tools/docker/hue) or watch the [Quick Start Video](http://gethue.com/getting-started-with-hue-in-2-minutes-with-docker/)
+> **Note:** The image uses an embedded SQLite database by default. Connect Hue to MySQL or PostgreSQL before real use. See the [Docker guide](tools/docker/hue/README.md).
 
-### ☸️ Kubernetes
+### Kubernetes
 
 ```bash
 helm repo add gethue https://helm.gethue.com
@@ -77,44 +71,44 @@ helm repo update
 helm install hue gethue/hue
 ```
 
-📖 Read more about configurations in the [Kubernetes docs](tools/kubernetes/)
+See the [Kubernetes guide](tools/kubernetes/README.md) and the [Hue Helm chart](tools/kubernetes/helm/hue/README.md) for the configuration options.
 
-### 💻 Development Setup
+### Build from source
 
-#### Quick Start with Docker
+Hue requires Python 3.11 and Node.js 22.13 or later.
 
-Use the [Dev Environment Docker](https://docs.gethue.com/developer/development/#dev-docker) for the fastest setup.
+1. Install the [dependencies](https://docs.gethue.com/administrator/installation/dependencies/) for your operating system.
+2. Clone the repository and build Hue:
 
-#### Manual Setup
+   ```bash
+   git clone https://github.com/cloudera/hue.git
+   cd hue
+   export PYTHON_VER=python3.11
+   make apps
+   ```
 
-1. Install [dependencies](https://docs.gethue.com/administrator/installation/dependencies/)
-2. Clone and build:
+3. Start the development server:
 
-```bash
-git clone https://github.com/cloudera/hue.git
-cd hue
-make apps
-build/env/bin/hue runserver
-```
+   ```bash
+   build/env/bin/hue runserver
+   ```
 
-Hue will be available at [http://localhost:8000](http://localhost:8000)
+Open [http://localhost:8000](http://localhost:8000).
 
-📖 Read more in the [development documentation](https://docs.gethue.com/developer/development/)
+For a development environment in Docker, see [Dev Docker](https://docs.gethue.com/developer/development/#dev-docker). For more details, see the [development documentation](https://docs.gethue.com/developer/development/).
 
-## 🧩 Components
+## Components
 
-Hue offers several powerful components:
+- **SQL Editor**: interactive query interface.
+- **SQL Parsers**: syntax handling for multiple dialects.
+- **REST and Python APIs**: programmatic access to Hue.
 
-- **SQL Editor** - Interactive query interface
-- **SQL Parsers** - Syntax handling for multiple dialects
-- **REST/Python/CLI APIs** - Programmatic access to all functionality
+Learn more about the [components](https://docs.gethue.com/developer/components/) and the [APIs](https://docs.gethue.com/developer/api/).
 
-📖 Learn about [components](https://docs.gethue.com/developer/components/) and [APIs](https://docs.gethue.com/developer/api/)
+## Contributing
 
-## 🤝 Contributing
+Contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) to get started.
 
-We welcome contributions! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) guide to get started.
-
-## 📜 License
+## License
 
 [Apache License, Version 2.0](LICENSE.txt)

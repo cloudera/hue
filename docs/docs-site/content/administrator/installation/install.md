@@ -5,16 +5,52 @@ draft: false
 weight: 2
 ---
 
-Start from a [release](/releases/) tarball or [building](https://github.com/cloudera/hue#getting-started) the project yourself.
+Build Hue from a clone of the [repository](https://github.com/cloudera/hue) and install it on your server.
 
-Make sure you have the [dependencies](/administrator/installation/dependencies/) for your operating system.
+## Prerequisites
 
-Then configure `$PREFIX` with the path where you want to install Hue by running:
+* The [dependencies](/administrator/installation/dependencies/) for your operating system: Python 3.11 and Node.js 22.13 or later.
+* A user to run Hue. Run Hue as a non-root user.
 
-    PREFIX=/usr/share make install
-    cd /usr/share/hue
+## Install Hue
 
-You can install Hue anywhere on your system, and run Hue as a non-root user.
+1. Set the build variables:
 
-It is a good practice to create a new user for Hue and either install Hue in
-that user's home directory, or in a directory within `/usr/share`.
+   ```bash
+   export PYTHON_VER=python3.11
+   ```
+
+2. Set `PREFIX` to the directory that will contain the `hue` directory, then install:
+
+   ```bash
+   PREFIX=$HOME make install
+   cd $HOME/hue
+   ```
+
+   Hue is installed in `$PREFIX/hue`. If you do not set `PREFIX`, it defaults to `/usr/local`, which usually requires root. To install in a shared location such as `/usr/share`, run the command with `sudo` and give the Hue user ownership of the `hue` directory.
+
+You can install Hue anywhere on your system. Install it in a directory within `/usr/share` or in the home directory of the user that runs Hue.
+
+## Build a tarball
+
+To build a tarball for production, run `make prod` in the Hue directory:
+
+```bash
+make prod
+```
+
+The tarball is created in `build/release/prod/`.
+
+## Start Hue
+
+After the installation, start Hue from the installation directory:
+
+```bash
+build/env/bin/supervisor
+```
+
+The supervisor starts the Hue processes. Open `http://<server>:8888/`. The first user who logs in becomes the superuser.
+
+> **Note:** Hue uses an embedded SQLite database by default. [Configure another database](/administrator/administration/database/) before real use.
+
+Next, [configure the server](/administrator/configuration/) and point it to the external services to query.

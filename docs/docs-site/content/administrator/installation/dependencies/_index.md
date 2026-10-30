@@ -5,331 +5,226 @@ draft: false
 weight: -1
 ---
 
-You will need Python, some OS packages, a Database and Node.js.
+You need Python, some OS packages, a database, and Node.js to build and run Hue.
 
 ## Python
 
-Hue employs some Python modules which use native code and requires certain development libraries be installed on your system. To install from the tarball, you'll need these library development packages and tools installed on your system:
+Hue uses Python modules that compile native code, so you need the Python development libraries and build tools on your system. See [OS packages](#os-packages).
 
-Versions supported:
-* Python 3.11, **3.11.18 or later** recommended (see the note below)
-```
-# If you are using Python 3.11, set PYTHON_VER before the build, like
+Supported versions:
+
+* Python 3.11 only. Python 3.11.18 or later is recommended (see the security note below).
+
+Before you build, set the Python version:
+
+```bash
 export PYTHON_VER=python3.11
-
-# Export ROOT which should point to your Hue directory
-export ROOT=<path_to_hue_directory>
 ```
 
->**Security note (eMudhra CA incident):** the compromised eMudhra (emSign) CA was removed from CA bundles such as `certifi`. The Hue build pins `certifi` to `2026.10.23`, installs `pip` 26.2.2 (older `pip` versions keep trusting the compromised CA through their vendored `certifi`) and uses `virtualenv` 21.14.13 on the build host. Python 3.11.18 additionally rejects the compromised intermediate CAs on its own. Rebuild container images without layer caching (`tools/container/build.sh` does this by default) so they pick up the latest system certificates.
+> **Security note (eMudhra CA incident):** the compromised eMudhra (emSign) CA was removed from CA bundles such as `certifi`. The Hue build pins `certifi` to `2026.10.23`, installs `pip` 26.2.2 (older `pip` versions keep trusting the compromised CA through their vendored `certifi`) and uses `virtualenv` 21.14.13 on the build host. Python 3.11.18 additionally rejects the compromised intermediate CAs on its own. Rebuild container images without layer caching (`tools/container/build.sh` does this by default) so they pick up the latest system certificates.
 
 ## Database
 
-Hue is being ran the most with [MySQL InnoDB, PostgreSQL or Oracle](https://docs.cloudera.com/documentation/enterprise/latest/topics/hue_dbs_0.html).
+Hue stores its data (users, query history, sharing permissions) in a database. It runs best with [MySQL InnoDB, MariaDB, PostgreSQL, or Oracle](/administrator/administration/database/). The embedded SQLite database is for testing only.
+
+Install the Python client library of your database in the Hue virtual environment, after `make apps` or `make install`.
 
 ### MySQL / MariaDB
 
-The client lib [MySQL-python](https://github.com/cloudera/hue/tree/master/desktop/core/ext-py/MySQL-python-1.2.5) is already included so it should work out of the box.
+Install the OS client headers (`libmysqlclient-dev` on Ubuntu), then install `mysqlclient`:
 
-**Note**
+```bash
+./build/env/bin/pip install mysqlclient
+```
 
-With the recent OSs like Ubuntu 20.04 or using Python 3, the MySQL-python lib won't compile properly and will produce an error similar to:
-
-    _mysql.c:44:10: fatal error: my_config.h: No such file or directory
-      44 | #include "my_config.h"
-          |          ^~~~~~~~~~~~~
-
-The lib folder needs to be swapped with https://pypi.org/project/mysqlclient/. Unfortunately for licensing reason (GPL vs Apache) this can't be officially done in the Hue repository.
-
-Remove and add the compatible MySql lib with these two commands:
-
-    git cherry-pick 7a9100d4a7f38eaef7bd4bd7c715ac1f24a969a8
-    git cherry-pick e67c1105b85b815346758ef1b9cd714dd91d7ea3
-
-    git clean -fdx
-
-    make apps
-
-Read [HUE-9390](https://issues.cloudera.org/browse/HUE-9390) for more details.
+The Hue Docker image uses `mysqlclient==2.2.7`. Use the `mysql` engine for both MySQL and MariaDB.
 
 ### PostgreSQL
 
-You would need the OS `python-psycopg2` or Python [psycopg2](https://pypi.org/project/psycopg2/).
+Install `psycopg2-binary`:
+
+```bash
+./build/env/bin/pip install psycopg2-binary
+```
 
 ### Oracle
 
-How to install the client lib.
+Hue ships the `cx_Oracle` 8.3.0 Python module. It needs the Oracle Instant Client libraries on the host. Download the Basic and SDK packages of the same version from [Oracle Instant Client](https://www.oracle.com/database/technologies/instant-client/downloads.html), unzip them into one directory, and make the directory available to the loader:
 
-#### Version 11
+```bash
+export ORACLE_HOME=/usr/local/share/oracle
+export LD_LIBRARY_PATH=$ORACLE_HOME
+```
 
-Download both instantclient-basic and instantclient-sdk of the same version (11.2.0.4.0 for this example) and on your ~/.bash_profile, add
+On macOS, use `DYLD_LIBRARY_PATH` instead of `LD_LIBRARY_PATH`.
 
-    export ORACLE_HOME=/usr/local/share/oracle
-    export VERSION=11.2.0.4.0
-    export ARCH=x86_64
-    export DYLD_LIBRARY_PATH=$ORACLE_HOME
-    export LD_LIBRARY_PATH=$ORACLE_HOME
+Hue sets `options={"threaded": true}` for Oracle by default. If you override `options` in the `[[database]]` section of the `hue.ini`, keep `threaded` set to `true` to avoid crashes. See [Database](/administrator/administration/database/).
 
-and then
-
-    source ~/.bash_profile
-    sudo mkdir -p $ORACLE_HOME
-    sudo chmod 775 $ORACLE_HOME
-
-then unzip the content of both downloaded zip files into the newly created $ORACLE_HOME in a way that the 'sdk' folder is at the same level with the other files and then
-
-    ln -s libclntsh.dylib.11.1 libclntsh.dylib
-    ln -s libocci.dylib.11.1 libocci.dylib
-
-and finally
-
-    cd sdk
-    unzip ottclasses.zip
-
-#### Version 12
-
-Hue comes with an older Oracle client cx_Oracle-5.2.1 Python module so it will fail. We need to do the above client install and then upgrade Hue's client module to at least cx_Oracle-5.3.
-
-Make sure you have the `python-dev` package dependencies, ensure that ORACLE_HOME and LB_LIBRARY_PATH are properly set so that pip knows which version to install, then:
-
-    echo $ORACLE_HOME $LD_LIBRARY_PATH
-
-    ./build/env/bin/pip install cx_Oracle
-
-Tip: You can also wget the proper cx_Oracle file yourself: https://pypi.python.org/pypi/cx_Oracle/.
-
-Tip: Going to where is the Oracle client, e.g. /usr/local/share/oracle then creating a symlink similar to below could even trick the cx_Oracle-5.2.1 module to work with 12.2 without doing the pip upgrade:
-
-    ln -s libclntsh.so.12.2 libclntsh.so.11.1
-
-There is more details on this [Apply Temporary Workaround for Oracle 12 Client](https://docs.cloudera.com/documentation/enterprise/latest/topics/hue_dbs_oracle_pkg.html#concept_qx3_hfw_4z).
-
-
-#### Mac
-
-* [Oracle Instant Client](https://www.oracle.com/database/technologies/instant-client/downloads.html)
-
-## OS Packages
+## OS packages
 
 ### Ubuntu
 
-    sudo apt-get install git ant gcc g++ libffi-dev libkrb5-dev libmysqlclient-dev libsasl2-dev libsasl2-modules-gssapi-mit libsqlite3-dev libssl-dev libxml2-dev libxslt-dev make maven libldap2-dev python-dev python-setuptools libgmp3-dev
+```bash
+sudo apt-get install git gcc g++ make pkg-config libffi-dev libkrb5-dev krb5-config libsasl2-dev libsasl2-modules-gssapi-mit libsqlite3-dev libssl-dev libxml2-dev libxslt-dev libldap2-dev libsnappy-dev libmysqlclient-dev python3.11 python3.11-dev python3.11-venv python3.11-distutils
+```
 
-With Python 3, also:
-
-    sudo apt-get install python3.11-dev python3-distutils
-
+On Ubuntu 22.04, `python3.11` is in the `universe` repository.
 
 ### CentOS/RHEL
 
-    sudo yum install ant asciidoc cyrus-sasl-devel cyrus-sasl-gssapi cyrus-sasl-plain gcc gcc-c++ krb5-devel libffi-devel libxml2-devel libxslt-devel make mysql mysql-devel openldap-devel python-devel sqlite-devel gmp-devel
-
-* mvn (from [``apache-maven``](https://gist.github.com/sebsto/19b99f1fa1f32cae5d00) package or maven3 tarball)
-* libtidy (for unit tests only)
-* openssl-devel (for version 7+)
+```bash
+sudo yum install cyrus-sasl-devel cyrus-sasl-gssapi cyrus-sasl-plain gcc gcc-c++ krb5-devel libffi-devel libxml2-devel libxslt-devel make mysql mysql-devel openldap-devel python3.11-devel sqlite-devel gmp-devel openssl-devel
+```
 
 ### SLES 12
 
-    zypper in ant asciidoc cyrus-sasl-devel cyrus-sasl-gssapi cyrus-sasl-plain gcc gcc-c++ krb5-devel libffi-devel libxml2-devel libxslt-devel make mysql mysql-devel openldap2-devel python-devel sqlite-devel gmp-devel
+```bash
+zypper in cyrus-sasl-devel cyrus-sasl-gssapi cyrus-sasl-plain gcc gcc-c++ krb5-devel libffi-devel libxml2-devel libxslt-devel make mysql mysql-devel openldap2-devel python311-devel sqlite-devel gmp-devel
+```
 
-Tip: if you run into building kerberos extension issue and see message `krb5-config: command not found`, install and append it to environment variable PATH.
+> **Note:** If the Kerberos extension fails to build with `krb5-config: command not found`, install `krb5-devel` and add the directory of `krb5-config` to your `PATH`:
 
-    rpm -ql krb5-devel | grep krb5-config ## find the path of krb5-config
-    export PATH=$PATH:/usr/lib/mit/bin
+```bash
+rpm -ql krb5-devel | grep krb5-config ## find the path of krb5-config
+export PATH=$PATH:/usr/lib/mit/bin
+```
 
-### MacOS
+### macOS
+
+Prerequisites:
 
 * Xcode command line tools
 * [Homebrew](https://brew.sh)
 
 #### Apple Silicon (M1, M2, M3)
 
-This is a verified step-by-step guide on how to get Hue up and running on a fresh installation of macOS, tested on Apple Silicon (M1, M2, M3).
+This step-by-step guide was tested on a fresh macOS installation on Apple Silicon.
 
-1. Clone the Hue repo
+1. Clone the Hue repository:
 
-    `git clone https://github.com/cloudera/hue.git`
-
-2. Install Homebrew (if not already installed)
-
-   `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
-
-3. Install Postgres (unless you prefer something else)
-
-   `brew install postgresql@14`
-
-4. Start Postgres
-
-   `brew services start postgresql@14`
-
-5. Create the Hue database and set permissions
-
+   ```bash
+   git clone https://github.com/cloudera/hue.git
+   cd hue
    ```
-   # Create the DB
+
+2. Install Homebrew if it is not already installed:
+
+   ```bash
+   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+   ```
+
+3. Install and start PostgreSQL (or use another database):
+
+   ```bash
+   brew install postgresql@14
+   brew services start postgresql@14
+   ```
+
+4. Create the Hue database and user:
+
+   ```bash
    createdb hue_d --lc-collate='en_US.UTF-8' -T "template0"
-   
-   # Connect to the dbms shell
    psql -s hue_d
-   
-   # Run the following lines one by one
+   ```
+
+   In the `psql` shell, run these statements one by one:
+
+   ```sql
    create user hue_u with password 'huepassword';
    grant all privileges on database hue_d to hue_u;
    \q
    ```
 
-6. Install gmp, openssl, and libffi (Note: some might be installed from Postgres)
+5. Install `gmp`, `openssl`, and `libffi`. Some of them might already be installed with PostgreSQL:
 
-   `brew install gmp openssl libffi`
+   ```bash
+   brew install gmp openssl libffi
+   ```
 
-7. Install Python, tested with the **macOS 64-bit (universal2) installer 3.11.x** direct download from python.org
-`https://www.python.org/ftp/python/3.11.9/python-3.11.9-macos11.pkg`
+6. Install Python 3.11, either with Homebrew or with the macOS installer from [python.org](https://www.python.org/downloads/macos/). The direct download from python.org is the tested option.
 
-   - For Apple Silicon (M1, M2, M3), Python 3.11 is recommended as of June 2025. You can install Python 3.11 either via Homebrew or by direct download from python.org—both options will work, but the direct download is preferred and tested.
+   > **Note:** Hue requires Python 3.11. python.org only publishes macOS installers for Python 3.11 up to 3.11.9. To get 3.11.18 or later, install Python 3.11 with Homebrew or build it from source. The Hue build upgrades `pip` and pins `certifi` either way.
 
->**Note:** Hue requires Python 3.11. Set `export PYTHON_VER=python3.11` before building and use `./build/env/bin/hue` for Hue commands. python.org only publishes macOS installers for Python 3.11 up to 3.11.9; to get 3.11.18 or later, install Python 3.11 via Homebrew or build it from source. The Hue build upgrades `pip` and pins `certifi` either way.
+7. Install Node.js 22.13 or later with `nvm` or Homebrew:
 
-8. Install node and npm (unless already present) using nvm or brew
+   ```bash
+   brew install node
+   ```
 
-   `brew install node`
+8. In the Hue directory, set the build variables and build:
 
-9. In the Hue directory run:
+   ```bash
+   export PYTHON_VER=python3.11
+   export SKIP_PYTHONDEV_CHECK=true
+   export CFLAGS="-I$(xcrun --show-sdk-path)/usr/include/sasl"
+   export LDFLAGS="-L/usr/local/opt/libffi/lib -L/usr/local/opt/openssl@1.1/lib"
+   export CPPFLAGS="-L/usr/local/opt/libffi/lib/include -L/usr/local/opt/openssl@1.1/lib/include"
+   make apps
+   ```
 
-    ```
-    export PYTHON_VER=python3.11
-    export SKIP_PYTHONDEV_CHECK=true
-    export CFLAGS="-I$(xcrun --show-sdk-path)/usr/include/sasl"
-    export LDFLAGS="-L/usr/local/opt/libffi/lib -L/usr/local/opt/openssl@1.1/lib"
-    export CPPFLAGS="-L/usr/local/opt/libffi/lib/include -L/usr/local/opt/openssl@1.1/lib/include"
-    ```
+9. Create the configuration file and set the database in the `[[database]]` section under `[desktop]` of `desktop/conf/pseudo-distributed.ini`:
 
-    Also export `ROOT` which should point to your Hue directory:
-    ```
-    export ROOT=<path_to_hue_directory>
-    ```
-    
-    Then run:
-    ```
-    make apps
-    ```
+   ```bash
+   cp desktop/conf/pseudo-distributed.ini.tmpl desktop/conf/pseudo-distributed.ini
+   ```
 
-10. Configure Hue to your liking, edit
+   ```ini
+   [[database]]
+     engine=postgresql_psycopg2
+     host=localhost
+     port=5432
+     user=hue_u
+     password=huepassword
+     name=hue_d
+   ```
 
-    `desktop/conf/pseudo-distributed.ini`
+10. Install the PostgreSQL client library in the Hue virtual environment:
 
-    According to step 5 above for Postgres, set under `[desktop]`:
-
-    ```
-    [[database]]
-      engine=postgresql_psycopg2
-      host=localhost
-      port=5432
-      user=hue_u
-      password=huepassword
-      name=hue_d
+    ```bash
+    ./build/env/bin/pip install psycopg2-binary
     ```
 
-11. If you use Postgres as configured in the previous step you'll need to add the psycopg2 lib manually
+11. Apply the database migrations:
 
-    `./build/env/bin/pip install psycopg2-binary`
-
-12. Apply migrations (if any)
-
-    ```
-    ./build/env/bin/hue makemigrations
+    ```bash
     ./build/env/bin/hue migrate
     ```
 
-13. Start Hue
+12. Start Hue:
 
-    `./build/env/bin/hue runserver`
+    ```bash
+    ./build/env/bin/hue runserver
+    ```
 
+    Open [http://localhost:8000](http://localhost:8000).
 
-#### macOS 10.14, 10.15
+If you get a `Could not find Python.h` message, make sure `SKIP_PYTHONDEV_CHECK=true` is exported.
 
-Install Dependencies via Homebrew
-
-    brew install mysql@5.7 maven gmp openssl libffi
-
-Install Xcode command line tools
-
-    sudo xcode-select --install
-
-Fix openssl errors (required for MacOS 10.11+)
-
-    export LDFLAGS=-L/usr/local/opt/openssl/lib && export CPPFLAGS=-I/usr/local/opt/openssl/include
-
-If `runserver` stops abruptly with a `"zsh: abort"` message
-
-    export DYLD_FALLBACK_LIBRARY_PATH=/usr/local/opt/openssl/lib
-
-If `runserver` stops abruptly with a `loading libcrypto in an unsafe way` message
-
-    sudo mkdir /usr/local/lib
-    # depends on your openssl version, link the following files to /usr/local/lib
-    sudo ln -s /opt/homebrew/Cellar/openssl@3/3.0.2/lib/libcrypto.3.dylib /usr/local/lib/libcrypto.dylib
-    sudo ln -s /opt/homebrew/Cellar/openssl@3/3.0.2/lib/libssl.3.dylib /usr/local/lib/libssl.dylib
-
-If you are getting `Could not find Python.h` message
-
-    export SKIP_PYTHONDEV_CHECK=true
-
-On macOS 10.15+, install an older version of openssl
-
-    brew uninstall --ignore-dependencies openssl && brew install https://github.com/tebelorg/Tump/releases/download/v1.0.0/openssl.rb
-
-Fix the possible missing Python headers message by installing the MacOS SDK headers
-
-On macOS 10.14.x
-
-    open /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg
-
-On macOS 10.15.x
-
-    sudo ln -s /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/* /usr/local/include/
-
-## NodeJs
+## Node.js
 
 Node.js 22.13 or later is required.
 
-e.g. how to install on Ubuntu:
+For example, to install it on Ubuntu:
 
-    curl -sL https://deb.nodesource.com/setup_22.x | sudo bash -
-    sudo apt-get install -y nodejs
+```bash
+curl -sL https://deb.nodesource.com/setup_22.x | sudo bash -
+sudo apt-get install -y nodejs
+```
 
-For Centos / Red Hat use this source:
+For CentOS or Red Hat, use this source:
 
-    curl -sL https://rpm.nodesource.com/setup_22.x | sudo bash -
-    sudo yum install -y nodejs
-
-Upgrade to npm 10+:
-
-    npm install --global npm
+```bash
+curl -sL https://rpm.nodesource.com/setup_22.x | sudo bash -
+sudo yum install -y nodejs
+```
 
 ## Java
 
-Optional.
+Java is optional. It is only needed for the [JDBC proxy](/developer/development/#connectors) connector, which is not built by default. Install a JDK and Maven from your OS package manager if you need it.
 
-Java is only for the [JDBC proxy](/developer/development/#connectors) connector which is not built automatically anymore.
+## Supported browsers
 
-**Install Oracle JDK**
-
-On Ubuntu 16.04 or less only:
-
-    sudo add-apt-repository ppa:webupd8team/java
-    sudo apt-get update
-    sudo apt-get install oracle-java8-installer
-
-On Centos:
-
-* [Oracle JDK](https://www.digitalocean.com/community/tutorials/how-to-install-java-on-centos-and-fedora)
-
-On Mac:
-
-    brew cask install adoptopenjdk
-
-## Supported Browsers
-
-The two latest LTS versions of each browsers:
+The two latest LTS versions of each browser:
 
 * Edge
 * Safari

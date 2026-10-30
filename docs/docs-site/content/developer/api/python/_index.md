@@ -5,197 +5,190 @@ draft: false
 weight: 3
 ---
 
-Leverage the built-in Python shell to interact with the server and the API.
+Use the Hue Python shell to run code with the server settings and database. Use it for administration tasks such as managing users and documents.
 
-    build/env/bin/hue shell
+Start the shell from your Hue installation:
 
-If using Cloudera Manager, as a *root* user launch the shell.
+```bash
+build/env/bin/hue shell
+```
 
-Export the configuration directory:
-
-    export HUE_CONF_DIR="/var/run/cloudera-scm-agent/process/`ls -alrt /var/run/cloudera-scm-agent/process | grep HUE_SERVER | tail -1 | awk '{print $9}'`"
-    echo $HUE_CONF_DIR
-    > /var/run/cloudera-scm-agent/process/2061-hue-HUE_SERVER
-
-Get the process id:
-
-    lsof -i :8888|grep -m1 hue|awk '{ print $2 }'
-    > 14850
-
-In order to export all Hue's env variables:
-
-    for line in `strings /proc/$(lsof -i :8888|grep -m1 hue|awk '{ print $2 }')/environ|egrep -v "^HOME=|^TERM=|^PWD="`;do export $line;done
-
-And finally launch the shell by:
-
-    HUE_IGNORE_PASSWORD_SCRIPT_ERRORS=1 /opt/cloudera/parcels/CDH/lib/hue/build/env/bin/hue shell
-    > ALERT: This appears to be a CM Managed environment
-    > ALERT: HUE_CONF_DIR must be set when running hue commands in CM Managed environment
-    > ALERT: Please run 'hue <command> --cm-managed'
-
+In the examples below, `user` is a Django user object, for example `User.objects.get(username='demo')`.
 
 ## Query
 
-Requires a user object:
+Run a statement and wait for it to finish. The call needs a request object with a user:
 
-    from notebook.models import make_notebook, MockRequest
+```python
+from django.contrib.auth.models import User
+from notebook.models import make_notebook, MockRequest
 
-    job = make_notebook(
-        name='List tables in Salesforce database',
-        editor_type='hive',
-        statement='SHOW TABLES',
-        status='ready',
-        database='sfdc',
-        on_success_url='assist.db.refresh'
-    )
+user = User.objects.get(username='demo')
 
-    request = MockRequest(user=user)
-    job.execute_and_wait(request)
+job = make_notebook(
+    name='List tables in the sales database',
+    editor_type='hive',
+    statement='SHOW TABLES',
+    status='ready',
+    database='sales',
+    on_success_url='assist.db.refresh'
+)
+
+request = MockRequest(user=user)
+job.execute_and_wait(request)
+```
 
 ## Storage
 
+Get a client for a storage with `get_client(name, fs, user)`. The `fs` argument is the scheme of the storage, for example `s3a` or `abfs`.
+
 ### S3
 
-Interact directly with S3 by first getting the client:
+Get the client:
 
-    from desktop.lib.fsmanager import get_client
+```python
+from desktop.lib.fsmanager import get_client
 
-    s3fs = get_client('default', 's3a', 'csso_hueuser')
+s3fs = get_client('default', 's3a', 'demo')
+```
 
-Then grab the key:
+Then get a key:
 
-    k = s3fs._get_key('s3a://gethue/')
-    k.exists()
-    s3fs.stats('s3a://gethue/user/gethue/footravel.csv').to_json_dict()
+```python
+k = s3fs._get_key('s3a://gethue/')
+k.exists()
+s3fs.stats('s3a://gethue/user/gethue/footravel.csv').to_json_dict()
+```
 
-Or perform various FS operations:
+Or run file system operations:
 
-    b = s3fs._get_bucket('gethue')
-    list(b.list(prefix='user/gethue/'))
+```python
+b = s3fs._get_bucket('gethue')
+list(b.list(prefix='user/gethue/'))
 
-    new_k = b.new_key('user/gethue/data/3')
-    new_k.set_contents_from_string('123')
+new_k = b.new_key('user/gethue/data/3')
+new_k.set_contents_from_string('123')
 
-    # new_k.delete()
-    result = new_k.bucket.delete_keys(new_k)
+# Delete the key
+result = new_k.bucket.delete_keys(new_k)
 
-    k = s3fs._get_key('s3a://gethue/user/gethue')
-
-    s3fs.listdir_stats('s3a://gethue/user/gethue')
-    s3fs.mkdir('s3a://gethue/user/gethue/demo')
+s3fs.listdir_stats('s3a://gethue/user/gethue')
+s3fs.mkdir('s3a://gethue/user/gethue/demo')
+```
 
 ### ADLS
 
+Get the client:
 
-Interact directly with ADLS by first getting the client:
+```python
+from desktop.lib.fsmanager import get_client
 
-    from desktop.lib.fsmanager import get_client
+fs = get_client('default', 'abfs', 'demo')
+```
 
-    fs = get_client('default', 'abfs', 'csso_hueuser')
+Then run file system operations:
 
-Perform various FS operations:
+```python
+# Stats
+fs.stats('abfs://data/user/demo/demo_dir')
 
-    # Stats
-    fs.stats('abfs://data/user/csso_hueuser/demo_dir')
+# List a directory
+fs.listdir('abfs://data/user/demo/demo_dir')
 
-    # List directory
-    fs.listdir('abfs://data/user/csso_hueuser/demo_dir')
+# Create a directory
+fs.mkdir('abfs://data/user/demo/new_dir')
 
-    # Create directory
-    fs.mkdir('abfs://data/user/csso_hueuser/new_dir')
+# Create a file
+fs.create('abfs://data/user/demo/demo_dir/newfile.txt')
 
-    # Create file
-    fs.create('abfs://data/user/csso_hueuser/demo_dir/newfile.txt')
+# Create a file with content
+fs.create('abfs://data/user/demo/demo_dir/demo_file.txt', data='Hello world!')
 
-    # Create file with write data
-    fs.create('abfs://data/user/csso_hueuser/demo_dir/demo_file.txt', data='Hello world!')
+# Read a file
+fs.read('abfs://data/user/demo/demo_dir/demo_file.txt')
 
-    # Read
-    fs.read('abfs://data/user/csso_hueuser/demo_dir/demo_file.txt')
+# Delete a file or an empty directory
+fs.remove('abfs://data/user/demo/demo_dir/demo_file.txt')
 
-    # Delete path (can be file or empty directory)
-    fs.remove('abfs://data/user/csso_hueuser/demo_dir/demo_file.txt')
+# Delete a directory and its content
+fs.rmtree('abfs://data/user/demo/demo_dir')
 
-    # Delete directory with recursive as true
-    fs.rmtree('abfs://data/user/csso_hueuser/demo_dir')
+# Change the permissions (octal number or string)
+fs.chmod('abfs://data/user/demo/demo_dir/demo_file.txt', permissionNumber='777')
 
-    # Chmod (accepts both octal number and string)
-    fs.chmod('abfs://data/user/csso_hueuser/demo_dir/demo_file.txt', permissionNumber='777')
+# Rename a path
+fs.rename('abfs://data/user/demo/old_name_dir', 'abfs://data/user/demo/new_name_dir')
 
-    # Rename path
-    fs.rename('abfs://data/user/csso_hueuser/old_name_dir', 'abfs://data/user/csso_hueuser/new_name_dir')
-
-    # Copy (for both file and directory)
-    fs.copy('abfs://data/user/csso_hueuser/source_path', 'abfs://data/user/csso_hueuser/destination_path')
+# Copy a file or a directory
+fs.copy('abfs://data/user/demo/source_path', 'abfs://data/user/demo/destination_path')
+```
 
 ## Users
 
-### Create
+### Create a user
 
-    from desktop.auth.backend import create_user
+```python
+from desktop.auth.backend import create_user
 
-    bob = create_user(username='bob', password='secret1', is_superuser=True)
-    alice = create_user(username='alice', password='secret2', is_superuser=False)
+bob = create_user(username='bob', password='secret1', is_superuser=True)
+alice = create_user(username='alice', password='secret2', is_superuser=False)
+```
 
-### Find or Create
+### Find or create a user
 
-    from desktop.auth.backend import find_or_create_user
+```python
+from desktop.auth.backend import find_or_create_user
 
-    bob = find_or_create_user(username='bob', password='secret1', is_superuser=True)
-    alice = find_or_create_user(username='alice', password='secret2', is_superuser=False)
+bob = find_or_create_user(username='bob', password='secret1', is_superuser=True)
+alice = find_or_create_user(username='alice', password='secret2', is_superuser=False)
+```
 
-### Convert to admin
+### Make a user an admin
 
-Then type something similar to:
+```python
+from django.contrib.auth.models import User
 
-    from django.contrib.auth.models import User
+a = User.objects.get(username='hdfs')
+a.is_staff = True
+a.is_superuser = True
+a.set_password('my_secret')
+a.save()
+```
 
-    a = User.objects.get(username='hdfs')
-    a.is_staff = True
-    a.is_superuser = True
-    a.set_password('my_secret')
-    a.save()
+### Change a password
 
-### Changing password
+```python
+from django.contrib.auth.models import User
 
-    from django.contrib.auth.models import User
+user = User.objects.get(username='example')
+user.set_password('some password')
+user.save()
+```
 
-    user = User.objects.get(username='example')
-    user.set_password('some password')
-    user.save()
+## Documents
 
-### Counting documents
+### Count the documents of a user
 
-    from django.contrib.auth.models import User
-    from desktop.models import Document2
+The `perms` argument is `both` (default), `shared` or `owned`.
 
-    user = User.objects.get(username='demo')
-    Document2.objects.documents(user=user).count()
+```python
+from django.contrib.auth.models import User
+from desktop.models import Document2
 
-    In [8]: Document2.objects.documents(user=user).count()
-    Out[8]: 1167
+user = User.objects.get(username='demo')
 
-    In [10]: Document2.objects.documents(user=user, perms='own').count()
-    Out[10]: 1166
+# Owned and shared documents
+Document2.objects.documents(user=user).count()
 
-    In [11]: Document2.objects.documents(user=user, perms='own', include_history=True).count()
-    Out[11]: 7125
+# Owned documents only
+Document2.objects.documents(user=user, perms='owned').count()
 
-    In [12]: Document2.objects.documents(user=user, perms='own', include_history=True, include_trashed=True).count()
-    Out[12]: 7638
+# Include the query history
+Document2.objects.documents(user=user, perms='owned', include_history=True).count()
 
-    In [13]: Document2.objects.documents(user=user, perms='own', include_history=True, include_trashed=True, include_managed=True).count()
-    Out[13]: 31408
+# Include the trashed documents
+Document2.objects.documents(user=user, perms='owned', include_history=True, include_trashed=True).count()
 
-    Out[14]:
-    (85667L,
-    {u'desktop.Document': 18524L,
-      u'desktop.Document2': 31409L,
-      u'desktop.Document2Permission': 556L,
-      u'desktop.Document2Permission_groups': 277L,
-      u'desktop.Document2Permission_users': 0L,
-      u'desktop.Document2_dependencies': 15087L,
-      u'desktop.DocumentPermission': 1290L,
-      u'desktop.DocumentPermission_groups': 0L,
-      u'desktop.DocumentPermission_users': 0L,
-      u'desktop.Document_tags': 18524L})
+# Include the documents managed by Hue
+Document2.objects.documents(user=user, perms='owned', include_history=True, include_trashed=True, include_managed=True).count()
+```
